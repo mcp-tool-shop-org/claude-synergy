@@ -4,7 +4,6 @@
 
 <p align="center"><img src="docs/logo.png" alt="Claude Synergy" width="480"></p>
 
-# Claude Synergy
 
 A local, queryable mirror of every Anthropic + adjacent AI dev tool changelog — plus a curated **Synergy** layer describing cross-product workflows — so the LLM agent inside the harness knows what the harness can do.
 
