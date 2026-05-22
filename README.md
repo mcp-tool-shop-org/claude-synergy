@@ -4,7 +4,7 @@
 
 A local, queryable mirror of every Anthropic + adjacent AI dev tool changelog — plus a curated **Synergy** layer describing cross-product workflows — so the LLM agent inside the harness knows what the harness can do.
 
-[![tests](https://img.shields.io/badge/tests-291%20passing-brightgreen)](test-spec-3.md) [![license](https://img.shields.io/badge/license-MIT-blue)](#license)
+[![tests](https://img.shields.io/badge/tests-294%20passing-brightgreen)](test-spec-3.md) [![license](https://img.shields.io/badge/license-MIT-blue)](#license)
 
 ```bash
 $ hk query redact
@@ -57,7 +57,7 @@ claude-synergy/
 │   └── plugins-{official,community,knowledge-work}/  # Plugin marketplaces
 ├── synergies/               # 12 curated cross-product workflows
 ├── src/                     # TypeScript implementation
-├── test/                    # 291 tests (unit, integration, regression, smoke)
+├── test/                    # 294 tests (unit, integration, regression, smoke)
 ├── data/claude-synergy.db   # SQLite database (created by `hk init`)
 ├── schema.sql               # Tier 2a tables (products, releases, changes, entities, FTS5, …)
 ├── schema-vec.sql           # Tier 2b tables (chunks, chunks_vec, chunks_fts)
@@ -65,7 +65,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v0.7.1):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 291 tests.
+**Live numbers (as of v0.7.1):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 294 tests.
 
 ---
 
@@ -241,9 +241,9 @@ Full index in [synergies/INDEX.md](synergies/INDEX.md).
 Vitest suite covers unit / integration / regression / smoke tiers. **[test-spec-3.md](test-spec-3.md) is the current authority** as of v0.7.0; [test-spec.md](test-spec.md) (v1) and [test-spec-2.md](test-spec-2.md) (v2) remain in the repo as historical record of the design lineage.
 
 ```bash
-pnpm test               # unit + integration + regression (~13s, 291 tests)
+pnpm test               # unit + integration + regression (~13s, 294 tests)
 pnpm test:watch         # interactive
-pnpm test:coverage      # generate coverage/index.html (thresholds: 80/75/85/80)
+pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 ```
 

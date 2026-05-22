@@ -2,6 +2,7 @@
 // 'aider-history' — handles aider/HISTORY.md where each release is a `### Aider vX.Y.Z` section.
 
 import { execSync } from 'node:child_process';
+import { fetchWithRetry } from './fetch-utils.js';
 
 export interface ChangelogItem {
   version: string;
@@ -9,8 +10,11 @@ export interface ChangelogItem {
   body: string;
 }
 
-export async function fetchAiderHistory(url: string, sinceIso: string): Promise<ChangelogItem[]> {
-  const res = await fetch(url, { headers: { 'user-agent': 'claude-synergy/0.1.0' } });
+export async function fetchAiderHistory(url: string, sinceIso: string, signal?: AbortSignal): Promise<ChangelogItem[]> {
+  const res = await fetchWithRetry(url, {
+    headers: { 'user-agent': 'claude-synergy/0.1.0' },
+    signal,
+  });
   if (!res.ok) throw new Error(`raw-changelog ${url} returned ${res.status}`);
   const md = await res.text();
 

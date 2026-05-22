@@ -2,6 +2,7 @@
 // Each target picks an `htmlParser` and gets a dedicated parser function below.
 
 import * as cheerio from 'cheerio';
+import { fetchWithRetry } from './fetch-utils.js';
 
 export interface HtmlItem {
   slug: string;
@@ -17,7 +18,7 @@ const UA = { 'user-agent': 'claude-synergy/0.1.0' };
 // Source: https://github.blog/changelog/label/copilot/
 // Listing page links to /changelog/YYYY-MM-DD-slug/ permalinks.
 
-export async function fetchGithubCopilotBlog(sinceIso: string): Promise<HtmlItem[]> {
+export async function fetchGithubCopilotBlog(sinceIso: string, signal?: AbortSignal): Promise<HtmlItem[]> {
   const baseUrl = 'https://github.blog/changelog/label/copilot/';
 
   // Listing pages — fetch up to 3 (covers ~60-90 entries; plenty for daily sync)
@@ -25,7 +26,7 @@ export async function fetchGithubCopilotBlog(sinceIso: string): Promise<HtmlItem
   for (let page = 1; page <= 3; page++) {
     const url = page === 1 ? baseUrl : `${baseUrl}page/${page}/`;
     try {
-      const res = await fetch(url, { headers: UA });
+      const res = await fetchWithRetry(url, { headers: UA, signal });
       if (!res.ok) break;
       const html = await res.text();
       const $ = cheerio.load(html);
@@ -50,7 +51,7 @@ export async function fetchGithubCopilotBlog(sinceIso: string): Promise<HtmlItem
     if (pubDate <= sinceIso) continue;
 
     try {
-      const res = await fetch(url, { headers: UA });
+      const res = await fetchWithRetry(url, { headers: UA, signal });
       if (!res.ok) continue;
       const html = await res.text();
       const $ = cheerio.load(html);
@@ -83,9 +84,9 @@ export async function fetchGithubCopilotBlog(sinceIso: string): Promise<HtmlItem
 //
 // This parser tries (2), and on failure logs a hint pointing at the playwright path.
 
-export async function fetchWindsurfChangelog(sinceIso: string): Promise<HtmlItem[]> {
+export async function fetchWindsurfChangelog(sinceIso: string, signal?: AbortSignal): Promise<HtmlItem[]> {
   const url = 'https://windsurf.com/changelog';
-  const res = await fetch(url, { headers: UA });
+  const res = await fetchWithRetry(url, { headers: UA, signal });
   if (!res.ok) throw new Error(`Windsurf ${res.status}`);
   const html = await res.text();
   const $ = cheerio.load(html);
@@ -226,7 +227,7 @@ function parseVscodeReleaseDate(html: string, $: cheerio.CheerioAPI): string | n
   return null;
 }
 
-export async function fetchVscodeUpdates(sinceIso: string): Promise<HtmlItem[]> {
+export async function fetchVscodeUpdates(sinceIso: string, signal?: AbortSignal): Promise<HtmlItem[]> {
   const items: HtmlItem[] = [];
   for (const [vStr, [year, monthIdx]] of Object.entries(VSCODE_V_TO_MONTH)) {
     const v = parseInt(vStr, 10);
@@ -244,7 +245,7 @@ export async function fetchVscodeUpdates(sinceIso: string): Promise<HtmlItem[]> 
     if (fallbackPlus31d <= sinceIso) continue;
 
     try {
-      const res = await fetch(url, { headers: UA });
+      const res = await fetchWithRetry(url, { headers: UA, signal, maxRetries: 1 });
       if (res.status === 404) continue;
       if (!res.ok) continue;
       const html = await res.text();
@@ -285,13 +286,13 @@ export async function fetchVscodeUpdates(sinceIso: string): Promise<HtmlItem[]> 
 
 export type HtmlParserName = 'github-copilot-blog' | 'windsurf-changelog' | 'vscode-updates';
 
-export async function fetchHtmlReleases(parser: HtmlParserName, sinceIso: string): Promise<HtmlItem[]> {
+export async function fetchHtmlReleases(parser: HtmlParserName, sinceIso: string, signal?: AbortSignal): Promise<HtmlItem[]> {
   switch (parser) {
     case 'github-copilot-blog':
-      return fetchGithubCopilotBlog(sinceIso);
+      return fetchGithubCopilotBlog(sinceIso, signal);
     case 'windsurf-changelog':
-      return fetchWindsurfChangelog(sinceIso);
+      return fetchWindsurfChangelog(sinceIso, signal);
     case 'vscode-updates':
-      return fetchVscodeUpdates(sinceIso);
+      return fetchVscodeUpdates(sinceIso, signal);
   }
 }

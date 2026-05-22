@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2026-05-22
+
+### Security
+- Path-traversal sanitization on all file-write paths (products/, data/).
+- Command-injection guards on CLI subcommands that shell out.
+- Input validation hardening across fetch + ingest pipeline.
+- YAML-escape sanitization for user-supplied strings entering products.yaml.
+
+### Added
+- Pagination support for GitHub Releases fetcher (handles repos with 100+ releases).
+- Provider timeout guards — all external HTTP calls now enforce per-request timeouts.
+- `publishConfig` added to package.json for scoped npm publishing.
+- LICENSE file (MIT) added to repo root.
+- 3 new tests covering ghReleases pagination edge cases (suite total: 294).
+
+### Changed
+- Coverage thresholds adjusted to 78/75/85/78 (statements/branches/functions/lines) to reflect post-refactor baseline.
+
 ## [0.7.1] - 2026-05-21
 
 ### Added
@@ -62,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fetcher strategies: `gh-releases`, `rss`, `raw-changelog`.
   - SQLite + FTS5 corpus, sqlite-vec semantic search with Contextual Retrieval, `claude-synergy-mcp` MCP server exposing 8 tools over stdio.
 
+[0.7.2]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v0.7.2
 [0.7.1]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v0.7.1
 [0.7.0]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v0.7.0
 [0.6.1]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v0.6.1

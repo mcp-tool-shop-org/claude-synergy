@@ -8,6 +8,7 @@
 
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { fetchWithRetry } from './fetch-utils.js';
 
 export interface CatalogEntry {
   /** Stable filesystem-safe slug */
@@ -59,7 +60,7 @@ interface OfficialResponse {
  * Fetch the Official MCP Registry. Paginates via cursor; returns latest-version entries only
  * (the registry exposes one row per version, so we dedupe by name keeping isLatest=true).
  */
-export async function fetchOfficialMcpRegistry(opts: { maxPages?: number } = {}): Promise<CatalogEntry[]> {
+export async function fetchOfficialMcpRegistry(opts: { maxPages?: number; signal?: AbortSignal } = {}): Promise<CatalogEntry[]> {
   const maxPages = opts.maxPages ?? 50;
   const limit = 100;
   let cursor: string | undefined;
@@ -67,7 +68,7 @@ export async function fetchOfficialMcpRegistry(opts: { maxPages?: number } = {})
 
   for (let page = 0; page < maxPages; page++) {
     const url = `https://registry.modelcontextprotocol.io/v0/servers?limit=${limit}${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`;
-    const res = await fetch(url, { headers: UA });
+    const res = await fetchWithRetry(url, { headers: UA, signal: opts.signal });
     if (!res.ok) throw new Error(`Official MCP Registry ${res.status}`);
     const json = (await res.json()) as OfficialResponse;
     if (!Array.isArray(json.servers)) break;
@@ -131,7 +132,7 @@ interface SmitheryResponse {
  * Fetch the Smithery Registry. Page-numbered pagination.
  * Smithery has thousands of servers; `maxEntries` caps the pull (default 200, top by useCount).
  */
-export async function fetchSmitheryRegistry(opts: { maxEntries?: number; pageSize?: number } = {}): Promise<CatalogEntry[]> {
+export async function fetchSmitheryRegistry(opts: { maxEntries?: number; pageSize?: number; signal?: AbortSignal } = {}): Promise<CatalogEntry[]> {
   const pageSize = opts.pageSize ?? 100;
   const maxEntries = opts.maxEntries ?? 200;
   const out: CatalogEntry[] = [];
@@ -139,7 +140,7 @@ export async function fetchSmitheryRegistry(opts: { maxEntries?: number; pageSiz
 
   while (out.length < maxEntries) {
     const url = `https://registry.smithery.ai/servers?page=${page}&pageSize=${pageSize}`;
-    const res = await fetch(url, { headers: UA });
+    const res = await fetchWithRetry(url, { headers: UA, signal: opts.signal });
     if (!res.ok) throw new Error(`Smithery Registry ${res.status}`);
     const json = (await res.json()) as SmitheryResponse;
     if (!Array.isArray(json.servers) || json.servers.length === 0) break;
@@ -225,12 +226,12 @@ export type CatalogType = 'official-mcp-registry' | 'smithery';
 
 export async function fetchCatalog(
   catalogType: CatalogType,
-  opts: { maxEntries?: number; maxPages?: number } = {}
+  opts: { maxEntries?: number; maxPages?: number; signal?: AbortSignal } = {}
 ): Promise<CatalogEntry[]> {
   switch (catalogType) {
     case 'official-mcp-registry':
-      return fetchOfficialMcpRegistry({ maxPages: opts.maxPages });
+      return fetchOfficialMcpRegistry({ maxPages: opts.maxPages, signal: opts.signal });
     case 'smithery':
-      return fetchSmitheryRegistry({ maxEntries: opts.maxEntries });
+      return fetchSmitheryRegistry({ maxEntries: opts.maxEntries, signal: opts.signal });
   }
 }

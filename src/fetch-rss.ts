@@ -2,6 +2,7 @@
 // Returns structured items; caller decides what to do with them.
 
 import { XMLParser } from 'fast-xml-parser';
+import { fetchWithRetry } from './fetch-utils.js';
 
 export interface RssItem {
   /** Stable filesystem-safe slug (derived from guid or pubDate) */
@@ -17,9 +18,13 @@ export interface RssItem {
 export async function fetchRssReleases(
   url: string,
   sinceIso: string,
-  titleFilter?: RegExp
+  titleFilter?: RegExp,
+  signal?: AbortSignal
 ): Promise<RssItem[]> {
-  const res = await fetch(url, { headers: { 'user-agent': 'claude-synergy/0.1.0' } });
+  const res = await fetchWithRetry(url, {
+    headers: { 'user-agent': 'claude-synergy/0.1.0' },
+    signal,
+  });
   if (!res.ok) throw new Error(`RSS ${url} returned ${res.status}`);
   const xml = await res.text();
 

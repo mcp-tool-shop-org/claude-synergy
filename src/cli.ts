@@ -9,6 +9,25 @@ import { searchChanges, lookupEntity, recentReleases, listProducts, entityFreque
 import { embedAll } from './embed.js';
 import { hybridSearch } from './hybrid.js';
 import { fetchAll, listFetchTargets, seedMarkersFromDb } from './fetch.js';
+import type Database from 'better-sqlite3';
+
+// ── Graceful shutdown ────────────────────────────────────────────────────────
+// Track the active DB handle so signal handlers can close it before exit,
+// preventing SQLite WAL corruption on Ctrl-C during long-running commands.
+let activeDb: Database.Database | null = null;
+
+function shutdown(signal: string): void {
+  if (activeDb) {
+    try { activeDb.close(); } catch { /* best-effort */ }
+    activeDb = null;
+  }
+  // 128 + signal number is the POSIX convention (SIGINT=2, SIGTERM=15)
+  const code = signal === 'SIGINT' ? 130 : 143;
+  process.exit(code);
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
 
 const cwd = process.cwd();
 const DEFAULT_DB = join(cwd, 'data', 'claude-synergy.db');
@@ -33,6 +52,13 @@ function intOpt(name: string, raw: string | undefined, defaultValue: number, min
   return n;
 }
 
+/** Open a DB handle and register it for graceful signal-handler cleanup. */
+function openTrackedDb(path: string): Database.Database {
+  const db = openDb(path);
+  activeDb = db;
+  return db;
+}
+
 const CONTEXT_PROVIDERS = ['none', 'structured', 'ollama', 'claude-haiku'] as const;
 const EMBED_PROVIDERS = ['ollama', 'voyage'] as const;
 const RERANK_PROVIDERS = ['none', 'ollama-judge', 'voyage', 'cohere'] as const;
@@ -52,7 +78,7 @@ program
   .description('Create the database file with the current schema')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((opts: { db: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     initSchema(db);
     console.log(`✓ initialized ${resolve(opts.db)}`);
     db.close();
@@ -68,7 +94,7 @@ program
       console.error(`✗ products dir not found: ${opts.products}`);
       process.exit(1);
     }
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     initSchema(db);
     const start = Date.now();
     const stats = ingestAll(db, opts.products);
@@ -99,7 +125,7 @@ program
     if (process.env.HK_DEBUG) {
       console.error(`[debug] text=${JSON.stringify(text)} opts=${JSON.stringify(opts)}`);
     }
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     const q = text;
     let results;
     try {
@@ -133,7 +159,7 @@ program
   .description('Find when an env var was introduced or last changed')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((name: string, opts: { db: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     const results = lookupEntity(db, 'env_var', name);
     printEntityResults(name, 'env var', results);
     db.close();
@@ -144,7 +170,7 @@ program
   .description('Find a slash command\'s history')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((slash: string, opts: { db: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     const normalized = slash.startsWith('/') ? slash : '/' + slash;
     const results = lookupEntity(db, 'slash_command', normalized);
     printEntityResults(normalized, 'slash command', results);
@@ -156,7 +182,7 @@ program
   .description('Find a Claude model ID\'s history (deprecations, launches)')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((id: string, opts: { db: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     const results = lookupEntity(db, 'model_id', id);
     printEntityResults(id, 'model id', results);
     db.close();
@@ -167,7 +193,7 @@ program
   .description('Find releases mentioning a specific CVE')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((id: string, opts: { db: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     const results = lookupEntity(db, 'cve', id);
     printEntityResults(id, 'CVE', results);
     db.close();
@@ -178,7 +204,7 @@ program
   .description('Seed fetch markers from the current DB state (run once after study-swarm to enable incremental fetch)')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((opts: { db: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     initSchema(db);
     const results = seedMarkersFromDb(db);
     for (const r of results) {
@@ -196,7 +222,7 @@ program
   .option('-p, --product <name>', 'limit to one product')
   .option('--since <iso>', 'override the stored marker (YYYY-MM-DD or full ISO)')
   .action(async (opts: { db: string; productsRoot: string; product?: string; since?: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     initSchema(db);
     try {
       const stats = await fetchAll(db, opts.productsRoot, {
@@ -242,7 +268,7 @@ program
       context: ContextProviderName;
       embedProvider: EmbedProviderName;
     }) => {
-      const db = openDb(opts.db);
+      const db = openTrackedDb(opts.db);
       initSchema(db);
       const t0 = Date.now();
       try {
@@ -303,7 +329,7 @@ program
       batchSize: string;
       force?: boolean;
     }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     try {
       const stats = await embedAll(db, {
         contextProviderName: opts.context,
@@ -365,7 +391,7 @@ program
         rerankCandidates: string;
       }
     ) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     try {
       const t0 = Date.now();
       const results = await hybridSearch(db, text, {
@@ -409,7 +435,7 @@ program
   .option('-p, --product <name>', 'limit to one product')
   .option('-l, --limit <n>', 'max results', '20')
   .action((opts: { db: string; product?: string; limit: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     const releases = recentReleases(db, opts.product, intOpt('limit', opts.limit, 20));
     for (const r of releases) {
       console.log(`${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
@@ -422,7 +448,7 @@ program
   .description('List all products in the DB with release counts')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((opts: { db: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     const products = listProducts(db);
     console.log('Product                              Releases  Latest');
     console.log('───────────────────────────────────  ────────  ──────────────────');
@@ -439,7 +465,7 @@ program
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .option('-l, --limit <n>', 'max results', '30')
   .action((entityType: string, opts: { db: string; limit: string }) => {
-    const db = openDb(opts.db);
+    const db = openTrackedDb(opts.db);
     const results = entityFrequency(db, entityType, intOpt('limit', opts.limit, 30));
     if (results.length === 0) {
       console.log(`(no entities of type "${entityType}")`);
@@ -463,4 +489,11 @@ function printEntityResults(name: string, label: string, results: ReturnType<typ
   }
 }
 
-program.parseAsync(process.argv);
+program.parseAsync(process.argv).catch((e: Error) => {
+  console.error(`fatal: ${e.message}`);
+  if (activeDb) {
+    try { activeDb.close(); } catch { /* best-effort */ }
+    activeDb = null;
+  }
+  process.exitCode = 2;
+});

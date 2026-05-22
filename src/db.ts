@@ -6,6 +6,15 @@ import * as sqliteVec from 'sqlite-vec';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Current schema version. Increment when schema changes require migration.
+ *
+ * Version history:
+ *   1 — Initial schema (products, releases, changes, entities, FTS5, markers, relevance, synergies)
+ *   2 — Added schema_version tracking (this version)
+ */
+export const SCHEMA_VERSION = 2;
+
 export function openDb(path: string, opts: { loadVec?: boolean } = {}): Database.Database {
   const abs = resolve(path);
   mkdirSync(dirname(abs), { recursive: true });
@@ -36,10 +45,74 @@ export function initSchema(db: Database.Database, schemaPath?: string): void {
   const existing = db
     .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='products'`)
     .get();
-  if (existing) return;
+  if (existing) {
+    // Schema exists — ensure version marker is present and run migrations if needed
+    ensureSchemaVersion(db);
+    return;
+  }
   const resolved = schemaPath ?? resolveSchemaPath();
   const sql = readFileSync(resolved, 'utf-8');
   db.exec(sql);
+  // Stamp the new database with the current schema version
+  ensureSchemaVersion(db);
+}
+
+/**
+ * Ensure the schema_meta table exists and the version marker is set.
+ * If the DB is at an older version, migrations run here (future-proofing).
+ */
+function ensureSchemaVersion(db: Database.Database): void {
+  // Create the version tracking table if it doesn't exist
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS schema_meta (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+
+  const row = db
+    .prepare(`SELECT value FROM schema_meta WHERE key = 'schema_version'`)
+    .get() as { value: string } | undefined;
+
+  const currentVersion = row ? parseInt(row.value, 10) : 0;
+
+  if (currentVersion < SCHEMA_VERSION) {
+    // Run migrations for each version step
+    migrateSchema(db, currentVersion, SCHEMA_VERSION);
+
+    // Stamp the version
+    db.prepare(`
+      INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_version', @version)
+    `).run({ version: String(SCHEMA_VERSION) });
+  }
+}
+
+/**
+ * Run schema migrations from `fromVersion` to `toVersion`.
+ * Each migration is additive (no destructive changes without explicit user action).
+ */
+function migrateSchema(db: Database.Database, fromVersion: number, toVersion: number): void {
+  // Migration 0 → 1: no-op (initial schema already applied by initSchema)
+  // Migration 1 → 2: just the schema_meta table (created above)
+  // Future migrations go here as `if (fromVersion < N) { ... }`
+  void db;
+  void fromVersion;
+  void toVersion;
+}
+
+/**
+ * Get the current schema version of a database. Returns 0 if no version marker exists.
+ */
+export function getSchemaVersion(db: Database.Database): number {
+  try {
+    const row = db
+      .prepare(`SELECT value FROM schema_meta WHERE key = 'schema_version'`)
+      .get() as { value: string } | undefined;
+    return row ? parseInt(row.value, 10) : 0;
+  } catch {
+    // Table doesn't exist yet
+    return 0;
+  }
 }
 
 function resolveSchemaPath(): string {

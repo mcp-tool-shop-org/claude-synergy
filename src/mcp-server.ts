@@ -255,27 +255,41 @@ function optEnum<T extends string>(
   return v as T;
 }
 
+// ── Server-level timeout ─────────────────────────────────────────────────────
+// Prevents a hung embedding provider from blocking the entire MCP server.
+const SEARCH_TIMEOUT_MS = 30_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new McpError(ErrorCode.InternalError, message)), ms);
+    promise.then(
+      (val) => { clearTimeout(timer); resolve(val); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+}
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
   try {
     switch (name) {
       case 'search': {
         const r = asRecord(args, 'search');
+        const searchResult = await withTimeout(
+          handleSearch({
+            query: requireString(r, 'query', 'search'),
+            mode: optEnum<'hybrid' | 'fts'>(r, 'mode', SEARCH_MODES, 'search'),
+            product: optString(r, 'product', 'search'),
+            since: optString(r, 'since', 'search'),
+            kind: optString(r, 'kind', 'search'),
+            rerank: optEnum<'none' | 'ollama-judge'>(r, 'rerank', RERANK_MODES, 'search'),
+            limit: optInt(r, 'limit', 'search'),
+          }),
+          SEARCH_TIMEOUT_MS,
+          'search timed out (30s) — is the embedding provider (Ollama) running?',
+        );
         return {
-          content: [
-            {
-              type: 'text',
-              text: await handleSearch({
-                query: requireString(r, 'query', 'search'),
-                mode: optEnum<'hybrid' | 'fts'>(r, 'mode', SEARCH_MODES, 'search'),
-                product: optString(r, 'product', 'search'),
-                since: optString(r, 'since', 'search'),
-                kind: optString(r, 'kind', 'search'),
-                rerank: optEnum<'none' | 'ollama-judge'>(r, 'rerank', RERANK_MODES, 'search'),
-                limit: optInt(r, 'limit', 'search'),
-              }),
-            },
-          ],
+          content: [{ type: 'text', text: searchResult }],
         };
       }
       case 'lookup_entity': {
@@ -544,6 +558,17 @@ function handleReadSynergy(args: { name: string }): string {
   }
   return `(synergy not found: ${args.name})`;
 }
+
+// ── Graceful shutdown ────────────────────────────────────────────────────────
+// Close DB and exit cleanly on signals or MCP transport disconnect.
+function shutdownMcp(): void {
+  try { db.close(); } catch { /* best-effort */ }
+  process.exit(0);
+}
+
+server.onclose = shutdownMcp;
+process.on('SIGINT', shutdownMcp);
+process.on('SIGTERM', shutdownMcp);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

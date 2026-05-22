@@ -12,6 +12,7 @@ import { fetchAiderHistory } from './fetch-changelog.js';
 import { fetchHtmlReleases, type HtmlParserName, type HtmlItem } from './fetch-html.js';
 import { fetchCatalog, writeCatalog, type CatalogType } from './fetch-mcp-registry.js';
 import { loadProductsConfig } from './products-config.js';
+import { createFetchAllController, DEFAULT_FETCH_ALL_TIMEOUT_MS } from './fetch-utils.js';
 
 // ─── Security helpers ──────────────────────────────────────────────────────
 //
@@ -155,16 +156,36 @@ export interface FetchStats {
 export async function fetchAll(
   db: Database.Database,
   productsRoot: string,
-  opts: { product?: string; sinceOverride?: string } = {}
+  opts: { product?: string; sinceOverride?: string; timeoutMs?: number } = {}
 ): Promise<FetchStats[]> {
   const targets = opts.product ? TARGETS.filter((t) => t.product === opts.product) : TARGETS;
   if (targets.length === 0) {
     throw new Error(`unknown product: ${opts.product} (available: ${TARGETS.map((t) => t.product).join(', ')})`);
   }
 
+  // H-2: Global timeout for the entire fetchAll run. Propagates AbortSignal to all
+  // individual fetches so they bail if the parent is cancelled (timeout or SIGINT).
+  const globalTimeoutMs = opts.timeoutMs ?? DEFAULT_FETCH_ALL_TIMEOUT_MS;
+  const { controller, signal } = createFetchAllController(globalTimeoutMs);
+
   const results: FetchStats[] = [];
-  for (const target of targets) {
-    results.push(await fetchOne(db, productsRoot, target, opts.sinceOverride));
+  try {
+    for (const target of targets) {
+      if (signal.aborted) {
+        results.push({
+          product: target.product,
+          fetched: 0,
+          newSince: opts.sinceOverride ?? '',
+          latest: null,
+          errors: ['skipped: global timeout exceeded'],
+        });
+        continue;
+      }
+      results.push(await fetchOne(db, productsRoot, target, opts.sinceOverride, signal));
+    }
+  } finally {
+    // Clean up the global timeout timer
+    controller.abort();
   }
   return results;
 }
@@ -173,7 +194,8 @@ async function fetchOne(
   db: Database.Database,
   productsRoot: string,
   target: FetchTarget,
-  sinceOverride?: string
+  sinceOverride?: string,
+  signal?: AbortSignal
 ): Promise<FetchStats> {
   // F-004: validate product name shape before joining into a path. Defense-in-depth
   // against a malformed products.yaml entry or hardcoded fallback typo.
@@ -188,13 +210,13 @@ async function fetchOne(
       case 'gh-releases':
         return await fetchGhReleases(db, outDir, target, since);
       case 'rss':
-        return await fetchRss(db, outDir, target, since);
+        return await fetchRss(db, outDir, target, since, signal);
       case 'raw-changelog':
-        return await fetchRawChangelog(db, outDir, target, since);
+        return await fetchRawChangelog(db, outDir, target, since, signal);
       case 'html-scrape':
-        return await fetchHtmlScrape(db, outDir, target, since);
+        return await fetchHtmlScrape(db, outDir, target, since, signal);
       case 'catalog':
-        return await fetchCatalogStrategy(db, productsRoot, target, since);
+        return await fetchCatalogStrategy(db, productsRoot, target, since, signal);
       case 'playwright':
         return await fetchPlaywrightStrategy(db, outDir, target, since);
     }
@@ -360,11 +382,12 @@ async function fetchRss(
   db: Database.Database,
   outDir: string,
   target: FetchTarget,
-  since: string
+  since: string,
+  signal?: AbortSignal
 ): Promise<FetchStats> {
   if (!target.rssUrl) throw new Error(`${target.product}: rss strategy requires rssUrl`);
 
-  const items = await fetchRssReleases(target.rssUrl, since, target.rssTitleFilter);
+  const items = await fetchRssReleases(target.rssUrl, since, target.rssTitleFilter, signal);
   let latest: string | null = null;
   let fetched = 0;
   const errors: string[] = [];
@@ -414,14 +437,15 @@ async function fetchRawChangelog(
   db: Database.Database,
   outDir: string,
   target: FetchTarget,
-  since: string
+  since: string,
+  signal?: AbortSignal
 ): Promise<FetchStats> {
   if (!target.rawChangelogUrl) throw new Error(`${target.product}: raw-changelog requires url`);
   if (target.rawChangelogParser !== 'aider-history') {
     throw new Error(`${target.product}: unsupported parser ${target.rawChangelogParser}`);
   }
 
-  const items = await fetchAiderHistory(target.rawChangelogUrl, since);
+  const items = await fetchAiderHistory(target.rawChangelogUrl, since, signal);
   let latest: string | null = null;
   let fetched = 0;
   const errors: string[] = [];
@@ -469,11 +493,12 @@ async function fetchHtmlScrape(
   db: Database.Database,
   outDir: string,
   target: FetchTarget,
-  since: string
+  since: string,
+  signal?: AbortSignal
 ): Promise<FetchStats> {
   if (!target.htmlParser) throw new Error(`${target.product}: html-scrape requires htmlParser`);
 
-  const items = await fetchHtmlReleases(target.htmlParser, since);
+  const items = await fetchHtmlReleases(target.htmlParser, since, signal);
   let latest: string | null = null;
   let fetched = 0;
   const errors: string[] = [];
@@ -576,11 +601,12 @@ async function fetchCatalogStrategy(
   db: Database.Database,
   productsRoot: string,
   target: FetchTarget,
-  since: string
+  since: string,
+  signal?: AbortSignal
 ): Promise<FetchStats> {
   if (!target.catalogType) throw new Error(`${target.product}: catalog requires catalogType`);
 
-  const entries = await fetchCatalog(target.catalogType, { maxEntries: target.catalogMaxEntries });
+  const entries = await fetchCatalog(target.catalogType, { maxEntries: target.catalogMaxEntries, signal });
   const productDir = resolve(productsRoot, target.product);
   writeCatalog(productDir, target.product, entries);
 

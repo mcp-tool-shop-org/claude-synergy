@@ -145,7 +145,7 @@ describe('fetchOfficialMcpRegistry', () => {
         response: () => errorResponse(500, 'oops'),
       },
     ]);
-    await expect(fetchOfficialMcpRegistry()).rejects.toThrow(/Official MCP Registry 500/);
+    await expect(fetchOfficialMcpRegistry()).rejects.toThrow(/HTTP 500.*registry\.modelcontextprotocol/);
   });
 
   it('empty servers array returns []', async () => {
@@ -256,7 +256,7 @@ describe('fetchSmitheryRegistry', () => {
         response: () => errorResponse(503, 'oops'),
       },
     ]);
-    await expect(fetchSmitheryRegistry()).rejects.toThrow(/Smithery Registry 503/);
+    await expect(fetchSmitheryRegistry()).rejects.toThrow(/HTTP 503.*registry\.smithery/);
   });
 
   it('empty response terminates without infinite loop', async () => {

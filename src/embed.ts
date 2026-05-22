@@ -19,6 +19,33 @@ export interface EmbedOptions {
   limit?: number;
   batchSize?: number;
   force?: boolean;
+  /** AbortSignal for cancellation. When aborted, the current batch completes but no further batches are processed. */
+  signal?: AbortSignal;
+  /** Maximum number of API requests before stopping. Budget guard for paid providers. */
+  maxRequests?: number;
+  /** Maximum tokens before stopping. Budget guard for paid providers. */
+  maxTokens?: number;
+  /** Progress callback invoked after each batch completes. */
+  onProgress?: (progress: EmbedProgress) => void;
+}
+
+export interface EmbedProgress {
+  /** Batches completed so far. */
+  batchesCompleted: number;
+  /** Total batches planned. */
+  batchesTotal: number;
+  /** Chunks embedded so far. */
+  chunksCompleted: number;
+  /** Total chunks pending. */
+  chunksTotal: number;
+}
+
+/** Usage tracking for paid embedding providers. */
+export interface EmbedUsage {
+  /** Total API requests made to the embedding provider. */
+  requests: number;
+  /** Total tokens consumed (as reported by the provider). */
+  tokens: number;
 }
 
 export interface EmbedStats {
@@ -29,6 +56,12 @@ export interface EmbedStats {
   contextMs: number;
   embedMs: number;
   totalMs: number;
+  /** Usage stats from the embedding provider (tokens, requests). Populated for paid providers. */
+  usage?: EmbedUsage;
+  /** Whether the run was stopped early due to cancellation or budget. */
+  stoppedEarly?: boolean;
+  /** Reason for early stop: 'cancelled' | 'budget_requests' | 'budget_tokens'. */
+  stopReason?: 'cancelled' | 'budget_requests' | 'budget_tokens';
 }
 
 export function initVecSchema(db: Database.Database): void {
@@ -140,15 +173,18 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
       siblings,
     };
     for (const chunk of siblings) {
+      // Check abort before context generation
+      if (opts.signal?.aborted) break;
       const t0 = Date.now();
       const ctxPrefix = await ctx.contextFor(chunk, release);
       contextMs += Date.now() - t0;
       contextsByChange.set(chunk.changeId, ctxPrefix);
       allChunks.push(chunk);
     }
+    if (opts.signal?.aborted) break;
   }
 
-  // Batch-embed
+  // Batch-embed with checkpoint support
   const batchSize = opts.batchSize ?? 64;
   const insertChunk = db.prepare(`
     INSERT OR REPLACE INTO chunks
@@ -161,7 +197,36 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
   const insertVec = db.prepare(`INSERT INTO chunks_vec(rowid, embedding) VALUES (?, ?)`);
 
   let created = 0;
+  let stoppedEarly = false;
+  let stopReason: 'cancelled' | 'budget_requests' | 'budget_tokens' | undefined;
+
+  // Usage tracking
+  const usage: EmbedUsage = { requests: 0, tokens: 0 };
+
+  const totalBatches = Math.ceil(allChunks.length / batchSize);
+
   for (let i = 0; i < allChunks.length; i += batchSize) {
+    // Check cancellation before each batch
+    if (opts.signal?.aborted) {
+      stoppedEarly = true;
+      stopReason = 'cancelled';
+      break;
+    }
+
+    // Budget guard: check request limit
+    if (opts.maxRequests !== undefined && usage.requests >= opts.maxRequests) {
+      stoppedEarly = true;
+      stopReason = 'budget_requests';
+      break;
+    }
+
+    // Budget guard: check token limit
+    if (opts.maxTokens !== undefined && usage.tokens >= opts.maxTokens) {
+      stoppedEarly = true;
+      stopReason = 'budget_tokens';
+      break;
+    }
+
     const batch = allChunks.slice(i, i + batchSize);
     const texts = batch.map((c) => {
       const prefix = contextsByChange.get(c.changeId) ?? '';
@@ -170,6 +235,15 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
     const t0 = Date.now();
     const vectors = await emb.embed(texts);
     embedMs += Date.now() - t0;
+
+    // Track usage from provider instance
+    usage.requests++;
+    if ('usage' in emb) {
+      const provUsage = (emb as any).usage;
+      if (provUsage && typeof provUsage.tokens === 'number') {
+        usage.tokens = provUsage.tokens;
+      }
+    }
 
     const tx = db.transaction(() => {
       for (let j = 0; j < batch.length; j++) {
@@ -196,9 +270,19 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
       }
     });
     tx();
+
+    // Progress callback
+    if (opts.onProgress) {
+      opts.onProgress({
+        batchesCompleted: Math.floor(i / batchSize) + 1,
+        batchesTotal: totalBatches,
+        chunksCompleted: created,
+        chunksTotal: allChunks.length,
+      });
+    }
   }
 
-  return {
+  const stats: EmbedStats = {
     contextProvider: ctx.name,
     embeddingProvider: `${emb.name}:${emb.model}`,
     chunksCreated: created,
@@ -207,6 +291,19 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
     embedMs,
     totalMs: Date.now() - startTotal,
   };
+
+  // Attach usage if any API calls were made
+  if (usage.requests > 0) {
+    stats.usage = usage;
+  }
+
+  // Attach early-stop info
+  if (stoppedEarly) {
+    stats.stoppedEarly = true;
+    stats.stopReason = stopReason;
+  }
+
+  return stats;
 }
 
 function makeContextProvider(name: string): ContextProvider {
