@@ -28,13 +28,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Empty-state guidance — helpful messages when DB is empty or query returns zero results.
 - CONTRIBUTING.md — guide for adding products, running tests, and submitting PRs.
 - Troubleshooting section in README (database locks, sqlite-vec load, fetch errors, schema mismatch).
-- 48 new tests covering proactive health, behavioral humanization, and visual polish (suite total: 342).
+- 88 new tests covering proactive health, behavioral humanization, visual polish, and feature pass (suite total: 382).
+- `exports` field in package.json for programmatic import resolution.
+- `prepublishOnly` build guard — prevents shipping empty `dist/`.
+- `fetchWithRetry` test suite (25 tests: retry, backoff, timeout, Retry-After, AbortSignal, GitHub rate-limit enrichment).
+- `--json` output mode integration tests (5 tests: query, latest, products, top, env-var).
+- Embed budget guard tests (10 tests: maxRequests, maxTokens, signal cancellation, partial-commit consistency).
 
 ### Changed
-- Coverage thresholds adjusted to 78/75/85/78 (statements/branches/functions/lines) to reflect post-refactor baseline.
-- Test count 294 to 342 (48 new tests covering proactive health + behavioral humanization + visual polish).
+- Coverage thresholds adjusted to 77/75/85/77 (statements/branches/functions/lines) to reflect post-refactor baseline.
+- Test count 294 to 382 (88 new tests across 4 swarm stages + feature pass).
 - README badge row: replaced static shields.io test badge with dynamic CI status badge; added npm version badge.
 - README test counts and live numbers updated to reflect v0.7.2 baseline.
+- npm tarball reduced from 1.1 MB to 62 KB by excluding docs/logo.png from `files` field.
+- Build scripts now use `--external playwright` to avoid bundling native Chromium bindings.
 
 ## [0.7.1] - 2026-05-21
 

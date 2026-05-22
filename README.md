@@ -1,3 +1,7 @@
+<p align="center">
+  <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
+</p>
+
 <p align="center"><img src="docs/logo.png" alt="Claude Synergy" width="480"></p>
 
 # Claude Synergy
@@ -58,7 +62,7 @@ claude-synergy/
 │   └── plugins-{official,community,knowledge-work}/  # Plugin marketplaces
 ├── synergies/               # 12 curated cross-product workflows
 ├── src/                     # TypeScript implementation
-├── test/                    # 342 tests (unit, integration, regression, smoke)
+├── test/                    # 382 tests (unit, integration, regression, smoke)
 ├── data/claude-synergy.db   # SQLite database (created by `hk init`)
 ├── schema.sql               # Tier 2a tables (products, releases, changes, entities, FTS5, …)
 ├── schema-vec.sql           # Tier 2b tables (chunks, chunks_vec, chunks_fts)
@@ -66,7 +70,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v0.7.2):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 342 tests.
+**Live numbers (as of v0.7.2):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 382 tests.
 
 ---
 
@@ -242,7 +246,7 @@ Full index in [synergies/INDEX.md](synergies/INDEX.md).
 Vitest suite covers unit / integration / regression / smoke tiers. **[test-spec-3.md](test-spec-3.md) is the current authority** as of v0.7.0; [test-spec.md](test-spec.md) (v1) and [test-spec-2.md](test-spec-2.md) (v2) remain in the repo as historical record of the design lineage.
 
 ```bash
-pnpm test               # unit + integration + regression (~13s, 342 tests)
+pnpm test               # unit + integration + regression (~16s, 382 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -326,4 +330,4 @@ This is safe — the DB is a derived cache. All source data lives in `products/*
 
 ## License
 
-MIT. Author: [mcp-tool-shop](https://github.com/mcp-tool-shop-org).
+MIT. Built by <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>.
