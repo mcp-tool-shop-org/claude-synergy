@@ -1,8 +1,38 @@
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join, relative, basename } from 'node:path';
 import matter from 'gray-matter';
+import TurndownService from 'turndown';
 import type Database from 'better-sqlite3';
 import { extractEntities } from './extract.js';
+
+// Turndown converts HTML release bodies (github-copilot, vscode-copilot-chat) to markdown
+// so parseBullets can extract <li> elements as bullet rows for FTS5 + entity extraction.
+const turndown = new TurndownService({
+  headingStyle: 'atx',
+  bulletListMarker: '-',
+  codeBlockStyle: 'fenced',
+  emDelimiter: '_',
+});
+// Drop link syntax in favor of just the text — keeps bullets clean for indexing
+turndown.addRule('plainLinks', {
+  filter: 'a',
+  replacement: (content, node) => {
+    const href = (node as any).getAttribute?.('href');
+    return href ? `${content} (${href})` : content;
+  },
+});
+
+function maybeConvertHtmlToMarkdown(content: string): string {
+  // Heuristic: count opening tags. HTML bodies (Cursor RSS, github-copilot, vscode pages)
+  // have many; markdown-native bodies (most release notes) have few or none.
+  const tagCount = (content.match(/<\/?[a-z][^>]*>/gi) || []).length;
+  if (tagCount < 5) return content;
+  try {
+    return turndown.turndown(content);
+  } catch {
+    return content;
+  }
+}
 
 interface Frontmatter {
   product?: string;
@@ -186,7 +216,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
           });
           stats.releasesAdded++;
 
-          const bullets = parseBullets(content);
+          const bullets = parseBullets(maybeConvertHtmlToMarkdown(content));
           bullets.forEach((bullet, i) => {
             const kind = classifyKind(bullet);
             const result = insertChange.run({
