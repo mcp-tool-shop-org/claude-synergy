@@ -86,6 +86,9 @@ export async function fetchWithRetry(
       // Retryable error — if we have attempts left, wait and retry
       if (attempt < maxRetries) {
         const delay = computeDelay(res, attempt, baseDelayMs);
+        console.error(
+          `[retry] ${fetchInit.method ?? 'GET'} ${String(url)} (attempt ${attempt + 2}/${maxRetries + 1}, status ${res.status}, backoff ${delay}ms)`
+        );
         await sleep(delay, externalSignal);
         continue;
       }
@@ -105,6 +108,9 @@ export async function fetchWithRetry(
 
       if (attempt < maxRetries) {
         const delay = computeDelay(null, attempt, baseDelayMs);
+        console.error(
+          `[retry] ${fetchInit.method ?? 'GET'} ${String(url)} (attempt ${attempt + 2}/${maxRetries + 1}, ${e.name ?? 'Error'}: ${e.message}, backoff ${delay}ms)`
+        );
         try {
           await sleep(delay, externalSignal);
         } catch {

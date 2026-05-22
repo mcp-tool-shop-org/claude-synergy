@@ -1,5 +1,53 @@
 import type Database from 'better-sqlite3';
 
+// ─── CLI / MCP formatting helpers ─────────────────────────────────────────
+
+/**
+ * Truncate a string to `maxLen` characters, appending an ellipsis when trimmed.
+ * Safe for empty / undefined input.
+ */
+export function truncate(text: string | undefined | null, maxLen = 200): string {
+  if (!text) return '';
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen) + '…';
+}
+
+/**
+ * Format a single result row as an aligned CLI line.
+ * Returns a two-line string:  date  product@version  [kind]
+ *                               body text (truncated)
+ *
+ * `productColWidth` controls the pad width for the product@version column
+ * so columns stay aligned across rows with varying product name lengths.
+ */
+export function formatResultLine(
+  row: { released_at: string | null; product: string; version: string; kind: string },
+  bodyText: string,
+  opts: { maxTextLen?: number; productColWidth?: number } = {}
+): string {
+  const date = row.released_at ?? '????-??-??';
+  const pv = `${row.product}@${row.version}`;
+  const padWidth = opts.productColWidth ?? 40;
+  const header = `${date}  ${pv.padEnd(padWidth)}  [${row.kind}]`;
+  const body = `  ${truncate(bodyText, opts.maxTextLen ?? 200)}`;
+  return `${header}\n${body}`;
+}
+
+/**
+ * Compute the ideal product@version column width for a set of rows
+ * (max observed length + 2 padding chars).
+ */
+export function productColWidth(
+  rows: Array<{ product: string; version: string }>
+): number {
+  if (rows.length === 0) return 30;
+  const maxLen = rows.reduce(
+    (mx, r) => Math.max(mx, `${r.product}@${r.version}`.length),
+    0
+  );
+  return maxLen + 2;
+}
+
 export interface QueryResult {
   product: string;
   version: string;

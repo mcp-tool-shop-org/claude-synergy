@@ -9,6 +9,7 @@ import { searchChanges, lookupEntity, recentReleases, listProducts, entityFreque
 import { embedAll } from './embed.js';
 import { hybridSearch } from './hybrid.js';
 import { fetchAll, listFetchTargets, seedMarkersFromDb } from './fetch.js';
+import type { FetchProgressEvent, FetchAllSummary } from './fetch.js';
 import type Database from 'better-sqlite3';
 
 // ── Graceful shutdown ────────────────────────────────────────────────────────
@@ -84,6 +85,47 @@ function warnIfEmpty(db: Database.Database): boolean {
     return true;
   }
   return false;
+}
+
+// ── Fetch progress helpers ──────────────────────────────────────────────────
+
+/** Format a number with thousands separators (e.g. 1247 → "1,247"). */
+function fmtNum(n: number): string {
+  return n.toLocaleString('en-US');
+}
+
+/** Build an onProgress callback for fetchAll that writes real-time status to stderr. */
+function makeFetchProgressWriter(): (event: FetchProgressEvent) => void {
+  return (event: FetchProgressEvent) => {
+    const idx = `${event.index + 1}/${event.total}`;
+    switch (event.type) {
+      case 'start':
+        process.stderr.write(`Fetching ${event.product} (${idx})...\n`);
+        break;
+      case 'error':
+        process.stderr.write(`✗ ${event.product}: ${event.error ?? 'unknown error'}\n`);
+        break;
+      case 'skip':
+        process.stderr.write(`⊘ ${event.product} (skipped — ${event.error ?? 'unknown'})\n`);
+        break;
+      // 'done' — the start line is sufficient; no extra output needed
+    }
+  };
+}
+
+/** Print a clean summary line from FetchAllSummary to stderr (or return JSON-friendly object). */
+function printFetchSummary(summary: FetchAllSummary): void {
+  const parts = [
+    `${fmtNum(summary.succeeded)} succeeded`,
+    `${fmtNum(summary.failed)} failed`,
+    `${fmtNum(summary.skipped)} skipped`,
+    `${fmtNum(summary.newChanges)} new changes`,
+  ];
+  process.stderr.write(`\nSync complete: ${parts.join(', ')}\n`);
+  if (summary.failed > 0 && summary.errors.length > 0) {
+    const failedList = summary.errors.map(e => `${e.product} (${e.error})`).join(', ');
+    process.stderr.write(`Failed: ${failedList}\n`);
+  }
 }
 
 const program = new Command();
@@ -284,25 +326,22 @@ program
     const db = openTrackedDb(opts.db);
     initSchema(db);
     try {
-      const targets = listFetchTargets();
-      const totalTargets = opts.product
-        ? targets.filter(t => t.product === opts.product).length
-        : targets.length;
       const stats = await fetchAll(db, opts.productsRoot, {
         product: opts.product,
         sinceOverride: opts.since,
+        onProgress: makeFetchProgressWriter(),
       });
-      let totalFetched = 0;
-      let fetchIdx = 0;
+      // Per-product detail to stdout
       for (const s of stats) {
-        fetchIdx++;
-        process.stderr.write(`Fetching ${s.product} (${fetchIdx}/${totalTargets})...\n`);
         const status = s.fetched > 0 ? `+${s.fetched} new` : `current (since ${s.newSince})`;
         console.log(`${s.product.padEnd(35)} ${status}${s.latest ? `  latest: ${s.latest.split('T')[0]}` : ''}`);
-        for (const e of s.errors) console.log(`  ✗ ${e}`);
-        totalFetched += s.fetched;
       }
-      console.log(`\n✓ fetched ${totalFetched} new release${totalFetched === 1 ? '' : 's'} across ${stats.length} product${stats.length === 1 ? '' : 's'}`);
+      // Consolidated summary
+      if (program.opts().json) {
+        console.log(JSON.stringify({ stats, summary: stats.summary }));
+      } else {
+        printFetchSummary(stats.summary);
+      }
     } finally {
       db.close();
     }
@@ -340,17 +379,14 @@ program
       try {
         if (!opts.skipFetch) {
           process.stderr.write('=== fetch ===\n');
-          const targets = listFetchTargets();
-          const totalTargets = targets.length;
-          const stats = await fetchAll(db, opts.productsRoot);
-          let fetchIdx = 0;
-          for (const s of stats) {
-            fetchIdx++;
-            const status = s.fetched > 0 ? `+${s.fetched} new` : 'current';
-            process.stderr.write(`  Fetching ${s.product} (${fetchIdx}/${totalTargets})... ${status}\n`);
+          const stats = await fetchAll(db, opts.productsRoot, {
+            onProgress: makeFetchProgressWriter(),
+          });
+          if (program.opts().json) {
+            // JSON summary deferred to final output
+          } else {
+            printFetchSummary(stats.summary);
           }
-          const total = stats.reduce((sum, s) => sum + s.fetched, 0);
-          console.log(`fetched ${total} new release${total === 1 ? '' : 's'}`);
         }
         process.stderr.write('\n=== ingest ===\n');
         const { ingestAll } = await import('./ingest.js');
@@ -363,7 +399,10 @@ program
             contextProviderName: opts.context,
             embeddingProviderName: opts.embedProvider,
             onProgress: (p) => {
-              process.stderr.write(`  Embedding batch ${p.batchesCompleted}/${p.batchesTotal} (${p.chunksCompleted} chunks)...\n`);
+              const prov = p.provider ? ` [${p.provider}]` : '';
+              const tokens = p.tokensUsed != null ? ` ${fmtNum(p.tokensUsed)} tokens` : '';
+              const reqs = p.requestsMade != null ? ` ${p.requestsMade} reqs` : '';
+              process.stderr.write(`  Embedding batch ${p.batchesCompleted}/${p.batchesTotal} (${p.chunksCompleted}/${p.chunksTotal} chunks)${prov}${tokens}${reqs}\n`);
             },
           });
           console.log(`embedded ${embedStats.chunksCreated} new chunks via ${embedStats.contextProvider} + ${embedStats.embeddingProvider}`);
@@ -416,7 +455,10 @@ program
         batchSize: intOpt('batch-size', opts.batchSize, 64),
         force: opts.force,
         onProgress: (p) => {
-          process.stderr.write(`Embedding batch ${p.batchesCompleted}/${p.batchesTotal} (${p.chunksCompleted}/${p.chunksTotal} chunks)...\n`);
+          const prov = p.provider ? ` [${p.provider}]` : '';
+          const tokens = p.tokensUsed != null ? ` ${fmtNum(p.tokensUsed)} tokens` : '';
+          const reqs = p.requestsMade != null ? ` ${p.requestsMade} reqs` : '';
+          process.stderr.write(`Embedding batch ${p.batchesCompleted}/${p.batchesTotal} (${p.chunksCompleted}/${p.chunksTotal} chunks)${prov}${tokens}${reqs}\n`);
         },
       });
       console.log(`✓ embedded ${stats.chunksCreated} chunks in ${stats.totalMs}ms`);

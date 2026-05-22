@@ -18,10 +18,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Provider timeout guards — all external HTTP calls now enforce per-request timeouts.
 - `publishConfig` added to package.json for scoped npm publishing.
 - LICENSE file (MIT) added to repo root.
-- 3 new tests covering ghReleases pagination edge cases (suite total: 294).
+- 3 new tests covering ghReleases pagination edge cases.
+- `fetchWithRetry` utility — timeout, retry, and exponential backoff for all external HTTP calls.
+- Signal handling (`SIGINT`/`SIGTERM`) for graceful shutdown in long-running commands.
+- Schema versioning with automatic migration detection on `hk init`.
+- Embed cost tracking — estimated token/cost metrics logged after `hk embed`.
+- Progress callbacks for ingest and embed pipelines (stderr progress when TTY attached).
+- `--json` flag on `hk query`, `hk latest`, `hk products` for machine-readable output.
+- Empty-state guidance — helpful messages when DB is empty or query returns zero results.
+- CONTRIBUTING.md — guide for adding products, running tests, and submitting PRs.
+- Troubleshooting section in README (database locks, sqlite-vec load, fetch errors, schema mismatch).
+- 48 new tests covering proactive health, behavioral humanization, and visual polish (suite total: 342).
 
 ### Changed
 - Coverage thresholds adjusted to 78/75/85/78 (statements/branches/functions/lines) to reflect post-refactor baseline.
+- Test count 294 to 342 (48 new tests covering proactive health + behavioral humanization + visual polish).
+- README badge row: replaced static shields.io test badge with dynamic CI status badge; added npm version badge.
+- README test counts and live numbers updated to reflect v0.7.2 baseline.
 
 ## [0.7.1] - 2026-05-21
 
