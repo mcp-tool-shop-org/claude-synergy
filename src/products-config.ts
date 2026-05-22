@@ -13,6 +13,20 @@ import { parse as parseYaml } from 'yaml';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Product slugs are used as filesystem directory names + SQLite keys.
+ * Restrict to lowercase alphanumerics + hyphens so we can't end up with
+ * '../' or whitespace in a name that later flows into path joins or SQL.
+ */
+const PRODUCT_NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
+
+/**
+ * GitHub repo slugs (owner/repo). Both segments are restricted to the
+ * characters GitHub itself allows for orgs + repos (alphanumeric + dot +
+ * underscore + hyphen). Exactly one '/' between them.
+ */
+const GH_REPO_RE = /^[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/;
+
 export interface ProductMeta {
   /** Slug used as filesystem dir name + DB key. */
   name: string;
@@ -112,6 +126,11 @@ export function loadProductsConfig(yamlPath?: string): ProductsConfig | null {
     if (!p.name || !p.display_name) {
       throw new Error(`[claude-synergy] products.yaml entry missing name/display_name: ${JSON.stringify(p)}`);
     }
+    if (!PRODUCT_NAME_RE.test(p.name)) {
+      throw new Error(
+        `[claude-synergy] products.yaml: invalid product name '${p.name}' — must match /^[a-z0-9][a-z0-9-]*$/ (lowercase alphanumeric + hyphens, no leading hyphen)`
+      );
+    }
     productMeta[p.name] = {
       name: p.name,
       display_name: p.display_name,
@@ -123,7 +142,17 @@ export function loadProductsConfig(yamlPath?: string): ProductsConfig | null {
 
     if (p.fetch) {
       const target = buildFetchTarget(p.name, p.fetch);
-      if (target) fetchTargets.push(target);
+      if (target) {
+        // Validate gh-releases repo shape AFTER buildFetchTarget has run its
+        // own 'repo is required' check, so the order of error messages is
+        // (missing repo) → (malformed repo).
+        if (target.strategy === 'gh-releases' && target.repo && !GH_REPO_RE.test(target.repo)) {
+          throw new Error(
+            `[claude-synergy] products.yaml: ${p.name}: invalid repo '${target.repo}' — must match 'owner/repo' (alphanumeric + dot/underscore/hyphen)`
+          );
+        }
+        fetchTargets.push(target);
+      }
     }
   }
 

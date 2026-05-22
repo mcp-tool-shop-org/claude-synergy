@@ -1,5 +1,24 @@
 import type { RerankProvider, RerankCandidate, RerankResult } from '../types.js';
 
+function providerTimeoutMs(): number {
+  const raw = process.env.CLAUDE_SYNERGY_PROVIDER_TIMEOUT_MS;
+  const n = raw === undefined ? NaN : parseInt(raw, 10);
+  return Number.isFinite(n) && n > 0 ? n : 60_000;
+}
+
+async function safeErrorBody(res: Response, max = 200): Promise<string> {
+  try {
+    const body = await res.text();
+    const safe = body
+      .split('\n')
+      .filter((l) => !/x-api-key|authorization|bearer|api[-_]?key/i.test(l))
+      .join('\n');
+    return safe.slice(0, max);
+  } catch {
+    return '<unreadable>';
+  }
+}
+
 /**
  * Voyage rerank-2 reranker. Anthropic-recommended.
  * Pricing: ~$0.05/M tokens; ~100ms per call for 20 candidates.
@@ -20,20 +39,30 @@ export class VoyageRerankProvider implements RerankProvider {
 
   async rerank(query: string, candidates: RerankCandidate[]): Promise<RerankResult[]> {
     if (candidates.length === 0) return [];
-    const res = await fetch('https://api.voyageai.com/v1/rerank', {
-      method: 'POST',
-      headers: {
-        'authorization': `Bearer ${this.apiKey}`,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: this.model,
-        query,
-        documents: candidates.map((c) => c.text),
-        top_k: candidates.length,
-      }),
-    });
-    if (!res.ok) throw new Error(`Voyage rerank ${res.status} ${await res.text()}`);
+    const timeoutMs = providerTimeoutMs();
+    let res: Response;
+    try {
+      res = await fetch('https://api.voyageai.com/v1/rerank', {
+        method: 'POST',
+        headers: {
+          'authorization': `Bearer ${this.apiKey}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: this.model,
+          query,
+          documents: candidates.map((c) => c.text),
+          top_k: candidates.length,
+        }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch (e: any) {
+      if (e?.name === 'TimeoutError' || e?.name === 'AbortError') {
+        throw new Error(`Voyage rerank request timed out after ${timeoutMs}ms — is the API responsive?`);
+      }
+      throw e;
+    }
+    if (!res.ok) throw new Error(`Voyage rerank ${res.status}: ${await safeErrorBody(res)}`);
     const json = (await res.json()) as { data: Array<{ index: number; relevance_score: number }> };
     return json.data.map((d) => ({
       id: candidates[d.index].id,

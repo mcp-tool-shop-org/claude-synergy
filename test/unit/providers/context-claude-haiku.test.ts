@@ -57,7 +57,9 @@ describe('ClaudeHaikuContextProvider — shape only', () => {
     try {
       expect(() => new ClaudeHaikuContextProvider({})).toThrow(/ANTHROPIC_API_KEY/);
     } finally {
-      if (orig !== undefined) process.env.ANTHROPIC_API_KEY = orig;
+      // Canonical env-restore (matches test/regression/bugs.test.ts §8.6).
+      if (orig === undefined) delete process.env.ANTHROPIC_API_KEY;
+      else process.env.ANTHROPIC_API_KEY = orig;
     }
   });
 

@@ -20,13 +20,25 @@ afterEach(() => {
 });
 
 /**
- * Mock the gh-api shell call. Returns the given release set as JSON.
- * The execSync we mock is module-level inside src/fetch.ts — we mock the
- * node:child_process import directly.
+ * Mock the gh-api subprocess call. Returns the given release set as JSON
+ * on the first page and an empty array on subsequent pages (so the
+ * pagination loop terminates cleanly).
+ *
+ * src/fetch.ts now uses execFileSync('gh', ['api', ...]) instead of execSync —
+ * the mock provides BOTH for backward compat with any callers that still use
+ * execSync; the executable is the first arg, the argv array is the second.
  */
 function mockGhApi(releases: any[]) {
+  let callCount = 0;
+  const respond = () => {
+    callCount += 1;
+    return callCount === 1
+      ? Buffer.from(JSON.stringify(releases), 'utf-8').toString('utf-8')
+      : '[]';
+  };
   vi.doMock('node:child_process', () => ({
-    execSync: vi.fn(() => Buffer.from(JSON.stringify(releases), 'utf-8').toString('utf-8')),
+    execFileSync: vi.fn(respond),
+    execSync: vi.fn(respond),
   }));
 }
 
@@ -207,10 +219,12 @@ describe('fetchAll', () => {
   });
 
   it('gh CLI throwing is captured in errors[] (wrapped as "fetch failed: ...") and does not crash', async () => {
+    const thrower = () => {
+      throw new Error('gh: command not found');
+    };
     vi.doMock('node:child_process', () => ({
-      execSync: vi.fn(() => {
-        throw new Error('gh: command not found');
-      }),
+      execFileSync: vi.fn(thrower),
+      execSync: vi.fn(thrower),
     }));
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
     const stats = await fetchAllMocked(temp.db, productsRoot, {

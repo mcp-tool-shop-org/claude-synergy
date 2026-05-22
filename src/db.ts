@@ -16,8 +16,14 @@ export function openDb(path: string, opts: { loadVec?: boolean } = {}): Database
     try {
       sqliteVec.load(db);
     } catch (e: any) {
-      // sqlite-vec is opt-in for Tier 2b; queries using only changes_fts work without it
-      if (!process.env.HK_DEBUG_VEC_LOAD_FAIL_SILENT) {
+      // sqlite-vec is opt-in for Tier 2b; queries using only changes_fts work without it.
+      // Respect the legacy HK_DEBUG_VEC_LOAD_FAIL_SILENT plus the broader CLAUDE_SYNERGY_QUIET
+      // (set by the MCP-stdio entry point so we never contaminate the JSON-RPC channel).
+      const quiet =
+        process.env.HK_DEBUG_VEC_LOAD_FAIL_SILENT ||
+        process.env.CLAUDE_SYNERGY_QUIET ||
+        process.env.MCP_QUIET;
+      if (!quiet) {
         console.error(`[warn] sqlite-vec load failed: ${e.message}`);
       }
     }

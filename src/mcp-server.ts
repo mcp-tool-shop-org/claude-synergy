@@ -25,14 +25,22 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import matter from 'gray-matter';
 import { openDb } from './db.js';
 import { searchChanges, lookupEntity, recentReleases, listProducts, entityFrequency } from './query.js';
 import { hybridSearch } from './hybrid.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Single-source-of-truth version from package.json (avoids hardcoded drift).
+const _require = createRequire(import.meta.url);
+const { version: PKG_VERSION } = _require('../package.json') as { version: string };
+
+// Synergy names: lowercase + digits + dash/underscore (filenames on disk).
+const SYNERGY_NAME_RE = /^[a-z0-9_-]+$/i;
 
 const DB_PATH =
   process.env.CLAUDE_SYNERGY_DB ??
@@ -67,7 +75,7 @@ const hasChunks =
   db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks'`).get() !== undefined;
 
 const server = new Server(
-  { name: 'claude-synergy', version: '0.1.0' },
+  { name: 'claude-synergy', version: PKG_VERSION },
   { capabilities: { tools: {} } }
 );
 
@@ -168,26 +176,187 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   ],
 }));
 
+// ── argument guards ───────────────────────────────────────────────────────
+// Per-handler validation. We treat `arguments` as `unknown` and narrow with
+// shape checks before passing into typed handlers. This replaces the previous
+// `args as any` casts which would have let malformed clients crash deep in
+// query/hybrid layers.
+
+const SEARCH_MODES = new Set(['hybrid', 'fts']);
+const RERANK_MODES = new Set(['none', 'ollama-judge']);
+const ENTITY_TYPES = new Set([
+  'env_var',
+  'slash_command',
+  'cli_option',
+  'model_id',
+  'beta_header',
+  'hook_event',
+  'setting_key',
+  'cve',
+  'ghsa',
+]);
+
+function asRecord(args: unknown, tool: string): Record<string, unknown> {
+  if (args === null || typeof args !== 'object' || Array.isArray(args)) {
+    throw new McpError(ErrorCode.InvalidParams, `${tool}: arguments must be an object`);
+  }
+  return args as Record<string, unknown>;
+}
+
+function requireString(rec: Record<string, unknown>, field: string, tool: string): string {
+  const v = rec[field];
+  if (typeof v !== 'string' || v.length === 0) {
+    throw new McpError(ErrorCode.InvalidParams, `${tool}: ${field} must be a non-empty string`);
+  }
+  return v;
+}
+
+function optString(rec: Record<string, unknown>, field: string, tool: string): string | undefined {
+  const v = rec[field];
+  if (v === undefined || v === null) return undefined;
+  if (typeof v !== 'string') {
+    throw new McpError(ErrorCode.InvalidParams, `${tool}: ${field} must be a string`);
+  }
+  return v;
+}
+
+function optInt(
+  rec: Record<string, unknown>,
+  field: string,
+  tool: string,
+  min = 1,
+  max = 10_000
+): number | undefined {
+  const v = rec[field];
+  if (v === undefined || v === null) return undefined;
+  if (typeof v !== 'number' || !Number.isFinite(v) || !Number.isInteger(v) || v < min || v > max) {
+    throw new McpError(
+      ErrorCode.InvalidParams,
+      `${tool}: ${field} must be an integer in [${min}, ${max}]`
+    );
+  }
+  return v;
+}
+
+function optEnum<T extends string>(
+  rec: Record<string, unknown>,
+  field: string,
+  allowed: Set<string>,
+  tool: string
+): T | undefined {
+  const v = rec[field];
+  if (v === undefined || v === null) return undefined;
+  if (typeof v !== 'string' || !allowed.has(v)) {
+    throw new McpError(
+      ErrorCode.InvalidParams,
+      `${tool}: ${field} must be one of ${[...allowed].join(', ')}`
+    );
+  }
+  return v as T;
+}
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
   try {
     switch (name) {
-      case 'search':
-        return { content: [{ type: 'text', text: await handleSearch(args as any) }] };
-      case 'lookup_entity':
-        return { content: [{ type: 'text', text: handleLookupEntity(args as any) }] };
-      case 'latest_releases':
-        return { content: [{ type: 'text', text: handleLatestReleases(args as any) }] };
-      case 'get_release':
-        return { content: [{ type: 'text', text: handleGetRelease(args as any) }] };
+      case 'search': {
+        const r = asRecord(args, 'search');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: await handleSearch({
+                query: requireString(r, 'query', 'search'),
+                mode: optEnum<'hybrid' | 'fts'>(r, 'mode', SEARCH_MODES, 'search'),
+                product: optString(r, 'product', 'search'),
+                since: optString(r, 'since', 'search'),
+                kind: optString(r, 'kind', 'search'),
+                rerank: optEnum<'none' | 'ollama-judge'>(r, 'rerank', RERANK_MODES, 'search'),
+                limit: optInt(r, 'limit', 'search'),
+              }),
+            },
+          ],
+        };
+      }
+      case 'lookup_entity': {
+        const r = asRecord(args, 'lookup_entity');
+        const type = requireString(r, 'type', 'lookup_entity');
+        if (!ENTITY_TYPES.has(type)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            `lookup_entity: type must be one of ${[...ENTITY_TYPES].join(', ')}`
+          );
+        }
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleLookupEntity({ type, value: requireString(r, 'value', 'lookup_entity') }),
+            },
+          ],
+        };
+      }
+      case 'latest_releases': {
+        const r = asRecord(args ?? {}, 'latest_releases');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleLatestReleases({
+                product: optString(r, 'product', 'latest_releases'),
+                limit: optInt(r, 'limit', 'latest_releases'),
+              }),
+            },
+          ],
+        };
+      }
+      case 'get_release': {
+        const r = asRecord(args, 'get_release');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleGetRelease({
+                product: requireString(r, 'product', 'get_release'),
+                version: requireString(r, 'version', 'get_release'),
+              }),
+            },
+          ],
+        };
+      }
       case 'list_products':
         return { content: [{ type: 'text', text: handleListProducts() }] };
-      case 'top_entities':
-        return { content: [{ type: 'text', text: handleTopEntities(args as any) }] };
+      case 'top_entities': {
+        const r = asRecord(args, 'top_entities');
+        const type = requireString(r, 'type', 'top_entities');
+        if (!ENTITY_TYPES.has(type)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            `top_entities: type must be one of ${[...ENTITY_TYPES].join(', ')}`
+          );
+        }
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleTopEntities({ type, limit: optInt(r, 'limit', 'top_entities') }),
+            },
+          ],
+        };
+      }
       case 'list_synergies':
         return { content: [{ type: 'text', text: handleListSynergies() }] };
-      case 'read_synergy':
-        return { content: [{ type: 'text', text: handleReadSynergy(args as any) }] };
+      case 'read_synergy': {
+        const r = asRecord(args, 'read_synergy');
+        const synName = requireString(r, 'name', 'read_synergy');
+        if (!SYNERGY_NAME_RE.test(synName)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'read_synergy: name must match /^[a-z0-9_-]+$/i'
+          );
+        }
+        return { content: [{ type: 'text', text: handleReadSynergy({ name: synName }) }] };
+      }
       default:
         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
@@ -197,11 +366,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; product?: string; since?: string; kind?: string; rerank?: string; limit?: number }): Promise<string> {
+async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; product?: string; since?: string; kind?: string; rerank?: 'none' | 'ollama-judge'; limit?: number }): Promise<string> {
   const mode = args.mode ?? 'hybrid';
   const limit = args.limit ?? 10;
 
-  if (mode === 'fts' || !hasChunks) {
+  if (mode === 'fts') {
     const results = searchChanges(db, args.query, {
       product: args.product,
       since: args.since,
@@ -218,11 +387,20 @@ async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; prod
     })));
   }
 
+  // mode === 'hybrid'. Refuse to silently fall back to FTS — clients asking
+  // for semantic search deserve a clear contract failure they can catch.
+  if (!hasChunks) {
+    throw new McpError(
+      ErrorCode.InvalidParams,
+      'hybrid mode requires embeddings — run `hk embed` first, or pass mode="fts"'
+    );
+  }
+
   const results = await hybridSearch(db, args.query, {
     product: args.product,
     since: args.since,
     kind: args.kind,
-    rerankProviderName: (args.rerank as any) ?? 'none',
+    rerankProviderName: args.rerank ?? 'none',
     limit,
   });
   return formatSearchResults(results.map((r) => ({
@@ -340,13 +518,26 @@ function handleListSynergies(): string {
 
 function handleReadSynergy(args: { name: string }): string {
   if (!existsSync(SYNERGIES_DIR)) return '(synergies dir not found)';
+  // Name shape is validated upstream in the CallTool handler against
+  // SYNERGY_NAME_RE — defense-in-depth recheck here as well.
+  if (!SYNERGY_NAME_RE.test(args.name)) {
+    return `(synergy not found: ${args.name})`;
+  }
   const files = readdirSync(SYNERGIES_DIR).filter((f) => f.endsWith('.md'));
+  // Exact basename match (no suffix-match — previously `endsWith` permitted
+  // empty/partial matches and would pick up an unrelated file).
+  const targetFile = files.find((f) => basename(f, '.md') === args.name);
+  if (targetFile) {
+    const raw = readFileSync(join(SYNERGIES_DIR, targetFile), 'utf-8');
+    return raw;
+  }
+  // Fall back to frontmatter `name:` lookup (some synergies set an explicit
+  // name in frontmatter that differs from the filename slug).
   for (const f of files) {
-    const path = join(SYNERGIES_DIR, f);
     try {
-      const raw = readFileSync(path, 'utf-8');
+      const raw = readFileSync(join(SYNERGIES_DIR, f), 'utf-8');
       const { data } = matter(raw);
-      if (data.name === args.name || f.replace(/\.md$/, '').endsWith(args.name)) {
+      if (data.name === args.name) {
         return raw;
       }
     } catch {}

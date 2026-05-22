@@ -1,5 +1,24 @@
 import type { RerankProvider, RerankCandidate, RerankResult } from '../types.js';
 
+function providerTimeoutMs(): number {
+  const raw = process.env.CLAUDE_SYNERGY_PROVIDER_TIMEOUT_MS;
+  const n = raw === undefined ? NaN : parseInt(raw, 10);
+  return Number.isFinite(n) && n > 0 ? n : 60_000;
+}
+
+async function safeErrorBody(res: Response, max = 200): Promise<string> {
+  try {
+    const body = await res.text();
+    const safe = body
+      .split('\n')
+      .filter((l) => !/x-api-key|authorization|bearer|api[-_]?key/i.test(l))
+      .join('\n');
+    return safe.slice(0, max);
+  } catch {
+    return '<unreadable>';
+  }
+}
+
 /**
  * LLM-as-judge reranker via local Ollama. Free; ~3-10s per query depending on model.
  *
@@ -43,18 +62,28 @@ export class OllamaJudgeRerankProvider implements RerankProvider {
       `Scores (one integer per line, ${candidates.length} lines total):`,
     ].join('\n');
 
-    const res = await fetch(`${this.host}/api/generate`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model: this.model,
-        prompt,
-        stream: false,
-        think: false, // for qwen3/o1-style models; harmless on others
-        options: { temperature: 0, num_predict: Math.max(120, candidates.length * 4) },
-      }),
-    });
-    if (!res.ok) throw new Error(`Ollama judge ${res.status} ${await res.text()}`);
+    const timeoutMs = providerTimeoutMs();
+    let res: Response;
+    try {
+      res = await fetch(`${this.host}/api/generate`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: this.model,
+          prompt,
+          stream: false,
+          think: false, // for qwen3/o1-style models; harmless on others
+          options: { temperature: 0, num_predict: Math.max(120, candidates.length * 4) },
+        }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch (e: any) {
+      if (e?.name === 'TimeoutError' || e?.name === 'AbortError') {
+        throw new Error(`Ollama judge rerank timed out after ${timeoutMs}ms — is the Ollama server responsive?`);
+      }
+      throw e;
+    }
+    if (!res.ok) throw new Error(`Ollama judge ${res.status}: ${await safeErrorBody(res)}`);
     const json = (await res.json()) as { response: string };
 
     const scores = parseScores(json.response, candidates.length);

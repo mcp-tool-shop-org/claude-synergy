@@ -1,8 +1,10 @@
+<p align="center"><img src="docs/logo.png" alt="Claude Synergy" width="280"></p>
+
 # Claude Synergy
 
 A local, queryable mirror of every Anthropic + adjacent AI dev tool changelog — plus a curated **Synergy** layer describing cross-product workflows — so the LLM agent inside the harness knows what the harness can do.
 
-[![tests](https://img.shields.io/badge/tests-239%20passing-brightgreen)](test-spec.md) [![coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)](#testing) [![license](https://img.shields.io/badge/license-MIT-blue)](#license)
+[![tests](https://img.shields.io/badge/tests-291%20passing-brightgreen)](test-spec-3.md) [![license](https://img.shields.io/badge/license-MIT-blue)](#license)
 
 ```bash
 $ hk query redact
@@ -34,7 +36,7 @@ The LLM agent inside any one of these has a frozen training cutoff. The gap wide
 
 ```
 claude-synergy/
-├── products/                # 34 product directories (1,101 release files)
+├── products/                # 44 product directories (1,186 release files)
 │   ├── claude-code/             # Anthropic CLI — 117 releases
 │   ├── claude-agent-sdk-{python,typescript}/  # Agent SDKs
 │   ├── anthropic-sdk-{python,typescript,go,java,csharp,ruby,php}/  # 7 language SDKs
@@ -50,12 +52,12 @@ claude-synergy/
 │   ├── cody-enterprise/         # filtered Sourcegraph RSS
 │   ├── github-copilot/          # HTML scrape (github.blog)
 │   ├── vscode-copilot-chat/     # HTML scrape (code.visualstudio.com)
-│   ├── windsurf/                # CSR fallback (Playwright in v0.7+)
+│   ├── windsurf/                # Playwright fetcher (CSR-only changelog)
 │   ├── skills/                  # Anthropic Skills catalog
 │   └── plugins-{official,community,knowledge-work}/  # Plugin marketplaces
 ├── synergies/               # 12 curated cross-product workflows
 ├── src/                     # TypeScript implementation
-├── test/                    # 239 tests (unit, integration, regression, smoke)
+├── test/                    # 291 tests (unit, integration, regression, smoke)
 ├── data/claude-synergy.db   # SQLite database (created by `hk init`)
 ├── schema.sql               # Tier 2a tables (products, releases, changes, entities, FTS5, …)
 ├── schema-vec.sql           # Tier 2b tables (chunks, chunks_vec, chunks_fts)
@@ -63,7 +65,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v0.6.1):** 34 products / 1,101 release files / 5,957 changes / 1,225 entities / 12 synergies / 239 tests / 85% coverage.
+**Live numbers (as of v0.7.1):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 291 tests.
 
 ---
 
@@ -71,15 +73,16 @@ claude-synergy/
 
 | Tier | Status | What's there |
 |------|--------|--------------|
-| **1 — bootstrap (markdown corpus)** | ✅ shipped | Study-swarm seeded 706 release files Jan→May 2026; extended to 1,101 by Tier 4 |
+| **1 — bootstrap (markdown corpus)** | ✅ shipped | Study-swarm seeded 706 release files Jan→May 2026; extended to 1,186 by Tier 4d |
 | **2a — SQLite + FTS5 + CLI** | ✅ shipped | `hk` CLI; 15 subcommands; sub-300ms ingest |
 | **2b — sqlite-vec + Contextual Retrieval** | ✅ shipped | Provider-pluggable (none/structured/ollama/claude-haiku context × ollama/voyage embed × none/ollama-judge/voyage/cohere rerank) |
 | **3 — sync + MCP server** | ✅ shipped | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` exposes 8 tools over stdio |
 | **4a — extend beyond Anthropic** | ✅ shipped | +15 MCP SDKs, Cursor (RSS), Aider (HISTORY.md), Continue.dev, Cody Enterprise (RSS filtered) |
 | **4b — HTML-scrape fetcher** | ✅ shipped | GitHub Copilot + VS Code Chat (Windsurf needs Playwright — v0.7) |
 | **4c — turndown HTML→markdown ingest** | ✅ shipped | HTML bodies (Copilot/VS Code/Cursor) now produce per-bullet rows for FTS5 + entity extraction |
+| **4d — Playwright + MCP registry + YAML config** | ✅ shipped | Windsurf via Playwright; Smithery + official MCP Registry as Tier-4 catalogs; products consolidated into `products.yaml` |
 
-Roadmap for v0.7+: Playwright fetcher for Windsurf, MCP registry catalogs (Smithery + official Registry), YAML-driven products config.
+Roadmap for v0.8+: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
 
 ---
 
@@ -120,7 +123,7 @@ hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
 hk latest [--product X] [--limit N]  # recent releases
-hk products                          # list all 34 with counts
+hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
@@ -205,7 +208,7 @@ Tools exposed:
 
 ---
 
-## Sources — 5 tiers, 4 fetcher strategies
+## Sources — 5 tiers, 6 fetcher strategies
 
 Full landscape in [SOURCES.md](SOURCES.md).
 
@@ -215,7 +218,7 @@ Full landscape in [SOURCES.md](SOURCES.md).
 - **Tier 4 (catalog)** — `anthropics/skills`, `claude-plugins-{official,community}`, `knowledge-work-plugins`
 - **Tier 5 (advisory)** — `@ClaudeCodeLog` X account; marckrenn changelog mirror
 
-Fetch strategies: `gh-releases | rss | raw-changelog | html-scrape`. New product = one entry in `src/fetch.ts` `TARGETS` array.
+Fetch strategies: `gh-releases | rss | raw-changelog | html-scrape | catalog | playwright`. New product = one entry in `products.yaml`.
 
 ---
 
@@ -257,7 +260,7 @@ Layout:
 
 **No network in tests by default** — provider HTTP is mocked via `vi.spyOn(global, 'fetch')`. Real SQLite in temp files (not `:memory:`) because sqlite-vec extension load semantics differ across versions and on-disk is the canonical path. Playwright is loaded via dynamic import and mocked via `vi.doMock('playwright', ...)` so tests pass without a real browser install.
 
-CI: `.github/workflows/test.yml` runs `pnpm test --coverage` on push and PR.
+CI: `.github/workflows/test.yml` runs `pnpm test:coverage` on push and PR.
 
 ---
 

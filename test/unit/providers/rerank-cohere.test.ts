@@ -32,7 +32,9 @@ describe('CohereRerankProvider — shape only', () => {
     try {
       expect(() => new CohereRerankProvider({})).toThrow(/COHERE_API_KEY/);
     } finally {
-      if (orig !== undefined) process.env.COHERE_API_KEY = orig;
+      // Canonical env-restore (matches test/regression/bugs.test.ts §8.6).
+      if (orig === undefined) delete process.env.COHERE_API_KEY;
+      else process.env.COHERE_API_KEY = orig;
     }
   });
 

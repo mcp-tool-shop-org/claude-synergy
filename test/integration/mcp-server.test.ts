@@ -135,16 +135,18 @@ describe('MCP server integration', () => {
   );
 
   it(
-    'empty search query surfaces an FTS5 syntax error per-call but server keeps running',
+    'empty search query is rejected with InvalidParams but the server keeps running',
     async () => {
       await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
         await client.initialize();
         await client.notifyInitialized();
-        // Current behavior: empty query throws an FTS5 syntax error.
-        // The contract that matters is the server stays alive after the bad call.
+        // Post-Wave-2 contract: handleSearch validates `query` and throws
+        // McpError(InvalidParams) for empty/non-string queries instead of
+        // letting them fall through to FTS5. The contract that matters is
+        // that the server stays alive after the bad call.
         await expect(
           client.callTool('search', { query: '', mode: 'fts' })
-        ).rejects.toThrow(/fts5: syntax error/);
+        ).rejects.toThrow(/query must be a non-empty string/i);
         // Subsequent call still works
         const ok = await client.callTool('search', { query: 'workflow', mode: 'fts', limit: 3 });
         expect(ok.content[0].text).toBeTruthy();

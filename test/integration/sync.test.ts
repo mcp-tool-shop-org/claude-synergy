@@ -19,8 +19,16 @@ afterEach(() => {
 });
 
 function mockGhWithReleases(releases: any[]) {
+  let callCount = 0;
+  const respond = () => {
+    callCount += 1;
+    return callCount === 1
+      ? Buffer.from(JSON.stringify(releases), 'utf-8').toString('utf-8')
+      : '[]';
+  };
   vi.doMock('node:child_process', () => ({
-    execSync: vi.fn(() => Buffer.from(JSON.stringify(releases), 'utf-8').toString('utf-8')),
+    execFileSync: vi.fn(respond),
+    execSync: vi.fn(respond),
   }));
 }
 

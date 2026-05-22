@@ -86,12 +86,14 @@ function parsePubDate(raw: string | null): string | null {
 }
 
 function makeSlug(guid: string, isoDate: string, title: string | null): string {
-  // Prefer URL path tail (Cursor's permalinks are /changelog/MM-DD-YY or /changelog/slug)
+  // Prefer URL path tail (Cursor's permalinks are /changelog/MM-DD-YY or /changelog/slug).
+  // F-003: tighten regex to require the slug start with [a-z0-9] (NOT a dot), so a
+  // crafted feed cannot yield a leading-dot slug that survives sanitization downstream.
   try {
     const u = new URL(guid);
     const parts = u.pathname.split('/').filter(Boolean);
     const last = parts[parts.length - 1];
-    if (last && /^[a-z0-9._-]+$/i.test(last)) {
+    if (last && /^[a-z0-9][a-z0-9._-]*$/i.test(last)) {
       return last.replace(/\.html?$/, '').toLowerCase();
     }
   } catch {}

@@ -26,7 +26,10 @@ describe('OllamaJudgeRerankProvider — defaults', () => {
       const p = new OllamaJudgeRerankProvider();
       expect((p as any).model).toBe('qwen3:8b');
     } finally {
-      if (orig !== undefined) process.env.OLLAMA_RERANK_MODEL = orig;
+      // Canonical env-restore: handle both "was unset" and "was set" cases
+      // symmetrically. Matches the pattern in test/regression/bugs.test.ts §8.6.
+      if (orig === undefined) delete process.env.OLLAMA_RERANK_MODEL;
+      else process.env.OLLAMA_RERANK_MODEL = orig;
     }
   });
 

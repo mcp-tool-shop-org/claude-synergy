@@ -185,22 +185,81 @@ const VSCODE_V_TO_MONTH: Record<number, [number, number]> = {
   120: [2026, 11],
 };
 
+/**
+ * F-008: extract the actual Release-date from the VS Code updates page HTML.
+ * The monthly page always carries a line like `<em>Release date: March 25, 2026</em>`
+ * (verified across v1_109 → v1_113 in the on-disk corpus). Returns ISO date or null.
+ * Also tries a `<time datetime="...">` tag and a generic "Welcome to the ... release"
+ * paragraph as secondary signals before giving up.
+ */
+function parseVscodeReleaseDate(html: string, $: cheerio.CheerioAPI): string | null {
+  // Primary signal: `<em>Release date: <Month> <Day>, <Year></em>`
+  const releaseDateMatch = html.match(
+    /Release\s+date[:\s]*((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},\s*\d{4})/i
+  );
+  if (releaseDateMatch) {
+    const d = new Date(releaseDateMatch[1]);
+    if (!Number.isNaN(d.getTime())) return d.toISOString();
+  }
+
+  // Secondary signal: `<time datetime="2026-03-25">` style
+  const timeEl = $('time[datetime]').first();
+  if (timeEl.length) {
+    const iso = timeEl.attr('datetime');
+    if (iso) {
+      const d = new Date(iso);
+      if (!Number.isNaN(d.getTime())) return d.toISOString();
+    }
+  }
+
+  // Tertiary signal: "Welcome to the <Month> <Year> release"
+  const welcomeMatch = html.match(
+    /Welcome to the\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})/i
+  );
+  if (welcomeMatch) {
+    // No day → use mid-month; this is still better than the version→month table fallback
+    // because at least the month is read from the page itself.
+    const d = new Date(`${welcomeMatch[1]} 15`);
+    if (!Number.isNaN(d.getTime())) return d.toISOString();
+  }
+
+  return null;
+}
+
 export async function fetchVscodeUpdates(sinceIso: string): Promise<HtmlItem[]> {
   const items: HtmlItem[] = [];
   for (const [vStr, [year, monthIdx]] of Object.entries(VSCODE_V_TO_MONTH)) {
     const v = parseInt(vStr, 10);
-    // Release-day convention: mid-month (15th)
-    const isoDate = new Date(Date.UTC(year, monthIdx, 15, 12)).toISOString();
-    if (isoDate <= sinceIso) continue;
+    // F-008: keep the version→month table as a FALLBACK only. Primary path reads
+    // the actual `Release date:` line from the page below.
+    const fallbackIsoDate = new Date(Date.UTC(year, monthIdx, 15, 12)).toISOString();
 
     const versionTag = `v1_${v}`;
     const url = `https://code.visualstudio.com/updates/${versionTag}`;
+
+    // Fast-skip optimization: real release dates are within ±31 days of the mid-month
+    // fallback (release moves around by a few weeks, never by a full month). If even
+    // fallback+31d is still ≤ sinceIso, we can confidently skip without HTTP fetch.
+    const fallbackPlus31d = new Date(Date.parse(fallbackIsoDate) + 31 * 24 * 3600 * 1000).toISOString();
+    if (fallbackPlus31d <= sinceIso) continue;
+
     try {
       const res = await fetch(url, { headers: UA });
       if (res.status === 404) continue;
       if (!res.ok) continue;
       const html = await res.text();
       const $ = cheerio.load(html);
+
+      // F-008: primary path — extract date from page content. If absent, warn + fall back.
+      let isoDate = parseVscodeReleaseDate(html, $);
+      if (!isoDate) {
+        console.warn(
+          `[fetch-html] vscode ${versionTag}: no Release-date line found; falling back to mid-month (${fallbackIsoDate.split('T')[0]})`
+        );
+        isoDate = fallbackIsoDate;
+      }
+
+      if (isoDate <= sinceIso) continue;
 
       const title = $('h1').first().text().trim() || `Visual Studio Code 1.${v}`;
       const body = ($('main').first().html() || $('article').first().html() || '').trim();

@@ -7,6 +7,42 @@ import { VoyageRerankProvider } from './providers/rerank/voyage.js';
 import { CohereRerankProvider } from './providers/rerank/cohere.js';
 import type { EmbeddingProvider, RerankProvider, RerankCandidate } from './providers/types.js';
 
+/** Hard upper bound on any user-supplied row-pull parameter. */
+const MAX_LIMIT = 500;
+
+/**
+ * Clamp a user-supplied row count into [min, MAX_LIMIT] using integer coercion.
+ * Rejects non-finite / NaN values with a clear error so callers can't slip
+ * through `parseInt('abc')` or `Infinity` and end up with unbounded SQL.
+ */
+function clampLimit(value: number, fallback: number, name: string): number {
+  const v = value ?? fallback;
+  if (typeof v !== 'number' || !Number.isFinite(v)) {
+    throw new Error(`hybridSearch: ${name} must be a finite number (got ${String(v)})`);
+  }
+  const n = v | 0;
+  return Math.max(1, Math.min(n, MAX_LIMIT));
+}
+
+/**
+ * Module-level cache of whether the chunks_vec virtual table exists on a
+ * given Database handle. Avoids re-probing on every call and avoids relying
+ * on regex matching against driver-specific error messages.
+ */
+function hasVecTable(db: Database.Database): boolean {
+  const tagged = db as Database.Database & { __synergyHasVec?: boolean };
+  if (typeof tagged.__synergyHasVec === 'boolean') return tagged.__synergyHasVec;
+  try {
+    db.prepare('SELECT count(*) FROM chunks_vec LIMIT 0').get();
+    tagged.__synergyHasVec = true;
+  } catch {
+    tagged.__synergyHasVec = false;
+  }
+  return tagged.__synergyHasVec!;
+}
+
+let warnedNoVec = false;
+
 export interface HybridResult {
   chunk_id: number;
   change_id: number;
@@ -45,9 +81,18 @@ export async function hybridSearch(
   query: string,
   opts: HybridOptions = {}
 ): Promise<HybridResult[]> {
-  const limit = opts.limit ?? 20;
-  const topK = opts.topK ?? 60;
+  // Clamp all user-supplied row-pull params to [1, MAX_LIMIT] integers up-front.
+  // Prevents unbounded SQL placeholders + NaN/Infinity from sneaking through.
+  const safeLimit = clampLimit(opts.limit as number, 20, 'limit');
+  const safeTopK = clampLimit(opts.topK as number, 60, 'topK');
+  // rerankCandidates must be at least safeLimit so we always have enough rows
+  // to fill the final result set after reranking.
+  const rerankRequested = clampLimit(opts.rerankCandidates as number, 20, 'rerankCandidates');
+  const safeRerankN = Math.max(safeLimit, rerankRequested);
   const rrfK = opts.rrfK ?? 60;
+  if (typeof rrfK !== 'number' || !Number.isFinite(rrfK)) {
+    throw new Error(`hybridSearch: rrfK must be a finite number (got ${String(rrfK)})`);
+  }
   const emb = makeEmbeddingProvider(opts.embedProviderName ?? 'ollama');
 
   // Pre-filter SQL fragment shared by both channels
@@ -79,7 +124,7 @@ export async function hybridSearch(
       ORDER BY bm25(chunks_fts)
       LIMIT @topK
     `;
-    fts = db.prepare(ftsSql).all({ ...params, query, topK }) as any;
+    fts = db.prepare(ftsSql).all({ ...params, query, topK: safeTopK }) as any;
   } catch (e) {
     // Sanitize query for FTS5 (strip dashes/special chars to bare tokens)
     const sanitized = query.replace(/[^A-Za-z0-9 ]/g, ' ').trim();
@@ -93,28 +138,33 @@ export async function hybridSearch(
         ORDER BY bm25(chunks_fts)
         LIMIT @topK
       `;
-      fts = db.prepare(ftsSql).all({ ...params, query: sanitized, topK }) as any;
+      fts = db.prepare(ftsSql).all({ ...params, query: sanitized, topK: safeTopK }) as any;
     }
   }
 
-  // Vec channel
-  const [qvec] = await emb.embed([query]);
-  const vecSql = `
-    SELECT ch.id AS id, row_number() OVER (ORDER BY distance) AS rank_pos
-    FROM chunks_vec
-    JOIN chunks ch ON ch.id = chunks_vec.rowid
-    WHERE chunks_vec.embedding MATCH @qvec AND k = @topK
-      ${whereClause}
-    ORDER BY distance
-  `;
+  // Vec channel — probe sqlite-vec existence up-front instead of relying on
+  // regex-matched error messages from the driver.
+  const vecAvailable = hasVecTable(db);
   let vec: Array<{ id: number; rank_pos: number }> = [];
-  try {
+  if (vecAvailable) {
+    const [qvec] = await emb.embed([query]);
+    const vecSql = `
+      SELECT ch.id AS id, row_number() OVER (ORDER BY distance) AS rank_pos
+      FROM chunks_vec
+      JOIN chunks ch ON ch.id = chunks_vec.rowid
+      WHERE chunks_vec.embedding MATCH @qvec AND k = @topK
+        ${whereClause}
+      ORDER BY distance
+    `;
+    // sqlite-vec accepts Float32Array directly for MATCH; align with insert path
+    // at src/embed.ts which passes vectors[j] (Float32Array) into chunks_vec.
     vec = db
       .prepare(vecSql)
-      .all({ ...params, qvec: Buffer.from(qvec.buffer), topK }) as any;
-  } catch (e: any) {
-    // If chunks_vec isn't populated yet, vec channel is empty
-    if (!/no such table|no such function/i.test(e.message)) throw e;
+      .all({ ...params, qvec, topK: safeTopK }) as any;
+  } else if (!warnedNoVec && !process.env.MCP_QUIET && !process.env.CLAUDE_SYNERGY_QUIET) {
+    // One-time stderr warning so MCP-stdio callers (which set MCP_QUIET) stay clean.
+    console.warn('[hybrid] sqlite-vec table not found; using BM25-only');
+    warnedNoVec = true;
   }
 
   // RRF fusion
@@ -135,10 +185,9 @@ export async function hybridSearch(
   if (scores.size === 0) return [];
 
   // RRF top candidates
-  const rerankCandidatesN = opts.rerankCandidates ?? 20;
   const rrfRanked = Array.from(scores.entries())
     .sort(([, a], [, b]) => b.score - a.score)
-    .slice(0, Math.max(limit, rerankCandidatesN));
+    .slice(0, safeRerankN);
 
   // Pull rows for candidates
   const candidateIds = rrfRanked.map(([id]) => id);
@@ -160,7 +209,7 @@ export async function hybridSearch(
   if (rerankProviderName !== 'none') {
     const reranker = makeRerankProvider(rerankProviderName);
     const candidates: RerankCandidate[] = rrfRanked
-      .slice(0, rerankCandidatesN)
+      .slice(0, rerankRequested)
       .map(([id]) => ({ id, text: byId.get(id)?.contextualized ?? byId.get(id)?.text ?? '' }))
       .filter((c) => c.text);
     const results = await reranker.rerank(query, candidates);
@@ -182,7 +231,7 @@ export async function hybridSearch(
       }
       return b.rrf - a.rrf;
     })
-    .slice(0, limit);
+    .slice(0, safeLimit);
 
   return final
     .map((entry) => {

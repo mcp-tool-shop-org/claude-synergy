@@ -2,7 +2,7 @@
 
 **Status:** authoritative — reflects the actual code at v0.7.0
 **Supersedes:** `test-spec.md` (v1) + `test-spec-2.md` (v2) as the single source of truth going forward
-**State at writing:** 35 products / 1,143 release files / 6,042 changes / 1,225 entities / 12 synergies / 239 tests / 85% coverage / **6 commits ahead of v0.6.1 pushed**
+**State at writing:** 35 products / 1,143 release files / 6,042 changes / 1,225 entities / 12 synergies / 291 tests / 85% coverage / **6 commits ahead of v0.6.1 pushed**
 
 This document **describes the final state** of the test suite for Claude Synergy through Phase 4d. The earlier specs (v1, v2) remain in the repo as **historical record of what was planned and why** — they're useful context but not load-bearing for new contributors. Read v3 to understand the current state; read v1/v2 to understand the design lineage.
 
@@ -92,7 +92,7 @@ Integration test (opt-in via `RUN_PLAYWRIGHT_E2E=1`): one real fetch against win
 | `test/unit/fetch-playwright.test.ts` | ~10 | medium (dynamic-import mocking is finicky) |
 | Optional integration: `test/integration/yaml-config.test.ts` | ~3 | low (parity check that hardcoded fallback == YAML path) |
 
-**Total new tests: ~37.** Brings suite from 239 → ~276 tests. Stays well under the 60s SLA.
+**Total new tests: ~37.** Brings suite from 291 → ~328 tests. Stays well under the 60s SLA.
 
 ---
 
@@ -100,9 +100,9 @@ Integration test (opt-in via `RUN_PLAYWRIGHT_E2E=1`): one real fetch against win
 
 When this spec is implemented:
 
-1. `pnpm test` exits 0 with ~276 tests passing
+1. `pnpm test` exits 0 with ~328 tests passing
 2. Coverage thresholds met (80/75/85/80 from v1; products-config.ts at 95%+; fetch-mcp-registry at 90%+; fetch-playwright at 80%+ given dynamic-import quirks)
-3. No regression in existing 239 tests
+3. No regression in existing 291 tests
 4. CI runs cleanly without playwright installed (the dynamic-import path is exercised, but the mock substitutes for the real lib)
 5. README's `## Testing` section updated to mention test-spec-3 as the current authority
 
@@ -145,7 +145,7 @@ products.yaml                         # Single source of truth (NEW v0.7.0)
 schema.sql, schema-vec.sql            # SQLite + sqlite-vec schemas
 products/                             # 35 products, 1,143 release files + 2 catalogs
 synergies/                            # 12 curated cross-product workflows
-test/                                 # 25 test files, 239 tests
+test/                                 # 28 test files, 291 tests
 ```
 
 ---
@@ -158,7 +158,7 @@ You are picking up Claude Synergy after Phase 4d. The 4 new features
 as v0.7.0. Your job is to write the remaining tests per test-spec-3.md
 (in repo root). v1 and v2 specs are historical context — work from v3.
 
-Run `pnpm test` to see what's passing (239 tests currently). Add the
+Run `pnpm test` to see what's passing (291 tests currently). Add the
 estimated ~37 new tests from §3. Run `pnpm test:coverage` to check
 thresholds. Use the existing patterns:
   - test/helpers/temp-db.ts for SQLite

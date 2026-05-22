@@ -10,6 +10,26 @@ import type { ContextProvider, ChangeChunk, ReleaseContext } from '../types.js';
  * For high-volume corpora, prefer `structured` (deterministic) or batch via
  * Claude Haiku with prompt caching.
  */
+
+function providerTimeoutMs(): number {
+  const raw = process.env.CLAUDE_SYNERGY_PROVIDER_TIMEOUT_MS;
+  const n = raw === undefined ? NaN : parseInt(raw, 10);
+  return Number.isFinite(n) && n > 0 ? n : 60_000;
+}
+
+async function safeErrorBody(res: Response, max = 200): Promise<string> {
+  try {
+    const body = await res.text();
+    const safe = body
+      .split('\n')
+      .filter((l) => !/x-api-key|authorization|bearer|api[-_]?key/i.test(l))
+      .join('\n');
+    return safe.slice(0, max);
+  } catch {
+    return '<unreadable>';
+  }
+}
+
 export class OllamaContextProvider implements ContextProvider {
   readonly name = 'ollama';
   private host: string;
@@ -43,17 +63,27 @@ export class OllamaContextProvider implements ContextProvider {
       `Please give a short succinct context (1 sentence, max 30 words) to situate this chunk within the overall document for improving search retrieval of the chunk. Mention any related product names, env vars, command names, or APIs. Answer only with the succinct context and nothing else.`,
     ].join('\n');
 
-    const res = await fetch(`${this.host}/api/generate`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model: this.model,
-        prompt,
-        stream: false,
-        options: { temperature: 0, num_predict: 80 },
-      }),
-    });
-    if (!res.ok) throw new Error(`Ollama ${res.status} ${await res.text()}`);
+    const timeoutMs = providerTimeoutMs();
+    let res: Response;
+    try {
+      res = await fetch(`${this.host}/api/generate`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: this.model,
+          prompt,
+          stream: false,
+          options: { temperature: 0, num_predict: 80 },
+        }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch (e: any) {
+      if (e?.name === 'TimeoutError' || e?.name === 'AbortError') {
+        throw new Error(`Ollama context request timed out after ${timeoutMs}ms — is the Ollama server responsive?`);
+      }
+      throw e;
+    }
+    if (!res.ok) throw new Error(`Ollama ${res.status}: ${await safeErrorBody(res)}`);
     const json = (await res.json()) as { response: string };
     return json.response.trim();
   }

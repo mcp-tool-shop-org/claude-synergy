@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import { join, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { openDb, initSchema } from './db.js';
 import { ingestAll } from './ingest.js';
 import { searchChanges, lookupEntity, recentReleases, listProducts, entityFrequency } from './query.js';
@@ -13,11 +14,37 @@ const cwd = process.cwd();
 const DEFAULT_DB = join(cwd, 'data', 'claude-synergy.db');
 const DEFAULT_PRODUCTS = join(cwd, 'products');
 
+// Single-source-of-truth version from package.json (avoids hardcoded drift).
+const _require = createRequire(import.meta.url);
+const { version: PKG_VERSION } = _require('../package.json') as { version: string };
+
+/**
+ * Validate a CLI integer option. Rejects NaN, non-finite, out-of-range, and
+ * negative values that would otherwise propagate into SQL LIMIT clauses as
+ * silent garbage (`LIMIT NaN` errors at the driver, but `LIMIT -1` runs).
+ */
+function intOpt(name: string, raw: string | undefined, defaultValue: number, min = 1, max = 10_000): number {
+  if (raw === undefined) return defaultValue;
+  const n = parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < min || n > max) {
+    console.error(`error: --${name} must be an integer in [${min}, ${max}] (got: ${raw})`);
+    process.exit(1);
+  }
+  return n;
+}
+
+const CONTEXT_PROVIDERS = ['none', 'structured', 'ollama', 'claude-haiku'] as const;
+const EMBED_PROVIDERS = ['ollama', 'voyage'] as const;
+const RERANK_PROVIDERS = ['none', 'ollama-judge', 'voyage', 'cohere'] as const;
+type ContextProviderName = (typeof CONTEXT_PROVIDERS)[number];
+type EmbedProviderName = (typeof EMBED_PROVIDERS)[number];
+type RerankProviderName = (typeof RERANK_PROVIDERS)[number];
+
 const program = new Command();
 program
   .name('hk')
   .description('Claude Synergy — local Anthropic changelog mirror + cross-product synergies')
-  .version('0.1.0')
+  .version(PKG_VERSION)
   .enablePositionalOptions();
 
 program
@@ -80,7 +107,7 @@ program
         product: opts.product,
         since: opts.since,
         kind: opts.kind,
-        limit: parseInt(opts.limit, 10),
+        limit: intOpt('limit', opts.limit, 20),
       });
     } catch (e: any) {
       console.error(`✗ query failed: ${e.message}`);
@@ -196,60 +223,94 @@ program
   .option('-r, --products-root <path>', 'products dir', DEFAULT_PRODUCTS)
   .option('--skip-fetch', 'skip the fetch step (just ingest+embed existing files)')
   .option('--skip-embed', 'skip the embed step (fetch+ingest only)')
-  .option('-c, --context <provider>', 'context provider for embed', 'structured')
-  .option('-e, --embed-provider <provider>', 'embedding provider', 'ollama')
-  .action(async (opts: { db: string; productsRoot: string; skipFetch?: boolean; skipEmbed?: boolean; context: string; embedProvider: string }) => {
-    const db = openDb(opts.db);
-    initSchema(db);
-    const t0 = Date.now();
-    try {
-      if (!opts.skipFetch) {
-        console.log('=== fetch ===');
-        const stats = await fetchAll(db, opts.productsRoot);
-        const total = stats.reduce((sum, s) => sum + s.fetched, 0);
-        console.log(`fetched ${total} new release${total === 1 ? '' : 's'}`);
-      }
-      console.log('\n=== ingest ===');
-      const { ingestAll } = await import('./ingest.js');
-      const ingestStats = ingestAll(db, opts.productsRoot);
-      console.log(`ingested ${ingestStats.releasesAdded} releases, ${ingestStats.changesAdded} changes, ${ingestStats.entitiesAdded} entities`);
+  .addOption(
+    new Option('-c, --context <provider>', 'context provider for embed')
+      .default('structured')
+      .choices([...CONTEXT_PROVIDERS])
+  )
+  .addOption(
+    new Option('-e, --embed-provider <provider>', 'embedding provider')
+      .default('ollama')
+      .choices([...EMBED_PROVIDERS])
+  )
+  .action(
+    async (opts: {
+      db: string;
+      productsRoot: string;
+      skipFetch?: boolean;
+      skipEmbed?: boolean;
+      context: ContextProviderName;
+      embedProvider: EmbedProviderName;
+    }) => {
+      const db = openDb(opts.db);
+      initSchema(db);
+      const t0 = Date.now();
+      try {
+        if (!opts.skipFetch) {
+          console.log('=== fetch ===');
+          const stats = await fetchAll(db, opts.productsRoot);
+          const total = stats.reduce((sum, s) => sum + s.fetched, 0);
+          console.log(`fetched ${total} new release${total === 1 ? '' : 's'}`);
+        }
+        console.log('\n=== ingest ===');
+        const { ingestAll } = await import('./ingest.js');
+        const ingestStats = ingestAll(db, opts.productsRoot);
+        console.log(`ingested ${ingestStats.releasesAdded} releases, ${ingestStats.changesAdded} changes, ${ingestStats.entitiesAdded} entities`);
 
-      if (!opts.skipEmbed) {
-        console.log('\n=== embed ===');
-        const embedStats = await embedAll(db, {
-          contextProviderName: opts.context as any,
-          embeddingProviderName: opts.embedProvider as any,
-        });
-        console.log(`embedded ${embedStats.chunksCreated} new chunks via ${embedStats.contextProvider} + ${embedStats.embeddingProvider}`);
+        if (!opts.skipEmbed) {
+          console.log('\n=== embed ===');
+          const embedStats = await embedAll(db, {
+            contextProviderName: opts.context,
+            embeddingProviderName: opts.embedProvider,
+          });
+          console.log(`embedded ${embedStats.chunksCreated} new chunks via ${embedStats.contextProvider} + ${embedStats.embeddingProvider}`);
+        }
+        console.log(`\n✓ sync complete in ${Date.now() - t0}ms`);
+      } catch (e: any) {
+        console.error(`✗ sync failed: ${e.message}`);
+        process.exit(1);
+      } finally {
+        db.close();
       }
-      console.log(`\n✓ sync complete in ${Date.now() - t0}ms`);
-    } catch (e: any) {
-      console.error(`✗ sync failed: ${e.message}`);
-      process.exit(1);
-    } finally {
-      db.close();
     }
-  });
+  );
 
 program
   .command('embed')
   .description('Generate contextual chunks + embeddings (Tier 2b — opt-in semantic layer)')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .option('-c, --context <provider>', 'context provider: none | structured | ollama | claude-haiku', 'structured')
-  .option('-e, --embed <provider>', 'embedding provider: ollama | voyage', 'ollama')
+  .addOption(
+    new Option('-c, --context <provider>', 'context provider')
+      .default('structured')
+      .choices([...CONTEXT_PROVIDERS])
+  )
+  .addOption(
+    new Option('-e, --embed <provider>', 'embedding provider')
+      .default('ollama')
+      .choices([...EMBED_PROVIDERS])
+  )
   .option('-p, --product <name>', 'limit to one product')
   .option('-l, --limit <n>', 'embed at most N pending chunks (testing)')
   .option('--batch-size <n>', 'embedding batch size', '64')
   .option('--force', 'recompute even if chunk already exists')
-  .action(async (opts: { db: string; context: string; embed: string; product?: string; limit?: string; batchSize: string; force?: boolean }) => {
+  .action(
+    async (opts: {
+      db: string;
+      context: ContextProviderName;
+      embed: EmbedProviderName;
+      product?: string;
+      limit?: string;
+      batchSize: string;
+      force?: boolean;
+    }) => {
     const db = openDb(opts.db);
     try {
       const stats = await embedAll(db, {
-        contextProviderName: opts.context as any,
-        embeddingProviderName: opts.embed as any,
+        contextProviderName: opts.context,
+        embeddingProviderName: opts.embed,
         product: opts.product,
-        limit: opts.limit ? parseInt(opts.limit, 10) : undefined,
-        batchSize: parseInt(opts.batchSize, 10),
+        limit: opts.limit !== undefined ? intOpt('limit', opts.limit, 1) : undefined,
+        batchSize: intOpt('batch-size', opts.batchSize, 64),
         force: opts.force,
       });
       console.log(`✓ embedded ${stats.chunksCreated} chunks in ${stats.totalMs}ms`);
@@ -276,12 +337,34 @@ program
   .option('-p, --product <name>', 'limit to one product')
   .option('-s, --since <date>', 'YYYY-MM-DD lower bound')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
-  .option('-e, --embed <provider>', 'embedding provider for query', 'ollama')
-  .option('-r, --rerank <provider>', 'rerank provider: none | ollama-judge | voyage | cohere', 'none')
+  .addOption(
+    new Option('-e, --embed <provider>', 'embedding provider for query')
+      .default('ollama')
+      .choices([...EMBED_PROVIDERS])
+  )
+  .addOption(
+    new Option('-r, --rerank <provider>', 'rerank provider')
+      .default('none')
+      .choices([...RERANK_PROVIDERS])
+  )
   .option('-l, --limit <n>', 'max results', '10')
   .option('--top-k <n>', 'per-channel pull before fusion', '60')
   .option('--rerank-candidates <n>', 'how many RRF candidates to rerank', '20')
-  .action(async (text: string, opts: { db: string; product?: string; since?: string; kind?: string; embed: string; rerank: string; limit: string; topK: string; rerankCandidates: string }) => {
+  .action(
+    async (
+      text: string,
+      opts: {
+        db: string;
+        product?: string;
+        since?: string;
+        kind?: string;
+        embed: EmbedProviderName;
+        rerank: RerankProviderName;
+        limit: string;
+        topK: string;
+        rerankCandidates: string;
+      }
+    ) => {
     const db = openDb(opts.db);
     try {
       const t0 = Date.now();
@@ -289,11 +372,11 @@ program
         product: opts.product,
         since: opts.since,
         kind: opts.kind,
-        embedProviderName: opts.embed as any,
-        rerankProviderName: opts.rerank as any,
-        limit: parseInt(opts.limit, 10),
-        topK: parseInt(opts.topK, 10),
-        rerankCandidates: parseInt(opts.rerankCandidates, 10),
+        embedProviderName: opts.embed,
+        rerankProviderName: opts.rerank,
+        limit: intOpt('limit', opts.limit, 10),
+        topK: intOpt('top-k', opts.topK, 60),
+        rerankCandidates: intOpt('rerank-candidates', opts.rerankCandidates, 20),
       });
       const ms = Date.now() - t0;
       if (results.length === 0) {
@@ -327,7 +410,7 @@ program
   .option('-l, --limit <n>', 'max results', '20')
   .action((opts: { db: string; product?: string; limit: string }) => {
     const db = openDb(opts.db);
-    const releases = recentReleases(db, opts.product, parseInt(opts.limit, 10));
+    const releases = recentReleases(db, opts.product, intOpt('limit', opts.limit, 20));
     for (const r of releases) {
       console.log(`${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
     }
@@ -357,7 +440,7 @@ program
   .option('-l, --limit <n>', 'max results', '30')
   .action((entityType: string, opts: { db: string; limit: string }) => {
     const db = openDb(opts.db);
-    const results = entityFrequency(db, entityType, parseInt(opts.limit, 10));
+    const results = entityFrequency(db, entityType, intOpt('limit', opts.limit, 30));
     if (results.length === 0) {
       console.log(`(no entities of type "${entityType}")`);
     } else {

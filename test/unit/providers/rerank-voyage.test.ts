@@ -33,7 +33,9 @@ describe('VoyageRerankProvider — shape only', () => {
     try {
       expect(() => new VoyageRerankProvider({})).toThrow(/VOYAGE_API_KEY/);
     } finally {
-      if (orig !== undefined) process.env.VOYAGE_API_KEY = orig;
+      // Canonical env-restore (matches test/regression/bugs.test.ts §8.6).
+      if (orig === undefined) delete process.env.VOYAGE_API_KEY;
+      else process.env.VOYAGE_API_KEY = orig;
     }
   });
 

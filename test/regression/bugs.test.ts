@@ -69,7 +69,7 @@ describe('§8.2 searchChanges does not error on FTS5 column ambiguity', () => {
 
 // ─── 8.3 Commander variadic does not consume options ───────────────────────
 describe('§8.3 Commander variadic does not consume options', () => {
-  it('hk query foo --limit 3 keeps `foo` as the positional and `3` as --limit', () => {
+  it('hk query foo --limit 2 keeps `foo` as the positional and `2` as --limit', () => {
     seedSampleProducts(temp.db);
     temp.db.close();
     const result = spawnSync(
@@ -78,8 +78,13 @@ describe('§8.3 Commander variadic does not consume options', () => {
       { encoding: 'utf-8', timeout: 25_000, shell: process.platform === 'win32', env: { ...process.env, HK_DEBUG: '1' } }
     );
     expect(result.status).toBe(0);
-    // HK_DEBUG mode echoes parsed args; check the limit was parsed
-    expect((result.stderr ?? '') + (result.stdout ?? '')).toMatch(/limit/i);
+    // HK_DEBUG mode echoes parsed args as JSON to stderr. Specifically assert
+    // the user-supplied --limit value (2) survived parsing — if the variadic
+    // had eaten the option, this would show "20" (commander default) instead.
+    const combined = (result.stderr ?? '') + (result.stdout ?? '');
+    expect(combined).toMatch(/"limit":\s*"2"/);
+    // Belt-and-suspenders: confirm the positional made it through as well.
+    expect(combined).toMatch(/text=\s*"workflow"/);
   }, 35_000);
 });
 
@@ -155,18 +160,34 @@ describe('§8.6 OLLAMA_HOST without protocol is normalized', () => {
 });
 
 // ─── 8.7 sqlite-vec accepts BigInt rowid + Float32Array embedding ──────────
-describe('§8.7 sqlite-vec rowid + embedding contract', () => {
+// Probe sqlite-vec load at module-eval time. If unavailable on this host (e.g.
+// musl or some CI runners), skip the whole describe block instead of pretending
+// to skip and then exploding on CREATE VIRTUAL TABLE.
+let __vecLoadFailed = false;
+try {
+  const probeDir = mkdtempSync(join(tmpdir(), 'vec-probe-'));
+  const probeDb = new Database(join(probeDir, 'probe.db'));
+  try {
+    sqliteVec.load(probeDb);
+    probeDb.prepare('SELECT vec_version()').get();
+  } catch {
+    __vecLoadFailed = true;
+  } finally {
+    try { probeDb.close(); } catch { /* noop */ }
+    try { rmSync(probeDir, { recursive: true, force: true }); } catch { /* noop */ }
+  }
+} catch {
+  __vecLoadFailed = true;
+}
+
+describe.runIf(!__vecLoadFailed)('§8.7 sqlite-vec rowid + embedding contract', () => {
   let dir: string;
   let db: Database.Database;
 
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), 'vec-test-'));
     db = new Database(join(dir, 'v.db'));
-    try {
-      sqliteVec.load(db);
-    } catch {
-      // skip if extension unavailable
-    }
+    sqliteVec.load(db);
     db.exec(`CREATE VIRTUAL TABLE IF NOT EXISTS chunks_vec USING vec0(embedding FLOAT[768]);`);
   });
   afterEach(() => {
@@ -232,7 +253,9 @@ describe('§8.9 OllamaJudgeRerankProvider default model is qwen3:8b', () => {
       const p = new OllamaJudgeRerankProvider();
       expect((p as any).model).toBe('qwen3:8b');
     } finally {
-      if (orig !== undefined) process.env.OLLAMA_RERANK_MODEL = orig;
+      // Canonical env-restore (matches §8.6 pattern).
+      if (orig === undefined) delete process.env.OLLAMA_RERANK_MODEL;
+      else process.env.OLLAMA_RERANK_MODEL = orig;
     }
   });
 });
@@ -254,18 +277,22 @@ describe('§8.10 fetch idempotency with v-prefix dual-form check', () => {
       join(productsRoot, 'claude-code-action', 'releases', 'v1.0.29.md'),
       '# already here'
     );
+    let callCount = 0;
+    const respond = () =>
+      ++callCount === 1
+        ? JSON.stringify([
+            {
+              tag_name: 'v1.0.29',
+              published_at: '2026-04-01T10:00:00Z',
+              name: 'r',
+              body: '- one',
+              html_url: 'u',
+            },
+          ])
+        : '[]';
     vi.doMock('node:child_process', () => ({
-      execSync: vi.fn(() =>
-        JSON.stringify([
-          {
-            tag_name: 'v1.0.29',
-            published_at: '2026-04-01T10:00:00Z',
-            name: 'r',
-            body: '- one',
-            html_url: 'u',
-          },
-        ])
-      ),
+      execFileSync: vi.fn(respond),
+      execSync: vi.fn(respond),
     }));
     const { fetchAll } = await import('../../src/fetch.js');
     const stats = await fetchAll(temp.db, productsRoot, { product: 'claude-code-action' });
@@ -290,18 +317,28 @@ describe('§8.11 gh api JSON parsing in JS, not shell jq', () => {
 
   it('command does NOT contain --jq; filter happens in JS', async () => {
     let capturedCmd = '';
+    let callCount = 0;
+    // src/fetch.ts now uses execFileSync('gh', ['api', 'repos/.../releases?...']).
+    // Reconstruct the equivalent command string from (file, args) for assertion.
+    const recordAndRespond = (file: string, args?: string[]) => {
+      capturedCmd = args ? `${file} ${args.join(' ')}` : String(file);
+      return ++callCount === 1
+        ? JSON.stringify([
+            {
+              tag_name: 'v0.1.0',
+              published_at: '2026-04-01T10:00:00Z',
+              name: 'r',
+              body: '- one',
+              html_url: 'u',
+            },
+          ])
+        : '[]';
+    };
     vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(recordAndRespond),
       execSync: vi.fn((cmd: string) => {
         capturedCmd = cmd;
-        return JSON.stringify([
-          {
-            tag_name: 'v0.1.0',
-            published_at: '2026-04-01T10:00:00Z',
-            name: 'r',
-            body: '- one',
-            html_url: 'u',
-          },
-        ]);
+        return recordAndRespond(cmd);
       }),
     }));
     const dir = mkdtempSync(join(tmpdir(), 'jq-test-'));
@@ -309,7 +346,7 @@ describe('§8.11 gh api JSON parsing in JS, not shell jq', () => {
       const { fetchAll } = await import('../../src/fetch.js');
       await fetchAll(temp.db, dir, { product: 'claude-agent-sdk-python' });
       expect(capturedCmd).not.toContain('--jq');
-      // The command should be a plain `gh api repos/...` call
+      // The command should be a plain `gh api repos/...` invocation
       expect(capturedCmd).toMatch(/gh api/);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -324,18 +361,22 @@ describe('§8.12 Markers upsert on (product, name)', () => {
   });
 
   it('writing the same marker twice keeps row count at 1, updates version', async () => {
+    let callCount1 = 0;
+    const respond1 = () =>
+      ++callCount1 === 1
+        ? JSON.stringify([
+            {
+              tag_name: 'v0.1.0',
+              published_at: '2026-04-01T10:00:00Z',
+              name: 'r',
+              body: '- one',
+              html_url: 'u',
+            },
+          ])
+        : '[]';
     vi.doMock('node:child_process', () => ({
-      execSync: vi.fn(() =>
-        JSON.stringify([
-          {
-            tag_name: 'v0.1.0',
-            published_at: '2026-04-01T10:00:00Z',
-            name: 'r',
-            body: '- one',
-            html_url: 'u',
-          },
-        ])
-      ),
+      execFileSync: vi.fn(respond1),
+      execSync: vi.fn(respond1),
     }));
     const dir = mkdtempSync(join(tmpdir(), 'marker-up-'));
     try {
@@ -346,18 +387,22 @@ describe('§8.12 Markers upsert on (product, name)', () => {
       ).c;
       expect(c1).toBe(1);
       vi.resetModules();
+      let callCount2 = 0;
+      const respond2 = () =>
+        ++callCount2 === 1
+          ? JSON.stringify([
+              {
+                tag_name: 'v0.2.0',
+                published_at: '2026-04-15T10:00:00Z',
+                name: 'r',
+                body: '- two',
+                html_url: 'u',
+              },
+            ])
+          : '[]';
       vi.doMock('node:child_process', () => ({
-        execSync: vi.fn(() =>
-          JSON.stringify([
-            {
-              tag_name: 'v0.2.0',
-              published_at: '2026-04-15T10:00:00Z',
-              name: 'r',
-              body: '- two',
-              html_url: 'u',
-            },
-          ])
-        ),
+        execFileSync: vi.fn(respond2),
+        execSync: vi.fn(respond2),
       }));
       const { fetchAll: fetchAll2 } = await import('../../src/fetch.js');
       await fetchAll2(temp.db, dir, { product: 'claude-agent-sdk-python' });
@@ -512,25 +557,80 @@ describe('§8.15 compactCommitDumpBody: continue-cli-style git commit dump colla
 
 // ─── 8.16 npm-scoped filename sanitization (Tier 4a, v0.4.0) ───────────────
 // Tags like @modelcontextprotocol/server@2.0.0-alpha.2 must NOT produce filename
-// with @ or / chars that break Windows paths. Verified at the fetch.ts level.
+// with @ or / chars that break Windows paths. Verified at the fetch.ts level
+// via the PUBLIC surface (fetchAll with mocked gh CLI) — this catches a real
+// regression if filenameFor() ever loses the npm-scoped sanitization rules.
 describe('§8.16 npm-scoped multiPackage tag → sanitized filename', () => {
-  it('@scope/pkg@1.0.0 → scope-pkg-1.0.0.md (no @ or / in filename)', async () => {
-    // We test indirectly: write a fixture that simulates having received an npm-scoped tag
-    // by checking the rendered filename via the existing multiPackage logic shape.
-    const sanitize = (tag: string): string =>
-      tag
-        .replace(/^@/, '')
-        .replace(/\//g, '-')
-        .replace(/@/g, '-')
-        .replace(/-v(\d)/g, '-$1')
-        .replace(/^v/, '');
+  beforeEach(() => {
+    vi.resetModules();
+  });
 
-    expect(sanitize('@modelcontextprotocol/server@2.0.0-alpha.2')).toBe(
-      'modelcontextprotocol-server-2.0.0-alpha.2'
-    );
-    expect(sanitize('@continuedev/config-yaml@1.42.0')).toBe('continuedev-config-yaml-1.42.0');
-    expect(sanitize('sdk-v0.98.0')).toBe('sdk-0.98.0'); // existing Anthropic style still works
-    expect(sanitize('v1.3.38-vscode')).toBe('1.3.38-vscode'); // Continue's platform suffix
+  it('@scope/pkg@1.0.0 → scope-pkg-1.0.0.md (no @ or / in filename)', async () => {
+    // Mock gh CLI returning an npm-scoped tag from a multiPackage repo
+    // (mcp-typescript-sdk has multi_package: true in products.yaml).
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(() =>
+        JSON.stringify([
+          {
+            tag_name: '@modelcontextprotocol/server@2.0.0-alpha.2',
+            published_at: '2026-04-01T10:00:00Z',
+            name: 'server 2.0.0-alpha.2',
+            body: '- first npm-scoped release',
+            html_url: 'https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/x',
+          },
+        ])
+      ),
+    }));
+    const dir = mkdtempSync(join(tmpdir(), 'npm-scoped-'));
+    try {
+      const { fetchAll } = await import('../../src/fetch.js');
+      await fetchAll(temp.db, dir, { product: 'mcp-typescript-sdk' });
+      const releasesDir = join(dir, 'mcp-typescript-sdk', 'releases');
+      // Expected sanitized name: '@' stripped, '/' → '-', '@' (between name+version) → '-'
+      expect(
+        existsSync(join(releasesDir, 'modelcontextprotocol-server-2.0.0-alpha.2.md'))
+      ).toBe(true);
+      // Negative: no file should retain the raw '@' or '/' chars in its name
+      expect(
+        existsSync(join(releasesDir, '@modelcontextprotocol-server@2.0.0-alpha.2.md'))
+      ).toBe(false);
+      expect(
+        existsSync(join(releasesDir, '@modelcontextprotocol/server@2.0.0-alpha.2.md'))
+      ).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('continue-style @scope/pkg@N tag → scope-pkg-N (no @ or / in filename)', async () => {
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(() =>
+        JSON.stringify([
+          {
+            tag_name: '@continuedev/config-yaml@1.42.0',
+            published_at: '2026-04-02T10:00:00Z',
+            name: 'config-yaml 1.42.0',
+            body: '- second npm-scoped release',
+            html_url: 'https://github.com/continuedev/continue/releases/tag/x',
+          },
+        ])
+      ),
+    }));
+    const dir = mkdtempSync(join(tmpdir(), 'npm-scoped-2-'));
+    try {
+      const { fetchAll } = await import('../../src/fetch.js');
+      // continue-dev is also multiPackage in products.yaml
+      await fetchAll(temp.db, dir, { product: 'continue-dev' });
+      const releasesDir = join(dir, 'continue-dev', 'releases');
+      expect(
+        existsSync(join(releasesDir, 'continuedev-config-yaml-1.42.0.md'))
+      ).toBe(true);
+      expect(
+        existsSync(join(releasesDir, '@continuedev-config-yaml@1.42.0.md'))
+      ).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
 
