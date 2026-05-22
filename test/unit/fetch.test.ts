@@ -266,6 +266,80 @@ describe('fetchAll', () => {
   });
 });
 
+describe('fetchAll pagination', () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('walks beyond the 100-release first page', async () => {
+    // 100 items on page 1, 30 items on page 2, then [] → terminate.
+    // Exercises the new ghReleases() pagination loop (page < 50 ceiling).
+    const page1 = Array.from({ length: 100 }, (_, i) => ({
+      tag_name: `v0.${i + 1}.0`,
+      published_at: '2026-04-15T10:00:00Z',
+      name: 'r',
+      body: '- one',
+      html_url: 'u',
+    }));
+    const page2 = Array.from({ length: 30 }, (_, i) => ({
+      tag_name: `v0.${i + 101}.0`,
+      published_at: '2026-04-16T10:00:00Z',
+      name: 'r',
+      body: '- one',
+      html_url: 'u',
+    }));
+    let call = 0;
+    const respond = () => {
+      call += 1;
+      if (call === 1) return JSON.stringify(page1);
+      if (call === 2) return JSON.stringify(page2);
+      return '[]';
+    };
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(respond),
+      execSync: vi.fn(respond),
+    }));
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const stats = await fetchAllMocked(temp.db, productsRoot, {
+      product: 'claude-agent-sdk-python',
+    });
+    // All 130 releases land on disk
+    expect(stats[0].fetched).toBe(130);
+    expect(call).toBeGreaterThanOrEqual(2);
+  });
+
+  it('terminates cleanly on partial first page (< 100 results)', async () => {
+    let call = 0;
+    const respond = () => {
+      call += 1;
+      return JSON.stringify(
+        call === 1
+          ? [
+              {
+                tag_name: 'v0.1.0',
+                published_at: '2026-04-15T10:00:00Z',
+                name: 'r',
+                body: '- one',
+                html_url: 'u',
+              },
+            ]
+          : []
+      );
+    };
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(respond),
+      execSync: vi.fn(respond),
+    }));
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const stats = await fetchAllMocked(temp.db, productsRoot, {
+      product: 'claude-agent-sdk-python',
+    });
+    expect(stats[0].fetched).toBe(1);
+    // Should NOT have called past page 1 — partial-page early break
+    expect(call).toBe(1);
+  });
+});
+
 describe('seedMarkersFromDb', () => {
   it('populates markers based on max released_at per product', () => {
     seedSampleProducts(temp.db);
