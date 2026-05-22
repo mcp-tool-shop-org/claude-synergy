@@ -3,12 +3,16 @@
   "version": "0.7.2",
   "description": "Local mirror of Anthropic product changelogs + curated cross-product synergies. So the LLM agent inside the harness knows what the harness can do.",
   "type": "module",
+  "exports": {
+    ".": "./dist/cli.js",
+    "./mcp": "./dist/mcp-server.js"
+  },
   "bin": {
     "hk": "./dist/cli.js",
     "claude-synergy-mcp": "./dist/mcp-server.js"
   },
   "scripts": {
-    "build": "tsup src/cli.ts src/mcp-server.ts --format esm --target node22 --shims --clean",
+    "build": "tsup src/cli.ts src/mcp-server.ts --format esm --target node22 --shims --clean --external playwright",
     "dev": "tsx src/cli.ts",
     "mcp": "tsx src/mcp-server.ts",
     "init": "tsx src/cli.ts init",
@@ -18,7 +22,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:smoke": "cross-env RUN_SMOKE=1 vitest run test/smoke"
+    "test:smoke": "cross-env RUN_SMOKE=1 vitest run test/smoke",
+    "prepublishOnly": "tsup src/cli.ts src/mcp-server.ts --format esm --target node22 --shims --clean --external playwright"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
@@ -58,9 +63,9 @@
     "schema-vec.sql",
     "synergies",
     "products.yaml",
-    "docs",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CONTRIBUTING.md"
   ],
   "publishConfig": {
     "access": "public"
