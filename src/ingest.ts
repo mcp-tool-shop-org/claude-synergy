@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 import TurndownService from 'turndown';
 import type Database from 'better-sqlite3';
 import { extractEntities } from './extract.js';
+import { loadProductsConfig } from './products-config.js';
 
 // Turndown converts HTML release bodies (github-copilot, vscode-copilot-chat) to markdown
 // so parseBullets can extract <li> elements as bullet rows for FTS5 + entity extraction.
@@ -85,9 +86,9 @@ export interface IngestStats {
   errors: Array<{ file: string; error: string }>;
 }
 
-// Default source-tier + fetch-strategy mapping per product.
-// Keep in sync with SOURCES.md.
-const PRODUCT_META: Record<string, { tier: number; strategy: string; url: string; display: string }> = {
+// Hardcoded fallback for PRODUCT_META, used when products.yaml is missing.
+// Single source of truth lives in products.yaml at repo root.
+const HARDCODED_PRODUCT_META: Record<string, { tier: number; strategy: string; url: string; display: string }> = {
   'claude-code': { tier: 2, strategy: 'git-changelog', url: 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md', display: 'Claude Code' },
   'claude-api': { tier: 3, strategy: 'webfetch', url: 'https://platform.claude.com/docs/en/release-notes/overview', display: 'Claude API / Platform' },
   'anthropic-apps': { tier: 3, strategy: 'webfetch', url: 'https://support.claude.com/en/articles/12138966-release-notes', display: 'Anthropic Apps (Design / Cowork / Chat / Mobile)' },
@@ -137,6 +138,22 @@ const PRODUCT_META: Record<string, { tier: number; strategy: string; url: string
   'vscode-copilot-chat': { tier: 3, strategy: 'html-scrape', url: 'https://code.visualstudio.com/updates/', display: 'VS Code Copilot Chat (editor)' },
   'windsurf': { tier: 3, strategy: 'html-scrape', url: 'https://windsurf.com/changelog', display: 'Windsurf (Cognition)' },
 };
+
+// Compose PRODUCT_META from products.yaml (preferred) with fallback to hardcoded.
+const PRODUCT_META: Record<string, { tier: number; strategy: string; url: string; display: string }> = (() => {
+  const cfg = loadProductsConfig();
+  if (!cfg) return HARDCODED_PRODUCT_META;
+  const out: Record<string, { tier: number; strategy: string; url: string; display: string }> = {};
+  for (const [name, meta] of Object.entries(cfg.productMeta)) {
+    out[name] = {
+      tier: meta.source_tier,
+      strategy: meta.fetch_strategy,
+      url: meta.source_url,
+      display: meta.display_name,
+    };
+  }
+  return out;
+})();
 
 export function ingestAll(db: Database.Database, productsRoot: string): IngestStats {
   const stats: IngestStats = {

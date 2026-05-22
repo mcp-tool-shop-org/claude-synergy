@@ -9,7 +9,9 @@ import { join, resolve } from 'node:path';
 import type Database from 'better-sqlite3';
 import { fetchRssReleases } from './fetch-rss.js';
 import { fetchAiderHistory } from './fetch-changelog.js';
-import { fetchHtmlReleases, type HtmlParserName } from './fetch-html.js';
+import { fetchHtmlReleases, type HtmlParserName, type HtmlItem } from './fetch-html.js';
+import { fetchCatalog, writeCatalog, type CatalogType } from './fetch-mcp-registry.js';
+import { loadProductsConfig } from './products-config.js';
 
 interface GhRelease {
   tag_name: string;
@@ -21,7 +23,7 @@ interface GhRelease {
 
 export interface FetchTarget {
   product: string;
-  strategy: 'gh-releases' | 'rss' | 'raw-changelog' | 'html-scrape';
+  strategy: 'gh-releases' | 'rss' | 'raw-changelog' | 'html-scrape' | 'catalog' | 'playwright';
   // gh-releases
   repo?: string;
   multiPackage?: boolean;
@@ -34,9 +36,15 @@ export interface FetchTarget {
   rawChangelogParser?: 'aider-history';
   // html-scrape
   htmlParser?: HtmlParserName;
+  // catalog
+  catalogType?: CatalogType;
+  catalogMaxEntries?: number;
 }
 
-const TARGETS: FetchTarget[] = [
+// Hardcoded fallback used when products.yaml is missing (e.g. in some test
+// environments that exercise this module without the full repo tree).
+// Single source of truth lives in products.yaml at repo root.
+const HARDCODED_FALLBACK_TARGETS: FetchTarget[] = [
   // ── Existing Anthropic GH-Releases sources ────────────────────────────────
   { product: 'claude-agent-sdk-python', strategy: 'gh-releases', repo: 'anthropics/claude-agent-sdk-python' },
   { product: 'claude-agent-sdk-typescript', strategy: 'gh-releases', repo: 'anthropics/claude-agent-sdk-typescript' },
@@ -86,6 +94,9 @@ const TARGETS: FetchTarget[] = [
   { product: 'windsurf', strategy: 'html-scrape', htmlParser: 'windsurf-changelog' },
 ];
 
+// Load TARGETS from products.yaml; fall back to hardcoded if YAML is unavailable.
+const TARGETS: FetchTarget[] = (loadProductsConfig()?.fetchTargets as FetchTarget[]) ?? HARDCODED_FALLBACK_TARGETS;
+
 export interface FetchStats {
   product: string;
   fetched: number;
@@ -131,6 +142,10 @@ async function fetchOne(
         return await fetchRawChangelog(db, outDir, target, since);
       case 'html-scrape':
         return await fetchHtmlScrape(db, outDir, target, since);
+      case 'catalog':
+        return await fetchCatalogStrategy(db, productsRoot, target, since);
+      case 'playwright':
+        return await fetchPlaywrightStrategy(db, outDir, target, since);
     }
   } catch (e: any) {
     return {
@@ -393,6 +408,84 @@ async function fetchHtmlScrape(
   if (latest) writeMarker(db, target.product, latest);
 
   return { product: target.product, fetched, newSince: since, latest, errors };
+}
+
+// ─── Strategy: playwright (CSR fetcher) ────────────────────────────────────
+
+async function fetchPlaywrightStrategy(
+  db: Database.Database,
+  outDir: string,
+  target: FetchTarget,
+  since: string
+): Promise<FetchStats> {
+  // Lazy-load to keep playwright OPTIONAL — the import resolves only when this strategy fires
+  const { fetchWindsurfWithPlaywright } = await import('./fetch-playwright.js');
+
+  const items: HtmlItem[] = await fetchWindsurfWithPlaywright(since);
+  let latest: string | null = null;
+  let fetched = 0;
+  const errors: string[] = [];
+
+  for (const item of items) {
+    try {
+      const path = join(outDir, `${item.slug}.md`);
+      if (existsSync(path)) {
+        if (!latest || item.pubDate > latest) latest = item.pubDate;
+        continue;
+      }
+      const body = [
+        '---',
+        `product: ${target.product}`,
+        `version: "${item.slug}"`,
+        `released_at: "${item.pubDate.split('T')[0]}"`,
+        `source_url: "${item.link}"`,
+        `fetched_at: "${new Date().toISOString().split('T')[0]}"`,
+        `title: "${(item.title ?? '').replace(/"/g, "'")}"`,
+        '---',
+        '',
+        `# ${target.product} — ${item.title ?? item.slug}`,
+        '',
+        item.body ?? '(no body)',
+        '',
+      ].join('\n');
+      writeFileSync(path, body, 'utf-8');
+      fetched++;
+      if (!latest || item.pubDate > latest) latest = item.pubDate;
+    } catch (e: any) {
+      errors.push(`${item.slug}: ${e.message}`);
+    }
+  }
+
+  if (latest) writeMarker(db, target.product, latest);
+
+  return { product: target.product, fetched, newSince: since, latest, errors };
+}
+
+// ─── Strategy: catalog (MCP registries) ────────────────────────────────────
+
+async function fetchCatalogStrategy(
+  db: Database.Database,
+  productsRoot: string,
+  target: FetchTarget,
+  since: string
+): Promise<FetchStats> {
+  if (!target.catalogType) throw new Error(`${target.product}: catalog requires catalogType`);
+
+  const entries = await fetchCatalog(target.catalogType, { maxEntries: target.catalogMaxEntries });
+  const productDir = resolve(productsRoot, target.product);
+  writeCatalog(productDir, target.product, entries);
+
+  // Catalog snapshots: marker is the date of this sync, not a release timestamp
+  const nowIso = new Date().toISOString();
+  writeMarker(db, target.product, nowIso);
+
+  return {
+    product: target.product,
+    fetched: entries.length,
+    newSince: since,
+    latest: nowIso,
+    errors: [],
+  };
 }
 
 // ─── Markers ────────────────────────────────────────────────────────────────

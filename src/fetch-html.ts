@@ -76,12 +76,12 @@ export async function fetchGithubCopilotBlog(sinceIso: string): Promise<HtmlItem
 // ─── windsurf-changelog ─────────────────────────────────────────────────────
 // Source: https://windsurf.com/changelog
 // IMPORTANT: Windsurf's changelog is a Next.js client-rendered SPA — the static HTML
-// from a plain fetch does NOT include entry content. Two paths to cover this:
-//   1. Headless browser (Playwright/Puppeteer) to render JS. Heavy dep; out of scope for v0.5.
+// from a plain fetch does NOT include entry content. Three paths:
+//   1. Headless browser (Playwright) to render JS — see src/fetch-playwright.ts (v0.7+)
 //   2. Mine the embedded Next.js __NEXT_DATA__ JSON if present. Best-effort below.
+//   3. Return [] gracefully with a clear log message.
 //
-// Currently this parser is best-effort: if __NEXT_DATA__ carries the changelog content,
-// we extract it; otherwise returns empty and logs a clear gap message.
+// This parser tries (2), and on failure logs a hint pointing at the playwright path.
 
 export async function fetchWindsurfChangelog(sinceIso: string): Promise<HtmlItem[]> {
   const url = 'https://windsurf.com/changelog';
@@ -94,7 +94,8 @@ export async function fetchWindsurfChangelog(sinceIso: string): Promise<HtmlItem
   const nextDataScript = $('script#__NEXT_DATA__').html();
   if (!nextDataScript) {
     // No SSR data — Windsurf is fully CSR. Log and return empty.
-    console.error('[fetch-html] windsurf: __NEXT_DATA__ not found; changelog is client-rendered (Playwright needed for full coverage). 0 entries.');
+    // Use `hk fetch --product windsurf --playwright` (or the playwright strategy in products.yaml) for full coverage.
+    console.error('[fetch-html] windsurf: __NEXT_DATA__ not found; changelog is client-rendered. Use the playwright strategy (src/fetch-playwright.ts) for full coverage. 0 entries.');
     return [];
   }
 

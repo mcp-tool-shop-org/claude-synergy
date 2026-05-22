@@ -1,6 +1,8 @@
 # Claude Synergy
 
-A local, queryable mirror of every Anthropic product's release notes — plus a curated **Synergy** layer describing cross-product workflows — so the LLM agent inside the harness knows what the harness can do.
+A local, queryable mirror of every Anthropic + adjacent AI dev tool changelog — plus a curated **Synergy** layer describing cross-product workflows — so the LLM agent inside the harness knows what the harness can do.
+
+[![tests](https://img.shields.io/badge/tests-239%20passing-brightgreen)](test-spec.md) [![coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)](#testing) [![license](https://img.shields.io/badge/license-MIT-blue)](#license)
 
 ```bash
 $ hk query redact
@@ -9,90 +11,138 @@ $ hk query redact
 2026-05-11  anthropic-sdk-go@1.42.0        [changed]  redact api-key headers in debug logs
 2026-05-07  anthropic-sdk-typescript@0.95.1 [changed] redact api-key headers in debug logs
 
-5 results
+4 results
 ```
 
-A single FTS query surfaces a coordinated cross-SDK security fix that no individual changelog flagged as a CVE. **This is the killer demo: patterns emerge when every changelog is side-by-side.**
+**A single FTS query surfaces a coordinated cross-SDK security fix that no individual changelog flagged as a CVE.** That's the killer demo: patterns emerge when every changelog is side-by-side.
+
+Repo: [github.com/mcp-tool-shop-org/claude-synergy](https://github.com/mcp-tool-shop-org/claude-synergy)
+
+---
 
 ## The problem
 
-The Claude Code CLI ships ~daily (404 releases through v2.1.147). The Anthropic API ships almost as often. SDKs ship per-CLI-release. Claude Design, Cowork, Chat, and Mobile all ship features through the unified Help Center feed. Plugin marketplaces and the Skills catalog grow continuously.
+Claude Code CLI ships ~daily. Claude API ships almost as often. SDKs ship per-CLI-release. Claude Design, Cowork, Chat, and Mobile feed through the unified Help Center. The MCP ecosystem ships ~200-300 new servers per week. Plus there are 7 major AI dev tool surfaces (Cursor, Aider, Continue, Copilot, Cody, Windsurf) all shipping their own changelogs at their own cadences.
 
-The LLM agent running inside any one of these surfaces has a frozen training cutoff. The gap widens every day. Features ship that the agent doesn't know exist. Bugs get fixed that the agent still works around. Env vars and flags get added that the agent never suggests. Cross-product workflows that compose multiple surfaces remain undiscovered.
+The LLM agent inside any one of these has a frozen training cutoff. The gap widens every day. Features ship that the agent doesn't know exist. Bugs get fixed that the agent still works around. Env vars and flags get added that the agent never suggests. Cross-product workflows that compose multiple surfaces remain undiscovered.
 
-This repo closes the gap. The Synergy section makes it a product instead of a mirror.
+**This repo closes the gap.** The Synergy section makes it a product instead of a mirror.
 
-## Status (2026-05-21)
-
-| Tier | Status | What's there |
-|------|--------|--------------|
-| 1 — bootstrap (markdown corpus) | ✅ done | 747 markdown files across 18 product sources, Jan→May 2026 |
-| 2a — SQLite + FTS5 + CLI | ✅ done | `hk` CLI; 14 products / 706 releases / 3,954 changes / 957 entities ingested in 224ms |
-| 2b — sqlite-vec + Contextual Retrieval | opt-in, deferred | Anthropic's pattern with Voyage 3 OR Ollama nomic-embed-text |
-| 3 — sync mechanism + MCP server | deferred | GH Action / Claude Routine; MCP server exposes hk's queries to other agents |
-| 4 — extend beyond Anthropic | future | Cursor / Aider / MCP server changelogs use the same shape |
+---
 
 ## What's here
 
 ```
 claude-synergy/
-├── products/                # 18 product directories (706 release files + 17 skill entries + 6 catalog files)
-├── synergies/               # 7 curated cross-product workflows (Skill portability, MCP portability, ...)
+├── products/                # 34 product directories (1,101 release files)
+│   ├── claude-code/             # Anthropic CLI — 117 releases
+│   ├── claude-agent-sdk-{python,typescript}/  # Agent SDKs
+│   ├── anthropic-sdk-{python,typescript,go,java,csharp,ruby,php}/  # 7 language SDKs
+│   ├── claude-api/              # Platform release notes
+│   ├── anthropic-apps/          # Design / Cowork / Chat / Mobile (Help Center feed)
+│   ├── claude-code-action/      # GitHub Action
+│   ├── anthropic-cli/           # `ant` CLI
+│   ├── mcp-{python,typescript,go,java,csharp,kotlin,ruby,swift,rust,php}-sdk/
+│   ├── mcp-{spec,inspector,registry,mcpb,conformance}/
+│   ├── cursor/                  # RSS feed
+│   ├── aider/                   # raw HISTORY.md
+│   ├── continue-{dev,cli}/      # GH releases
+│   ├── cody-enterprise/         # filtered Sourcegraph RSS
+│   ├── github-copilot/          # HTML scrape (github.blog)
+│   ├── vscode-copilot-chat/     # HTML scrape (code.visualstudio.com)
+│   ├── windsurf/                # CSR fallback (Playwright in v0.7+)
+│   ├── skills/                  # Anthropic Skills catalog
+│   └── plugins-{official,community,knowledge-work}/  # Plugin marketplaces
+├── synergies/               # 12 curated cross-product workflows
+├── src/                     # TypeScript implementation
+├── test/                    # 239 tests (unit, integration, regression, smoke)
 ├── data/claude-synergy.db   # SQLite database (created by `hk init`)
-├── schema.sql               # DB schema (products, releases, changes, entities, FTS5, synergies)
-├── src/                     # TypeScript CLI implementation
+├── schema.sql               # Tier 2a tables (products, releases, changes, entities, FTS5, …)
+├── schema-vec.sql           # Tier 2b tables (chunks, chunks_vec, chunks_fts)
 ├── SOURCES.md               # 5-tier source landscape with fetch strategies
-└── URGENT_FINDINGS.md       # 19 actionable items surfaced from the corpus
+└── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
+
+**Live numbers (as of v0.6.1):** 34 products / 1,101 release files / 5,957 changes / 1,225 entities / 12 synergies / 239 tests / 85% coverage.
+
+---
+
+## Status — all tiers shipped
+
+| Tier | Status | What's there |
+|------|--------|--------------|
+| **1 — bootstrap (markdown corpus)** | ✅ shipped | Study-swarm seeded 706 release files Jan→May 2026; extended to 1,101 by Tier 4 |
+| **2a — SQLite + FTS5 + CLI** | ✅ shipped | `hk` CLI; 15 subcommands; sub-300ms ingest |
+| **2b — sqlite-vec + Contextual Retrieval** | ✅ shipped | Provider-pluggable (none/structured/ollama/claude-haiku context × ollama/voyage embed × none/ollama-judge/voyage/cohere rerank) |
+| **3 — sync + MCP server** | ✅ shipped | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` exposes 8 tools over stdio |
+| **4a — extend beyond Anthropic** | ✅ shipped | +15 MCP SDKs, Cursor (RSS), Aider (HISTORY.md), Continue.dev, Cody Enterprise (RSS filtered) |
+| **4b — HTML-scrape fetcher** | ✅ shipped | GitHub Copilot + VS Code Chat (Windsurf needs Playwright — v0.7) |
+| **4c — turndown HTML→markdown ingest** | ✅ shipped | HTML bodies (Copilot/VS Code/Cursor) now produce per-bullet rows for FTS5 + entity extraction |
+
+Roadmap for v0.7+: Playwright fetcher for Windsurf, MCP registry catalogs (Smithery + official Registry), YAML-driven products config.
+
+---
 
 ## Install
 
 ```bash
-git clone <repo>
+git clone https://github.com/mcp-tool-shop-org/claude-synergy
 cd claude-synergy
 pnpm install
-pnpm build       # produces dist/cli.js
-npm link         # makes `hk` available globally (or `npm install -g .`)
+pnpm build       # produces dist/cli.js + dist/mcp-server.js
+npm link         # makes `hk` and `claude-synergy-mcp` available globally
 ```
 
-For dev without building, use `npx tsx src/cli.ts ...` directly. **`pnpm dev` swallows CLI flags after `--` (pnpm 10 quirk); use `npx tsx` for development.**
+For dev without building, use `npx tsx src/cli.ts ...` directly. **pnpm 10 quirk:** `pnpm dev` swallows CLI flags after `--`; use `npx tsx` for development.
 
-## CLI surface
+---
+
+## CLI surface — 15 commands
 
 ```
+# DB lifecycle
 hk init                              # create DB with schema
 hk ingest                            # parse products/*/releases/*.md → DB (idempotent)
+hk embed                             # generate chunks + embeddings (sqlite-vec)
+hk fetch [--product X]               # incremental pull from sources
+hk sync                              # combined fetch → ingest → embed (cron-friendly)
+hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 across all change bullets
-hk query workflow --product claude-code --since 2026-05-01 --limit 10
-hk query "TodoWrite" --kind breaking
+hk query "managed agents"            # FTS5 keyword search
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ optional --rerank)
 
-# Entity lookups (using extracted entities)
+# Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
 hk command code-review               # slash command + rename history
 hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases across products
-hk products                          # list all products + release counts
-hk top env_var                       # most-mentioned env vars (or slash_command, cli_option, model_id, beta_header, cve, ghsa, hook_event, setting_key)
+hk latest [--product X] [--limit N]  # recent releases
+hk products                          # list all 34 with counts
+hk top env_var                       # most-mentioned by entity type
+                                     # (env_var, slash_command, cli_option,
+                                     #  model_id, beta_header, cve, ghsa,
+                                     #  hook_event, setting_key)
 ```
+
+---
 
 ## Example workflows
 
 **Find when a Claude Code env var was introduced:**
-```bash
+```
 $ hk env-var CLAUDE_CODE_WORKFLOWS
 env var CLAUDE_CODE_WORKFLOWS — 1 mention:
 
 2026-05-21  claude-code@2.1.147  [added]
-  Added the `Workflow` tool for deterministic multi-agent orchestration. It is off by default — set `CLAUDE_CODE_WORKFLOWS=1` to enable
+  Added the `Workflow` tool for deterministic multi-agent orchestration.
+  It is off by default — set `CLAUDE_CODE_WORKFLOWS=1` to enable
 ```
 
 **Track a cross-SDK breaking change:**
-```bash
+```
 $ hk query TodoWrite --limit 5
 2026-05-15  claude-agent-sdk-python@0.2.82       [breaking]   Headless and SDK sessions now use Task tools...
 2026-05-14  claude-agent-sdk-typescript@0.3.142  [breaking]   Headless and SDK sessions now use Task tools...
@@ -100,76 +150,127 @@ $ hk query TodoWrite --limit 5
 ```
 
 **Plan a model migration:**
-```bash
+```
 $ hk model claude-opus-4-20250514
 model id claude-opus-4-20250514 — 2 mentions:
 
 2026-04-14  anthropic-sdk-python@0.94.0  [deprecated]
-  We announced the deprecation of the Claude Sonnet 4 model and the Claude Opus 4 model, with retirement on the Claude API scheduled for June 15, 2026...
+  Deprecation of the Claude Sonnet 4 model and the Claude Opus 4 model,
+  with retirement on the Claude API scheduled for June 15, 2026...
 ```
 
-## Sources
+**Semantic search across the whole corpus:**
+```
+$ hk hybrid "credential exfiltration" --limit 3
+2026-03-25  claude-code@2.1.83  [added]          vec#5 rrf=0.0154
+  Added `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` to strip Anthropic and
+  cloud provider credentials from subprocess environments...
+```
 
-Full source landscape in [SOURCES.md](SOURCES.md). Headlines:
+The query never says "env_scrub" — vec surfaces it by semantic similarity. Pure FTS5 misses it entirely.
 
-- **Tier 1 (best):** `gh api repos/anthropics/<repo>/releases` for `claude-agent-sdk-*`, `anthropic-cli`, `anthropic-sdk-*` (7 languages), `claude-code-action`, `claude-code-security-review`
-- **Tier 2:** GitHub CHANGELOG.md for `anthropics/claude-code` (mirrored to docs.claude.com)
-- **Tier 3:** HTML pages — `platform.claude.com/docs/release-notes` (API), `support.claude.com/articles/12138966` (Apps unified feed)
-- **Tier 4:** Catalog repos for Skills, plugins (official + community + knowledge-work), vertical marketplaces
+---
 
-## Tier 2b — opt-in vector search (planned)
+## MCP server — give your agents access to this corpus
 
-Tier 2a uses FTS5 only (zero deps beyond SQLite). Tier 2b adds vector search via `sqlite-vec` for semantic queries that FTS5 misses (paraphrases, conceptual matches).
+`claude-synergy-mcp` exposes 8 tools over stdio. Wire into Claude Code (or any MCP host) via `~/.claude/.mcp.json` or your project's `.mcp.json`:
 
-Architecture follows [Anthropic's Contextual Retrieval pattern](https://www.anthropic.com/news/contextual-retrieval):
-- 50–100 token context prefix generated per chunk
-- Contextual + BM25 + reranking → 67% retrieval failure reduction vs naive RAG
+```json
+{
+  "mcpServers": {
+    "claude-synergy": {
+      "command": "claude-synergy-mcp",
+      "env": {
+        "CLAUDE_SYNERGY_DB": "/path/to/claude-synergy/data/claude-synergy.db"
+      }
+    }
+  }
+}
+```
 
-Provider choices, all configurable:
+For GitHub Copilot's `.vscode/mcp.json`, use the `servers` wrapper instead of `mcpServers` (see [synergy 12](synergies/12-mcp-config-format-gotcha.md)).
 
-| Layer | Free default | Paid opt-in |
-|-------|--------------|-------------|
-| Context generation | Local Ollama (`llama3.2:3b`) OR Claude Routine | Claude Haiku 4.5 with prompt caching |
-| Embeddings | Ollama `nomic-embed-text` (768-d) | Voyage 3 (1024-d, Anthropic-recommended) |
+Tools exposed:
 
-## Tier 3 — sync (planned)
+| Tool | Purpose |
+|---|---|
+| `search` | Hybrid FTS5 + vec; optional rerank. Default mode for natural-language queries. |
+| `lookup_entity` | Exact entity history: env vars, slash commands, model IDs, CVEs, etc. |
+| `latest_releases` | Recent releases across products (or one) |
+| `get_release` | Full content of one release |
+| `list_products` | Enumeration with counts + latest version |
+| `top_entities` | Most-mentioned entities by type |
+| `list_synergies` | Curated cross-product workflows |
+| `read_synergy` | Full text of one synergy file |
 
-`.github/workflows/sync.yml` scaffold included. Free path: GitHub Action with Ollama on the ubuntu runner runs daily, fetches new releases, regenerates the DB, commits back to the repo. Alternative: Claude Routine on a cron schedule using your existing plan quota.
+---
+
+## Sources — 5 tiers, 4 fetcher strategies
+
+Full landscape in [SOURCES.md](SOURCES.md).
+
+- **Tier 1 (GitHub Releases)** — `gh api repos/<owner>/<repo>/releases` for 22 products including Anthropic SDKs (7 languages), Agent SDKs (2), ant CLI, claude-code-action, claude-code-security-review, and 15 MCP ecosystem SDKs
+- **Tier 2 (raw markdown)** — `anthropics/claude-code/CHANGELOG.md` + `Aider-AI/aider/HISTORY.md`
+- **Tier 3 (HTML / RSS)** — `platform.claude.com/docs/release-notes`, `support.claude.com/articles/12138966`, `cursor.com/changelog/rss.xml`, `sourcegraph.com/changelog/featured.rss` (filtered), `github.blog/changelog/label/copilot/`, `code.visualstudio.com/updates/v1_NNN`
+- **Tier 4 (catalog)** — `anthropics/skills`, `claude-plugins-{official,community}`, `knowledge-work-plugins`
+- **Tier 5 (advisory)** — `@ClaudeCodeLog` X account; marckrenn changelog mirror
+
+Fetch strategies: `gh-releases | rss | raw-changelog | html-scrape`. New product = one entry in `src/fetch.ts` `TARGETS` array.
+
+---
+
+## Synergies — what gets unlocked
+
+12 curated cross-product workflows. Each describes a composition pattern, the trigger that makes it the right answer, and the changelog evidence that enables it. Examples:
+
+- **08 — Universal SKILL.md format** (Code + Cursor + Codex): one skill author, three agents read it
+- **09 — MCP across seven surfaces** (Code + Cursor + Continue + Copilot + Windsurf + Cody + API): one binary, every agent
+- **10 — Anthropic BYOK across surfaces**: one API key powers Claude in 7 editors with unified billing
+- **11 — Claude Code orchestrates Aider**: cost-shift heavy edits to a cheap model while Claude plans
+- **12 — MCP config format gotcha**: Copilot uses `servers`; everyone else uses `mcpServers`
+
+Full index in [synergies/INDEX.md](synergies/INDEX.md).
+
+---
 
 ## Testing
 
-Vitest suite covers unit / integration / regression / smoke tiers. See [test-spec.md](test-spec.md) for the full specification.
+Vitest suite covers unit / integration / regression / smoke tiers. See [test-spec.md](test-spec.md) for the v1 spec (covers v0.4–v0.6.1) and [test-spec-2.md](test-spec-2.md) for the v2 spec (covers v0.7+).
 
 ```bash
-pnpm test               # unit + integration + regression (~10s, 205 tests)
+pnpm test               # unit + integration + regression (~12s, 239 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 80/75/85/80)
-pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1; needs products/ on disk)
+pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 ```
 
 Layout:
 
 | Dir | What it covers |
 |-----|----------------|
-| `test/unit/` | per-module unit tests — extract, ingest, query, db, embed, hybrid, fetch, + every provider |
-| `test/integration/` | end-to-end — full pipeline, sync, MCP server (spawns over stdio), CLI |
-| `test/regression/` | named bug-regression tests (§8 of [test-spec.md](test-spec.md)) — each protects against a real bug |
-| `test/smoke/` | opt-in full-corpus check against the real `products/` (706 files) |
-| `test/fixtures/` | 3 fake products + mock HTTP responses |
+| `test/unit/` | per-module — extract, ingest, query, db, embed, hybrid, fetch + every provider + fetch-rss/changelog/html |
+| `test/integration/` | end-to-end — pipeline, sync, MCP server (stdio JSON-RPC), CLI |
+| `test/regression/` | §8.1–§8.18 — each protects against a real bug fixed during development |
+| `test/smoke/` | opt-in full-corpus against real `products/` (1,101 files) |
+| `test/fixtures/` | 3 fake products + mock HTTP responses (RSS / GH / Voyage / Cohere / Ollama / Anthropic) |
 | `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts` |
 
-No network in tests by default — provider HTTP is mocked via `vi.spyOn(global, 'fetch')` (helper at `test/helpers/fetch-mock.ts`). Real SQLite in temp files (not `:memory:`) because sqlite-vec extension load behaves differently across versions and on-disk is the canonical path.
+**No network in tests by default** — provider HTTP is mocked via `vi.spyOn(global, 'fetch')`. Real SQLite in temp files (not `:memory:`) because sqlite-vec extension load semantics differ across versions and on-disk is the canonical path.
 
-CI: `.github/workflows/test.yml` runs `pnpm test:coverage` on push / PR.
+CI: `.github/workflows/test.yml` runs `pnpm test --coverage` on push and PR.
+
+---
 
 ## Related files
 
-- [URGENT_FINDINGS.md](URGENT_FINDINGS.md) — 19 actionable items surfaced from the corpus
-- [SOURCES.md](SOURCES.md) — 5-tier source landscape
-- [synergies/INDEX.md](synergies/INDEX.md) — 7 curated cross-product workflows
-- [schema.sql](schema.sql) — current SQLite schema
-- [test-spec.md](test-spec.md) — test suite specification
+- [URGENT_FINDINGS.md](URGENT_FINDINGS.md) — 23 actionable items (security CVEs, model retirements, breaking changes, config gotchas)
+- [SOURCES.md](SOURCES.md) — 5-tier source landscape with fetch strategies
+- [synergies/INDEX.md](synergies/INDEX.md) — 12 curated cross-product workflows
+- [schema.sql](schema.sql) + [schema-vec.sql](schema-vec.sql) — SQLite + sqlite-vec schemas
+- [test-spec.md](test-spec.md) + [test-spec-2.md](test-spec-2.md) — test suite specs
+
+---
 
 ## License
 
-MIT. Author: mcp-tool-shop.
+MIT. Author: [mcp-tool-shop](https://github.com/mcp-tool-shop-org).

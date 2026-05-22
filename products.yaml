@@ -1,0 +1,405 @@
+# Claude Synergy — products configuration
+#
+# Single source of truth for product metadata + fetcher dispatch. Loaded by
+# src/products-config.ts; consumed by src/fetch.ts (TARGETS) + src/ingest.ts
+# (PRODUCT_META). If this file is missing, both modules fall back to their
+# hardcoded defaults (with a one-time warn to stderr).
+#
+# Adding a new product: append an entry here. No code change required as long
+# as the fetcher 'type' matches an existing strategy (gh-releases | rss |
+# raw-changelog | html-scrape | catalog).
+
+products:
+
+  # ── Tier 2 / Anthropic CHANGELOG.md ───────────────────────────────────────
+  - name: claude-code
+    display_name: Claude Code
+    tier: 2
+    source_url: https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
+    fetch_strategy: git-changelog
+    # No fetch: block — corpus seeded by initial study-swarm; CHANGELOG.md
+    # incremental sync deferred to a future phase.
+
+  # ── Tier 3 / HTML feeds ──────────────────────────────────────────────────
+  - name: claude-api
+    display_name: Claude API / Platform
+    tier: 3
+    source_url: https://platform.claude.com/docs/en/release-notes/overview
+    fetch_strategy: webfetch
+    # WebFetch-based; corpus seeded by initial swarm.
+
+  - name: anthropic-apps
+    display_name: Anthropic Apps (Design / Cowork / Chat / Mobile)
+    tier: 3
+    source_url: https://support.claude.com/en/articles/12138966-release-notes
+    fetch_strategy: webfetch
+
+  # ── Tier 1 / GitHub Releases — Anthropic SDKs ────────────────────────────
+  - name: claude-agent-sdk-python
+    display_name: Claude Agent SDK (Python)
+    tier: 1
+    source_url: https://github.com/anthropics/claude-agent-sdk-python
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/claude-agent-sdk-python
+
+  - name: claude-agent-sdk-typescript
+    display_name: Claude Agent SDK (TypeScript)
+    tier: 1
+    source_url: https://github.com/anthropics/claude-agent-sdk-typescript
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/claude-agent-sdk-typescript
+
+  - name: anthropic-cli
+    display_name: Anthropic CLI (ant)
+    tier: 1
+    source_url: https://github.com/anthropics/anthropic-cli
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/anthropic-cli
+
+  - name: anthropic-sdk-python
+    display_name: Anthropic SDK (Python)
+    tier: 1
+    source_url: https://github.com/anthropics/anthropic-sdk-python
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/anthropic-sdk-python
+
+  - name: anthropic-sdk-typescript
+    display_name: Anthropic SDK (TypeScript)
+    tier: 1
+    source_url: https://github.com/anthropics/anthropic-sdk-typescript
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/anthropic-sdk-typescript
+      multi_package: true
+
+  - name: anthropic-sdk-go
+    display_name: Anthropic SDK (Go)
+    tier: 1
+    source_url: https://github.com/anthropics/anthropic-sdk-go
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/anthropic-sdk-go
+
+  - name: anthropic-sdk-java
+    display_name: Anthropic SDK (Java)
+    tier: 1
+    source_url: https://github.com/anthropics/anthropic-sdk-java
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/anthropic-sdk-java
+
+  - name: anthropic-sdk-ruby
+    display_name: Anthropic SDK (Ruby)
+    tier: 1
+    source_url: https://github.com/anthropics/anthropic-sdk-ruby
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/anthropic-sdk-ruby
+
+  - name: anthropic-sdk-csharp
+    display_name: Anthropic SDK (C#)
+    tier: 1
+    source_url: https://github.com/anthropics/anthropic-sdk-csharp
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/anthropic-sdk-csharp
+      multi_package: true
+
+  - name: anthropic-sdk-php
+    display_name: Anthropic SDK (PHP)
+    tier: 1
+    source_url: https://github.com/anthropics/anthropic-sdk-php
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/anthropic-sdk-php
+
+  - name: claude-code-action
+    display_name: Claude Code Action (GitHub Action)
+    tier: 1
+    source_url: https://github.com/anthropics/claude-code-action
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/claude-code-action
+
+  - name: claude-code-security-review
+    display_name: Claude Code Security Review (GitHub Action)
+    tier: 1
+    source_url: https://github.com/anthropics/claude-code-security-review
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/claude-code-security-review
+
+  # ── Tier 4 / Catalog repos (Anthropic) ───────────────────────────────────
+  - name: skills
+    display_name: Anthropic Skills Catalog
+    tier: 4
+    source_url: https://github.com/anthropics/skills
+    fetch_strategy: git-snapshot
+
+  - name: plugins-official
+    display_name: Claude Plugins (Official)
+    tier: 4
+    source_url: https://github.com/anthropics/claude-plugins-official
+    fetch_strategy: git-snapshot
+
+  - name: plugins-community
+    display_name: Claude Plugins (Community)
+    tier: 4
+    source_url: https://github.com/anthropics/claude-plugins-community
+    fetch_strategy: git-snapshot
+
+  - name: plugins-knowledge-work
+    display_name: Knowledge Work Plugins (Cowork)
+    tier: 4
+    source_url: https://github.com/anthropics/knowledge-work-plugins
+    fetch_strategy: git-snapshot
+
+  # ── Tier 1 / MCP ecosystem SDKs ──────────────────────────────────────────
+  - name: mcp-python-sdk
+    display_name: MCP Python SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/python-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/python-sdk
+
+  - name: mcp-typescript-sdk
+    display_name: MCP TypeScript SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/typescript-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/typescript-sdk
+      multi_package: true
+
+  - name: mcp-go-sdk
+    display_name: MCP Go SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/go-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/go-sdk
+
+  - name: mcp-java-sdk
+    display_name: MCP Java SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/java-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/java-sdk
+
+  - name: mcp-csharp-sdk
+    display_name: MCP C# SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/csharp-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/csharp-sdk
+
+  - name: mcp-kotlin-sdk
+    display_name: MCP Kotlin SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/kotlin-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/kotlin-sdk
+
+  - name: mcp-ruby-sdk
+    display_name: MCP Ruby SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/ruby-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/ruby-sdk
+
+  - name: mcp-swift-sdk
+    display_name: MCP Swift SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/swift-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/swift-sdk
+
+  - name: mcp-rust-sdk
+    display_name: MCP Rust SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/rust-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/rust-sdk
+
+  - name: mcp-php-sdk
+    display_name: MCP PHP SDK
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/php-sdk
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/php-sdk
+
+  - name: mcp-spec
+    display_name: MCP Specification
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/modelcontextprotocol
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/modelcontextprotocol
+
+  - name: mcp-inspector
+    display_name: MCP Inspector
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/inspector
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/inspector
+
+  - name: mcp-registry
+    display_name: MCP Registry
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/registry
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/registry
+
+  - name: mcp-mcpb
+    display_name: MCP Bundle (mcpb)
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/mcpb
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/mcpb
+
+  - name: mcp-conformance
+    display_name: MCP Conformance
+    tier: 1
+    source_url: https://github.com/modelcontextprotocol/conformance
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: modelcontextprotocol/conformance
+
+  # ── Tier 4a / Non-Anthropic AI dev tools ─────────────────────────────────
+  - name: continue-dev
+    display_name: Continue.dev
+    tier: 1
+    source_url: https://github.com/continuedev/continue
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: continuedev/continue
+      multi_package: true
+
+  - name: continue-cli
+    display_name: Continue.dev CLI
+    tier: 1
+    source_url: https://github.com/continuedev/continue-cli
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: continuedev/continue-cli
+
+  - name: cursor
+    display_name: Cursor
+    tier: 3
+    source_url: https://cursor.com/changelog/rss.xml
+    fetch_strategy: rss
+    fetch:
+      type: rss
+      url: https://cursor.com/changelog/rss.xml
+
+  - name: cody-enterprise
+    display_name: Sourcegraph Cody Enterprise
+    tier: 3
+    source_url: https://sourcegraph.com/changelog/featured.rss
+    fetch_strategy: rss
+    fetch:
+      type: rss
+      url: https://sourcegraph.com/changelog/featured.rss
+      title_filter: 'cody|sourcegraph'
+
+  - name: aider
+    display_name: Aider
+    tier: 2
+    source_url: https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md
+    fetch_strategy: raw-changelog
+    fetch:
+      type: raw-changelog
+      url: https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md
+      parser: aider-history
+
+  # ── Tier 4b / HTML-scraped (Tier 4b) ─────────────────────────────────────
+  - name: github-copilot
+    display_name: GitHub Copilot
+    tier: 3
+    source_url: https://github.blog/changelog/label/copilot/
+    fetch_strategy: html-scrape
+    fetch:
+      type: html-scrape
+      parser: github-copilot-blog
+
+  - name: vscode-copilot-chat
+    display_name: VS Code Copilot Chat (editor)
+    tier: 3
+    source_url: https://code.visualstudio.com/updates/
+    fetch_strategy: html-scrape
+    fetch:
+      type: html-scrape
+      parser: vscode-updates
+
+  - name: windsurf
+    display_name: Windsurf (Cognition)
+    tier: 3
+    source_url: https://windsurf.com/changelog
+    fetch_strategy: playwright
+    fetch:
+      type: playwright
+    notes: "Client-rendered Next.js — requires Playwright (pnpm add -D playwright && npx playwright install chromium)"
+
+  # ── Tier 4 / MCP registry catalogs ───────────────────────────────────────
+  - name: mcp-registry-official
+    display_name: Official MCP Registry
+    tier: 4
+    source_url: https://registry.modelcontextprotocol.io
+    fetch_strategy: catalog
+    fetch:
+      type: catalog
+      catalog_type: official-mcp-registry
+
+  - name: mcp-registry-smithery
+    display_name: Smithery MCP Registry
+    tier: 4
+    source_url: https://registry.smithery.ai
+    fetch_strategy: catalog
+    fetch:
+      type: catalog
+      catalog_type: smithery
+      max_entries: 200
