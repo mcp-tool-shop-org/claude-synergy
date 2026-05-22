@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-05-22
+
+### Added
+- Structured error shape (`AppError` class) with `code`, `message`, `hint`, `cause?`, `retryable?` across all CLI commands.
+- Logging levels: `--verbose`, `--debug` flags + `HK_LOG_LEVEL` env var (silent/normal/verbose/debug). Secrets never logged at any level.
+- Exit code 3 for partial success (fetch/sync where some products fail but others succeed).
+- Dependabot config for automated npm + GitHub Actions dependency updates.
+- Dependency audit step (`pnpm audit`) in CI test workflow.
+- CHANGELOG.md included in npm tarball.
+
+### Changed
+- Version promoted from 0.7.2 to 1.0.0 — first stable release.
+- All CLI error paths use `formatError()` with structured output; `--json` mode returns error shape as JSON.
+- Legacy `HK_DEBUG=1` env var mapped to `--debug` log level for backward compatibility.
+
 ## [0.7.2] - 2026-05-22
 
 ### Security
@@ -100,6 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fetcher strategies: `gh-releases`, `rss`, `raw-changelog`.
   - SQLite + FTS5 corpus, sqlite-vec semantic search with Contextual Retrieval, `claude-synergy-mcp` MCP server exposing 8 tools over stdio.
 
+[1.0.0]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v1.0.0
 [0.7.2]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v0.7.2
 [0.7.1]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v0.7.1
 [0.7.0]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v0.7.0

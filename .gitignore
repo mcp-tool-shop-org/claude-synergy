@@ -9,3 +9,7 @@ data/*.db-shm
 .DS_Store
 Thumbs.db
 coverage/
+site/.astro/
+site/dist/
+site/node_modules/
+.polyglot-cache.json

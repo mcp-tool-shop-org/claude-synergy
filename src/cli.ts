@@ -10,7 +10,33 @@ import { embedAll } from './embed.js';
 import { hybridSearch } from './hybrid.js';
 import { fetchAll, listFetchTargets, seedMarkersFromDb } from './fetch.js';
 import type { FetchProgressEvent, FetchAllSummary } from './fetch.js';
+import { AppError, formatError } from './errors.js';
 import type Database from 'better-sqlite3';
+
+// ── Log levels ──────────────────────────────────────────────────────────────
+// Controlled via HK_LOG_LEVEL env var or --verbose / --debug flags.
+// silent=0  normal=1  verbose=2  debug=3
+// Secrets (API keys, tokens) are NEVER logged at any level.
+type LogLevel = 'silent' | 'normal' | 'verbose' | 'debug';
+const LOG_LEVELS: Record<LogLevel, number> = { silent: 0, normal: 1, verbose: 2, debug: 3 };
+
+function resolveLogLevel(): LogLevel {
+  const env = (process.env.HK_LOG_LEVEL ?? '').toLowerCase();
+  if (env in LOG_LEVELS) return env as LogLevel;
+  // Backward compat: HK_DEBUG=1 maps to debug level
+  if (process.env.HK_DEBUG) return 'debug';
+  return 'normal';
+}
+
+let logLevel: LogLevel = resolveLogLevel();
+
+function logVerbose(msg: string): void {
+  if (LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose) process.stderr.write(`[verbose] ${msg}\n`);
+}
+
+function logDebug(msg: string): void {
+  if (LOG_LEVELS[logLevel] >= LOG_LEVELS.debug) process.stderr.write(`[debug] ${msg}\n`);
+}
 
 // ── Graceful shutdown ────────────────────────────────────────────────────────
 // Track the active DB handle so signal handlers can close it before exit,
@@ -134,7 +160,14 @@ program
   .description('Claude Synergy — local Anthropic changelog mirror + cross-product synergies')
   .version(PKG_VERSION)
   .enablePositionalOptions()
-  .option('--json', 'Output results as JSON (for CI/scripting)');
+  .option('--json', 'Output results as JSON (for CI/scripting)')
+  .option('--verbose', 'Show verbose output (also: HK_LOG_LEVEL=verbose)')
+  .option('--debug', 'Show debug output including query parameters (also: HK_LOG_LEVEL=debug)')
+  .hook('preAction', () => {
+    const opts = program.opts();
+    if (opts.debug) logLevel = 'debug';
+    else if (opts.verbose) logLevel = 'verbose';
+  });
 
 program
   .command('init')
@@ -185,9 +218,7 @@ program
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .option('-l, --limit <n>', 'max results', '20')
   .action((text: string, opts: { db: string; product?: string; since?: string; kind?: string; limit: string }) => {
-    if (process.env.HK_DEBUG) {
-      console.error(`[debug] text=${JSON.stringify(text)} opts=${JSON.stringify(opts)}`);
-    }
+    logDebug(`text=${JSON.stringify(text)} opts=${JSON.stringify(opts)}`);
     const db = openTrackedDb(opts.db);
     if (warnIfEmpty(db)) { db.close(); return; }
     const q = text;
@@ -200,9 +231,17 @@ program
         limit: intOpt('limit', opts.limit, 20),
       });
     } catch (e: any) {
-      console.error(`✗ query failed: ${e.message}`);
-      console.error(`  query: ${q}`);
-      console.error(`  hint: FTS5 syntax — use double quotes for phrase: hk query '"AskUserQuestion"' or use plain words: hk query AskUserQuestion`);
+      const appErr = new AppError({
+        code: 'QUERY_FAILED',
+        message: `query failed: ${e.message}`,
+        hint: `FTS5 syntax — use double quotes for phrase: hk query '"AskUserQuestion"' or use plain words: hk query AskUserQuestion`,
+        cause: e.message,
+      });
+      if (program.opts().json) {
+        console.log(JSON.stringify(appErr.toJSON()));
+      } else {
+        console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      }
       db.close();
       process.exit(1);
     }
@@ -342,6 +381,12 @@ program
       } else {
         printFetchSummary(stats.summary);
       }
+      // Exit code 3 = partial success (some products failed, others succeeded)
+      if (stats.summary.failed > 0 && stats.summary.succeeded > 0) {
+        process.exitCode = 3;
+      } else if (stats.summary.failed > 0 && stats.summary.succeeded === 0) {
+        process.exitCode = 2;
+      }
     } finally {
       db.close();
     }
@@ -409,8 +454,19 @@ program
         }
         console.log(`\n✓ sync complete in ${Date.now() - t0}ms`);
       } catch (e: any) {
-        console.error(`✗ sync failed: ${e.message}`);
-        process.exit(1);
+        const appErr = new AppError({
+          code: 'SYNC_FAILED',
+          message: `sync failed: ${e.message}`,
+          hint: 'Check network connectivity and API credentials. Re-run with --verbose for details.',
+          cause: e.message,
+          retryable: true,
+        });
+        if (program.opts().json) {
+          console.log(JSON.stringify(appErr.toJSON()));
+        } else {
+          console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+        }
+        process.exit(2);
       } finally {
         db.close();
       }
@@ -468,11 +524,22 @@ program
         console.log(`  (nothing to do — all changes already embedded; use --force to re-embed)`);
       }
     } catch (e: any) {
-      console.error(`✗ embed failed: ${e.message}`);
-      if (e.message.includes('Ollama') || e.message.includes('11434')) {
-        console.error(`  hint: start Ollama with 'ollama serve' and pull the model: 'ollama pull nomic-embed-text'`);
+      const hint = (e.message.includes('Ollama') || e.message.includes('11434'))
+        ? "start Ollama with 'ollama serve' and pull the model: 'ollama pull nomic-embed-text'"
+        : 'Check provider connectivity. Re-run with --verbose for details.';
+      const appErr = new AppError({
+        code: 'EMBED_FAILED',
+        message: `embed failed: ${e.message}`,
+        hint,
+        cause: e.message,
+        retryable: true,
+      });
+      if (program.opts().json) {
+        console.log(JSON.stringify(appErr.toJSON()));
+      } else {
+        console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
       }
-      process.exit(1);
+      process.exit(2);
     } finally {
       db.close();
     }
@@ -546,11 +613,22 @@ program
         console.log(`\n${results.length} result${results.length === 1 ? '' : 's'} in ${ms}ms (rerank: ${opts.rerank})`);
       }
     } catch (e: any) {
-      console.error(`✗ hybrid query failed: ${e.message}`);
-      if (e.message.includes('Ollama') || e.message.includes('11434')) {
-        console.error(`  hint: start Ollama and pull the embedding model (and rerank model if using ollama-judge)`);
+      const hint = (e.message.includes('Ollama') || e.message.includes('11434'))
+        ? 'start Ollama and pull the embedding model (and rerank model if using ollama-judge)'
+        : 'Check provider connectivity. Re-run with --verbose for details.';
+      const appErr = new AppError({
+        code: 'HYBRID_QUERY_FAILED',
+        message: `hybrid query failed: ${e.message}`,
+        hint,
+        cause: e.message,
+        retryable: true,
+      });
+      if (program.opts().json) {
+        console.log(JSON.stringify(appErr.toJSON()));
+      } else {
+        console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
       }
-      process.exit(1);
+      process.exit(2);
     } finally {
       db.close();
     }
@@ -635,7 +713,7 @@ function printEntityResults(name: string, label: string, results: ReturnType<typ
 }
 
 program.parseAsync(process.argv).catch((e: Error) => {
-  console.error(`fatal: ${e.message}`);
+  console.error(formatError(e, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
   if (activeDb) {
     try { activeDb.close(); } catch { /* best-effort */ }
     activeDb = null;

@@ -2,13 +2,15 @@
   <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
 </p>
 
-<p align="center"><img src="docs/logo.png" alt="Claude Synergy" width="480"></p>
-
+<p align="center"><img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/claude-synergy/readme.png" alt="Claude Synergy" width="400"></p>
 
 A local, queryable mirror of every Anthropic + adjacent AI dev tool changelog — plus a curated **Synergy** layer describing cross-product workflows — so the LLM agent inside the harness knows what the harness can do.
 
-<!-- Note: logo text may be dim on GitHub dark theme -->
-[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license)
+<p align="center">
+
+[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license) [![landing page](https://img.shields.io/badge/landing%20page-live-brightgreen)](https://mcp-tool-shop-org.github.io/claude-synergy/)
+
+</p>
 
 ```bash
 $ hk query redact
@@ -70,7 +72,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v0.7.2):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 382 tests.
+**Live numbers (as of v1.0.0):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 382 tests.
 
 ---
 
@@ -88,6 +90,12 @@ claude-synergy/
 | **4d — Playwright + MCP registry + YAML config** | ✅ shipped | Windsurf via Playwright; Smithery + official MCP Registry as Tier-4 catalogs; products consolidated into `products.yaml` |
 
 Roadmap for v0.8+: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
+
+---
+
+## Security & data model
+
+This tool runs locally. **Data touched:** a derived SQLite database and markdown release files — all re-creatable. **Network:** outbound HTTPS only when you run `hk fetch`/`hk sync` (GitHub API, RSS feeds, changelog pages, MCP registries) or `hk embed` with a remote provider (Voyage, Cohere). **Secrets:** reads `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` from env vars — never logged, never stored to disk. **No telemetry.** See [SECURITY.md](SECURITY.md) for reporting policy.
 
 ---
 
