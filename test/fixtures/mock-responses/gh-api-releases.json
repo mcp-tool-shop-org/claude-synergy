@@ -1,0 +1,37 @@
+[
+  {
+    "tag_name": "v0.2.0",
+    "published_at": "2026-04-01T10:00:00Z",
+    "name": "Release 0.2.0",
+    "body": "- Added new `EXAMPLE_FLAG` env var\n- Fixed crash in `/run` slash command",
+    "html_url": "https://github.com/anthropics/test-product/releases/tag/v0.2.0"
+  },
+  {
+    "tag_name": "v0.2.1",
+    "published_at": "2026-04-15T10:00:00Z",
+    "name": "Release 0.2.1",
+    "body": "- Fixed regression in `EXAMPLE_FLAG` propagation\n- Improved error messages",
+    "html_url": "https://github.com/anthropics/test-product/releases/tag/v0.2.1"
+  },
+  {
+    "tag_name": "v0.3.0",
+    "published_at": "2026-05-01T10:00:00Z",
+    "name": "Release 0.3.0",
+    "body": "- Added breaking changes to API surface",
+    "html_url": "https://github.com/anthropics/test-product/releases/tag/v0.3.0"
+  },
+  {
+    "tag_name": "sdk-v0.98.0",
+    "published_at": "2026-04-20T10:00:00Z",
+    "name": "SDK 0.98.0",
+    "body": "- Multi-package release line for the sdk package",
+    "html_url": "https://github.com/anthropics/test-product/releases/tag/sdk-v0.98.0"
+  },
+  {
+    "tag_name": "bedrock-sdk-v0.29.2",
+    "published_at": "2026-04-21T10:00:00Z",
+    "name": "Bedrock SDK 0.29.2",
+    "body": "- Multi-package release line for the bedrock-sdk package",
+    "html_url": "https://github.com/anthropics/test-product/releases/tag/bedrock-sdk-v0.29.2"
+  }
+]

@@ -1,0 +1,69 @@
+{
+  "name": "@mcptoolshop/claude-synergy",
+  "version": "0.1.0",
+  "description": "Local mirror of Anthropic product changelogs + curated cross-product synergies. So the LLM agent inside the harness knows what the harness can do.",
+  "type": "module",
+  "bin": {
+    "hk": "./dist/cli.js",
+    "claude-synergy-mcp": "./dist/mcp-server.js"
+  },
+  "scripts": {
+    "build": "tsup src/cli.ts src/mcp-server.ts --format esm --target node22 --shims --clean",
+    "dev": "tsx src/cli.ts",
+    "mcp": "tsx src/mcp-server.ts",
+    "init": "tsx src/cli.ts init",
+    "ingest": "tsx src/cli.ts ingest",
+    "query": "tsx src/cli.ts query",
+    "latest": "tsx src/cli.ts latest",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:smoke": "cross-env RUN_SMOKE=1 vitest run test/smoke"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "better-sqlite3": "^11.5.0",
+    "commander": "^12.1.0",
+    "fast-xml-parser": "^4.5.0",
+    "gray-matter": "^4.0.3",
+    "sqlite-vec": "^0.1.9"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "cross-env": "^7.0.3",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
+  },
+  "files": [
+    "dist",
+    "schema.sql",
+    "README.md"
+  ],
+  "keywords": [
+    "claude",
+    "anthropic",
+    "changelog",
+    "synergy",
+    "mcp",
+    "agent-sdk"
+  ],
+  "license": "MIT",
+  "author": "mcp-tool-shop <64996768+mcp-tool-shop@users.noreply.github.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcp-tool-shop-org/claude-synergy"
+  }
+}

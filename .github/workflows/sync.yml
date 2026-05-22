@@ -1,0 +1,53 @@
+name: Daily sync
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # daily at noon UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@latest
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Ollama (free LLM provider)
+        run: |
+          curl -fsSL https://ollama.ai/install.sh | sh
+          ollama serve &
+          sleep 5
+          ollama pull llama3.2:3b
+          ollama pull nomic-embed-text
+
+      - name: Build CLI
+        run: pnpm build
+
+      - name: Sync (fetch + ingest + embed)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node dist/cli.js sync
+
+      - name: Refresh top-level summaries
+        run: |
+          node dist/cli.js products > PRODUCTS.txt
+          node dist/cli.js latest --limit 50 > LATEST.txt
+
+      - name: Commit changes if any
+        run: |
+          git config user.name "claude-synergy-bot"
+          git config user.email "bot@mcp-tool-shop.dev"
+          git add -A data/ products/ URGENT_FINDINGS.md SOURCES.md PRODUCTS.txt LATEST.txt
+          git diff --staged --quiet || (git commit -m "Daily sync $(date -I)" && git push)

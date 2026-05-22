@@ -1,0 +1,6 @@
+{
+  "model": "nomic-embed-text",
+  "embeddings": [
+    "<filled-by-golden-vectors-helper>"
+  ]
+}

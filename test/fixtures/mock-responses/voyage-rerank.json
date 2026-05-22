@@ -1,0 +1,10 @@
+{
+  "object": "list",
+  "model": "rerank-2",
+  "data": [
+    { "index": 1, "relevance_score": 0.93 },
+    { "index": 0, "relevance_score": 0.61 },
+    { "index": 2, "relevance_score": 0.22 }
+  ],
+  "usage": { "total_tokens": 80 }
+}

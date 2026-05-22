@@ -1,0 +1,8 @@
+{
+  "object": "list",
+  "model": "voyage-3-large",
+  "data": [
+    { "object": "embedding", "embedding": [], "index": 0 }
+  ],
+  "usage": { "total_tokens": 12 }
+}
