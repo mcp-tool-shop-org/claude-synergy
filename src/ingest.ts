@@ -34,6 +34,37 @@ function maybeConvertHtmlToMarkdown(content: string): string {
   }
 }
 
+/**
+ * Compact bodies whose bullets are mostly raw git-commit dumps.
+ *
+ * Example pattern (continue-cli, anthropic-cli-style auto-generated release notes):
+ *   * 6ad60da114171ac9e9d51f67ec80fd413a27efcd refactor: rename checks CLI (#3516)
+ *
+ * When a release body has >=10 SHA-prefixed bullets AND that's >=50% of the
+ * total, replace the bullets with one summary line. Original file on disk is
+ * preserved; this only affects what gets indexed in `changes` / FTS5 / vec.
+ */
+function compactCommitDumpBody(bullets: string[]): string[] {
+  if (bullets.length < 10) return bullets;
+
+  // Match SHA prefix: 7-40 hex chars + whitespace. Tolerate leading whitespace.
+  const SHA_PREFIX = /^\s*[0-9a-f]{7,40}\b/i;
+  const commitLines = bullets.filter((b) => SHA_PREFIX.test(b)).length;
+  const ratio = commitLines / bullets.length;
+
+  if (commitLines >= 10 && ratio >= 0.5) {
+    const nonCommitLines = bullets.length - commitLines;
+    const noteParts = [`Auto-generated release notes: ${commitLines} commits from previous release. See source_url for full commit list.`];
+    if (nonCommitLines > 0) {
+      // Preserve any non-commit bullets (e.g. "What's Changed" header text)
+      const preserved = bullets.filter((b) => !SHA_PREFIX.test(b));
+      noteParts.push(...preserved);
+    }
+    return noteParts;
+  }
+  return bullets;
+}
+
 interface Frontmatter {
   product?: string;
   version?: string;
@@ -216,7 +247,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
           });
           stats.releasesAdded++;
 
-          const bullets = parseBullets(maybeConvertHtmlToMarkdown(content));
+          const bullets = compactCommitDumpBody(parseBullets(maybeConvertHtmlToMarkdown(content)));
           bullets.forEach((bullet, i) => {
             const kind = classifyKind(bullet);
             const result = insertChange.run({
