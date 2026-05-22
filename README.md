@@ -20,6 +20,7 @@ $ hk query redact
 4 results
 ```
 
+
 **A single FTS query surfaces a coordinated cross-SDK security fix that no individual changelog flagged as a CVE.** That's the killer demo: patterns emerge when every changelog is side-by-side.
 
 Repo: [github.com/mcp-tool-shop-org/claude-synergy](https://github.com/mcp-tool-shop-org/claude-synergy)
