@@ -145,9 +145,9 @@ describe('ingest — bullet parsing', () => {
       )
       .all() as Array<{ text: string }>;
     expect(rows.length).toBeGreaterThanOrEqual(4);
-    expect(rows.some((r) => r.text.includes('claude-haiku-4-5'))).toBe(true);
-    expect(rows.some((r) => r.text.includes('CVE-2026-12345'))).toBe(true);
-    expect(rows.some((r) => r.text.includes('--old-flag'))).toBe(true);
+    expect(rows.some((r) => r.text.includes('claude-haiku-4-5')), 'should contain claude-haiku-4-5 bullet').toBe(true);
+    expect(rows.some((r) => r.text.includes('CVE-2026-12345')), 'should contain CVE-2026-12345 bullet').toBe(true);
+    expect(rows.some((r) => r.text.includes('--old-flag')), 'should contain --old-flag bullet').toBe(true);
   });
 
   it('does NOT extract bullets inside fenced code blocks', () => {

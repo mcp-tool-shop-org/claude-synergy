@@ -72,55 +72,126 @@ describe('MCP server integration', () => {
     25_000
   );
 
-  it(
-    'calls each tool successfully with valid args',
-    async () => {
-      await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
-        await client.initialize();
-        await client.notifyInitialized();
+  // --- Per-tool validation (split from the former monolithic "calls each tool" block) ---
 
-        // search — use fts mode so no Ollama embedding is needed
-        const search = await client.callTool('search', { query: 'workflow', mode: 'fts', limit: 5 });
-        expect(search.content[0].type).toBe('text');
-        expect((search.content[0].text ?? '').length).toBeGreaterThan(0);
-
-        // lookup_entity
-        const lookup = await client.callTool('lookup_entity', {
-          type: 'env_var',
-          value: 'ANTHROPIC_API_KEY',
+  describe('search tools', () => {
+    it(
+      'search (fts mode) returns text results for a known keyword',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const search = await client.callTool('search', { query: 'workflow', mode: 'fts', limit: 5 });
+          expect(search.content[0].type).toBe('text');
+          expect((search.content[0].text ?? '').length).toBeGreaterThan(0);
         });
-        expect(lookup.content[0].text).toBeTruthy();
+      },
+      25_000
+    );
 
-        // latest_releases
-        const latest = await client.callTool('latest_releases', { limit: 5 });
-        expect(latest.content[0].text).toBeTruthy();
-
-        // get_release
-        const release = await client.callTool('get_release', {
-          product: 'test-cli',
-          version: '1.0.0',
+    it(
+      'lookup_entity returns results for a known entity',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const lookup = await client.callTool('lookup_entity', {
+            type: 'env_var',
+            value: 'ANTHROPIC_API_KEY',
+          });
+          expect(lookup.content[0].text).toBeTruthy();
         });
-        expect((release.content[0].text ?? '')).toContain('test-cli');
+      },
+      25_000
+    );
 
-        // list_products
-        const products = await client.callTool('list_products', {});
-        expect((products.content[0].text ?? '')).toContain('test-cli');
+    it(
+      'top_entities returns non-empty results for a known entity type',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const top = await client.callTool('top_entities', { type: 'env_var', limit: 5 });
+          expect((top.content[0].text ?? '').length).toBeGreaterThan(0);
+        });
+      },
+      25_000
+    );
+  });
 
-        // top_entities
-        const top = await client.callTool('top_entities', { type: 'env_var', limit: 5 });
-        expect((top.content[0].text ?? '').length).toBeGreaterThan(0);
+  describe('list tools', () => {
+    it(
+      'latest_releases returns non-empty content',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const latest = await client.callTool('latest_releases', { limit: 5 });
+          expect(latest.content[0].text).toBeTruthy();
+        });
+      },
+      25_000
+    );
 
-        // list_synergies
-        const synergies = await client.callTool('list_synergies', {});
-        expect((synergies.content[0].text ?? '')).toContain('test-synergy');
+    it(
+      'list_products response contains seeded product names',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const products = await client.callTool('list_products', {});
+          expect((products.content[0].text ?? '')).toContain('test-cli');
+        });
+      },
+      25_000
+    );
 
-        // read_synergy
-        const synergy = await client.callTool('read_synergy', { name: 'test-synergy' });
-        expect((synergy.content[0].text ?? '')).toContain('Test synergy');
-      });
-    },
-    25_000
-  );
+    it(
+      'list_synergies response contains seeded synergy name',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const synergies = await client.callTool('list_synergies', {});
+          expect((synergies.content[0].text ?? '')).toContain('test-synergy');
+        });
+      },
+      25_000
+    );
+  });
+
+  describe('read tools', () => {
+    it(
+      'get_release returns release details for a known product+version',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const release = await client.callTool('get_release', {
+            product: 'test-cli',
+            version: '1.0.0',
+          });
+          expect((release.content[0].text ?? '')).toContain('test-cli');
+        });
+      },
+      25_000
+    );
+
+    it(
+      'read_synergy returns full synergy content by name',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const synergy = await client.callTool('read_synergy', { name: 'test-synergy' });
+          expect((synergy.content[0].text ?? '')).toContain('Test synergy');
+        });
+      },
+      25_000
+    );
+  });
+
+  // --- Error handling ---
 
   it(
     'returns MCP error for unknown tool',

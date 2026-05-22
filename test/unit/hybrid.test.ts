@@ -69,8 +69,10 @@ describe('hybridSearch — FTS + vec channels', () => {
     const res = await hybridSearch(temp.db, 'workflow', { limit: 10 });
     expect(res.length).toBeGreaterThan(0);
     // At least some results should have a bm25_rank
-    const hasFts = res.some((r) => r.bm25_rank !== null);
-    expect(hasFts).toBe(true);
+    expect(
+      res.some((r) => r.bm25_rank !== null),
+      'at least one result should have a non-null bm25_rank from the FTS channel'
+    ).toBe(true);
   });
 
   it('candidates appearing in both channels get summed RRF scores', async () => {
@@ -90,7 +92,7 @@ describe('hybridSearch — FTS + vec channels', () => {
     // ":@/" are FTS5-hostile chars; vanilla query would error
     const res = await hybridSearch(temp.db, '-:@/ workflow', { limit: 5 });
     // Should not throw; results may be empty or populated
-    expect(Array.isArray(res)).toBe(true);
+    expect(res, 'fallback query should return an array').toBeInstanceOf(Array);
   });
 
   it('--product filter applies to both channels', async () => {
@@ -101,7 +103,10 @@ describe('hybridSearch — FTS + vec channels', () => {
   it('--since filter applies to both channels', async () => {
     const res = await hybridSearch(temp.db, 'workflow', { since: '2026-03-01', limit: 20 });
     for (const r of res) {
-      expect((r.released_at ?? '') >= '2026-03-01').toBe(true);
+      expect(
+        r.released_at ?? '',
+        `released_at "${r.released_at}" should be >= 2026-03-01`
+      ).toSatisfy((d: string) => d >= '2026-03-01');
     }
   });
 
@@ -126,7 +131,10 @@ describe('hybridSearch — rerank', () => {
     for (const r of res) expect(r.rerank_score).toBeNull();
     // RRF-monotonic
     for (let i = 1; i < res.length; i++) {
-      expect(res[i - 1].rrf_score >= res[i].rrf_score).toBe(true);
+      expect(
+        res[i - 1].rrf_score,
+        `rrf_score[${i - 1}] (${res[i - 1].rrf_score}) should be >= rrf_score[${i}] (${res[i].rrf_score})`
+      ).toBeGreaterThanOrEqual(res[i].rrf_score);
     }
   });
 
@@ -143,7 +151,10 @@ describe('hybridSearch — rerank', () => {
       const a = res[i - 1].rerank_score;
       const b = res[i].rerank_score;
       if (a !== null && b !== null) {
-        expect(a >= b).toBe(true);
+        expect(
+          a,
+          `rerank_score[${i - 1}] (${a}) should be >= rerank_score[${i}] (${b})`
+        ).toBeGreaterThanOrEqual(b);
       }
     }
   });
@@ -184,7 +195,11 @@ describe('hybridSearch — rerank fallback when scores are uniform', () => {
     expect(res.length).toBeGreaterThan(0);
     for (let i = 1; i < res.length; i++) {
       // When rerank ties, the implementation keeps the rrf order; rerank scores all === 0.
-      expect(res[i - 1].rerank_score === 0 || res[i - 1].rerank_score === null).toBe(true);
+      const score = res[i - 1].rerank_score;
+      expect(
+        score === 0 || score === null,
+        `rerank_score[${i - 1}] should be 0 or null when judge returns all zeros, got ${score}`
+      ).toBe(true);
     }
   });
 });

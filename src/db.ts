@@ -76,6 +76,13 @@ function ensureSchemaVersion(db: Database.Database): void {
 
   const currentVersion = row ? parseInt(row.value, 10) : 0;
 
+  if (currentVersion > SCHEMA_VERSION) {
+    throw new Error(
+      `Database schema version ${currentVersion} is newer than this tool supports (version ${SCHEMA_VERSION}). ` +
+        `Please upgrade claude-synergy: npm update -g @mcptoolshop/claude-synergy`,
+    );
+  }
+
   if (currentVersion < SCHEMA_VERSION) {
     // Run migrations for each version step
     migrateSchema(db, currentVersion, SCHEMA_VERSION);

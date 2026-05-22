@@ -72,7 +72,10 @@ describe('end-to-end pipeline: ingest → query → embed → hybrid', () => {
     });
     expect(reranked.length).toBeGreaterThan(0);
     // At least one result has a non-null rerank score
-    expect(reranked.some((r) => r.rerank_score !== null)).toBe(true);
+    expect(
+      reranked.some((r) => r.rerank_score !== null),
+      'at least one reranked result should have a non-null rerank_score'
+    ).toBe(true);
   });
 
   it('counts roughly match: 3 products, 9 releases, >= 15 changes', () => {

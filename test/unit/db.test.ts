@@ -22,7 +22,7 @@ describe('openDb', () => {
     const path = join(workdir, 'nested', 'deeper', 'sub.db');
     const db = openDb(path, { loadVec: false });
     db.close();
-    expect(existsSync(path)).toBe(true);
+    expect(existsSync(path), 'database file should be created at nested path').toBe(true);
   });
 
   it('enables WAL journal mode', () => {
@@ -43,7 +43,7 @@ describe('openDb', () => {
     // No crash, no warning about extension load expected (we explicitly opt out)
     const db = openDb(join(workdir, 'novec.db'), { loadVec: false });
     db.close();
-    expect(true).toBe(true);
+    // No error thrown — openDb with loadVec:false completed successfully
   });
 
   it('attempts sqlite-vec load by default; failure logs a warning but does not throw', () => {

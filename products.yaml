@@ -7,7 +7,58 @@
 #
 # Adding a new product: append an entry here. No code change required as long
 # as the fetcher 'type' matches an existing strategy (gh-releases | rss |
-# raw-changelog | html-scrape | catalog).
+# raw-changelog | html-scrape | catalog | playwright).
+#
+# ─── Schema reference ──────────────────────────────────────────────────────
+#
+# Each entry under `products:` has these fields:
+#
+#   REQUIRED:
+#     name            string   Product slug. Used as directory name + DB key.
+#                              Must match ^[a-z0-9][a-z0-9-]*$ (lowercase
+#                              alphanumeric + hyphens, no leading hyphen).
+#     display_name    string   Human-readable name shown in CLI output.
+#     tier            integer  Source reliability tier (1-5):
+#                                1 = Structured API (GitHub Releases) — highest fidelity
+#                                2 = Raw markdown changelog (CHANGELOG.md / HISTORY.md)
+#                                3 = HTML / RSS scrape (blogs, feed URLs)
+#                                4 = Catalog snapshot (not versioned releases)
+#                                5 = Advisory / manual (X accounts, mirrors)
+#     source_url      string   Canonical URL for the data source.
+#     fetch_strategy  string   Fetcher type label. Should match fetch.type when
+#                              a fetch: block is present.
+#
+#   OPTIONAL:
+#     notes           string   Free-text notes (e.g., platform requirements).
+#     fetch           object   Fetcher configuration. Omit if the product's
+#                              corpus is seeded manually (no automated fetch).
+#
+#   fetch: sub-schema (varies by fetch.type):
+#
+#     type: gh-releases
+#       repo           string   REQUIRED. "owner/repo" (e.g., "anthropics/anthropic-sdk-python").
+#       multi_package  boolean  Optional. Set true for monorepos with scoped
+#                               tags like "@scope/pkg@1.0.0" or "sdk-v1.0.0".
+#
+#     type: rss
+#       url            string   REQUIRED. RSS 2.0 feed URL.
+#       title_filter   string   Optional. Regex (case-insensitive) to filter
+#                               entries by title (e.g., "cody|sourcegraph").
+#
+#     type: raw-changelog
+#       url            string   REQUIRED. Raw file URL (e.g., GitHub raw URL).
+#       parser         string   REQUIRED. Parser name. Currently: "aider-history".
+#
+#     type: html-scrape
+#       parser         string   REQUIRED. Parser name. One of:
+#                               "github-copilot-blog", "vscode-updates".
+#
+#     type: playwright
+#       (no additional fields — currently hardcoded to Windsurf's CSR changelog)
+#
+#     type: catalog
+#       catalog_type   string   REQUIRED. One of: "official-mcp-registry", "smithery".
+#       max_entries    integer  Optional. Cap on entries to fetch (default: all).
 
 products:
 

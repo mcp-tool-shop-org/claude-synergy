@@ -327,7 +327,7 @@ describe('writeCatalog', () => {
       },
     ];
     const result = writeCatalog(join(dir, 'mcp-test'), 'mcp-test', entries);
-    expect(existsSync(result.catalogPath)).toBe(true);
+    expect(existsSync(result.catalogPath), 'catalog file should be written to disk').toBe(true);
     expect(result.entriesFetched).toBe(2);
     const body = readFileSync(result.catalogPath, 'utf-8');
     expect(body).toContain('# mcp-test — MCP server catalog');

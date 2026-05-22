@@ -63,7 +63,7 @@ describe('§8.2 searchChanges does not error on FTS5 column ambiguity', () => {
     seedSampleProducts(temp.db);
     expect(() => searchChanges(temp.db, 'test')).not.toThrow();
     const rows = searchChanges(temp.db, 'test');
-    expect(Array.isArray(rows)).toBe(true);
+    expect(rows, 'searchChanges should return an array without FTS5 column ambiguity').toBeInstanceOf(Array);
   });
 });
 
@@ -151,7 +151,7 @@ describe('§8.6 OLLAMA_HOST without protocol is normalized', () => {
       };
       const release = { product: 'p', version: 'v', releasedAt: null, siblings: [chunk] };
       await p.contextFor(chunk as any, release as any);
-      expect(fm.calls[0].url.startsWith('http://127.0.0.1:11434')).toBe(true);
+      expect(fm.calls[0].url, 'OLLAMA_HOST without protocol should get http:// prefix').toMatch(/^http:\/\/127\.0\.0\.1:11434/);
     } finally {
       if (orig === undefined) delete process.env.OLLAMA_HOST;
       else process.env.OLLAMA_HOST = orig;
@@ -588,14 +588,17 @@ describe('§8.16 npm-scoped multiPackage tag → sanitized filename', () => {
       const releasesDir = join(dir, 'mcp-typescript-sdk', 'releases');
       // Expected sanitized name: '@' stripped, '/' → '-', '@' (between name+version) → '-'
       expect(
-        existsSync(join(releasesDir, 'modelcontextprotocol-server-2.0.0-alpha.2.md'))
+        existsSync(join(releasesDir, 'modelcontextprotocol-server-2.0.0-alpha.2.md')),
+        'sanitized filename should exist without @ or / chars'
       ).toBe(true);
       // Negative: no file should retain the raw '@' or '/' chars in its name
       expect(
-        existsSync(join(releasesDir, '@modelcontextprotocol-server@2.0.0-alpha.2.md'))
+        existsSync(join(releasesDir, '@modelcontextprotocol-server@2.0.0-alpha.2.md')),
+        'filename with @ should not exist'
       ).toBe(false);
       expect(
-        existsSync(join(releasesDir, '@modelcontextprotocol/server@2.0.0-alpha.2.md'))
+        existsSync(join(releasesDir, '@modelcontextprotocol/server@2.0.0-alpha.2.md')),
+        'filename with @ and / should not exist'
       ).toBe(false);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -623,10 +626,12 @@ describe('§8.16 npm-scoped multiPackage tag → sanitized filename', () => {
       await fetchAll(temp.db, dir, { product: 'continue-dev' });
       const releasesDir = join(dir, 'continue-dev', 'releases');
       expect(
-        existsSync(join(releasesDir, 'continuedev-config-yaml-1.42.0.md'))
+        existsSync(join(releasesDir, 'continuedev-config-yaml-1.42.0.md')),
+        'sanitized filename for continue-style npm-scoped tag should exist'
       ).toBe(true);
       expect(
-        existsSync(join(releasesDir, '@continuedev-config-yaml@1.42.0.md'))
+        existsSync(join(releasesDir, '@continuedev-config-yaml@1.42.0.md')),
+        'filename with @ chars should not exist'
       ).toBe(false);
     } finally {
       rmSync(dir, { recursive: true, force: true });

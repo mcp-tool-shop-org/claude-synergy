@@ -40,8 +40,8 @@ describe('initVecSchema', () => {
       .prepare(`SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name IN ('chunks', 'chunks_vec', 'chunks_fts')`)
       .all() as Array<{ name: string }>;
     const names = new Set(tables.map((t) => t.name));
-    expect(names.has('chunks')).toBe(true);
-    expect(names.has('chunks_fts')).toBe(true);
+    expect(names.has('chunks'), 'schema should include chunks table').toBe(true);
+    expect(names.has('chunks_fts'), 'schema should include chunks_fts table').toBe(true);
     // chunks_vec is a virtual table — sqlite-vec must be loaded
     // (might fail in headless test envs; assert only if extension loaded)
   });

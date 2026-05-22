@@ -66,12 +66,33 @@ type ContextProviderName = (typeof CONTEXT_PROVIDERS)[number];
 type EmbedProviderName = (typeof EMBED_PROVIDERS)[number];
 type RerankProviderName = (typeof RERANK_PROVIDERS)[number];
 
+/** Check if the database has any ingested changes. */
+function isDbEmpty(db: Database.Database): boolean {
+  try {
+    const row = db.prepare('SELECT COUNT(*) AS n FROM changes').get() as { n: number } | undefined;
+    return !row || row.n === 0;
+  } catch {
+    // Table doesn't exist yet (DB was never initialized)
+    return true;
+  }
+}
+
+/** Print empty-DB guidance to stderr and return true if empty. */
+function warnIfEmpty(db: Database.Database): boolean {
+  if (isDbEmpty(db)) {
+    console.error('No data yet. Run `hk sync` to fetch changelogs, then `hk query <term>` to search.');
+    return true;
+  }
+  return false;
+}
+
 const program = new Command();
 program
   .name('hk')
   .description('Claude Synergy — local Anthropic changelog mirror + cross-product synergies')
   .version(PKG_VERSION)
-  .enablePositionalOptions();
+  .enablePositionalOptions()
+  .option('--json', 'Output results as JSON (for CI/scripting)');
 
 program
   .command('init')
@@ -126,6 +147,7 @@ program
       console.error(`[debug] text=${JSON.stringify(text)} opts=${JSON.stringify(opts)}`);
     }
     const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
     const q = text;
     let results;
     try {
@@ -142,7 +164,12 @@ program
       db.close();
       process.exit(1);
     }
-    if (results.length === 0) {
+    if (program.opts().json) {
+      console.log(JSON.stringify(results.map(r => ({
+        released_at: r.released_at, product: r.product, version: r.version,
+        kind: r.kind, text: r.text, snippet: r.snippet,
+      }))));
+    } else if (results.length === 0) {
       console.log('(no results)');
     } else {
       for (const r of results) {
@@ -160,8 +187,16 @@ program
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((name: string, opts: { db: string }) => {
     const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
     const results = lookupEntity(db, 'env_var', name);
-    printEntityResults(name, 'env var', results);
+    if (program.opts().json) {
+      console.log(JSON.stringify(results.map(r => ({
+        released_at: r.released_at, product: r.product, version: r.version,
+        kind: r.kind, text: r.text,
+      }))));
+    } else {
+      printEntityResults(name, 'env var', results);
+    }
     db.close();
   });
 
@@ -171,9 +206,17 @@ program
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((slash: string, opts: { db: string }) => {
     const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
     const normalized = slash.startsWith('/') ? slash : '/' + slash;
     const results = lookupEntity(db, 'slash_command', normalized);
-    printEntityResults(normalized, 'slash command', results);
+    if (program.opts().json) {
+      console.log(JSON.stringify(results.map(r => ({
+        released_at: r.released_at, product: r.product, version: r.version,
+        kind: r.kind, text: r.text,
+      }))));
+    } else {
+      printEntityResults(normalized, 'slash command', results);
+    }
     db.close();
   });
 
@@ -183,8 +226,16 @@ program
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((id: string, opts: { db: string }) => {
     const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
     const results = lookupEntity(db, 'model_id', id);
-    printEntityResults(id, 'model id', results);
+    if (program.opts().json) {
+      console.log(JSON.stringify(results.map(r => ({
+        released_at: r.released_at, product: r.product, version: r.version,
+        kind: r.kind, text: r.text,
+      }))));
+    } else {
+      printEntityResults(id, 'model id', results);
+    }
     db.close();
   });
 
@@ -194,8 +245,16 @@ program
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((id: string, opts: { db: string }) => {
     const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
     const results = lookupEntity(db, 'cve', id);
-    printEntityResults(id, 'CVE', results);
+    if (program.opts().json) {
+      console.log(JSON.stringify(results.map(r => ({
+        released_at: r.released_at, product: r.product, version: r.version,
+        kind: r.kind, text: r.text,
+      }))));
+    } else {
+      printEntityResults(id, 'CVE', results);
+    }
     db.close();
   });
 
@@ -225,12 +284,19 @@ program
     const db = openTrackedDb(opts.db);
     initSchema(db);
     try {
+      const targets = listFetchTargets();
+      const totalTargets = opts.product
+        ? targets.filter(t => t.product === opts.product).length
+        : targets.length;
       const stats = await fetchAll(db, opts.productsRoot, {
         product: opts.product,
         sinceOverride: opts.since,
       });
       let totalFetched = 0;
+      let fetchIdx = 0;
       for (const s of stats) {
+        fetchIdx++;
+        process.stderr.write(`Fetching ${s.product} (${fetchIdx}/${totalTargets})...\n`);
         const status = s.fetched > 0 ? `+${s.fetched} new` : `current (since ${s.newSince})`;
         console.log(`${s.product.padEnd(35)} ${status}${s.latest ? `  latest: ${s.latest.split('T')[0]}` : ''}`);
         for (const e of s.errors) console.log(`  ✗ ${e}`);
@@ -273,21 +339,32 @@ program
       const t0 = Date.now();
       try {
         if (!opts.skipFetch) {
-          console.log('=== fetch ===');
+          process.stderr.write('=== fetch ===\n');
+          const targets = listFetchTargets();
+          const totalTargets = targets.length;
           const stats = await fetchAll(db, opts.productsRoot);
+          let fetchIdx = 0;
+          for (const s of stats) {
+            fetchIdx++;
+            const status = s.fetched > 0 ? `+${s.fetched} new` : 'current';
+            process.stderr.write(`  Fetching ${s.product} (${fetchIdx}/${totalTargets})... ${status}\n`);
+          }
           const total = stats.reduce((sum, s) => sum + s.fetched, 0);
           console.log(`fetched ${total} new release${total === 1 ? '' : 's'}`);
         }
-        console.log('\n=== ingest ===');
+        process.stderr.write('\n=== ingest ===\n');
         const { ingestAll } = await import('./ingest.js');
         const ingestStats = ingestAll(db, opts.productsRoot);
         console.log(`ingested ${ingestStats.releasesAdded} releases, ${ingestStats.changesAdded} changes, ${ingestStats.entitiesAdded} entities`);
 
         if (!opts.skipEmbed) {
-          console.log('\n=== embed ===');
+          process.stderr.write('\n=== embed ===\n');
           const embedStats = await embedAll(db, {
             contextProviderName: opts.context,
             embeddingProviderName: opts.embedProvider,
+            onProgress: (p) => {
+              process.stderr.write(`  Embedding batch ${p.batchesCompleted}/${p.batchesTotal} (${p.chunksCompleted} chunks)...\n`);
+            },
           });
           console.log(`embedded ${embedStats.chunksCreated} new chunks via ${embedStats.contextProvider} + ${embedStats.embeddingProvider}`);
         }
@@ -338,6 +415,9 @@ program
         limit: opts.limit !== undefined ? intOpt('limit', opts.limit, 1) : undefined,
         batchSize: intOpt('batch-size', opts.batchSize, 64),
         force: opts.force,
+        onProgress: (p) => {
+          process.stderr.write(`Embedding batch ${p.batchesCompleted}/${p.batchesTotal} (${p.chunksCompleted}/${p.chunksTotal} chunks)...\n`);
+        },
       });
       console.log(`✓ embedded ${stats.chunksCreated} chunks in ${stats.totalMs}ms`);
       console.log(`  context provider: ${stats.contextProvider} (${stats.contextMs}ms total)`);
@@ -405,7 +485,13 @@ program
         rerankCandidates: intOpt('rerank-candidates', opts.rerankCandidates, 20),
       });
       const ms = Date.now() - t0;
-      if (results.length === 0) {
+      if (program.opts().json) {
+        console.log(JSON.stringify(results.map(r => ({
+          released_at: r.released_at, product: r.product, version: r.version,
+          kind: r.kind, text: r.text, rrf_score: r.rrf_score,
+          rerank_score: r.rerank_score,
+        }))));
+      } else if (results.length === 0) {
         console.log('(no results)');
       } else {
         for (const r of results) {
@@ -436,9 +522,16 @@ program
   .option('-l, --limit <n>', 'max results', '20')
   .action((opts: { db: string; product?: string; limit: string }) => {
     const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
     const releases = recentReleases(db, opts.product, intOpt('limit', opts.limit, 20));
-    for (const r of releases) {
-      console.log(`${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
+    if (program.opts().json) {
+      console.log(JSON.stringify(releases));
+    } else if (releases.length === 0) {
+      console.log('(no releases)');
+    } else {
+      for (const r of releases) {
+        console.log(`${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
+      }
     }
     db.close();
   });
@@ -449,12 +542,19 @@ program
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .action((opts: { db: string }) => {
     const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
     const products = listProducts(db);
-    console.log('Product                              Releases  Latest');
-    console.log('───────────────────────────────────  ────────  ──────────────────');
-    for (const p of products) {
-      const latest = p.latest_version ? `${p.latest_version} (${p.latest_date})` : '—';
-      console.log(`${p.name.padEnd(36)} ${String(p.release_count).padStart(8)}  ${latest}`);
+    if (program.opts().json) {
+      console.log(JSON.stringify(products));
+    } else if (products.length === 0) {
+      console.log('(no products)');
+    } else {
+      console.log('Product                              Releases  Latest');
+      console.log('───────────────────────────────────  ────────  ──────────────────');
+      for (const p of products) {
+        const latest = p.latest_version ? `${p.latest_version} (${p.latest_date})` : '—';
+        console.log(`${p.name.padEnd(36)} ${String(p.release_count).padStart(8)}  ${latest}`);
+      }
     }
     db.close();
   });
@@ -466,8 +566,11 @@ program
   .option('-l, --limit <n>', 'max results', '30')
   .action((entityType: string, opts: { db: string; limit: string }) => {
     const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
     const results = entityFrequency(db, entityType, intOpt('limit', opts.limit, 30));
-    if (results.length === 0) {
+    if (program.opts().json) {
+      console.log(JSON.stringify(results));
+    } else if (results.length === 0) {
       console.log(`(no entities of type "${entityType}")`);
     } else {
       for (const r of results) {

@@ -153,15 +153,45 @@ export interface FetchStats {
   errors: string[];
 }
 
+// ─── Progress & Summary types (Stage C — behavioral humanization) ──────────
+
+/** Emitted by fetchAll for each product as it progresses through the sync loop. */
+export interface FetchProgressEvent {
+  type: 'start' | 'done' | 'error' | 'skip';
+  product: string;
+  index: number;
+  total: number;
+  error?: string;
+}
+
+/** Callback signature for progress reporting. The CLI wires this to stderr. */
+export type OnProgress = (event: FetchProgressEvent) => void;
+
+/** Consolidated summary returned alongside per-product stats from fetchAll. */
+export interface FetchAllSummary {
+  total: number;
+  succeeded: number;
+  failed: number;
+  skipped: number;
+  newChanges: number;
+  errors: Array<{ product: string; error: string }>;
+}
+
+/** FetchStats array augmented with a summary property for consolidated reporting. */
+export type FetchAllResult = FetchStats[] & { summary: FetchAllSummary };
+
 export async function fetchAll(
   db: Database.Database,
   productsRoot: string,
-  opts: { product?: string; sinceOverride?: string; timeoutMs?: number } = {}
-): Promise<FetchStats[]> {
+  opts: { product?: string; sinceOverride?: string; timeoutMs?: number; onProgress?: OnProgress } = {}
+): Promise<FetchAllResult> {
   const targets = opts.product ? TARGETS.filter((t) => t.product === opts.product) : TARGETS;
   if (targets.length === 0) {
     throw new Error(`unknown product: ${opts.product} (available: ${TARGETS.map((t) => t.product).join(', ')})`);
   }
+
+  const total = targets.length;
+  const onProgress = opts.onProgress;
 
   // H-2: Global timeout for the entire fetchAll run. Propagates AbortSignal to all
   // individual fetches so they bail if the parent is cancelled (timeout or SIGINT).
@@ -170,8 +200,11 @@ export async function fetchAll(
 
   const results: FetchStats[] = [];
   try {
-    for (const target of targets) {
+    for (let i = 0; i < targets.length; i++) {
+      const target = targets[i];
+
       if (signal.aborted) {
+        onProgress?.({ type: 'skip', product: target.product, index: i, total, error: 'global timeout exceeded' });
         results.push({
           product: target.product,
           fetched: 0,
@@ -181,13 +214,55 @@ export async function fetchAll(
         });
         continue;
       }
-      results.push(await fetchOne(db, productsRoot, target, opts.sinceOverride, signal));
+
+      onProgress?.({ type: 'start', product: target.product, index: i, total });
+
+      const stats = await fetchOne(db, productsRoot, target, opts.sinceOverride, signal);
+      results.push(stats);
+
+      if (stats.errors.length > 0) {
+        onProgress?.({ type: 'error', product: target.product, index: i, total, error: stats.errors[0] });
+      } else {
+        onProgress?.({ type: 'done', product: target.product, index: i, total });
+      }
     }
   } finally {
     // Clean up the global timeout timer
     controller.abort();
   }
-  return results;
+
+  // Augment the results array with a consolidated summary for CLI consumption.
+  // The array is still iterable/indexable as FetchStats[], preserving backward compat.
+  const augmented = results as FetchAllResult;
+  augmented.summary = buildSummary(results);
+  return augmented;
+}
+
+function buildSummary(results: FetchStats[]): FetchAllSummary {
+  let succeeded = 0;
+  let failed = 0;
+  let skipped = 0;
+  let newChanges = 0;
+  const errors: Array<{ product: string; error: string }> = [];
+
+  for (const r of results) {
+    const isSkipped = r.errors.some((e) => e.startsWith('skipped:'));
+    const isFailed = r.errors.length > 0 && !isSkipped;
+
+    if (isSkipped) {
+      skipped++;
+    } else if (isFailed) {
+      failed++;
+      for (const e of r.errors) {
+        errors.push({ product: r.product, error: e });
+      }
+    } else {
+      succeeded++;
+    }
+    newChanges += r.fetched;
+  }
+
+  return { total: results.length, succeeded, failed, skipped, newChanges, errors };
 }
 
 async function fetchOne(
@@ -301,6 +376,14 @@ function ghReleases(repo: string, sinceIso: string): GhRelease[] {
       // but if it does we stop pagination and return what we have.
       const stderr = (e.stderr ?? '').toString();
       if (stderr.includes('404')) return page === 1 ? [] : all;
+      // Enrich rate-limit errors with GITHUB_TOKEN guidance
+      if (stderr.includes('403') || stderr.includes('429') || stderr.includes('rate limit')) {
+        throw new Error(
+          `GitHub API rate limit hit for ${repo}. ` +
+          'Set GITHUB_TOKEN env var for 5000 req/hr (vs 60 unauthenticated). ' +
+          `Original error: ${e.message}`
+        );
+      }
       throw e;
     }
 

@@ -38,6 +38,12 @@ export interface EmbedProgress {
   chunksCompleted: number;
   /** Total chunks pending. */
   chunksTotal: number;
+  /** Active embedding provider identifier (e.g. "voyage-3", "ollama:nomic-embed-text"). */
+  provider?: string;
+  /** Cumulative tokens consumed by the embedding provider so far. */
+  tokensUsed?: number;
+  /** Cumulative API requests made to the embedding provider so far. */
+  requestsMade?: number;
 }
 
 /** Usage tracking for paid embedding providers. */
@@ -278,6 +284,9 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
         batchesTotal: totalBatches,
         chunksCompleted: created,
         chunksTotal: allChunks.length,
+        provider: `${emb.name}:${emb.model}`,
+        tokensUsed: usage.tokens,
+        requestsMade: usage.requests,
       });
     }
   }

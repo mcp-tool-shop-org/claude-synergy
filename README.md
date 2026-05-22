@@ -264,8 +264,57 @@ CI: `.github/workflows/test.yml` runs `pnpm test:coverage` on push and PR.
 
 ---
 
+## Troubleshooting
+
+**"Database locked" or WAL errors**
+
+Another `hk` process (or a stale MCP server) is holding the SQLite database open. Close other `hk` processes, then retry. If the issue persists, check for a `-wal` or `-shm` file alongside `data/claude-synergy.db` — these are normal WAL-mode files and will be cleaned up when the last connection closes. Do not delete them while another process has the DB open.
+
+**"sqlite-vec extension not found" / sqlite-vec load failed**
+
+The `sqlite-vec` native extension failed to load. Common causes:
+
+1. **Node version too old** — `claude-synergy` requires Node 22+. Check with `node -v`.
+2. **Native module needs rebuild** — run `npm rebuild better-sqlite3` (or `pnpm rebuild better-sqlite3`).
+3. **Platform mismatch** — on Windows/ARM, `better-sqlite3` needs a C++ build toolchain. Install the [windows-build-tools](https://github.com/nicedoc/windows-build-tools) or Visual Studio Build Tools with "Desktop development with C++".
+
+Note: `sqlite-vec` is optional. FTS5 keyword search (`hk query`) works without it. Only `hk embed` and `hk hybrid` require the vector extension.
+
+**"Sync failed for product X" / fetch errors**
+
+`hk fetch` and `hk sync` call external APIs. Common causes:
+
+- **GitHub rate limit** — the `gh-releases` strategy shells out to `gh api`, which uses your `GITHUB_TOKEN`. Unauthenticated requests hit 60 req/hr; authenticate with `gh auth login` or set `GITHUB_TOKEN` in your environment.
+- **Network / proxy** — RSS and HTML fetchers use `fetch()`. Check connectivity and any corporate proxy settings (`HTTPS_PROXY`).
+- **Unknown product** — `hk fetch --product foo` only works for products listed in `products.yaml`. Run `hk products` to see all available names.
+
+Sync is idempotent — safe to re-run after a partial failure. Already-fetched releases are skipped.
+
+**"Embedding provider not responding"**
+
+`hk embed` calls an external embedding service:
+
+- **Ollama (default)** — ensure Ollama is running (`ollama serve`) and the embedding model is pulled (`ollama pull nomic-embed-text`).
+- **Voyage** — set `VOYAGE_API_KEY` in your environment. Check your API key at [dash.voyageai.com](https://dash.voyageai.com).
+
+**Schema version mismatch / corrupted database**
+
+If the DB was created with an older schema version and migration fails, or if data looks wrong after a crash:
+
+```bash
+rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
+hk init
+hk ingest
+hk embed --context structured --embedding ollama   # optional, for vector search
+```
+
+This is safe — the DB is a derived cache. All source data lives in `products/*/releases/*.md` files.
+
+---
+
 ## Related files
 
+- [CONTRIBUTING.md](CONTRIBUTING.md) — how to add products, run tests, submit PRs
 - [URGENT_FINDINGS.md](URGENT_FINDINGS.md) — 23 actionable items (security CVEs, model retirements, breaking changes, config gotchas)
 - [SOURCES.md](SOURCES.md) — 5-tier source landscape with fetch strategies
 - [synergies/INDEX.md](synergies/INDEX.md) — 12 curated cross-product workflows

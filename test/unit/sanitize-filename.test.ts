@@ -11,6 +11,7 @@ import { mkdtempSync, rmSync, readdirSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
+import { mockGhApiTag } from '../helpers/mock-gh-api.js';
 
 let temp: TempDb;
 let productsRoot: string;
@@ -25,31 +26,6 @@ afterEach(() => {
   rmSync(productsRoot, { recursive: true, force: true });
   vi.restoreAllMocks();
 });
-
-/**
- * Helper: mock gh CLI to return one release with the given tag_name.
- * Returns the tag after fetchAll runs so we can inspect the filesystem.
- */
-function mockGhWithTag(tag: string) {
-  let callCount = 0;
-  vi.doMock('node:child_process', () => ({
-    execFileSync: vi.fn(() => {
-      callCount += 1;
-      return callCount === 1
-        ? JSON.stringify([
-            {
-              tag_name: tag,
-              published_at: '2026-05-01T10:00:00Z',
-              name: `Release ${tag}`,
-              body: '- test',
-              html_url: `https://github.com/anthropics/claude-agent-sdk-python/releases/tag/${encodeURIComponent(tag)}`,
-            },
-          ])
-        : '[]';
-    }),
-    execSync: vi.fn(() => '[]'),
-  }));
-}
 
 /** Get all .md filenames in the releases dir for a product */
 function releasedFiles(product: string): string[] {
@@ -78,7 +54,7 @@ function assertAllFilesSafe(product: string) {
 
 describe('sanitizeFilename — path traversal defense (via fetchAll)', () => {
   it('normal semver tag passes through safely', async () => {
-    mockGhWithTag('v1.2.3');
+    mockGhApiTag('v1.2.3');
     const { fetchAll } = await import('../../src/fetch.js');
     const stats = await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     expect(stats[0].fetched).toBe(1);
@@ -87,7 +63,7 @@ describe('sanitizeFilename — path traversal defense (via fetchAll)', () => {
   });
 
   it('../ traversal in tag name is neutralized (forward slash)', async () => {
-    mockGhWithTag('../../etc/passwd');
+    mockGhApiTag('../../etc/passwd');
     const { fetchAll } = await import('../../src/fetch.js');
     const stats = await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     // Either written safely or rejected outright — must not write to ../../
@@ -101,7 +77,7 @@ describe('sanitizeFilename — path traversal defense (via fetchAll)', () => {
   });
 
   it('..\\traversal (backslash) in tag name is neutralized', async () => {
-    mockGhWithTag('..\\..\\windows\\system32\\evil');
+    mockGhApiTag('..\\..\\windows\\system32\\evil');
     const { fetchAll } = await import('../../src/fetch.js');
     const stats = await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     assertAllFilesSafe('claude-agent-sdk-python');
@@ -113,7 +89,7 @@ describe('sanitizeFilename — path traversal defense (via fetchAll)', () => {
   });
 
   it('null bytes in tag name are stripped', async () => {
-    mockGhWithTag('v1.0.0\x00malicious');
+    mockGhApiTag('v1.0.0\x00malicious');
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     assertAllFilesSafe('claude-agent-sdk-python');
@@ -125,7 +101,7 @@ describe('sanitizeFilename — path traversal defense (via fetchAll)', () => {
 
   it('very long tag name is truncated to safe length', async () => {
     const longTag = 'v' + 'a'.repeat(250) + '.0';
-    mockGhWithTag(longTag);
+    mockGhApiTag(longTag);
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     const files = releasedFiles('claude-agent-sdk-python');
@@ -136,32 +112,31 @@ describe('sanitizeFilename — path traversal defense (via fetchAll)', () => {
   });
 
   it('Windows-reserved characters (<>:"|?*) are sanitized', async () => {
-    mockGhWithTag('v1.0.0<script>|"test"?*');
+    mockGhApiTag('v1.0.0<script>|"test"?*');
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     assertAllFilesSafe('claude-agent-sdk-python');
   });
 
   it('leading dots are stripped (hidden file attack)', async () => {
-    mockGhWithTag('.hidden-release');
+    mockGhApiTag('.hidden-release');
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     const files = releasedFiles('claude-agent-sdk-python');
     for (const f of files) {
-      // Filename should not start with a dot (after v-strip)
-      expect(f.startsWith('.')).toBe(false);
+      expect(f, `filename "${f}" should not start with a dot`).not.toMatch(/^\./);
     }
   });
 
   it('embedded .. sequences are replaced', async () => {
-    mockGhWithTag('v1..2..3');
+    mockGhApiTag('v1..2..3');
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     assertAllFilesSafe('claude-agent-sdk-python');
   });
 
   it('unicode characters pass through without breaking safety', async () => {
-    mockGhWithTag('v1.0.0-日本語リリース');
+    mockGhApiTag('v1.0.0-日本語リリース');
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     assertAllFilesSafe('claude-agent-sdk-python');
@@ -169,7 +144,7 @@ describe('sanitizeFilename — path traversal defense (via fetchAll)', () => {
   });
 
   it('@scope/pkg@version multiPackage tag produces safe filename', async () => {
-    mockGhWithTag('@evil/../../../etc/passwd@1.0.0');
+    mockGhApiTag('@evil/../../../etc/passwd@1.0.0');
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'anthropic-sdk-typescript' });
     assertAllFilesSafe('anthropic-sdk-typescript');

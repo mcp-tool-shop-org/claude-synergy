@@ -74,7 +74,7 @@ describe('fetchAll', () => {
     });
     expect(stats[0].fetched).toBe(1);
     const path = join(productsRoot, 'claude-agent-sdk-python', 'releases', '0.2.0.md');
-    expect(existsSync(path)).toBe(true);
+    expect(existsSync(path), 'release file should be written to disk').toBe(true);
     const body = readFileSync(path, 'utf-8');
     expect(body).toMatch(/product: claude-agent-sdk-python/);
     expect(body).toMatch(/version: "0\.2\.0"/);
@@ -95,7 +95,8 @@ describe('fetchAll', () => {
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
     await fetchAllMocked(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     expect(
-      existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '1.2.3.md'))
+      existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '1.2.3.md')),
+      'v-stripped filename 1.2.3.md should exist'
     ).toBe(true);
   });
 
@@ -119,12 +120,14 @@ describe('fetchAll', () => {
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
     await fetchAllMocked(temp.db, productsRoot, { product: 'anthropic-sdk-typescript' });
     expect(
-      existsSync(join(productsRoot, 'anthropic-sdk-typescript', 'releases', 'sdk-0.98.0.md'))
+      existsSync(join(productsRoot, 'anthropic-sdk-typescript', 'releases', 'sdk-0.98.0.md')),
+      'sdk release file should exist with prefix preserved'
     ).toBe(true);
     expect(
       existsSync(
         join(productsRoot, 'anthropic-sdk-typescript', 'releases', 'bedrock-sdk-0.29.2.md')
-      )
+      ),
+      'bedrock-sdk release file should exist with prefix preserved'
     ).toBe(true);
   });
 
@@ -261,7 +264,8 @@ describe('fetchAll', () => {
       existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '0.1.0.md'))
     ).toBe(false);
     expect(
-      existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '0.2.0.md'))
+      existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '0.2.0.md')),
+      'new release after since-date should be written to disk'
     ).toBe(true);
   });
 });

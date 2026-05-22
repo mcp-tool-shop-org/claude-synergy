@@ -40,7 +40,10 @@ describe('searchChanges', () => {
     const results = searchChanges(temp.db, 'workflow', { since: '2026-03-01' });
     for (const r of results) {
       expect(r.released_at).not.toBeNull();
-      expect((r.released_at ?? '') >= '2026-03-01').toBe(true);
+      expect(
+        r.released_at ?? '',
+        `released_at "${r.released_at}" should be >= 2026-03-01`
+      ).toSatisfy((d: string) => d >= '2026-03-01');
     }
   });
 
@@ -62,7 +65,10 @@ describe('searchChanges', () => {
       if (prev.released_at === cur.released_at) {
         expect(cur.ordinal).toBeGreaterThanOrEqual(prev.ordinal);
       } else {
-        expect((prev.released_at ?? '') >= (cur.released_at ?? '')).toBe(true);
+        expect(
+          prev.released_at ?? '',
+          `result[${i - 1}].released_at "${prev.released_at}" should be >= result[${i}].released_at "${cur.released_at}"`
+        ).toSatisfy((d: string) => d >= (cur.released_at ?? ''));
       }
     }
   });
@@ -108,7 +114,10 @@ describe('lookupEntity', () => {
     // Easier: pick an entity guaranteed to appear in multiple releases — we just verify the sort is monotonic
     const results = lookupEntity(temp.db, 'env_var', 'ANTHROPIC_API_KEY');
     for (let i = 1; i < results.length; i++) {
-      expect((results[i].released_at ?? '') >= (results[i - 1].released_at ?? '')).toBe(true);
+      expect(
+        results[i].released_at ?? '',
+        `result[${i}].released_at should be >= result[${i - 1}].released_at (chronological order)`
+      ).toSatisfy((d: string) => d >= (results[i - 1].released_at ?? ''));
     }
   });
 });
@@ -130,7 +139,10 @@ describe('recentReleases', () => {
   it('orders by released_at DESC', () => {
     const rows = recentReleases(temp.db, undefined, 100);
     for (let i = 1; i < rows.length; i++) {
-      expect(rows[i - 1].released_at >= rows[i].released_at).toBe(true);
+      expect(
+        rows[i - 1].released_at,
+        `row[${i - 1}].released_at "${rows[i - 1].released_at}" should be >= row[${i}].released_at "${rows[i].released_at}"`
+      ).toSatisfy((d: string) => d >= rows[i].released_at);
     }
   });
 
@@ -164,7 +176,10 @@ describe('listProducts', () => {
   it('orders by release_count DESC', () => {
     const rows = listProducts(temp.db);
     for (let i = 1; i < rows.length; i++) {
-      expect(rows[i - 1].release_count >= rows[i].release_count).toBe(true);
+      expect(
+        rows[i - 1].release_count,
+        `row[${i - 1}].release_count (${rows[i - 1].release_count}) should be >= row[${i}].release_count (${rows[i].release_count})`
+      ).toBeGreaterThanOrEqual(rows[i].release_count);
     }
   });
 });
@@ -176,9 +191,15 @@ describe('entityFrequency', () => {
       const prev = rows[i - 1];
       const cur = rows[i];
       if (prev.count === cur.count) {
-        expect((prev.first_seen ?? '9999') <= (cur.first_seen ?? '9999')).toBe(true);
+        expect(
+          prev.first_seen ?? '9999',
+          `when counts tied, row[${i - 1}].first_seen "${prev.first_seen}" should be <= row[${i}].first_seen "${cur.first_seen}"`
+        ).toSatisfy((d: string) => d <= (cur.first_seen ?? '9999'));
       } else {
-        expect(prev.count > cur.count).toBe(true);
+        expect(
+          prev.count,
+          `row[${i - 1}].count (${prev.count}) should be > row[${i}].count (${cur.count})`
+        ).toBeGreaterThan(cur.count);
       }
     }
   });

@@ -159,7 +159,7 @@ describe('fetchVscodeUpdates', () => {
     ]);
     const items = await fetchVscodeUpdates('2025-01-01');
     expect(items.length).toBeGreaterThanOrEqual(1);
-    expect(items.some((i) => i.slug === 'v1_113')).toBe(true);
+    expect(items.some((i) => i.slug === 'v1_113'), 'should include the v1_113 VS Code update').toBe(true);
   });
 
   it('skips entries dated at or before sinceIso', async () => {
@@ -176,7 +176,10 @@ describe('fetchVscodeUpdates', () => {
     // sinceIso pushed to May 2026 — only versions mapped to dates after May 15 2026 land
     const items = await fetchVscodeUpdates('2026-05-15T13:00:00Z');
     // v1_113 maps to 2026-05-15 12:00 UTC which is BEFORE this since; v1_114 → 2026-06 etc. should land
-    expect(items.every((i) => i.pubDate > '2026-05-15T13:00:00Z')).toBe(true);
+    expect(
+      items.every((i) => i.pubDate > '2026-05-15T13:00:00Z'),
+      'all returned items should have pubDate after the since cutoff'
+    ).toBe(true);
   });
 });
 

@@ -72,7 +72,7 @@ describe('OllamaEmbeddingProvider', () => {
     try {
       const p = new OllamaEmbeddingProvider({});
       await p.embed(['x']);
-      expect(fm.calls[0].url.startsWith('http://127.0.0.1:11434')).toBe(true);
+      expect(fm.calls[0].url, 'OLLAMA_HOST without protocol should get http:// prefix').toMatch(/^http:\/\/127\.0\.0\.1:11434/);
     } finally {
       if (orig === undefined) delete process.env.OLLAMA_HOST;
       else process.env.OLLAMA_HOST = orig;

@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join, relative, basename } from 'node:path';
+import { createHash } from 'node:crypto';
 import matter from 'gray-matter';
 import TurndownService from 'turndown';
 import type Database from 'better-sqlite3';
@@ -82,8 +83,16 @@ export interface IngestStats {
   releasesAdded: number;
   changesAdded: number;
   entitiesAdded: number;
+  /** Releases skipped because their content hash has not changed since last ingest. */
   skipped: number;
+  /** Total release files encountered (= releasesAdded + skipped + errors). */
+  total: number;
   errors: Array<{ file: string; error: string }>;
+}
+
+/** Compute a short SHA-256 hex digest of file content for dedup. */
+function contentHash(raw: string): string {
+  return createHash('sha256').update(raw).digest('hex').slice(0, 16);
 }
 
 // Hardcoded fallback for PRODUCT_META, used when products.yaml is missing.
@@ -162,6 +171,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
     changesAdded: 0,
     entitiesAdded: 0,
     skipped: 0,
+    total: 0,
     errors: [],
   };
 
@@ -189,6 +199,10 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
   `);
 
   const deleteChanges = db.prepare(`DELETE FROM changes WHERE product = ? AND version = ?`);
+
+  const selectExistingHash = db.prepare(
+    `SELECT notes_hash FROM releases WHERE product = ? AND version = ?`
+  );
 
   const insertEntity = db.prepare(`
     INSERT INTO entities (change_id, entity_type, entity_value)
@@ -234,6 +248,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
     const ingestTransaction = db.transaction(() => {
       for (const file of releaseFiles) {
         try {
+          stats.total++;
           const path = join(releasesDir, file);
           const raw = readFileSync(path, 'utf-8');
           const { data: fm, content } = matter(raw);
@@ -245,6 +260,15 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
           const version = fmTyped.sub_product
             ? `${baseVersion}-${fmTyped.sub_product}`
             : baseVersion;
+
+          // Dedup: skip re-processing if content hash has not changed
+          const hash = contentHash(raw);
+          const existingRow = selectExistingHash.get(product, version) as { notes_hash: string | null } | undefined;
+          if (existingRow?.notes_hash === hash) {
+            stats.skipped++;
+            continue;
+          }
+
           const released_at = fmTyped.released_at ?? null;
           const source_url = fmTyped.source_url ?? '';
           const fetched_at = fmTyped.fetched_at ?? new Date().toISOString().split('T')[0];
@@ -260,7 +284,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
             fetched_at,
             source_url,
             bundle_size_kb,
-            notes_hash: null,
+            notes_hash: hash,
           });
           stats.releasesAdded++;
 

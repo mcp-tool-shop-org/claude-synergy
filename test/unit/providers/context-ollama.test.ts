@@ -90,7 +90,7 @@ describe('OllamaContextProvider', () => {
       const p = new OllamaContextProvider({});
       await p.contextFor(ctx(), rel());
       const url = fm.calls[0].url;
-      expect(url.startsWith('http://127.0.0.1:11434')).toBe(true);
+      expect(url, 'OLLAMA_HOST without protocol should get http:// prefix').toMatch(/^http:\/\/127\.0\.0\.1:11434/);
     } finally {
       if (orig === undefined) delete process.env.OLLAMA_HOST;
       else process.env.OLLAMA_HOST = orig;

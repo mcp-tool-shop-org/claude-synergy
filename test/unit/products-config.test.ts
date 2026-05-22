@@ -88,8 +88,8 @@ describe('loadProductsConfig — strategy mapping', () => {
     expect(cody.rssUrl).toContain('sourcegraph.com');
     expect(cody.rssTitleFilter).toBeInstanceOf(RegExp);
     expect(cody.rssTitleFilter!.flags).toContain('i');
-    expect(cody.rssTitleFilter!.test('Cody update')).toBe(true);
-    expect(cody.rssTitleFilter!.test('unrelated')).toBe(false);
+    expect(cody.rssTitleFilter!.test('Cody update'), 'title filter should match "Cody update"').toBe(true);
+    expect(cody.rssTitleFilter!.test('unrelated'), 'title filter should not match "unrelated"').toBe(false);
   });
 
   it('raw-changelog carries url + parser', () => {

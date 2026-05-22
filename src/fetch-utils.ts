@@ -22,6 +22,9 @@ export interface FetchRetryOptions extends Omit<RequestInit, 'signal'> {
 /** HTTP status codes eligible for retry */
 const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
 
+const GITHUB_TOKEN_HINT =
+  'GitHub API rate limit hit. Set GITHUB_TOKEN env var for 5000 req/hr (vs 60 unauthenticated).';
+
 /**
  * Fetch with timeout + retry. Near-drop-in replacement for `fetch(url, init)` with resilience.
  *
@@ -72,7 +75,11 @@ export async function fetchWithRetry(
 
       // Non-retryable HTTP status (e.g. 404, 403, 301) — return as-is so caller
       // can inspect .status / .ok. Only 429 + 5xx merit retry.
+      // Enrich GitHub API rate-limit errors (403) with GITHUB_TOKEN guidance.
       if (!RETRYABLE_STATUSES.has(res.status)) {
+        if (res.status === 403 && isGitHubApiUrl(url)) {
+          throw new Error(`HTTP 403 from ${url} — ${GITHUB_TOKEN_HINT}`);
+        }
         return res;
       }
 
@@ -84,7 +91,9 @@ export async function fetchWithRetry(
       }
 
       // Exhausted retries on retryable status — throw
-      throw new Error(`HTTP ${res.status} from ${url} after ${maxRetries + 1} attempts`);
+      // Enrich GitHub API 429 with GITHUB_TOKEN guidance
+      const ghHint = (res.status === 429 && isGitHubApiUrl(url)) ? ` ${GITHUB_TOKEN_HINT}` : '';
+      throw new Error(`HTTP ${res.status} from ${url} after ${maxRetries + 1} attempts.${ghHint}`);
     } catch (e: any) {
       // If the external signal caused abort, don't retry
       if (externalSignal?.aborted) {
@@ -166,6 +175,20 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
     }, ms);
     signal.addEventListener('abort', onAbort, { once: true });
   });
+}
+
+// ─── GitHub rate-limit detection ───────────────────────────────────────────
+
+/** Check whether a URL targets the GitHub API (api.github.com or raw.githubusercontent.com). */
+function isGitHubApiUrl(url: string | URL): boolean {
+  try {
+    const hostname = typeof url === 'string' ? new URL(url).hostname : url.hostname;
+    return hostname === 'api.github.com' || hostname === 'raw.githubusercontent.com';
+  } catch {
+    // If URL parsing fails, fall back to string matching
+    const s = String(url);
+    return s.includes('api.github.com') || s.includes('raw.githubusercontent.com');
+  }
 }
 
 // ─── Global fetchAll timeout helper ────────────────────────────────────────

@@ -78,7 +78,15 @@ function aiderReleaseDates(): Map<string, string> {
     const map = new Map<string, string>();
     for (const r of releases) if (r.tag_name && r.published_at) map.set(r.tag_name, r.published_at);
     return map;
-  } catch {
+  } catch (e: any) {
+    // Enrich rate-limit errors with GITHUB_TOKEN guidance
+    const stderr = (e?.stderr ?? '').toString();
+    if (stderr.includes('403') || stderr.includes('429') || stderr.includes('rate limit')) {
+      console.error(
+        '[claude-synergy] GitHub API rate limit hit while fetching aider release dates. ' +
+        'Set GITHUB_TOKEN env var for 5000 req/hr (vs 60 unauthenticated).'
+      );
+    }
     return new Map();
   }
 }

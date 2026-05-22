@@ -216,9 +216,9 @@ describe('extractEntities', () => {
         'Added CLAUDE_CODE_WORKFLOWS env var and /code-review slash command with --limit option.';
       const results = extractEntities(text);
       const types = new Set(results.map(([t]) => t));
-      expect(types.has('env_var')).toBe(true);
-      expect(types.has('slash_command')).toBe(true);
-      expect(types.has('cli_option')).toBe(true);
+      expect(types.has('env_var'), 'should extract env_var entity type').toBe(true);
+      expect(types.has('slash_command'), 'should extract slash_command entity type').toBe(true);
+      expect(types.has('cli_option'), 'should extract cli_option entity type').toBe(true);
     });
   });
 });

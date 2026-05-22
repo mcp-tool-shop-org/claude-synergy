@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
+import { mockGhApi, release } from '../helpers/mock-gh-api.js';
 
 let temp: TempDb;
 let productsRoot: string;
@@ -18,46 +19,22 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function mockGhWithReleases(releases: any[]) {
-  let callCount = 0;
-  const respond = () => {
-    callCount += 1;
-    return callCount === 1
-      ? Buffer.from(JSON.stringify(releases), 'utf-8').toString('utf-8')
-      : '[]';
-  };
-  vi.doMock('node:child_process', () => ({
-    execFileSync: vi.fn(respond),
-    execSync: vi.fn(respond),
-  }));
-}
-
 describe('integration/sync — fetch → write files → marker', () => {
   it('first run pulls all releases, second run pulls 0 (idempotent)', async () => {
-    mockGhWithReleases([
-      {
-        tag_name: 'v0.2.0',
-        published_at: '2026-04-01T10:00:00Z',
-        name: 'r',
-        body: '- one',
-        html_url: 'u',
-      },
-      {
-        tag_name: 'v0.2.1',
-        published_at: '2026-04-15T10:00:00Z',
-        name: 'r',
-        body: '- two',
-        html_url: 'u',
-      },
+    mockGhApi([
+      release('v0.2.0'),
+      release('v0.2.1', { published_at: '2026-04-15T10:00:00Z', body: '- two' }),
     ]);
     const { fetchAll } = await import('../../src/fetch.js');
     const first = await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     expect(first[0].fetched).toBe(2);
     expect(
-      existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '0.2.0.md'))
+      existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '0.2.0.md')),
+      'release 0.2.0 should be written to disk'
     ).toBe(true);
     expect(
-      existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '0.2.1.md'))
+      existsSync(join(productsRoot, 'claude-agent-sdk-python', 'releases', '0.2.1.md')),
+      'release 0.2.1 should be written to disk'
     ).toBe(true);
 
     // Second run — same input, same files exist; the since-marker advanced past
@@ -72,15 +49,7 @@ describe('integration/sync — fetch → write files → marker', () => {
   });
 
   it('writes marker per (product, name) after a successful fetch', async () => {
-    mockGhWithReleases([
-      {
-        tag_name: 'v0.2.0',
-        published_at: '2026-04-01T10:00:00Z',
-        name: 'r',
-        body: '- one',
-        html_url: 'u',
-      },
-    ]);
+    mockGhApi([release('v0.2.0')]);
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
 
@@ -92,15 +61,7 @@ describe('integration/sync — fetch → write files → marker', () => {
   });
 
   it('--since override pre-dating the marker re-pulls (but idempotent files still skip)', async () => {
-    mockGhWithReleases([
-      {
-        tag_name: 'v0.2.0',
-        published_at: '2026-04-01T10:00:00Z',
-        name: 'r',
-        body: '- one',
-        html_url: 'u',
-      },
-    ]);
+    mockGhApi([release('v0.2.0')]);
     const { fetchAll } = await import('../../src/fetch.js');
     await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
     const second = await fetchAll(temp.db, productsRoot, {
