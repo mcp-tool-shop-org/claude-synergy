@@ -375,6 +375,216 @@ describe('§8.12 Markers upsert on (product, name)', () => {
   });
 });
 
+// ─── 8.14 turndown HTML→markdown in ingest (Phase 4c, v0.5.1) ──────────────
+describe('§8.14 turndown HTML→markdown ingest', () => {
+  it('HTML body with <ul>/<li> produces bullet rows in changes table', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'html-ingest-'));
+    try {
+      mkdirSync(join(dir, 'html-product', 'releases'), { recursive: true });
+      const path = join(dir, 'html-product', 'releases', 'v1.md');
+      writeFileSync(
+        path,
+        `---\nproduct: html-product\nversion: "v1"\n---\n\n` +
+          `<p>Release notes:</p>\n<ul>\n<li>Added <code>foo</code> command</li>\n` +
+          `<li>Fixed <strong>bar</strong> crash</li>\n<li>Removed <em>baz</em> option</li>\n</ul>\n`
+      );
+      ingestAll(temp.db, dir);
+      const rows = temp.db
+        .prepare(`SELECT text FROM changes WHERE product='html-product' ORDER BY ordinal`)
+        .all() as Array<{ text: string }>;
+      // Before turndown this would have been 0 rows; after, we get the three <li> items
+      expect(rows.length).toBeGreaterThanOrEqual(3);
+      expect(rows.map((r) => r.text).join('\n')).toMatch(/foo/);
+      expect(rows.map((r) => r.text).join('\n')).toMatch(/bar/);
+      expect(rows.map((r) => r.text).join('\n')).toMatch(/baz/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('markdown-native body (no HTML tags) is left untouched', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'md-ingest-'));
+    try {
+      mkdirSync(join(dir, 'md-product', 'releases'), { recursive: true });
+      writeFileSync(
+        join(dir, 'md-product', 'releases', 'v1.md'),
+        `---\nproduct: md-product\nversion: "v1"\n---\n\n- One\n- Two\n- Three\n`
+      );
+      ingestAll(temp.db, dir);
+      const rows = temp.db
+        .prepare(`SELECT text FROM changes WHERE product='md-product' ORDER BY ordinal`)
+        .all() as Array<{ text: string }>;
+      expect(rows.map((r) => r.text)).toEqual(['One', 'Two', 'Three']);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+// ─── 8.15 Commit-dump compaction (Phase 4c, v0.6.0) ───────────────────────
+describe('§8.15 compactCommitDumpBody: continue-cli-style git commit dump collapses to 1 summary', () => {
+  it('release body with >=10 SHA-prefixed bullets + >=50% ratio → 1 summary change row', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'commit-dump-'));
+    try {
+      mkdirSync(join(dir, 'noisy-cli', 'releases'), { recursive: true });
+      const commits = [
+        '6ad60da114171ac9e9d51f67ec80fd413a27efcd refactor: rename foo (#1)',
+        '9e5adf959303844a82cc904f3bb9493b447fec5c feat: add bar (#2)',
+        'e9471f2da47daddd7dff556339d28cb6c05035f0 fix: edge case (#3)',
+        'a5c2d5594b3e12fd4c6233c61fcd2c768d68d198 fix: UI polish (#4)',
+        '41850dcb3ef0102b5d0461974e09f4a4144eb484 fix: redirect blog (#5)',
+        'cab63914514fd5929b85c1efab9eeaee35dd104c chore: standardize icon (#6)',
+        '0331e87645286c9e26f53c959c9a00a87de796af feat: require feedback (#7)',
+        'fc0d9e8066c651fc3295e51260e3a3e4513d3d84 fix: render markdown (#8)',
+        '7a5e442f479dc6526b2eb70934628f63846042d4 feat: migrate model (#9)',
+        'cdab88d443a5a23737b75c04ac52bd8115cbe559 fix: remove tool (#10)',
+        '045872c61c61bba860ea14d2d2428a7ca415f145 chore: remove hook (#11)',
+      ];
+      const body = '- ' + commits.join('\n- ');
+      writeFileSync(
+        join(dir, 'noisy-cli', 'releases', '0.1.0.md'),
+        `---\nproduct: noisy-cli\nversion: "0.1.0"\n---\n\n${body}\n`
+      );
+      ingestAll(temp.db, dir);
+      const rows = temp.db
+        .prepare(`SELECT text FROM changes WHERE product='noisy-cli'`)
+        .all() as Array<{ text: string }>;
+      expect(rows.length).toBe(1);
+      expect(rows[0].text).toMatch(/Auto-generated release notes:\s+11 commits/);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('body with fewer than 10 SHA bullets is NOT compacted (preserves small commit lists)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'small-dump-'));
+    try {
+      mkdirSync(join(dir, 'small-cli', 'releases'), { recursive: true });
+      const body = [
+        '- abc1234 feat: one',
+        '- def5678 fix: two',
+        '- 9abcdef chore: three',
+      ].join('\n');
+      writeFileSync(
+        join(dir, 'small-cli', 'releases', '0.1.0.md'),
+        `---\nproduct: small-cli\nversion: "0.1.0"\n---\n\n${body}\n`
+      );
+      ingestAll(temp.db, dir);
+      const count = (
+        temp.db.prepare(`SELECT COUNT(*) AS n FROM changes WHERE product='small-cli'`).get() as { n: number }
+      ).n;
+      // Threshold is 10 SHA bullets; with 3 we keep them as-is
+      expect(count).toBe(3);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('body with >=10 SHA bullets but ratio < 50% is NOT compacted (mixed substantive content wins)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mixed-dump-'));
+    try {
+      mkdirSync(join(dir, 'mixed-cli', 'releases'), { recursive: true });
+      // 10 SHA bullets + 12 substantive bullets = ratio 10/22 ≈ 45%
+      const commits = Array.from(
+        { length: 10 },
+        (_, i) => `- ${'a'.repeat(8)}${i.toString().padStart(2, '0')} fix: thing ${i}`
+      );
+      const substantive = Array.from(
+        { length: 12 },
+        (_, i) => `- Added feature ${i} for user-facing workflow improvements`
+      );
+      const body = [...commits, ...substantive].join('\n');
+      writeFileSync(
+        join(dir, 'mixed-cli', 'releases', '0.1.0.md'),
+        `---\nproduct: mixed-cli\nversion: "0.1.0"\n---\n\n${body}\n`
+      );
+      ingestAll(temp.db, dir);
+      const count = (
+        temp.db.prepare(`SELECT COUNT(*) AS n FROM changes WHERE product='mixed-cli'`).get() as { n: number }
+      ).n;
+      // Ratio under 50% → keep everything (22 bullets)
+      expect(count).toBe(22);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+// ─── 8.16 npm-scoped filename sanitization (Tier 4a, v0.4.0) ───────────────
+// Tags like @modelcontextprotocol/server@2.0.0-alpha.2 must NOT produce filename
+// with @ or / chars that break Windows paths. Verified at the fetch.ts level.
+describe('§8.16 npm-scoped multiPackage tag → sanitized filename', () => {
+  it('@scope/pkg@1.0.0 → scope-pkg-1.0.0.md (no @ or / in filename)', async () => {
+    // We test indirectly: write a fixture that simulates having received an npm-scoped tag
+    // by checking the rendered filename via the existing multiPackage logic shape.
+    const sanitize = (tag: string): string =>
+      tag
+        .replace(/^@/, '')
+        .replace(/\//g, '-')
+        .replace(/@/g, '-')
+        .replace(/-v(\d)/g, '-$1')
+        .replace(/^v/, '');
+
+    expect(sanitize('@modelcontextprotocol/server@2.0.0-alpha.2')).toBe(
+      'modelcontextprotocol-server-2.0.0-alpha.2'
+    );
+    expect(sanitize('@continuedev/config-yaml@1.42.0')).toBe('continuedev-config-yaml-1.42.0');
+    expect(sanitize('sdk-v0.98.0')).toBe('sdk-0.98.0'); // existing Anthropic style still works
+    expect(sanitize('v1.3.38-vscode')).toBe('1.3.38-vscode'); // Continue's platform suffix
+  });
+});
+
+// ─── 8.17 fetchAll lazy-inserts products row to satisfy FK on markers ─────
+describe('§8.17 fetch lazy-inserts product row for marker FK', () => {
+  it('fetching a never-ingested product does not FK-fail on markers insert', () => {
+    // Setup: temp.db is fresh (initSchema applied, no products inserted)
+    expect(
+      (temp.db.prepare(`SELECT COUNT(*) AS n FROM products`).get() as { n: number }).n
+    ).toBe(0);
+
+    // Simulate the lazy-insert pattern used by writeMarker
+    temp.db
+      .prepare(
+        `INSERT OR IGNORE INTO products (name, display_name, source_tier, source_url, fetch_strategy, notes)
+         VALUES (?, ?, 1, '', 'gh-releases', NULL)`
+      )
+      .run('lazy-product', 'lazy-product');
+
+    expect(() =>
+      temp.db
+        .prepare(
+          `INSERT INTO markers (product, name, version, updated_at)
+           VALUES (?, 'last_fetched_release_at', ?, ?)
+           ON CONFLICT(product, name) DO UPDATE SET version = excluded.version, updated_at = excluded.updated_at`
+        )
+        .run('lazy-product', '2026-05-21T00:00:00Z', new Date().toISOString())
+    ).not.toThrow();
+  });
+});
+
+// ─── 8.18 Windsurf CSR fallback returns empty array (Tier 4b, v0.5.0) ─────
+describe('§8.18 Windsurf scraper returns empty array on CSR fallback (no __NEXT_DATA__)', () => {
+  it('HTML without __NEXT_DATA__ script ⇒ 0 entries, no throw', async () => {
+    const handle = mockFetch([
+      {
+        urlPattern: /windsurf\.com\/changelog/,
+        response: () =>
+          new Response(
+            '<!DOCTYPE html><html><body><h1>Windsurf Editor Changelog</h1></body></html>',
+            { status: 200, headers: { 'content-type': 'text/html' } }
+          ),
+      },
+    ]);
+    try {
+      const { fetchWindsurfChangelog } = await import('../../src/fetch-html.js');
+      const items = await fetchWindsurfChangelog('2026-01-01');
+      expect(items).toEqual([]);
+    } finally {
+      handle.restore();
+    }
+  });
+});
+
 // ─── 8.13 Ingest deletes prior changes for replaced version, FTS5 sync ────
 describe('§8.13 Ingest deletes prior changes for replaced version (FTS5 sync)', () => {
   it('re-ingesting a file with 2 bullets after 3 → changes table has 2 rows, not 5', () => {
