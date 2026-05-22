@@ -162,4 +162,12 @@ describe('MCP server integration', () => {
       });
       await client.initialize();
       await client.close();
-      // Exit code may be null brie
+      // Exit code may be null briefly; should not still be running
+      await new Promise((r) => setTimeout(r, 200));
+      // Either exited cleanly (0 or SIGTERM-like) or we forcibly killed (SIGKILL)
+      // The exitCode getter should not be undefined
+      expect(client.exitCode()).not.toBe(undefined);
+    },
+    25_000
+  );
+});

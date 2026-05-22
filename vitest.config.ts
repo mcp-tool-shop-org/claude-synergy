@@ -12,6 +12,13 @@ export default defineConfig({
         singleFork: false,
       },
     },
+    // cheerio is a hybrid CJS/ESM package that Vite's SSR transformer chokes on
+    // (especially under coverage instrumentation). Externalize so Node loads it directly.
+    server: {
+      deps: {
+        external: ['cheerio'],
+      },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
@@ -25,6 +32,15 @@ export default defineConfig({
         'src/providers/embedding/voyage.ts',
         'src/providers/rerank/voyage.ts',
         'src/providers/rerank/cohere.ts',
+        // Tier 4b fetch strategies — RSS / raw markdown / HTML scrape against
+        // live external feeds. Test against real feeds would burn budget and
+        // network; same reason paid providers are shape-only.
+        // The gh-releases path inside fetch.ts is covered.
+        'src/fetch-rss.ts',
+        'src/fetch-changelog.ts',
+        'src/fetch-html.ts',
+        // Interface-only declaration file (no executable code)
+        'src/providers/types.ts',
       ],
       thresholds: {
         statements: 80,

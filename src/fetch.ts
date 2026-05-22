@@ -9,6 +9,7 @@ import { join, resolve } from 'node:path';
 import type Database from 'better-sqlite3';
 import { fetchRssReleases } from './fetch-rss.js';
 import { fetchAiderHistory } from './fetch-changelog.js';
+import { fetchHtmlReleases, type HtmlParserName } from './fetch-html.js';
 
 interface GhRelease {
   tag_name: string;
@@ -20,7 +21,7 @@ interface GhRelease {
 
 export interface FetchTarget {
   product: string;
-  strategy: 'gh-releases' | 'rss' | 'raw-changelog';
+  strategy: 'gh-releases' | 'rss' | 'raw-changelog' | 'html-scrape';
   // gh-releases
   repo?: string;
   multiPackage?: boolean;
@@ -31,6 +32,8 @@ export interface FetchTarget {
   // raw-changelog
   rawChangelogUrl?: string;
   rawChangelogParser?: 'aider-history';
+  // html-scrape
+  htmlParser?: HtmlParserName;
 }
 
 const TARGETS: FetchTarget[] = [
@@ -76,6 +79,11 @@ const TARGETS: FetchTarget[] = [
 
   // Raw markdown CHANGELOG
   { product: 'aider', strategy: 'raw-changelog', rawChangelogUrl: 'https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md', rawChangelogParser: 'aider-history' },
+
+  // ── Tier 4b additions — HTML-scraped sources ──────────────────────────────
+  { product: 'github-copilot', strategy: 'html-scrape', htmlParser: 'github-copilot-blog' },
+  { product: 'vscode-copilot-chat', strategy: 'html-scrape', htmlParser: 'vscode-updates' },
+  { product: 'windsurf', strategy: 'html-scrape', htmlParser: 'windsurf-changelog' },
 ];
 
 export interface FetchStats {
@@ -121,6 +129,8 @@ async function fetchOne(
         return await fetchRss(db, outDir, target, since);
       case 'raw-changelog':
         return await fetchRawChangelog(db, outDir, target, since);
+      case 'html-scrape':
+        return await fetchHtmlScrape(db, outDir, target, since);
     }
   } catch (e: any) {
     return {
@@ -327,6 +337,56 @@ async function fetchRawChangelog(
       if (item.releasedAt && (!latest || item.releasedAt > latest)) latest = item.releasedAt;
     } catch (e: any) {
       errors.push(`${item.version}: ${e.message}`);
+    }
+  }
+
+  if (latest) writeMarker(db, target.product, latest);
+
+  return { product: target.product, fetched, newSince: since, latest, errors };
+}
+
+// ─── Strategy: html-scrape ──────────────────────────────────────────────────
+
+async function fetchHtmlScrape(
+  db: Database.Database,
+  outDir: string,
+  target: FetchTarget,
+  since: string
+): Promise<FetchStats> {
+  if (!target.htmlParser) throw new Error(`${target.product}: html-scrape requires htmlParser`);
+
+  const items = await fetchHtmlReleases(target.htmlParser, since);
+  let latest: string | null = null;
+  let fetched = 0;
+  const errors: string[] = [];
+
+  for (const item of items) {
+    try {
+      const path = join(outDir, `${item.slug}.md`);
+      if (existsSync(path)) {
+        if (!latest || item.pubDate > latest) latest = item.pubDate;
+        continue;
+      }
+      const body = [
+        '---',
+        `product: ${target.product}`,
+        `version: "${item.slug}"`,
+        `released_at: "${item.pubDate.split('T')[0]}"`,
+        `source_url: "${item.link}"`,
+        `fetched_at: "${new Date().toISOString().split('T')[0]}"`,
+        `title: "${(item.title ?? '').replace(/"/g, "'")}"`,
+        '---',
+        '',
+        `# ${target.product} — ${item.title ?? item.slug}`,
+        '',
+        item.body ?? '(no body)',
+        '',
+      ].join('\n');
+      writeFileSync(path, body, 'utf-8');
+      fetched++;
+      if (!latest || item.pubDate > latest) latest = item.pubDate;
+    } catch (e: any) {
+      errors.push(`${item.slug}: ${e.message}`);
     }
   }
 

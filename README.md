@@ -136,12 +136,39 @@ Provider choices, all configurable:
 
 `.github/workflows/sync.yml` scaffold included. Free path: GitHub Action with Ollama on the ubuntu runner runs daily, fetches new releases, regenerates the DB, commits back to the repo. Alternative: Claude Routine on a cron schedule using your existing plan quota.
 
+## Testing
+
+Vitest suite covers unit / integration / regression / smoke tiers. See [test-spec.md](test-spec.md) for the full specification.
+
+```bash
+pnpm test               # unit + integration + regression (~10s, 205 tests)
+pnpm test:watch         # interactive
+pnpm test:coverage      # generate coverage/index.html (thresholds: 80/75/85/80)
+pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1; needs products/ on disk)
+```
+
+Layout:
+
+| Dir | What it covers |
+|-----|----------------|
+| `test/unit/` | per-module unit tests — extract, ingest, query, db, embed, hybrid, fetch, + every provider |
+| `test/integration/` | end-to-end — full pipeline, sync, MCP server (spawns over stdio), CLI |
+| `test/regression/` | named bug-regression tests (§8 of [test-spec.md](test-spec.md)) — each protects against a real bug |
+| `test/smoke/` | opt-in full-corpus check against the real `products/` (706 files) |
+| `test/fixtures/` | 3 fake products + mock HTTP responses |
+| `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts` |
+
+No network in tests by default — provider HTTP is mocked via `vi.spyOn(global, 'fetch')` (helper at `test/helpers/fetch-mock.ts`). Real SQLite in temp files (not `:memory:`) because sqlite-vec extension load behaves differently across versions and on-disk is the canonical path.
+
+CI: `.github/workflows/test.yml` runs `pnpm test:coverage` on push / PR.
+
 ## Related files
 
 - [URGENT_FINDINGS.md](URGENT_FINDINGS.md) — 19 actionable items surfaced from the corpus
 - [SOURCES.md](SOURCES.md) — 5-tier source landscape
 - [synergies/INDEX.md](synergies/INDEX.md) — 7 curated cross-product workflows
 - [schema.sql](schema.sql) — current SQLite schema
+- [test-spec.md](test-spec.md) — test suite specification
 
 ## License
 

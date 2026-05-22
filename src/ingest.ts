@@ -70,6 +70,11 @@ const PRODUCT_META: Record<string, { tier: number; strategy: string; url: string
   'cursor': { tier: 3, strategy: 'rss', url: 'https://cursor.com/changelog/rss.xml', display: 'Cursor' },
   'cody-enterprise': { tier: 3, strategy: 'rss', url: 'https://sourcegraph.com/changelog/featured.rss', display: 'Sourcegraph Cody Enterprise' },
   'aider': { tier: 2, strategy: 'raw-changelog', url: 'https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md', display: 'Aider' },
+
+  // Tier 4b additions — HTML-scraped sources
+  'github-copilot': { tier: 3, strategy: 'html-scrape', url: 'https://github.blog/changelog/label/copilot/', display: 'GitHub Copilot' },
+  'vscode-copilot-chat': { tier: 3, strategy: 'html-scrape', url: 'https://code.visualstudio.com/updates/', display: 'VS Code Copilot Chat (editor)' },
+  'windsurf': { tier: 3, strategy: 'html-scrape', url: 'https://windsurf.com/changelog', display: 'Windsurf (Cognition)' },
 };
 
 export function ingestAll(db: Database.Database, productsRoot: string): IngestStats {
