@@ -2,14 +2,15 @@
   <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.hi.md">हिन्दी</a> | <a href="README.it.md">Italiano</a> | <a href="README.md">English</a>
 </p>
 
-<p align="center"><img src="docs/logo.png" alt="Claude Synergy" width="280"></p>
-
-# Claude Synergy
+<p align="center"><img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/claude-synergy/readme.png" alt="Claude Synergy" width="400"></p>
 
 Um espelho local e pesquisável de todos os registros de alterações do Anthropic e de outras ferramentas de desenvolvimento de IA, além de uma camada de **Sinergia** que descreve fluxos de trabalho entre diferentes produtos, para que o agente LLM dentro do sistema saiba o que o sistema pode fazer.
 
-<!-- Note: logo text may be dim on GitHub dark theme -->
-[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license)
+<p align="center">
+
+[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license) [![landing page](https://img.shields.io/badge/landing%20page-live-brightgreen)](https://mcp-tool-shop-org.github.io/claude-synergy/)
+
+</p>
 
 ```bash
 $ hk query redact
@@ -70,7 +71,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Números atualizados (a partir da versão 0.7.2):** 44 produtos / 1.186 arquivos de lançamento / 6.042 alterações / 1.225 entidades / 12 sinergias / 382 testes.
+**Números atualizados (a partir da versão 1.0.0):** 44 produtos / 1.186 arquivos de lançamento / 6.042 alterações / 1.225 entidades / 12 sinergias / 382 testes.
 
 ---
 
@@ -88,6 +89,12 @@ claude-synergy/
 | **4d — Playwright + registro MCP + configuração YAML** | ✅ implementado | Windsurf via Playwright; Smithery + registro oficial MCP como catálogos da etapa 4; produtos consolidados em `products.yaml`. |
 
 Roteiro para a versão 0.8+: acompanhado em [URGENT_FINDINGS.md](URGENT_FINDINGS.md) e nas issues.
+
+---
+
+## Segurança e modelo de dados
+
+Esta ferramenta é executada localmente. **Dados acessados:** um banco de dados SQLite derivado e arquivos de lançamento em formato Markdown — todos podem ser recriados. **Rede:** apenas conexões HTTPS de saída quando você executa `hk fetch`/`hk sync` (API do GitHub, feeds RSS, páginas de histórico de alterações, registros MCP) ou `hk embed` com um provedor remoto (Voyage, Cohere). **Credenciais:** lê as variáveis de ambiente `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` — nunca são registradas e nunca são armazenadas em disco. **Não há telemetria.** Consulte [SECURITY.md](SECURITY.md) para obter informações sobre a política de relatórios.
 
 ---
 

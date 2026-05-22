@@ -2,14 +2,15 @@
   <a href="README.ja.md">日本語</a> | <a href="README.zh.md">中文</a> | <a href="README.es.md">Español</a> | <a href="README.fr.md">Français</a> | <a href="README.md">English</a> | <a href="README.it.md">Italiano</a> | <a href="README.pt-BR.md">Português (BR)</a>
 </p>
 
-<p align="center"><img src="docs/logo.png" alt="Claude Synergy" width="280"></p>
-
-# क्लाउड सिनर्जी
+<p align="center"><img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/claude-synergy/readme.png" alt="Claude Synergy" width="400"></p>
 
 यह एंथ्रोपिक (Anthropic) और उससे संबंधित सभी एआई विकास उपकरणों के परिवर्तनों का एक स्थानीय, खोज योग्य दर्पण है - साथ ही एक क्यूरेटेड "**सिनर्जी**" (Synergy) परत जो विभिन्न उत्पादों के बीच कार्यप्रवाह का वर्णन करती है - ताकि 'हॉर्नेस्स' (harness) के अंदर मौजूद एलएलएम (LLM) एजेंट को पता चल सके कि 'हॉर्नेस्स' क्या कर सकता है।
 
-<!-- ध्यान दें: GitHub के गहरे थीम पर लोगो का टेक्स्ट धुंधला दिखाई दे सकता है -->
-[![परीक्षण](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![लाइसेंस](https://img.shields.io/badge/license-MIT-blue)](#license)
+<p align="center">
+
+[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license) [![landing page](https://img.shields.io/badge/landing%20page-live-brightgreen)](https://mcp-tool-shop-org.github.io/claude-synergy/)
+
+</p>
 
 ```bash
 $ hk query redact
@@ -70,7 +71,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**लाइव आंकड़े (v0.7.2 के अनुसार):** 44 उत्पाद / 1,186 रिलीज फ़ाइलें / 6,042 परिवर्तन / 1,225 एंटिटीज (entities) / 12 सिनर्जी (synergies) / 382 परीक्षण।
+**वर्तमान आंकड़े (v1.0.0 के अनुसार):** 44 उत्पाद / 1,186 रिलीज़ फ़ाइलें / 6,042 परिवर्तन / 1,225 इकाइयां / 12 तालमेल / 382 परीक्षण।
 
 ---
 
@@ -88,6 +89,12 @@ claude-synergy/
 | **4d — प्लेराइट + एमसीपी रजिस्ट्री + YAML कॉन्फ़िगरेशन** | ✅ जारी किया गया | प्लेराइट के माध्यम से विंडसर्फ़; स्मिथरी + आधिकारिक एमसीपी रजिस्ट्री को चौथे स्तर के कैटलॉग के रूप में उपयोग किया जाता है; उत्पादों को `products.yaml` में समेकित किया गया है। |
 
 v0.8+ के लिए रोडमैप: [URGENT_FINDINGS.md](URGENT_FINDINGS.md) और मुद्दों में ट्रैक किया गया है।
+
+---
+
+## सुरक्षा और डेटा मॉडल
+
+यह टूल स्थानीय रूप से चलता है। **डेटा जो प्रभावित होता है:** एक व्युत्पन्न SQLite डेटाबेस और मार्कडाउन रिलीज़ फ़ाइलें - ये सभी फिर से बनाए जा सकते हैं। **नेटवर्क:** केवल आउटबाउंड HTTPS कनेक्शन, जब आप `hk fetch`/`hk sync` (GitHub API, RSS फ़ीड, परिवर्तन लॉग पेज, MCP रजिस्ट्री) या `hk embed` को किसी दूरस्थ प्रदाता (Voyage, Cohere) के साथ चलाते हैं। **गुप्त जानकारी:** यह `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` को पर्यावरण चर से पढ़ता है - कभी भी लॉग नहीं किया जाता, कभी भी डिस्क पर संग्रहीत नहीं किया जाता। **कोई टेलीमेट्री नहीं।** रिपोर्टिंग नीति के लिए [SECURITY.md](SECURITY.md) देखें।
 
 ---
 
