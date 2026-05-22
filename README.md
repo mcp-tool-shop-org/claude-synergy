@@ -235,10 +235,10 @@ Full index in [synergies/INDEX.md](synergies/INDEX.md).
 
 ## Testing
 
-Vitest suite covers unit / integration / regression / smoke tiers. See [test-spec.md](test-spec.md) for the v1 spec (covers v0.4–v0.6.1) and [test-spec-2.md](test-spec-2.md) for the v2 spec (covers v0.7+).
+Vitest suite covers unit / integration / regression / smoke tiers. **[test-spec-3.md](test-spec-3.md) is the current authority** as of v0.7.0; [test-spec.md](test-spec.md) (v1) and [test-spec-2.md](test-spec-2.md) (v2) remain in the repo as historical record of the design lineage.
 
 ```bash
-pnpm test               # unit + integration + regression (~12s, 239 tests)
+pnpm test               # unit + integration + regression (~13s, 291 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 80/75/85/80)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -248,14 +248,14 @@ Layout:
 
 | Dir | What it covers |
 |-----|----------------|
-| `test/unit/` | per-module — extract, ingest, query, db, embed, hybrid, fetch + every provider + fetch-rss/changelog/html |
+| `test/unit/` | per-module — extract, ingest, query, db, embed, hybrid, fetch + every provider + fetch-rss/changelog/html + fetch-mcp-registry + fetch-playwright + products-config |
 | `test/integration/` | end-to-end — pipeline, sync, MCP server (stdio JSON-RPC), CLI |
 | `test/regression/` | §8.1–§8.18 — each protects against a real bug fixed during development |
-| `test/smoke/` | opt-in full-corpus against real `products/` (1,101 files) |
-| `test/fixtures/` | 3 fake products + mock HTTP responses (RSS / GH / Voyage / Cohere / Ollama / Anthropic) |
-| `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts` |
+| `test/smoke/` | opt-in full-corpus against real `products/` (1,143 files) |
+| `test/fixtures/` | 3 fake products + mock HTTP responses (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Official MCP Registry) |
+| `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts`, `playwright-mock.ts`, `yaml-fixtures.ts` |
 
-**No network in tests by default** — provider HTTP is mocked via `vi.spyOn(global, 'fetch')`. Real SQLite in temp files (not `:memory:`) because sqlite-vec extension load semantics differ across versions and on-disk is the canonical path.
+**No network in tests by default** — provider HTTP is mocked via `vi.spyOn(global, 'fetch')`. Real SQLite in temp files (not `:memory:`) because sqlite-vec extension load semantics differ across versions and on-disk is the canonical path. Playwright is loaded via dynamic import and mocked via `vi.doMock('playwright', ...)` so tests pass without a real browser install.
 
 CI: `.github/workflows/test.yml` runs `pnpm test --coverage` on push and PR.
 
@@ -267,7 +267,7 @@ CI: `.github/workflows/test.yml` runs `pnpm test --coverage` on push and PR.
 - [SOURCES.md](SOURCES.md) — 5-tier source landscape with fetch strategies
 - [synergies/INDEX.md](synergies/INDEX.md) — 12 curated cross-product workflows
 - [schema.sql](schema.sql) + [schema-vec.sql](schema-vec.sql) — SQLite + sqlite-vec schemas
-- [test-spec.md](test-spec.md) + [test-spec-2.md](test-spec-2.md) — test suite specs
+- [test-spec-3.md](test-spec-3.md) (current) + [test-spec-2.md](test-spec-2.md), [test-spec.md](test-spec.md) (historical) — test suite specs
 
 ---
 

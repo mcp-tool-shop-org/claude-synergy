@@ -1,0 +1,49 @@
+{
+  "servers": [
+    {
+      "server": {
+        "name": "io.modelcontextprotocol/filesystem",
+        "title": "Filesystem MCP Server",
+        "description": "Read and write files on the local filesystem.",
+        "version": "1.0.3",
+        "remotes": [{ "type": "stdio", "url": "https://example.test/fs" }]
+      },
+      "_meta": {
+        "io.modelcontextprotocol.registry/official": {
+          "isLatest": true,
+          "publishedAt": "2026-04-10T12:00:00Z"
+        }
+      }
+    },
+    {
+      "server": {
+        "name": "io.modelcontextprotocol/filesystem",
+        "title": "Filesystem MCP Server",
+        "description": "Older release",
+        "version": "0.9.0"
+      },
+      "_meta": {
+        "io.modelcontextprotocol.registry/official": {
+          "isLatest": false,
+          "publishedAt": "2026-01-15T12:00:00Z"
+        }
+      }
+    },
+    {
+      "server": {
+        "name": "io.modelcontextprotocol/sqlite",
+        "title": "SQLite MCP Server",
+        "description": "Query SQLite databases.",
+        "version": "1.2.0",
+        "remotes": [{ "type": "stdio", "url": "https://example.test/sqlite" }]
+      },
+      "_meta": {
+        "io.modelcontextprotocol.registry/official": {
+          "isLatest": true,
+          "publishedAt": "2026-04-22T12:00:00Z"
+        }
+      }
+    }
+  ],
+  "metadata": { "nextCursor": "next-page-token", "count": 3 }
+}

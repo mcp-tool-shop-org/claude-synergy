@@ -1,0 +1,49 @@
+{
+  "servers": [
+    {
+      "id": "srv_1",
+      "qualifiedName": "@anthropic/test-server",
+      "namespace": "@anthropic",
+      "displayName": "Anthropic Test Server",
+      "description": "Test MCP server hosted by Anthropic.",
+      "verified": true,
+      "useCount": 1234,
+      "remote": false,
+      "isDeployed": true,
+      "createdAt": "2026-03-05T10:00:00Z",
+      "homepage": "https://example.test/anthropic-test",
+      "bySmithery": false,
+      "owner": "anthropic",
+      "score": 9.4
+    },
+    {
+      "id": "srv_2",
+      "qualifiedName": "@community/popular-tool",
+      "namespace": "@community",
+      "displayName": "Popular Community Tool",
+      "description": "Most-used community MCP server.",
+      "verified": false,
+      "useCount": 9999,
+      "remote": true,
+      "isDeployed": true,
+      "createdAt": "2026-02-14T10:00:00Z",
+      "homepage": "https://example.test/popular",
+      "bySmithery": false,
+      "owner": "community",
+      "score": 8.1
+    },
+    {
+      "id": "srv_3",
+      "qualifiedName": "@niche/rare-tool",
+      "namespace": "@niche",
+      "displayName": "Rare Tool",
+      "description": "Less-used MCP server.",
+      "verified": false,
+      "useCount": 12,
+      "createdAt": "2026-04-01T10:00:00Z",
+      "homepage": null,
+      "score": null
+    }
+  ],
+  "pagination": { "currentPage": 1, "pageSize": 100, "totalPages": 1, "totalCount": 3 }
+}
