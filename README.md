@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/logo.png" alt="Claude Synergy" width="280"></p>
+<p align="center"><img src="docs/logo.png" alt="Claude Synergy" width="480"></p>
 
 # Claude Synergy
 
