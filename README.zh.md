@@ -4,13 +4,14 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/claude-synergy/readme.png" alt="Claude Synergy" width="400"></p>
 
-一个本地、可查询的镜像，记录了 Anthropic 及其相关人工智能开发工具的所有更新日志，此外，还提供一个精心策划的“协同”层，描述了跨产品的工作流程，以便嵌入在系统中的大型语言模型（LLM）代理能够了解该系统的功能。
-
 <p align="center">
+  <a href="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml"><img src="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg" alt="tests"></a>
+  <a href="https://www.npmjs.com/package/@mcptoolshop/claude-synergy"><img src="https://img.shields.io/npm/v/@mcptoolshop/claude-synergy" alt="npm"></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
+  <a href="https://mcp-tool-shop-org.github.io/claude-synergy/"><img src="https://img.shields.io/badge/landing%20page-live-brightgreen" alt="landing page"></a>
+</p>
 
-[![测试](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![许可证](https://img.shields.io/badge/license-MIT-blue)](#license) [![着陆页](https://img.shields.io/badge/landing%20page-live-brightgreen)](https://mcp-tool-shop-org.github.io/claude-synergy/)
-
-请提供需要翻译的英文文本。
+一个本地、可查询的镜像，记录了 Anthropic 及其相关人工智能开发工具的所有更新日志，此外，还提供一个精心策划的“协同”层，描述了跨产品的工作流程，以便嵌入在系统中的大型语言模型（LLM）代理能够了解该系统的功能。
 
 ```bash
 $ hk query redact
@@ -21,6 +22,7 @@ $ hk query redact
 
 4 results
 ```
+
 
 **通过一次完整的FTS查询，我们发现了一个跨SDK的安全修复方案，但单个版本的更新日志中并未将其标记为CVE漏洞。** 这就是最直观的演示：当所有更新日志并排比较时，隐藏的模式就会显现出来。
 

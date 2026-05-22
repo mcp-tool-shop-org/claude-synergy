@@ -4,13 +4,14 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/claude-synergy/readme.png" alt="Claude Synergy" width="400"></p>
 
-यह एंथ्रोपिक (Anthropic) और उससे संबंधित सभी एआई विकास उपकरणों के परिवर्तनों का एक स्थानीय, खोज योग्य दर्पण है - साथ ही एक क्यूरेटेड "**सिनर्जी**" (Synergy) परत जो विभिन्न उत्पादों के बीच कार्यप्रवाह का वर्णन करती है - ताकि 'हॉर्नेस्स' (harness) के अंदर मौजूद एलएलएम (LLM) एजेंट को पता चल सके कि 'हॉर्नेस्स' क्या कर सकता है।
-
 <p align="center">
-
-[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license) [![landing page](https://img.shields.io/badge/landing%20page-live-brightgreen)](https://mcp-tool-shop-org.github.io/claude-synergy/)
-
+  <a href="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml"><img src="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg" alt="tests"></a>
+  <a href="https://www.npmjs.com/package/@mcptoolshop/claude-synergy"><img src="https://img.shields.io/npm/v/@mcptoolshop/claude-synergy" alt="npm"></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
+  <a href="https://mcp-tool-shop-org.github.io/claude-synergy/"><img src="https://img.shields.io/badge/landing%20page-live-brightgreen" alt="landing page"></a>
 </p>
+
+यह एंथ्रोपिक (Anthropic) और उससे संबंधित सभी एआई विकास उपकरणों के परिवर्तनों का एक स्थानीय, खोज योग्य दर्पण है - साथ ही एक क्यूरेटेड "**सिनर्जी**" (Synergy) परत जो विभिन्न उत्पादों के बीच कार्यप्रवाह का वर्णन करती है - ताकि 'हॉर्नेस्स' (harness) के अंदर मौजूद एलएलएम (LLM) एजेंट को पता चल सके कि 'हॉर्नेस्स' क्या कर सकता है।
 
 ```bash
 $ hk query redact
@@ -21,6 +22,7 @@ $ hk query redact
 
 4 results
 ```
+
 
 एकल एफटीएस (FTS) क्वेरी एक समन्वित क्रॉस-एसडीके (SDK) सुरक्षा सुधार को उजागर करती है जिसे किसी भी व्यक्तिगत परिवर्तन लॉग में सीवीई (CVE) के रूप में चिह्नित नहीं किया गया था। यही मुख्य प्रदर्शन है: जब प्रत्येक परिवर्तन लॉग एक साथ होता है, तो पैटर्न उभरते हैं।
 
@@ -71,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**वर्तमान आंकड़े (v1.0.0 के अनुसार):** 44 उत्पाद / 1,186 रिलीज़ फ़ाइलें / 6,042 परिवर्तन / 1,225 इकाइयां / 12 तालमेल / 382 परीक्षण।
+**वर्तमान आंकड़े (v1.0.0 के अनुसार):** 44 उत्पाद / 1,186 रिलीज़ फ़ाइलें / 6,042 बदलाव / 1,225 इकाइयां / 12 तालमेल / 382 परीक्षण।
 
 ---
 
@@ -94,7 +96,7 @@ v0.8+ के लिए रोडमैप: [URGENT_FINDINGS.md](URGENT_FINDINGS.
 
 ## सुरक्षा और डेटा मॉडल
 
-यह टूल स्थानीय रूप से चलता है। **डेटा जो प्रभावित होता है:** एक व्युत्पन्न SQLite डेटाबेस और मार्कडाउन रिलीज़ फ़ाइलें - ये सभी फिर से बनाए जा सकते हैं। **नेटवर्क:** केवल आउटबाउंड HTTPS कनेक्शन, जब आप `hk fetch`/`hk sync` (GitHub API, RSS फ़ीड, परिवर्तन लॉग पेज, MCP रजिस्ट्री) या `hk embed` को किसी दूरस्थ प्रदाता (Voyage, Cohere) के साथ चलाते हैं। **गुप्त जानकारी:** यह `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` को पर्यावरण चर से पढ़ता है - कभी भी लॉग नहीं किया जाता, कभी भी डिस्क पर संग्रहीत नहीं किया जाता। **कोई टेलीमेट्री नहीं।** रिपोर्टिंग नीति के लिए [SECURITY.md](SECURITY.md) देखें।
+यह टूल स्थानीय रूप से चलता है। **डेटा जो उपयोग में है:** एक व्युत्पन्न SQLite डेटाबेस और मार्कडाउन रिलीज़ फ़ाइलें - ये सभी दोबारा बनाए जा सकते हैं। **नेटवर्क:** केवल आउटबाउंड HTTPS कनेक्शन का उपयोग तब किया जाता है जब आप `hk fetch`/`hk sync` (GitHub API, RSS फ़ीड, बदलाव लॉग पेज, MCP रजिस्ट्री) या `hk embed` को किसी दूरस्थ प्रदाता (Voyage, Cohere) के साथ चलाते हैं। **सुरक्षा क्रेडेंशियल:** यह `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` जैसे पर्यावरण चर से जानकारी पढ़ता है - यह कभी भी लॉग नहीं किया जाता है और कभी भी डिस्क पर संग्रहीत नहीं किया जाता है। **कोई भी डेटा संग्रह (टेलीमेट्री) नहीं है।** रिपोर्टिंग नीति के बारे में जानकारी के लिए [SECURITY.md](SECURITY.md) देखें।
 
 ---
 

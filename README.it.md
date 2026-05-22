@@ -4,13 +4,14 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/claude-synergy/readme.png" alt="Claude Synergy" width="400"></p>
 
-Un mirror locale e interrogabile di tutte le modifiche apportate a Anthropic e agli strumenti di sviluppo AI correlati, oltre a un livello curato di **"Synergy"** che descrive i flussi di lavoro tra i diversi prodotti, in modo che l'agente LLM all'interno del sistema sappia cosa può fare il sistema stesso.
-
 <p align="center">
-
-[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license) [![landing page](https://img.shields.io/badge/landing%20page-live-brightgreen)](https://mcp-tool-shop-org.github.io/claude-synergy/)
-
+  <a href="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml"><img src="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg" alt="tests"></a>
+  <a href="https://www.npmjs.com/package/@mcptoolshop/claude-synergy"><img src="https://img.shields.io/npm/v/@mcptoolshop/claude-synergy" alt="npm"></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
+  <a href="https://mcp-tool-shop-org.github.io/claude-synergy/"><img src="https://img.shields.io/badge/landing%20page-live-brightgreen" alt="landing page"></a>
 </p>
+
+Un mirror locale e interrogabile di tutte le modifiche apportate a Anthropic e agli strumenti di sviluppo AI correlati, oltre a un livello curato di **"Synergy"** che descrive i flussi di lavoro tra i diversi prodotti, in modo che l'agente LLM all'interno del sistema sappia cosa può fare il sistema stesso.
 
 ```bash
 $ hk query redact
@@ -21,6 +22,7 @@ $ hk query redact
 
 4 results
 ```
+
 
 **Una singola query FTS (Full-Text Search) rivela una correzione di sicurezza coordinata tra diversi SDK che non era stata segnalata come CVE (Common Vulnerabilities and Exposures) in nessuna delle singole liste di modifiche.** Questo è l'esempio più efficace: emergono dei modelli quando tutte le liste di modifiche sono confrontate fianco a fianco.
 

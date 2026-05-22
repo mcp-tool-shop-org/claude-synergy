@@ -4,13 +4,14 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/claude-synergy/readme.png" alt="Claude Synergy" width="400"></p>
 
-Anthropic社および関連するAI開発ツールに関する変更履歴をローカルで検索可能なミラーとして提供します。さらに、複数の製品を組み合わせたワークフローを説明する**Synergy（連携）**レイヤーも搭載しており、これにより、ハネス（制御環境）内のLLMエージェントが、ハネスが何ができるかを理解できるようになります。
-
 <p align="center">
-
-[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license) [![landing page](https://img.shields.io/badge/landing%20page-live-brightgreen)](https://mcp-tool-shop-org.github.io/claude-synergy/)
-
+  <a href="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml"><img src="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg" alt="tests"></a>
+  <a href="https://www.npmjs.com/package/@mcptoolshop/claude-synergy"><img src="https://img.shields.io/npm/v/@mcptoolshop/claude-synergy" alt="npm"></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
+  <a href="https://mcp-tool-shop-org.github.io/claude-synergy/"><img src="https://img.shields.io/badge/landing%20page-live-brightgreen" alt="landing page"></a>
 </p>
+
+Anthropic社および関連するAI開発ツールに関する変更履歴をローカルで検索可能なミラーとして提供します。さらに、複数の製品を組み合わせたワークフローを説明する**Synergy（連携）**レイヤーも搭載しており、これにより、ハネス（制御環境）内のLLMエージェントが、ハネスが何ができるかを理解できるようになります。
 
 ```bash
 $ hk query redact
@@ -21,6 +22,7 @@ $ hk query redact
 
 4 results
 ```
+
 
 **単一のFTS（Full-Text Search）クエリで、個々の変更履歴ではCVE（Common Vulnerabilities and Exposures：共通脆弱性情報）として特定されなかった、複数のSDKにまたがるセキュリティ修正をまとめて表示できます。** これが最も効果的なデモです。すべての変更履歴を並べて比較することで、パターンが見えてきます。
 
@@ -71,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**現在の数値 (v1.0.0時点):** 44製品 / 1,186個のリリースファイル / 6,042件の変更 / 1,225個のエンティティ / 12の連携 / 382件のテスト。
+**現在の状況（v1.0.0時点）：** 44製品 / 1,186件のリリースファイル / 6,042件の変更 / 1,225件のエンティティ / 12件の連携 / 382件のテスト。
 
 ---
 
@@ -94,7 +96,7 @@ v0.8以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)およ
 
 ## セキュリティとデータモデル
 
-このツールはローカルで実行されます。 **アクセスするデータ:** 派生したSQLiteデータベースと、Markdown形式のリリースファイル。これらはすべて再作成可能です。 **ネットワーク:** `hk fetch`または`hk sync`（GitHub API、RSSフィード、変更ログページ、MCPレジストリ）を実行する場合、またはリモートプロバイダー（Voyage、Cohere）を使用する`hk embed`を実行する場合にのみ、HTTPS通信を行います。 **機密情報:** 環境変数から`GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY`を読み込みます。これらの情報はログに記録されず、ディスクに保存もされません。 **テレメトリー機能はありません。** 報告に関するポリシーは[SECURITY.md](SECURITY.md)を参照してください。
+このツールはローカルで動作します。**アクセスするデータ：** 派生したSQLiteデータベースと、マークダウン形式のリリースファイル。これらはすべて再作成可能です。**ネットワーク：** `hk fetch` または `hk sync` コマンド（GitHub API、RSSフィード、変更履歴ページ、MCPレジストリ）、またはリモートプロバイダー（Voyage、Cohere）を使用する `hk embed` コマンドを実行する場合にのみ、HTTPS経由で外部サーバーと通信します。**機密情報：** `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` を環境変数から読み込みます。これらの情報はログに記録されることも、ディスクに保存されることもありません。**テレメトリー機能はありません。** セキュリティに関するポリシーについては、[SECURITY.md](SECURITY.md) を参照してください。
 
 ---
 

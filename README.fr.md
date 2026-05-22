@@ -4,13 +4,14 @@
 
 <p align="center"><img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/claude-synergy/readme.png" alt="Claude Synergy" width="400"></p>
 
-Un miroir local et consultable de tous les journaux de modifications d'Anthropic et des outils de développement d'IA associés, ainsi qu'une couche **Synergy** organisée décrivant les flux de travail inter-produits, afin que l'agent LLM intégré à l'outil sache ce que l'outil peut faire.
-
 <p align="center">
-
-[![tests](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg)](https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/@mcptoolshop/claude-synergy)](https://www.npmjs.com/package/@mcptoolshop/claude-synergy) [![license](https://img.shields.io/badge/license-MIT-blue)](#license) [![landing page](https://img.shields.io/badge/landing%20page-live-brightgreen)](https://mcp-tool-shop-org.github.io/claude-synergy/)
-
+  <a href="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml"><img src="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg" alt="tests"></a>
+  <a href="https://www.npmjs.com/package/@mcptoolshop/claude-synergy"><img src="https://img.shields.io/npm/v/@mcptoolshop/claude-synergy" alt="npm"></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
+  <a href="https://mcp-tool-shop-org.github.io/claude-synergy/"><img src="https://img.shields.io/badge/landing%20page-live-brightgreen" alt="landing page"></a>
 </p>
+
+Un miroir local et consultable de tous les journaux de modifications d'Anthropic et des outils de développement d'IA associés, ainsi qu'une couche **Synergy** organisée décrivant les flux de travail inter-produits, afin que l'agent LLM intégré à l'outil sache ce que l'outil peut faire.
 
 ```bash
 $ hk query redact
@@ -21,6 +22,7 @@ $ hk query redact
 
 4 results
 ```
+
 
 Une seule requête FTS révèle une correction de sécurité coordonnée entre les SDK qui n'est signalée par aucun journal de modifications individuel comme une CVE. C'est la démonstration clé : des schémas émergent lorsque tous les journaux de modifications sont côte à côte.
 
