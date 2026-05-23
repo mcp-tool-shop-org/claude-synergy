@@ -2,7 +2,12 @@
 -- Run after schema.sql. Tables here are independent of Tier 2a's changes_fts,
 -- so naive FTS still works on the raw bullets while hybrid uses the contextualized layer.
 --
--- Dimension: 768 (nomic-embed-text native; Voyage 3 truncatable via Matryoshka)
+-- Dimension: configurable, stored in `schema_meta` under the key
+-- `embedding_dim` (see src/db.ts). The `chunks_vec` virtual table is created
+-- in code by initVecSchema() in src/embed.ts using the negotiated dim so that
+-- switching providers (Ollama 768d, Voyage 768d-truncated, OpenAI 1536d, etc.)
+-- works without manual schema edits. Default is 768 (nomic-embed-text native;
+-- Voyage 3 truncatable via Matryoshka).
 -- One row per change. Reranking deferred.
 
 CREATE TABLE IF NOT EXISTS chunks (
@@ -22,10 +27,9 @@ CREATE TABLE IF NOT EXISTS chunks (
 CREATE INDEX IF NOT EXISTS idx_chunks_product ON chunks(product, released_at);
 CREATE INDEX IF NOT EXISTS idx_chunks_change ON chunks(change_id);
 
--- Vector storage (sqlite-vec extension required)
-CREATE VIRTUAL TABLE IF NOT EXISTS chunks_vec USING vec0(
-  embedding FLOAT[768]
-);
+-- NOTE: `chunks_vec` is created dynamically by src/embed.ts initVecSchema()
+-- so its dimension can match the configured embedding provider. The legacy
+-- 768-dim definition is preserved in db migration code for backward compat.
 
 -- FTS5 over the contextualized text (separate from changes_fts which indexes raw bullets)
 CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(

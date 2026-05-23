@@ -690,6 +690,69 @@ describe('§8.18 Windsurf scraper returns empty array on CSR fallback (no __NEXT
   });
 });
 
+// ─── 8.19 ghReleases early-exit pagination (Wave 1, FETCHERS) ─────────────
+// Regression: FE-3 short-circuits pagination once a full page's LAST item is
+// older than sinceIso (releases come in DESC published_at). The hazard is that
+// a page with 100 items where the FIRST 99 are newer than since but the LAST
+// is older must still return those 99. We assert the early-exit preserves all
+// in-window items and DOES NOT fetch the next page.
+describe('§8.19 ghReleases early-exit pagination preserves in-window items', () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('full page where last item is older-than-since still keeps the newer items on that page', async () => {
+    // Build a page of 100 releases — first 99 are in-window, last is out-of-window
+    const sinceIso = '2026-04-01T00:00:00Z';
+    const inWindow = Array.from({ length: 99 }, (_, i) => ({
+      tag_name: `v1.${i}.0`,
+      published_at: `2026-04-${String((i % 28) + 2).padStart(2, '0')}T10:00:00Z`,
+      name: `r${i}`,
+      body: `- bullet ${i}`,
+      html_url: `https://example.test/v1.${i}.0`,
+    }));
+    const outOfWindow = {
+      tag_name: 'v0.0.1',
+      published_at: '2026-03-01T10:00:00Z', // before since
+      name: 'oldr',
+      body: '- old',
+      html_url: 'https://example.test/v0.0.1',
+    };
+    const page1 = JSON.stringify([...inWindow, outOfWindow]);
+
+    let callCount = 0;
+    const respond = (_file: string, args?: string[]) => {
+      callCount++;
+      // gh api repos/<repo>/releases?per_page=100&page=N
+      const url = args?.[1] ?? '';
+      if (url.includes('page=1')) return page1;
+      // If anything tries to fetch page 2, return empty so the test still works
+      return '[]';
+    };
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(respond),
+      execSync: vi.fn(respond),
+    }));
+    const dir = mkdtempSync(join(tmpdir(), 'early-exit-'));
+    try {
+      const { fetchAll } = await import('../../src/fetch.js');
+      const stats = await fetchAll(temp.db, dir, {
+        product: 'claude-agent-sdk-python',
+        sinceOverride: sinceIso,
+      });
+      // All 99 in-window items should be fetched. The 1 out-of-window should be excluded.
+      expect(stats[0].fetched, 'all 99 in-window releases should be written').toBe(99);
+      // Early-exit must engage: page 2 should NOT be requested. callCount = 1.
+      expect(
+        callCount,
+        `gh api should be called exactly once (page=1) but was called ${callCount} times`
+      ).toBe(1);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
 // ─── 8.13 Ingest deletes prior changes for replaced version, FTS5 sync ────
 describe('§8.13 Ingest deletes prior changes for replaced version (FTS5 sync)', () => {
   it('re-ingesting a file with 2 bullets after 3 → changes table has 2 rows, not 5', () => {

@@ -1,6 +1,6 @@
 {
   "name": "@mcptoolshop/claude-synergy",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Local mirror of Anthropic product changelogs + curated cross-product synergies. So the LLM agent inside the harness knows what the harness can do.",
   "type": "module",
   "exports": {

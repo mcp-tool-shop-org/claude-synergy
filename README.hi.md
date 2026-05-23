@@ -65,7 +65,7 @@ claude-synergy/
 │   └── plugins-{official,community,knowledge-work}/  # Plugin marketplaces
 ├── synergies/               # 12 curated cross-product workflows
 ├── src/                     # TypeScript implementation
-├── test/                    # 382 tests (unit, integration, regression, smoke)
+├── test/                    # 508 tests (unit, integration, regression, smoke)
 ├── data/claude-synergy.db   # SQLite database (created by `hk init`)
 ├── schema.sql               # Tier 2a tables (products, releases, changes, entities, FTS5, …)
 ├── schema-vec.sql           # Tier 2b tables (chunks, chunks_vec, chunks_fts)
@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**वर्तमान आंकड़े (v1.0.0 के अनुसार):** 44 उत्पाद / 1,186 रिलीज़ फ़ाइलें / 6,042 बदलाव / 1,225 इकाइयां / 12 तालमेल / 382 परीक्षण।
+**वर्तमान आंकड़े (v1.1.0 के अनुसार):** 44 उत्पाद / 1,186 रिलीज़ फ़ाइलें / 6,042 परिवर्तन / 1,225 इकाइयां / 12 तालमेल / 508 परीक्षण / 11 एमसीपी उपकरण / 17 सीएलआई कमांड।
 
 ---
 
@@ -84,11 +84,12 @@ claude-synergy/
 | **1 — बूटस्ट्रैप (मार्कडाउन कॉर्पस)** | ✅ जारी किया गया | स्टडी-स्वार्म ने जनवरी से मई 2026 तक 706 रिलीज फ़ाइलें सीड (seed) कीं; इसे चौथे स्तर तक 1,186 तक बढ़ाया गया। |
 | **2a — SQLite + FTS5 + CLI** | ✅ जारी किया गया | `hk` सीएलआई (CLI); 15 सबकमांड; 300 मिलीसेकंड से कम में डेटा इनपुट। |
 | **2b — sqlite-vec + प्रासंगिक पुनर्प्राप्ति (Contextual Retrieval)** | ✅ जारी किया गया | प्रदाता-प्लग करने योग्य (कोई नहीं/संरचित/ओलामा/क्लाउड-हाइक्यू संदर्भ × ओलामा/वॉयज एम्बेड × कोई नहीं/ओलामा-जज/वॉयज/कोहेर रीरैंक)। |
-| **3 — सिंक + एमसीपी सर्वर** | ✅ जारी किया गया | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` 8 टूल को stdio के माध्यम से उजागर करता है। |
+| **3 — सिंक + एमसीपी सर्वर** | ✅ जारी किया गया | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` 11 उपकरण stdio के माध्यम से प्रदान करता है (8 मूल टियर-3 संस्करण में, 3 v1.1 में जोड़े गए)। |
 | **4a — एंथ्रोपिक से आगे बढ़ें** | ✅ जारी किया गया | +15 एमसीपी एसडीके (SDK), कर्सर (RSS), एडर (HISTORY.md), कंटिन्यू.देव, कोडी एंटरप्राइज (RSS फ़िल्टर)। |
 | **4b — एचटीएमएल-स्क्रैप फ़ेचर** | ✅ जारी किया गया | GitHub कोपायलट + वीएस कोड चैट (विंडसर्फ़ के लिए प्लेराइट की आवश्यकता है - v0.7)। |
 | **4c — टर्नडाउन एचटीएमएल→मार्कडाउन इनजेस्ट** | ✅ जारी किया गया | एचटीएमएल बॉडी (कोपायलट/वीएस कोड/कर्सर) अब एफटीएस5 (FTS5) + एंटिटी एक्सट्रैक्शन के लिए प्रति-बुलेट पंक्तियाँ उत्पन्न करते हैं। |
 | **4d — प्लेराइट + एमसीपी रजिस्ट्री + YAML कॉन्फ़िगरेशन** | ✅ जारी किया गया | प्लेराइट के माध्यम से विंडसर्फ़; स्मिथरी + आधिकारिक एमसीपी रजिस्ट्री को चौथे स्तर के कैटलॉग के रूप में उपयोग किया जाता है; उत्पादों को `products.yaml` में समेकित किया गया है। |
+| **5 — v1.1 विंडो ब्राउज़िंग + ओपनएआई एम्बेड** | ✅ जारी किया गया | `hk diff` / `hk breaking`, सभी ब्राउज़िंग कमांड के लिए तारीख सीमा, 3 नए एमसीपी उपकरण (कुल 11), ओपनएआई एम्बेडिंग प्रदाता, कॉन्फ़िगर करने योग्य एम्बेडिंग आयाम, `claude-code` ऑटो-सिंक, सामान्य `keep-a-changelog` पार्सर। |
 
 v0.8+ के लिए रोडमैप: [URGENT_FINDINGS.md](URGENT_FINDINGS.md) और मुद्दों में ट्रैक किया गया है।
 
@@ -126,8 +127,12 @@ hk sync                              # combined fetch → ingest → embed (cron
 hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 keyword search
-hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ optional --rerank)
+hk query "managed agents"            # FTS5 keyword search (+ --until <date>)
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --rerank, --until)
+
+# Windowed change browsing
+hk diff [product] --since 7d         # what changed in a window, grouped by product+version
+hk breaking --since 30d              # filter-browse of breaking changes (no search term)
 
 # Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
@@ -136,13 +141,15 @@ hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases
+hk latest [--product X] [--limit N]  # recent releases (+ --since <date>)
 hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
                                      #  hook_event, setting_key)
 ```
+
+**v1.1 में नया:** `hk diff` और `hk breaking` बिना किसी खोज शब्द की आवश्यकता के "हाल ही में क्या बदला?" का उत्तर देते हैं। तारीख सीमा समान हैं: प्रत्येक ब्राउज़िंग कमांड `--since` और `--until` को `YYYY-MM-DD` (या पूर्ण आईएसओ 8601), या एक सापेक्ष रूप (`7d`, `2w`, `3m`, `1y`) में लेता है।
 
 ---
 
@@ -186,6 +193,30 @@ $ hk hybrid "credential exfiltration" --limit 3
 
 यह क्वेरी कभी भी "env_scrub" शब्द का उल्लेख नहीं करती है - यह वेक्टर सतहों को अर्थ संबंधी समानता के आधार पर खोजता है। शुद्ध FTS5 (फुल-टेक्स्ट सर्च 5) इसे पूरी तरह से छोड़ देता है।
 
+**इस सप्ताह claude-code में क्या बदला:**
+```
+$ hk diff claude-code --since 7d
+claude-code@2.1.147  2026-05-21  (3 changes)
+  [added]     Added the `Workflow` tool for deterministic multi-agent orchestration.
+  [changed]   Slash commands now lazy-load until first invocation.
+  [fixed]     Race condition in MCP server discovery on Windows.
+
+claude-code@2.1.146  2026-05-19  (1 change)
+  [fixed]     Restored `--debug` flag accidentally removed in 2.1.144.
+```
+
+**पूरे डेटासेट में परिवर्तनों को ब्राउज़ करें:**
+```
+$ hk breaking --since 30d --limit 5
+2026-05-15  claude-agent-sdk-python@0.2.82       Headless and SDK sessions now use Task tools by default.
+2026-05-14  claude-agent-sdk-typescript@0.3.142  Headless and SDK sessions now use Task tools by default.
+2026-05-08  anthropic-sdk-go@1.42.0              Removed deprecated `client.Beta()` namespace.
+2026-04-29  cursor@0.49.0                        MCP server config moved from `cursor.json` to `.cursor/mcp.json`.
+2026-04-22  windsurf@1.10.0                      Removed `cascade.run` JSON-RPC method.
+```
+
+किसी खोज शब्द की आवश्यकता नहीं — `hk breaking` "क्या हाल ही में कुछ महत्वपूर्ण बदला?" का उत्तर है।
+
 ---
 
 ## MCP सर्वर: अपने एजेंटों को इस डेटासेट तक पहुंचने की अनुमति दें।
@@ -211,14 +242,19 @@ GitHub Copilot के लिए `.vscode/mcp.json` फ़ाइल में, `m
 
 | उपकरण। | उद्देश्य। |
 |---|---|
-| `search` | हाइब्रिड एफटीएस5 + वेक्टर; वैकल्पिक रूप से पुनः रैंकिंग (रीरैंक)। प्राकृतिक भाषा में पूछे गए प्रश्नों के लिए डिफ़ॉल्ट मोड। |
+| `search` | हाइब्रिड FTS5 + vec; वैकल्पिक रीरैंक। प्राकृतिक भाषा प्रश्नों के लिए डिफ़ॉल्ट मोड। (+ `until` तारीख ऊपरी सीमा) |
 | `lookup_entity` | सटीक इकाई इतिहास: पर्यावरण चर, स्लैश कमांड, मॉडल आईडी, सीवीई (सुरक्षा कमजोरियों), आदि। |
-| `latest_releases` | हाल ही में विभिन्न उत्पादों (या एक उत्पाद) के लिए जारी किए गए नए संस्करण। |
+| `latest_releases` | उत्पादों (या एक) में हाल के रिलीज़। (+ `since` तारीख निचली सीमा) |
 | `get_release` | एक विज्ञप्ति की पूरी सामग्री। |
 | `list_products` | गणना के साथ सूची बनाना + नवीनतम संस्करण। |
 | `top_entities` | प्रकार के अनुसार सबसे अधिक उल्लेखित इकाइयाँ। |
-| `list_synergies` | विभिन्न उत्पादों को मिलाकर तैयार किए गए कार्यप्रवाह। |
+| `list_synergies` | कस्टम क्रॉस-उत्पाद वर्कफ़्लो। (+ वैकल्पिक `उत्पाद` फ़िल्टर) |
 | `read_synergy` | एक सिनर्जी फ़ाइल का पूरा पाठ। |
+| `get_changes_since` | **नया।** एक समय विंडो में परिवर्तन, उत्पाद+संस्करण द्वारा समूहीकृत। इनपुट: `since` (आवश्यक), `until?`, `product?`, `kind?`, `limit?`. |
+| `search_breaking_changes` | **नया।** महत्वपूर्ण परिवर्तनों की एक सपाट सूची — किसी खोज शब्द की आवश्यकता नहीं। इनपुट: `product?`, `since?`, `until?`, `limit?`. |
+| `compare_versions` | **नया।** एक उत्पाद के दो संस्करणों के बीच सभी परिवर्तन। इनपुट: `product`, `from_version`, `to_version`. |
+
+ये तीन नए उपकरण `hk diff` / `hk breaking` और संस्करण-तुलना वर्कफ़्लो को प्रतिबिंबित करते हैं, जिसके लिए पहले स्क्रिप्टिंग की आवश्यकता होती थी। पूर्ण इनपुट स्कीमा के लिए [हैंडबुक → एमसीपी सर्वर](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) देखें।
 
 ---
 
@@ -226,11 +262,11 @@ GitHub Copilot के लिए `.vscode/mcp.json` फ़ाइल में, `m
 
 [SOURCES.md] फ़ाइल में विस्तृत जानकारी उपलब्ध है।
 
-- **स्तर 1 (GitHub रिलीज़)** — `gh api repos/<मालिक>/<रिपॉजिटरी>/releases`। यह 22 उत्पादों के लिए है, जिनमें एंथ्रोपिक एसडीके (7 भाषाएं), एजेंट एसडीके (2), एंट सीएलआई, क्लाउड-कोड-एक्शन, क्लाउड-कोड-सुरक्षा-समीक्षा, और 15 एमसीपी इकोसिस्टम एसडीके शामिल हैं।
-- **स्तर 2 (रॉ मार्कडाउन)** — `anthropics/claude-code/CHANGELOG.md` + `Aider-AI/aider/HISTORY.md`
-- **स्तर 3 (एचटीएमएल / आरएसएस)** — `platform.claude.com/docs/release-notes`, `support.claude.com/articles/12138966`, `cursor.com/changelog/rss.xml`, `sourcegraph.com/changelog/featured.rss` (फ़िल्टर किया गया), `github.blog/changelog/label/copilot/`, `code.visualstudio.com/updates/v1_NNN`
-- **स्तर 4 (सूची)** — `anthropics/skills`, `claude-plugins-{आधिकारिक,समुदाय}`, `knowledge-work-plugins`
-- **स्तर 5 (सलाह)** — `@ClaudeCodeLog` ट्विटर अकाउंट; marckrenn का चेंजलॉग दर्पण।
+- **टियर 1 (GitHub रिलीज़)** — `gh api repos/<owner>/<repo>/releases` 23 उत्पादों के लिए, जिसमें एंथ्रोपिक एसडीके (7 भाषाएं), एजेंट एसडीके (2), एंट सीएलआई, **claude-code** (अब v1.1 से gh-releases के माध्यम से ऑटो-सिंक — पहले मैन्युअल रूप से सीड किया गया था), claude-code-action, claude-code-security-review, और 15 एमसीपी इकोसिस्टम एसडीके शामिल हैं।
+- **टियर 2 (कच्चा मार्कडाउन)** — `Aider-AI/aider/HISTORY.md`. सामान्य `keep-a-changelog` पार्सर (v1.1+) किसी भी उत्पाद के लिए उपलब्ध है जिसका स्रोत `CHANGELOG.md` एक `Keep-a-Changelog` प्रारूप में है — `products.yaml` में एक प्रविष्टि के माध्यम से कॉन्फ़िगर करें।
+- **टियर 3 (HTML / RSS)** — `platform.claude.com/docs/release-notes`, `support.claude.com/articles/12138966`, `cursor.com/changelog/rss.xml`, `sourcegraph.com/changelog/featured.rss` (फ़िल्टर किया गया), `github.blog/changelog/label/copilot/`, `code.visualstudio.com/updates/v1_NNN`
+- **टियर 4 (कैटलॉग)** — `anthropics/skills`, `claude-plugins-{official,community}`, `knowledge-work-plugins`
+- **टियर 5 (सलाह)** — `@ClaudeCodeLog` एक्स खाता; marckrenn चेंजलॉग मिरर
 
 डेटा प्राप्त करने की विधियाँ: `gh-releases | rss | raw-changelog | html-scrape | catalog | playwright`. नया उत्पाद = `products.yaml` फ़ाइल में एक प्रविष्टि।
 
@@ -255,7 +291,7 @@ GitHub Copilot के लिए `.vscode/mcp.json` फ़ाइल में, `m
 विटेस्ट (Vitest) में यूनिट, इंटीग्रेशन, रिग्रेशन और स्मोक परीक्षण शामिल हैं। v0.7.0 के अनुसार, "[test-spec-3.md](test-spec-3.md)" वर्तमान में आधिकारिक दस्तावेज है; [test-spec.md](test-spec.md) (v1) और [test-spec-2.md](test-spec-2.md) (v2) डिज़ाइन के ऐतिहासिक रिकॉर्ड के रूप में रिपॉजिटरी में मौजूद हैं।
 
 ```bash
-pnpm test               # unit + integration + regression (~16s, 382 tests)
+pnpm test               # unit + integration + regression (~18s, 508 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -265,9 +301,9 @@ pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 
 | मुझे खेद है, लेकिन मैं इस अनुरोध को पूरा करने में असमर्थ हूं क्योंकि यह अपूर्ण है। कृपया पूरा वाक्य या पाठ प्रदान करें जिसका आप अनुवाद करवाना चाहते हैं। | यह क्या शामिल करता है। |
 |-----|----------------|
-| `test/unit/` | प्रत्येक मॉड्यूल के लिए: डेटा निकालना, डेटा का संग्रह करना, डेटा पर प्रश्न करना, डेटाबेस, एम्बेडिंग, हाइब्रिड सिस्टम, डेटा प्राप्त करना, साथ ही प्रत्येक प्रदाता के लिए, आरएसएस/परिवर्तन लॉग/एचटीएमएल डेटा प्राप्त करना, एमसीपी रजिस्ट्री डेटा प्राप्त करना, प्लेराइट डेटा प्राप्त करना, और उत्पादों की कॉन्फ़िगरेशन जानकारी प्राप्त करना। |
-| `test/integration/` | एंड-टू-एंड — पाइपलाइन, सिंक्रोनाइज़ेशन, एमसीपी सर्वर (स्टैंडर्ड इनपुट/आउटपुट JSON-RPC), कमांड-लाइन इंटरफेस। |
-| `test/regression/` | §8.1–§8.18 — प्रत्येक एक वास्तविक बग को ठीक करता है जो विकास के दौरान पाया गया था। |
+| `test/unit/` | प्रति-मॉड्यूल — निकालें, इनजेस्ट करें, क्वेरी करें (शामिल `until` / ब्राउज़ / since / तुलना), डेटाबेस (शामिल dim-config v3 माइग्रेशन), एम्बेड, हाइब्रिड, फेच + प्रत्येक प्रदाता (Ollama / Voyage / **OpenAI**) + फेच-rss/changelog (शामिल **keep-a-changelog** पार्सर)/html + फेच-mcp-registry + फेच-playwright + उत्पादों-कॉन्फ़िग + सि synergy इनजेस्ट/क्वेरी |
+| `test/integration/` | एंड-टू-एंड — पाइपलाइन, सिंक, एमसीपी सर्वर (stdio JSON-RPC, 11 उपकरण), सीएलआई (शामिल `hk diff`, `hk breaking`) |
+| `test/regression/` | §8.1–§8.19 — प्रत्येक एक वास्तविक बग से बचाता है जिसे विकास के दौरान ठीक किया गया था (§8.19: ghReleases शुरुआती-निकास पेजिंग विंडो में आइटम को संरक्षित करता है) |
 | `test/smoke/` | पूर्ण डेटासेट, वास्तविक `products/` (1,143 फ़ाइलें) के लिए। |
 | `test/fixtures/` | 3 नकली उत्पाद + मॉक एचटीटीपी प्रतिक्रियाएं (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / आधिकारिक MCP रजिस्ट्री)। |
 | `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts`, `playwright-mock.ts`, `yaml-fixtures.ts` |
@@ -308,8 +344,22 @@ CI: `.github/workflows/test.yml` पुश और PR पर `pnpm test:coverage`
 
 `hk embed` एक बाहरी एम्बेडिंग सेवा को कॉल करता है:
 
-- **Ollama (डिफ़ॉल्ट)** — सुनिश्चित करें कि Ollama चल रहा है (`ollama serve`) और एम्बेडिंग मॉडल डाउनलोड किया गया है (`ollama pull nomic-embed-text`)।
-- **Voyage** — अपने वातावरण में `VOYAGE_API_KEY` सेट करें। अपने API कुंजी की जांच [dash.voyageai.com](https://dash.voyageai.com) पर करें।
+- **ओलामा (डिफ़ॉल्ट, 768-डायमेंशन)** — सुनिश्चित करें कि ओलामा चल रहा है (`ollama serve`) और एम्बेडिंग मॉडल डाउनलोड किया गया है (`ollama pull nomic-embed-text`)।
+- **वॉयज (1024-डायमेंशन)** — अपने वातावरण में `VOYAGE_API_KEY` सेट करें। अपना एपीआई कुंजी [dash.voyageai.com](https://dash.voyageai.com) पर जांचें।
+- **ओपनएआई (डिफ़ॉल्ट 1536-डायमेंशन, कॉन्फ़िगर करने योग्य)** — `OPENAI_API_KEY` सेट करें। डिफ़ॉल्ट मॉडल `text-embedding-3-small` है; `OPENAI_EMBED_MODEL` के साथ इसे बदलें (उदाहरण के लिए, 3072-डायमेंशन के लिए `text-embedding-3-large`)। `hk hybrid --embed openai` या `hk embed --embed openai` के माध्यम से उपयोग करें।
+
+**प्रदाता बदलने पर एम्बेडिंग डायमेंशन में अंतर**
+
+प्रत्येक प्रदाता एक निश्चित डायमेंशन के वेक्टर उत्पन्न करता है (ओलामा 768, वॉयज 1024, ओपनएआई डिफ़ॉल्ट रूप से 1536 — ओपनएआई मॉडल के मूल आकार के भीतर कॉन्फ़िगर करने योग्य डायमेंशन का समर्थन करता है)। डेटाबेस `schema_meta.embedding_dim` में सक्रिय डायमेंशन को संग्रहीत करता है। अलग-अलग डायमेंशन वाले प्रदाताओं के बीच स्विच करने से वेक्टर टेबल चुपचाप दूषित होने के बजाय `EMBEDDING_DIM_MISMATCH` (`AppError`) त्रुटि उत्पन्न होती है, खासकर जब डेटा मौजूद हो। स्विच करने के लिए:
+
+```bash
+rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
+hk init
+hk ingest
+hk embed --embed openai     # new provider, new dim, fresh chunks_vec
+```
+
+ओपनएआई मैट्रियोश्का ट्रंकेशन (मॉडल के मूल डायमेंशन से छोटा डायमेंशन) के लिए, `OPENAI_EMBED_MODEL` सेट करें और `hk embed` के प्रदाता निर्माण के माध्यम से वांछित डायमेंशन पास करें — विवरण के लिए [हैंडबुक एम्बेडिंग अनुभाग](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions) देखें।
 
 **स्कीमा संस्करण बेमेल / दूषित डेटाबेस**
 

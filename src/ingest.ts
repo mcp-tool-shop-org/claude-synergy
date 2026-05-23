@@ -363,3 +363,402 @@ function classifyKind(text: string): string {
   if (lower.startsWith('improved')) return 'improved';
   return 'changed';
 }
+
+// ─── Synergy ingestion (P1-5) ────────────────────────────────────────────
+
+interface SynergyFrontmatter {
+  name?: string;
+  title?: string;
+  trigger?: string;
+  status?: string;
+  last_validated?: string | Date;
+  products?: string[];
+  /** Optional explicit evidence array; otherwise we parse the **Evidence:** body section. */
+  evidence?: Array<{ source_url: string; quote?: string; source_kind?: string } | string>;
+  /** Optional explicit steps array; otherwise we parse the **Workflow:** body section. */
+  steps?: string[];
+  /** Optional explicit change refs as { product, version } pairs (resolved against the changes table). */
+  change_refs?: Array<{ product: string; version: string; ordinal?: number } | string>;
+}
+
+export interface SynergyIngestStats {
+  /** Synergies successfully upserted (alias: synergiesAdded). */
+  ingested: number;
+  /** Files that could not be ingested (= errors.length, surfaced for ergonomic checks). */
+  skipped: number;
+  synergiesAdded: number;
+  productsLinked: number;
+  stepsAdded: number;
+  evidenceAdded: number;
+  changeRefsAdded: number;
+  /** Files that errored — file basename + message. */
+  errors: Array<{ file: string; error: string }>;
+}
+
+/** URL extractor — matches the first markdown-link target or a bare https URL. */
+const URL_INLINE_RE = /\[(?:[^\]]*)\]\((https?:\/\/[^)\s]+)\)|\((https?:\/\/[^)\s]+)\)|(https?:\/\/[^\s)\]]+)/;
+
+/**
+ * Pull the bullet list under a named section heading like **Workflow:** /
+ * **Evidence:**. The match is forgiving: numbered or `-` bullets are both
+ * accepted; nested indentation under a bullet is folded back onto the
+ * parent (matches parseBullets() behavior for changelog bodies).
+ *
+ * Stops at the next bolded section heading (`**Caveats:**`, `**Evidence:**`, etc.)
+ * or end of file. Returns an array of bullet strings (already trimmed).
+ */
+function extractBodySection(body: string, sectionLabel: string): string[] {
+  const lines = body.split('\n');
+  // Find heading: `**<sectionLabel>:**` or `**<sectionLabel>**:` or heading-style `## <label>`
+  const headingRe = new RegExp(
+    `^\\s*(?:\\*\\*${sectionLabel}:?\\*\\*:?\\s*|##+\\s+${sectionLabel}:?\\s*)$`,
+    'i'
+  );
+  // Generic "next bold/heading section" detector to stop at.
+  const nextSectionRe = /^\s*(?:\*\*[A-Z][A-Za-z][A-Za-z /-]*:?\*\*|##+\s+[A-Z])/;
+  let inSection = false;
+  const bullets: string[] = [];
+  let current = '';
+
+  function flush() {
+    if (current.trim()) bullets.push(current.trim());
+    current = '';
+  }
+
+  for (const line of lines) {
+    if (!inSection) {
+      if (headingRe.test(line)) inSection = true;
+      continue;
+    }
+    // Hit the next bold section — done. Make sure we don't re-match our own heading though.
+    if (line.trim() && nextSectionRe.test(line) && !headingRe.test(line)) {
+      flush();
+      break;
+    }
+    // Numbered list: `1. text` / `1) text`
+    const numbered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+    if (numbered) {
+      flush();
+      current = numbered[1];
+      continue;
+    }
+    // Dash/asterisk bullet
+    const bulleted = line.match(/^\s*[-*]\s+(.+)$/);
+    if (bulleted) {
+      flush();
+      current = bulleted[1];
+      continue;
+    }
+    // Indented continuation
+    if (/^\s{2,}\S/.test(line) && current) {
+      current += ' ' + line.trim();
+      continue;
+    }
+    // Blank line — flush the current bullet
+    if (line.trim() === '') {
+      flush();
+      continue;
+    }
+    // Anything else (prose) — flush the current bullet and skip
+    flush();
+  }
+  flush();
+  return bullets;
+}
+
+/**
+ * Try to classify an evidence URL into one of the schema's source_kind values.
+ * Falls back to null when nothing matches; callers can store NULL.
+ */
+function classifyEvidenceSource(url: string, surroundingText: string): string | null {
+  const lower = `${url} ${surroundingText}`.toLowerCase();
+  if (lower.includes('release-notes') || lower.includes('/releases/')) return 'release-notes';
+  if (lower.includes('changelog')) return 'changelog';
+  if (lower.includes('blog')) return 'blog';
+  if (lower.includes('github.com') && lower.includes('readme')) return 'github-readme';
+  if (lower.includes('/docs/') || lower.includes('docs.')) return 'docs';
+  if (lower.includes('github.com')) return 'github-readme';
+  return null;
+}
+
+/**
+ * Convert a Date or string into a YYYY-MM-DD string. Returns null when the
+ * input can't be parsed; callers fall back to today.
+ */
+function toIsoDate(value: string | Date | undefined): string | null {
+  if (!value) return null;
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return null;
+    return value.toISOString().slice(0, 10);
+  }
+  // string — accept YYYY-MM-DD already, else try Date()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Ingest synergy markdown files from `synergyDir` into the five synergy
+ * tables. Idempotent: re-running replaces all data for any synergy whose
+ * slug matches. Synergies referenced via filename are not deleted when
+ * absent from the source directory (call sites can wipe the table first
+ * if they want strict mirroring).
+ *
+ * Per-file flow:
+ *   1. Parse frontmatter (name/title/trigger/status/products/last_validated)
+ *   2. INSERT-or-REPLACE synergy row using the file slug (basename minus `.md`)
+ *      as primary key when frontmatter omits `name`
+ *   3. Populate synergy_products from `products: [...]` frontmatter
+ *   4. Populate synergy_steps from frontmatter `steps:` if present, else
+ *      parse the **Workflow:** section bullets from the body
+ *   5. Populate synergy_evidence from frontmatter `evidence:` if present,
+ *      else extract URLs from the **Evidence:** section bullets
+ *   6. Resolve `change_refs:` frontmatter entries against the `changes` table
+ *      by (product, version, ordinal?). Skipped silently when the change
+ *      row is absent (e.g. product not yet ingested) so synergies can ship
+ *      ahead of the changelog import for that product.
+ *
+ * Returns SynergyIngestStats with per-table counts and any parse errors.
+ */
+export function ingestSynergies(
+  db: Database.Database,
+  synergyDir: string
+): SynergyIngestStats {
+  const stats: SynergyIngestStats = {
+    ingested: 0,
+    skipped: 0,
+    synergiesAdded: 0,
+    productsLinked: 0,
+    stepsAdded: 0,
+    evidenceAdded: 0,
+    changeRefsAdded: 0,
+    errors: [],
+  };
+
+  if (!existsSync(synergyDir)) {
+    return stats;
+  }
+
+  let files: string[];
+  try {
+    files = readdirSync(synergyDir).filter((f) => f.endsWith('.md') && f !== 'INDEX.md');
+  } catch (e: any) {
+    stats.errors.push({ file: synergyDir, error: e?.message ?? String(e) });
+    return stats;
+  }
+
+  // Prepared statements — reused across all files
+  const upsertSynergy = db.prepare(`
+    INSERT INTO synergies (name, title, trigger, status, last_validated, notes_path)
+    VALUES (@name, @title, @trigger, @status, @last_validated, @notes_path)
+    ON CONFLICT(name) DO UPDATE SET
+      title = excluded.title,
+      trigger = excluded.trigger,
+      status = excluded.status,
+      last_validated = excluded.last_validated,
+      notes_path = excluded.notes_path
+  `);
+  const selectSynergyIdByName = db.prepare(
+    `SELECT id FROM synergies WHERE name = ?`
+  );
+  const deleteProductsBySynergy = db.prepare(
+    `DELETE FROM synergy_products WHERE synergy_id = ?`
+  );
+  const deleteStepsBySynergy = db.prepare(
+    `DELETE FROM synergy_steps WHERE synergy_id = ?`
+  );
+  const deleteEvidenceBySynergy = db.prepare(
+    `DELETE FROM synergy_evidence WHERE synergy_id = ?`
+  );
+  const deleteChangeRefsBySynergy = db.prepare(
+    `DELETE FROM synergy_change_refs WHERE synergy_id = ?`
+  );
+  const insertProductLink = db.prepare(`
+    INSERT OR IGNORE INTO synergy_products (synergy_id, product) VALUES (?, ?)
+  `);
+  const insertStep = db.prepare(`
+    INSERT INTO synergy_steps (synergy_id, ordinal, text) VALUES (?, ?, ?)
+  `);
+  const insertEvidence = db.prepare(`
+    INSERT INTO synergy_evidence (synergy_id, source_url, quote, source_kind) VALUES (?, ?, ?, ?)
+  `);
+  const insertChangeRef = db.prepare(`
+    INSERT OR IGNORE INTO synergy_change_refs (synergy_id, change_id) VALUES (?, ?)
+  `);
+  const selectChangeByPvOrdinal = db.prepare(`
+    SELECT id FROM changes WHERE product = ? AND version = ? AND ordinal = ?
+  `);
+  const selectChangeByPv = db.prepare(`
+    SELECT id FROM changes WHERE product = ? AND version = ? ORDER BY ordinal
+  `);
+  const selectProductExists = db.prepare(
+    `SELECT name FROM products WHERE name = ?`
+  );
+
+  // Synergies can reference products that aren't yet ingested as full
+  // products (e.g. claude-cowork, claude-design). FK enforcement on
+  // synergy_products requires the row to exist — make sure they do.
+  const insertStubProduct = db.prepare(`
+    INSERT OR IGNORE INTO products (name, display_name, source_tier, source_url, fetch_strategy, notes)
+    VALUES (@name, @display_name, 0, '', 'manual', 'synergy-stub')
+  `);
+
+  const tx = db.transaction(() => {
+    for (const file of files) {
+      try {
+        const path = join(synergyDir, file);
+        const raw = readFileSync(path, 'utf-8');
+        const parsed = matter(raw);
+        const fm = parsed.data as SynergyFrontmatter;
+        const body = parsed.content;
+
+        const slug = (fm.name && typeof fm.name === 'string' ? fm.name : basename(file, '.md')).trim();
+        if (!slug) {
+          stats.errors.push({ file, error: 'missing synergy name (frontmatter or filename)' });
+          stats.skipped++;
+          continue;
+        }
+        const title = (fm.title && typeof fm.title === 'string' ? fm.title : slug).trim();
+        const trigger = typeof fm.trigger === 'string' ? fm.trigger.trim() : '';
+        const status = typeof fm.status === 'string' && fm.status.trim() ? fm.status.trim() : 'speculative';
+        const last_validated =
+          toIsoDate(fm.last_validated) ?? new Date().toISOString().slice(0, 10);
+        const notes_path = `synergies/${file}`;
+
+        upsertSynergy.run({
+          name: slug,
+          title,
+          trigger,
+          status,
+          last_validated,
+          notes_path,
+        });
+        const synergyRow = selectSynergyIdByName.get(slug) as { id: number } | undefined;
+        if (!synergyRow) {
+          stats.errors.push({ file, error: 'failed to resolve synergy id after upsert' });
+          stats.skipped++;
+          continue;
+        }
+        const synergyId = synergyRow.id;
+        stats.synergiesAdded++;
+        stats.ingested++;
+
+        // Wipe joined data so re-ingest is a pure refresh
+        deleteProductsBySynergy.run(synergyId);
+        deleteStepsBySynergy.run(synergyId);
+        deleteEvidenceBySynergy.run(synergyId);
+        deleteChangeRefsBySynergy.run(synergyId);
+
+        // Products
+        const products = Array.isArray(fm.products) ? fm.products.filter((p) => typeof p === 'string') : [];
+        for (const product of products) {
+          const productSlug = product.trim();
+          if (!productSlug) continue;
+          // Ensure FK target exists; create a stub if not
+          if (!selectProductExists.get(productSlug)) {
+            insertStubProduct.run({ name: productSlug, display_name: productSlug });
+          }
+          insertProductLink.run(synergyId, productSlug);
+          stats.productsLinked++;
+        }
+
+        // Steps — frontmatter `steps:` wins; otherwise parse **Workflow:** bullets.
+        const steps =
+          Array.isArray(fm.steps) && fm.steps.length > 0
+            ? fm.steps.filter((s) => typeof s === 'string').map((s) => s.trim()).filter(Boolean)
+            : extractBodySection(body, 'Workflow');
+        steps.forEach((stepText, idx) => {
+          insertStep.run(synergyId, idx + 1, stepText);
+          stats.stepsAdded++;
+        });
+
+        // Evidence — frontmatter `evidence:` wins; otherwise parse **Evidence:** bullets.
+        if (Array.isArray(fm.evidence) && fm.evidence.length > 0) {
+          for (const ev of fm.evidence) {
+            if (typeof ev === 'string') {
+              const m = ev.match(URL_INLINE_RE);
+              const url = m ? (m[1] ?? m[2] ?? m[3]) : null;
+              if (!url) continue;
+              insertEvidence.run(synergyId, url, ev, classifyEvidenceSource(url, ev));
+              stats.evidenceAdded++;
+            } else if (ev && typeof ev === 'object' && typeof ev.source_url === 'string') {
+              insertEvidence.run(
+                synergyId,
+                ev.source_url,
+                ev.quote ?? null,
+                ev.source_kind ?? classifyEvidenceSource(ev.source_url, ev.quote ?? '')
+              );
+              stats.evidenceAdded++;
+            }
+          }
+        } else {
+          const evidenceBullets = extractBodySection(body, 'Evidence');
+          for (const bullet of evidenceBullets) {
+            const m = bullet.match(URL_INLINE_RE);
+            const url = m ? (m[1] ?? m[2] ?? m[3]) : null;
+            if (!url) continue;
+            insertEvidence.run(synergyId, url, bullet, classifyEvidenceSource(url, bullet));
+            stats.evidenceAdded++;
+          }
+        }
+
+        // Change refs — only structured frontmatter is supported here.
+        // Parsing arbitrary "v2.1.147" mentions from prose is too noisy; users
+        // who want strict links should declare them in frontmatter.
+        if (Array.isArray(fm.change_refs)) {
+          for (const ref of fm.change_refs) {
+            if (typeof ref === 'string') {
+              // "product@version" or "product@version#ordinal"
+              const m = ref.match(/^([^@]+)@([^#]+)(?:#(\d+))?$/);
+              if (!m) continue;
+              const refProduct = m[1].trim();
+              const refVersion = m[2].trim();
+              const ordinal = m[3] ? parseInt(m[3], 10) : null;
+              if (ordinal !== null) {
+                const row = selectChangeByPvOrdinal.get(refProduct, refVersion, ordinal) as
+                  | { id: number }
+                  | undefined;
+                if (row) {
+                  insertChangeRef.run(synergyId, row.id);
+                  stats.changeRefsAdded++;
+                }
+              } else {
+                const rows = selectChangeByPv.all(refProduct, refVersion) as Array<{ id: number }>;
+                for (const r of rows) {
+                  insertChangeRef.run(synergyId, r.id);
+                  stats.changeRefsAdded++;
+                }
+              }
+            } else if (ref && typeof ref === 'object') {
+              const refProduct = String(ref.product ?? '').trim();
+              const refVersion = String(ref.version ?? '').trim();
+              if (!refProduct || !refVersion) continue;
+              if (typeof ref.ordinal === 'number') {
+                const row = selectChangeByPvOrdinal.get(refProduct, refVersion, ref.ordinal) as
+                  | { id: number }
+                  | undefined;
+                if (row) {
+                  insertChangeRef.run(synergyId, row.id);
+                  stats.changeRefsAdded++;
+                }
+              } else {
+                const rows = selectChangeByPv.all(refProduct, refVersion) as Array<{ id: number }>;
+                for (const r of rows) {
+                  insertChangeRef.run(synergyId, r.id);
+                  stats.changeRefsAdded++;
+                }
+              }
+            }
+          }
+        }
+      } catch (e: any) {
+        stats.errors.push({ file, error: e?.message ?? String(e) });
+        stats.skipped++;
+      }
+    }
+  });
+  tx();
+
+  return stats;
+}

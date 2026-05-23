@@ -1,11 +1,10 @@
 import type Database from 'better-sqlite3';
-import { OllamaEmbeddingProvider } from './providers/embedding/ollama.js';
-import { VoyageEmbeddingProvider } from './providers/embedding/voyage.js';
-import { NoneRerankProvider } from './providers/rerank/none.js';
+import { makeEmbeddingProvider, type EmbedProviderName } from './embed.js';
 import { OllamaJudgeRerankProvider } from './providers/rerank/ollama-judge.js';
 import { VoyageRerankProvider } from './providers/rerank/voyage.js';
 import { CohereRerankProvider } from './providers/rerank/cohere.js';
-import type { EmbeddingProvider, RerankProvider, RerankCandidate } from './providers/types.js';
+import type { RerankProvider, RerankCandidate } from './providers/types.js';
+import { getEmbeddingDim } from './db.js';
 
 /** Hard upper bound on any user-supplied row-pull parameter. */
 const MAX_LIMIT = 500;
@@ -61,10 +60,17 @@ export interface HybridResult {
 export interface HybridOptions {
   product?: string;
   since?: string;
+  /** Inclusive date upper bound (YYYY-MM-DD). Pairs with `since` for windowed search. */
+  until?: string;
   kind?: string;
   limit?: number;
-  embedProviderName?: 'ollama' | 'voyage';
+  /** Canonical embedding-provider option. */
+  embed?: EmbedProviderName;
+  /** Deprecated alias kept for backward compat with older callers. */
+  embedProviderName?: EmbedProviderName;
   rerankProviderName?: 'none' | 'ollama-judge' | 'voyage' | 'cohere';
+  /** Deprecated alias kept for backward compat. */
+  rerank?: string;
   /** Per-channel pull before fusion. Default 60. */
   topK?: number;
   rrfK?: number;
@@ -93,7 +99,11 @@ export async function hybridSearch(
   if (typeof rrfK !== 'number' || !Number.isFinite(rrfK)) {
     throw new Error(`hybridSearch: rrfK must be a finite number (got ${String(rrfK)})`);
   }
-  const emb = makeEmbeddingProvider(opts.embedProviderName ?? 'ollama');
+
+  // Honor both `embed` (canonical) and `embedProviderName` (legacy alias).
+  const embedName: EmbedProviderName = opts.embed ?? opts.embedProviderName ?? 'ollama';
+  const dbDim = getEmbeddingDim(db) ?? undefined;
+  const emb = makeEmbeddingProvider(embedName, { dim: dbDim });
 
   // Pre-filter SQL fragment shared by both channels
   const filters: string[] = [];
@@ -105,6 +115,10 @@ export async function hybridSearch(
   if (opts.since) {
     filters.push('ch.released_at >= @since');
     params.since = opts.since;
+  }
+  if (opts.until) {
+    filters.push('ch.released_at <= @until');
+    params.until = opts.until;
   }
   if (opts.kind) {
     filters.push("EXISTS (SELECT 1 FROM changes c WHERE c.id = ch.change_id AND c.kind = @kind)");
@@ -203,8 +217,11 @@ export async function hybridSearch(
   const byId = new Map<number, any>();
   for (const r of rows) byId.set(r.chunk_id, r);
 
-  // Optional rerank step
-  const rerankProviderName = opts.rerankProviderName ?? 'none';
+  // Optional rerank step. Honor canonical `rerankProviderName` first, then
+  // the looser `rerank` alias used by some callers (CLI flag mirror).
+  const rerankProviderName: 'none' | 'ollama-judge' | 'voyage' | 'cohere' =
+    opts.rerankProviderName ??
+    (isKnownReranker(opts.rerank) ? (opts.rerank as 'none' | 'ollama-judge' | 'voyage' | 'cohere') : 'none');
   let rerankScores = new Map<number, number>();
   if (rerankProviderName !== 'none') {
     const reranker = makeRerankProvider(rerankProviderName);
@@ -248,13 +265,8 @@ export async function hybridSearch(
     .filter(Boolean) as HybridResult[];
 }
 
-function makeEmbeddingProvider(name: 'ollama' | 'voyage'): EmbeddingProvider {
-  switch (name) {
-    case 'ollama':
-      return new OllamaEmbeddingProvider();
-    case 'voyage':
-      return new VoyageEmbeddingProvider();
-  }
+function isKnownReranker(v: string | undefined): v is 'none' | 'ollama-judge' | 'voyage' | 'cohere' {
+  return v === 'none' || v === 'ollama-judge' || v === 'voyage' || v === 'cohere';
 }
 
 function makeRerankProvider(name: 'ollama-judge' | 'voyage' | 'cohere'): RerankProvider {
@@ -267,3 +279,6 @@ function makeRerankProvider(name: 'ollama-judge' | 'voyage' | 'cohere'): RerankP
       return new CohereRerankProvider();
   }
 }
+
+// Re-export so callers don't have to import from embed.ts for typing.
+export type { EmbedProviderName };

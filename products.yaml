@@ -62,14 +62,20 @@
 
 products:
 
-  # ── Tier 2 / Anthropic CHANGELOG.md ───────────────────────────────────────
+  # ── Tier 1 / Anthropic flagship product ──────────────────────────────────
+  # FE-1 (2026-05-22): wired up automated sync via GH Releases. The repo
+  # publishes a per-version GitHub Release whose body mirrors CHANGELOG.md,
+  # so gh-releases yields strictly richer data than parsing the raw file
+  # (released_at, html_url, tag_name are all structured). Bumped to tier 1
+  # from tier 2 to reflect that this is now a Structured-API source.
   - name: claude-code
     display_name: Claude Code
-    tier: 2
-    source_url: https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
-    fetch_strategy: git-changelog
-    # No fetch: block — corpus seeded by initial study-swarm; CHANGELOG.md
-    # incremental sync deferred to a future phase.
+    tier: 1
+    source_url: https://github.com/anthropics/claude-code
+    fetch_strategy: gh-releases
+    fetch:
+      type: gh-releases
+      repo: anthropics/claude-code
 
   # ── Tier 3 / HTML feeds ──────────────────────────────────────────────────
   - name: claude-api

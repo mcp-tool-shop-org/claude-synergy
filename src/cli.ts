@@ -5,7 +5,16 @@ import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { openDb, initSchema } from './db.js';
 import { ingestAll } from './ingest.js';
-import { searchChanges, lookupEntity, recentReleases, listProducts, entityFrequency } from './query.js';
+import {
+  searchChanges,
+  lookupEntity,
+  recentReleases,
+  listProducts,
+  entityFrequency,
+  browseChanges,
+  getChangesSince,
+  type ChangesSinceResult,
+} from './query.js';
 import { embedAll } from './embed.js';
 import { hybridSearch } from './hybrid.js';
 import { fetchAll, listFetchTargets, seedMarkersFromDb } from './fetch.js';
@@ -84,6 +93,79 @@ function openTrackedDb(path: string): Database.Database {
   const db = openDb(path);
   activeDb = db;
   return db;
+}
+
+/**
+ * Parse a date string into an ISO 8601 date (YYYY-MM-DD or full ISO timestamp).
+ *
+ * Accepts:
+ *   - Relative: `Nd` (days), `Nw` (weeks), `Nm` (months), `Ny` (years)
+ *     e.g. `7d` → 7 days ago, `2w` → 2 weeks ago.
+ *   - ISO 8601 dates: `YYYY-MM-DD` or full `YYYY-MM-DDTHH:mm:ssZ`.
+ *
+ * Throws AppError on invalid input so callers can surface a friendly hint.
+ */
+export function parseRelativeDate(input: string, now: Date = new Date()): string {
+  const trimmed = input.trim();
+  if (trimmed.length === 0) {
+    throw new AppError({
+      code: 'INVALID_DATE',
+      message: 'date is empty',
+      hint: 'Pass a date like 7d, 2w, 1m, 1y, or YYYY-MM-DD',
+    });
+  }
+  // Relative: Nd / Nw / Nm / Ny
+  const relMatch = /^(\d+)([dwmy])$/i.exec(trimmed);
+  if (relMatch) {
+    const n = parseInt(relMatch[1], 10);
+    const unit = relMatch[2].toLowerCase();
+    if (!Number.isFinite(n) || n < 0) {
+      throw new AppError({
+        code: 'INVALID_DATE',
+        message: `invalid relative date: ${input}`,
+        hint: 'Relative dates must be a non-negative integer (e.g. 7d, 2w, 1m, 1y)',
+      });
+    }
+    const d = new Date(now);
+    switch (unit) {
+      case 'd': d.setUTCDate(d.getUTCDate() - n); break;
+      case 'w': d.setUTCDate(d.getUTCDate() - n * 7); break;
+      case 'm': d.setUTCMonth(d.getUTCMonth() - n); break;
+      case 'y': d.setUTCFullYear(d.getUTCFullYear() - n); break;
+    }
+    return d.toISOString().slice(0, 10);
+  }
+  // ISO date: parse and re-emit normalized
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new AppError({
+      code: 'INVALID_DATE',
+      message: `invalid date: ${input}`,
+      hint: 'Use YYYY-MM-DD, a full ISO timestamp, or a relative form like 7d/2w/1m/1y',
+    });
+  }
+  // YYYY-MM-DD form short-circuit (avoid time-component drift)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+  return parsed.toISOString();
+}
+
+/** Wrap a parse call to emit AppError JSON / formatted text and exit. */
+function resolveDateOrExit(name: string, raw: string | undefined): string | undefined {
+  if (raw === undefined) return undefined;
+  try {
+    return parseRelativeDate(raw);
+  } catch (e) {
+    if (e instanceof AppError) {
+      if (program.opts().json) {
+        console.log(JSON.stringify(e.toJSON()));
+      } else {
+        console.error(formatError(e, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      }
+    } else {
+      console.error(`error: --${name} ${(e as Error).message}`);
+    }
+    process.exit(1);
+  }
 }
 
 const CONTEXT_PROVIDERS = ['none', 'structured', 'ollama', 'claude-haiku'] as const;
@@ -214,19 +296,23 @@ program
   .description('Full-text search across all change bullets (FTS5). Quote multi-word: hk query "managed agents"')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .option('-p, --product <name>', 'limit to one product')
-  .option('-s, --since <date>', 'YYYY-MM-DD lower bound')
+  .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
+  .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .option('-l, --limit <n>', 'max results', '20')
-  .action((text: string, opts: { db: string; product?: string; since?: string; kind?: string; limit: string }) => {
+  .action((text: string, opts: { db: string; product?: string; since?: string; until?: string; kind?: string; limit: string }) => {
     logDebug(`text=${JSON.stringify(text)} opts=${JSON.stringify(opts)}`);
     const db = openTrackedDb(opts.db);
     if (warnIfEmpty(db)) { db.close(); return; }
     const q = text;
+    const since = resolveDateOrExit('since', opts.since);
+    const until = resolveDateOrExit('until', opts.until);
     let results;
     try {
       results = searchChanges(db, q, {
         product: opts.product,
-        since: opts.since,
+        since,
+        until,
         kind: opts.kind,
         limit: intOpt('limit', opts.limit, 20),
       });
@@ -550,7 +636,8 @@ program
   .description('Hybrid FTS5 + sqlite-vec search via RRF, optional rerank (requires `hk embed` first)')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .option('-p, --product <name>', 'limit to one product')
-  .option('-s, --since <date>', 'YYYY-MM-DD lower bound')
+  .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
+  .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .addOption(
     new Option('-e, --embed <provider>', 'embedding provider for query')
@@ -572,6 +659,7 @@ program
         db: string;
         product?: string;
         since?: string;
+        until?: string;
         kind?: string;
         embed: EmbedProviderName;
         rerank: RerankProviderName;
@@ -581,11 +669,14 @@ program
       }
     ) => {
     const db = openTrackedDb(opts.db);
+    const since = resolveDateOrExit('since', opts.since);
+    const until = resolveDateOrExit('until', opts.until);
     try {
       const t0 = Date.now();
       const results = await hybridSearch(db, text, {
         product: opts.product,
-        since: opts.since,
+        since,
+        until,
         kind: opts.kind,
         embedProviderName: opts.embed,
         rerankProviderName: opts.rerank,
@@ -639,11 +730,13 @@ program
   .description('Recent releases across all products (or one)')
   .option('-d, --db <path>', 'database path', DEFAULT_DB)
   .option('-p, --product <name>', 'limit to one product')
+  .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-l, --limit <n>', 'max results', '20')
-  .action((opts: { db: string; product?: string; limit: string }) => {
+  .action((opts: { db: string; product?: string; since?: string; limit: string }) => {
     const db = openTrackedDb(opts.db);
     if (warnIfEmpty(db)) { db.close(); return; }
-    const releases = recentReleases(db, opts.product, intOpt('limit', opts.limit, 20));
+    const since = resolveDateOrExit('since', opts.since);
+    const releases = recentReleases(db, opts.product, intOpt('limit', opts.limit, 20), since);
     if (program.opts().json) {
       console.log(JSON.stringify(releases));
     } else if (releases.length === 0) {
@@ -675,6 +768,130 @@ program
         const latest = p.latest_version ? `${p.latest_version} (${p.latest_date})` : '—';
         console.log(`${p.name.padEnd(36)} ${String(p.release_count).padStart(8)}  ${latest}`);
       }
+    }
+    db.close();
+  });
+
+// ── hk diff ────────────────────────────────────────────────────────────────
+// "What changed in the last 7 days?" — grouped by product+version, with the
+// version's change bullets listed underneath. The headline feature of this
+// wave (IF-001).
+program
+  .command('diff [product]')
+  .description('Show changes in a date window, grouped by release. Default: last 7 days across all products.')
+  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)', '7d')
+  .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative); default: now')
+  .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
+  .option('-l, --limit <n>', 'max change rows', '200')
+  .action((product: string | undefined, opts: { db: string; since: string; until?: string; kind?: string; limit: string }) => {
+    const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
+    const since = resolveDateOrExit('since', opts.since);
+    const until = resolveDateOrExit('until', opts.until);
+    if (!since) {
+      // Should be unreachable because --since has a default, but guard anyway
+      console.error('error: --since is required');
+      db.close();
+      process.exit(1);
+      return;
+    }
+    let results: ChangesSinceResult[];
+    try {
+      results = getChangesSince(db, {
+        since,
+        until,
+        product,
+        kind: opts.kind,
+        limit: intOpt('limit', opts.limit, 200, 1, 10_000),
+      });
+    } catch (e: any) {
+      const appErr = new AppError({
+        code: 'DIFF_FAILED',
+        message: `diff failed: ${e.message}`,
+        hint: 'Verify --since / --until parse correctly and the DB is initialized.',
+        cause: e.message,
+      });
+      if (program.opts().json) console.log(JSON.stringify(appErr.toJSON()));
+      else console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      db.close();
+      process.exit(1);
+      return;
+    }
+    if (program.opts().json) {
+      console.log(JSON.stringify(results));
+    } else if (results.length === 0) {
+      const scope = product ? ` for product "${product}"` : '';
+      console.log(`(no changes in window since ${since}${until ? ` until ${until}` : ''}${scope})`);
+      console.log('Try widening the date window: hk diff --since 30d, or remove --kind / --product filters.');
+    } else {
+      let totalChanges = 0;
+      for (const rel of results) {
+        const date = rel.released_at ?? '????-??-??';
+        console.log(`\n${date}  ${rel.product}@${rel.version}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
+        for (const c of rel.changes) {
+          console.log(`  - [${c.kind}] ${c.text}`);
+        }
+        totalChanges += rel.changes.length;
+      }
+      const sinceLbl = opts.since;
+      const untilLbl = opts.until ? ` until ${opts.until}` : '';
+      console.log(`\n${totalChanges} change${totalChanges === 1 ? '' : 's'} across ${results.length} release${results.length === 1 ? '' : 's'} since ${sinceLbl}${untilLbl}`);
+    }
+    db.close();
+  });
+
+// ── hk breaking ────────────────────────────────────────────────────────────
+// Filtered browse for breaking changes. No search term required.
+program
+  .command('breaking')
+  .description('List breaking changes, most recent first. Filter by product / date window.')
+  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-p, --product <name>', 'limit to one product')
+  .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
+  .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
+  .option('-l, --limit <n>', 'max results', '50')
+  .action((opts: { db: string; product?: string; since?: string; until?: string; limit: string }) => {
+    const db = openTrackedDb(opts.db);
+    if (warnIfEmpty(db)) { db.close(); return; }
+    const since = resolveDateOrExit('since', opts.since);
+    const until = resolveDateOrExit('until', opts.until);
+    let results;
+    try {
+      results = browseChanges(db, {
+        product: opts.product,
+        since,
+        until,
+        kind: 'breaking',
+        limit: intOpt('limit', opts.limit, 50, 1, 10_000),
+      });
+    } catch (e: any) {
+      const appErr = new AppError({
+        code: 'BREAKING_FAILED',
+        message: `breaking query failed: ${e.message}`,
+        hint: 'Verify --since / --until parse correctly and the DB is initialized.',
+        cause: e.message,
+      });
+      if (program.opts().json) console.log(JSON.stringify(appErr.toJSON()));
+      else console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      db.close();
+      process.exit(1);
+      return;
+    }
+    if (program.opts().json) {
+      console.log(JSON.stringify(results.map(r => ({
+        released_at: r.released_at, product: r.product, version: r.version,
+        kind: r.kind, text: r.text,
+      }))));
+    } else if (results.length === 0) {
+      console.log('(no breaking changes)');
+      console.log('Note: ingest may not have classified any changes as breaking yet — try `hk query "" --kind breaking` patterns, or widen --since.');
+    } else {
+      for (const r of results) {
+        console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+        console.log(`  ${r.text}`);
+      }
+      console.log(`\n${results.length} breaking change${results.length === 1 ? '' : 's'}`);
     }
     db.close();
   });

@@ -65,7 +65,7 @@ claude-synergy/
 │   └── plugins-{official,community,knowledge-work}/  # Plugin marketplaces
 ├── synergies/               # 12 curated cross-product workflows
 ├── src/                     # TypeScript implementation
-├── test/                    # 382 tests (unit, integration, regression, smoke)
+├── test/                    # 508 tests (unit, integration, regression, smoke)
 ├── data/claude-synergy.db   # SQLite database (created by `hk init`)
 ├── schema.sql               # Tier 2a tables (products, releases, changes, entities, FTS5, …)
 ├── schema-vec.sql           # Tier 2b tables (chunks, chunks_vec, chunks_fts)
@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v1.0.0):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 382 tests.
+**Live numbers (as of v1.1.0):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 508 tests / 11 MCP tools / 17 CLI commands.
 
 ---
 
@@ -84,13 +84,14 @@ claude-synergy/
 | **1 — bootstrap (markdown corpus)** | ✅ shipped | Study-swarm seeded 706 release files Jan→May 2026; extended to 1,186 by Tier 4d |
 | **2a — SQLite + FTS5 + CLI** | ✅ shipped | `hk` CLI; 15 subcommands; sub-300ms ingest |
 | **2b — sqlite-vec + Contextual Retrieval** | ✅ shipped | Provider-pluggable (none/structured/ollama/claude-haiku context × ollama/voyage embed × none/ollama-judge/voyage/cohere rerank) |
-| **3 — sync + MCP server** | ✅ shipped | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` exposes 8 tools over stdio |
+| **3 — sync + MCP server** | ✅ shipped | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` exposes 11 tools over stdio (8 at original Tier-3 ship, 3 added in v1.1) |
 | **4a — extend beyond Anthropic** | ✅ shipped | +15 MCP SDKs, Cursor (RSS), Aider (HISTORY.md), Continue.dev, Cody Enterprise (RSS filtered) |
 | **4b — HTML-scrape fetcher** | ✅ shipped | GitHub Copilot + VS Code Chat (Windsurf needs Playwright — v0.7) |
 | **4c — turndown HTML→markdown ingest** | ✅ shipped | HTML bodies (Copilot/VS Code/Cursor) now produce per-bullet rows for FTS5 + entity extraction |
 | **4d — Playwright + MCP registry + YAML config** | ✅ shipped | Windsurf via Playwright; Smithery + official MCP Registry as Tier-4 catalogs; products consolidated into `products.yaml` |
+| **5 — v1.1 windowed browsing + OpenAI embed** | ✅ shipped | `hk diff` / `hk breaking`, date bounds across all browsing commands, 3 new MCP tools (11 total), OpenAI embedding provider, configurable embedding dimension, `claude-code` auto-sync, generic `keep-a-changelog` parser |
 
-Roadmap for v0.8+: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
+Roadmap beyond v1.1: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
 
 ---
 
@@ -114,7 +115,7 @@ For dev without building, use `npx tsx src/cli.ts ...` directly. **pnpm 10 quirk
 
 ---
 
-## CLI surface — 15 commands
+## CLI surface — 17 commands
 
 ```
 # DB lifecycle
@@ -126,8 +127,12 @@ hk sync                              # combined fetch → ingest → embed (cron
 hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 keyword search
-hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ optional --rerank)
+hk query "managed agents"            # FTS5 keyword search (+ --until <date>)
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --rerank, --until)
+
+# Windowed change browsing
+hk diff [product] --since 7d         # what changed in a window, grouped by product+version
+hk breaking --since 30d              # filter-browse of breaking changes (no search term)
 
 # Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
@@ -136,13 +141,15 @@ hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases
+hk latest [--product X] [--limit N]  # recent releases (+ --since <date>)
 hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
                                      #  hook_event, setting_key)
 ```
+
+**New in v1.1:** `hk diff` and `hk breaking` answer "what changed lately?" without needing a search term. Date bounds are uniform: every browsing command takes `--since` and `--until` in `YYYY-MM-DD` (or full ISO 8601), or a relative form (`7d`, `2w`, `3m`, `1y`).
 
 ---
 
@@ -186,11 +193,35 @@ $ hk hybrid "credential exfiltration" --limit 3
 
 The query never says "env_scrub" — vec surfaces it by semantic similarity. Pure FTS5 misses it entirely.
 
+**What changed in claude-code this week:**
+```
+$ hk diff claude-code --since 7d
+claude-code@2.1.147  2026-05-21  (3 changes)
+  [added]     Added the `Workflow` tool for deterministic multi-agent orchestration.
+  [changed]   Slash commands now lazy-load until first invocation.
+  [fixed]     Race condition in MCP server discovery on Windows.
+
+claude-code@2.1.146  2026-05-19  (1 change)
+  [fixed]     Restored `--debug` flag accidentally removed in 2.1.144.
+```
+
+**Browse breaking changes across the corpus:**
+```
+$ hk breaking --since 30d --limit 5
+2026-05-15  claude-agent-sdk-python@0.2.82       Headless and SDK sessions now use Task tools by default.
+2026-05-14  claude-agent-sdk-typescript@0.3.142  Headless and SDK sessions now use Task tools by default.
+2026-05-08  anthropic-sdk-go@1.42.0              Removed deprecated `client.Beta()` namespace.
+2026-04-29  cursor@0.49.0                        MCP server config moved from `cursor.json` to `.cursor/mcp.json`.
+2026-04-22  windsurf@1.10.0                      Removed `cascade.run` JSON-RPC method.
+```
+
+No search term needed — `hk breaking` is the answer to "did anything load-bearing change recently?"
+
 ---
 
 ## MCP server — give your agents access to this corpus
 
-`claude-synergy-mcp` exposes 8 tools over stdio. Wire into Claude Code (or any MCP host) via `~/.claude/.mcp.json` or your project's `.mcp.json`:
+`claude-synergy-mcp` exposes 11 tools over stdio. Wire into Claude Code (or any MCP host) via `~/.claude/.mcp.json` or your project's `.mcp.json`:
 
 ```json
 {
@@ -211,28 +242,33 @@ Tools exposed:
 
 | Tool | Purpose |
 |---|---|
-| `search` | Hybrid FTS5 + vec; optional rerank. Default mode for natural-language queries. |
+| `search` | Hybrid FTS5 + vec; optional rerank. Default mode for natural-language queries. (+ `until` date upper bound) |
 | `lookup_entity` | Exact entity history: env vars, slash commands, model IDs, CVEs, etc. |
-| `latest_releases` | Recent releases across products (or one) |
+| `latest_releases` | Recent releases across products (or one). (+ `since` date lower bound) |
 | `get_release` | Full content of one release |
 | `list_products` | Enumeration with counts + latest version |
 | `top_entities` | Most-mentioned entities by type |
-| `list_synergies` | Curated cross-product workflows |
+| `list_synergies` | Curated cross-product workflows. (+ optional `product` filter) |
 | `read_synergy` | Full text of one synergy file |
+| `get_changes_since` | **New.** Changes in a time window, grouped by product+version. Inputs: `since` (required), `until?`, `product?`, `kind?`, `limit?`. |
+| `search_breaking_changes` | **New.** Flat list of breaking changes — no search term needed. Inputs: `product?`, `since?`, `until?`, `limit?`. |
+| `compare_versions` | **New.** All changes between two versions of one product. Inputs: `product`, `from_version`, `to_version`. |
+
+The three new tools mirror `hk diff` / `hk breaking` and the version-comparison workflow that previously required scripting. See [handbook → MCP server](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) for full input schemas.
 
 ---
 
-## Sources — 5 tiers, 6 fetcher strategies
+## Sources — 5 tiers, 7 fetcher strategies
 
 Full landscape in [SOURCES.md](SOURCES.md).
 
-- **Tier 1 (GitHub Releases)** — `gh api repos/<owner>/<repo>/releases` for 22 products including Anthropic SDKs (7 languages), Agent SDKs (2), ant CLI, claude-code-action, claude-code-security-review, and 15 MCP ecosystem SDKs
-- **Tier 2 (raw markdown)** — `anthropics/claude-code/CHANGELOG.md` + `Aider-AI/aider/HISTORY.md`
+- **Tier 1 (GitHub Releases)** — `gh api repos/<owner>/<repo>/releases` for 23 products including Anthropic SDKs (7 languages), Agent SDKs (2), ant CLI, **claude-code** (now auto-synced via gh-releases as of v1.1 — previously manually seeded), claude-code-action, claude-code-security-review, and 15 MCP ecosystem SDKs
+- **Tier 2 (raw markdown)** — `Aider-AI/aider/HISTORY.md`. The generic `keep-a-changelog` parser (v1.1+) is also available for any product whose source is a CHANGELOG.md in Keep-a-Changelog format — configure via one entry in `products.yaml`.
 - **Tier 3 (HTML / RSS)** — `platform.claude.com/docs/release-notes`, `support.claude.com/articles/12138966`, `cursor.com/changelog/rss.xml`, `sourcegraph.com/changelog/featured.rss` (filtered), `github.blog/changelog/label/copilot/`, `code.visualstudio.com/updates/v1_NNN`
 - **Tier 4 (catalog)** — `anthropics/skills`, `claude-plugins-{official,community}`, `knowledge-work-plugins`
 - **Tier 5 (advisory)** — `@ClaudeCodeLog` X account; marckrenn changelog mirror
 
-Fetch strategies: `gh-releases | rss | raw-changelog | html-scrape | catalog | playwright`. New product = one entry in `products.yaml`.
+Fetch strategies: `gh-releases | rss | raw-changelog | keep-a-changelog | html-scrape | catalog | playwright`. New product = one entry in `products.yaml`.
 
 ---
 
@@ -255,7 +291,7 @@ Full index in [synergies/INDEX.md](synergies/INDEX.md).
 Vitest suite covers unit / integration / regression / smoke tiers. **[test-spec-3.md](test-spec-3.md) is the current authority** as of v0.7.0; [test-spec.md](test-spec.md) (v1) and [test-spec-2.md](test-spec-2.md) (v2) remain in the repo as historical record of the design lineage.
 
 ```bash
-pnpm test               # unit + integration + regression (~16s, 382 tests)
+pnpm test               # unit + integration + regression (~18s, 508 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -265,9 +301,9 @@ Layout:
 
 | Dir | What it covers |
 |-----|----------------|
-| `test/unit/` | per-module — extract, ingest, query, db, embed, hybrid, fetch + every provider + fetch-rss/changelog/html + fetch-mcp-registry + fetch-playwright + products-config |
-| `test/integration/` | end-to-end — pipeline, sync, MCP server (stdio JSON-RPC), CLI |
-| `test/regression/` | §8.1–§8.18 — each protects against a real bug fixed during development |
+| `test/unit/` | per-module — extract, ingest, query (incl. `until` / browse / since / compare), db (incl. dim-config v3 migration), embed, hybrid, fetch + every provider (Ollama / Voyage / **OpenAI**) + fetch-rss/changelog (incl. **keep-a-changelog** parser)/html + fetch-mcp-registry + fetch-playwright + products-config + synergy ingest/query |
+| `test/integration/` | end-to-end — pipeline, sync, MCP server (stdio JSON-RPC, 11 tools), CLI (incl. `hk diff`, `hk breaking`) |
+| `test/regression/` | §8.1–§8.19 — each protects against a real bug fixed during development (§8.19: ghReleases early-exit pagination preserves in-window items) |
 | `test/smoke/` | opt-in full-corpus against real `products/` (1,143 files) |
 | `test/fixtures/` | 3 fake products + mock HTTP responses (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Official MCP Registry) |
 | `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts`, `playwright-mock.ts`, `yaml-fixtures.ts` |
@@ -308,8 +344,22 @@ Sync is idempotent — safe to re-run after a partial failure. Already-fetched r
 
 `hk embed` calls an external embedding service:
 
-- **Ollama (default)** — ensure Ollama is running (`ollama serve`) and the embedding model is pulled (`ollama pull nomic-embed-text`).
-- **Voyage** — set `VOYAGE_API_KEY` in your environment. Check your API key at [dash.voyageai.com](https://dash.voyageai.com).
+- **Ollama (default, 768-dim)** — ensure Ollama is running (`ollama serve`) and the embedding model is pulled (`ollama pull nomic-embed-text`).
+- **Voyage (1024-dim)** — set `VOYAGE_API_KEY` in your environment. Check your API key at [dash.voyageai.com](https://dash.voyageai.com).
+- **OpenAI (1536-dim default, configurable)** — set `OPENAI_API_KEY`. Default model is `text-embedding-3-small`; override with `OPENAI_EMBED_MODEL` (e.g. `text-embedding-3-large` for 3072-dim). Use via `hk hybrid --embed openai` or `hk embed --embed openai`.
+
+**Embedding dimension mismatch on provider switch**
+
+Each provider produces vectors of a fixed dimension (Ollama 768, Voyage 1024, OpenAI 1536 by default — OpenAI supports configurable dim within the model's native size). The DB stores the active dimension in `schema_meta.embedding_dim`. Switching providers across different dimensions while chunks exist raises `EMBEDDING_DIM_MISMATCH` (`AppError`) rather than silently corrupting the vector table. To switch:
+
+```bash
+rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
+hk init
+hk ingest
+hk embed --embed openai     # new provider, new dim, fresh chunks_vec
+```
+
+For OpenAI Matryoshka truncation (smaller-than-native dim), set `OPENAI_EMBED_MODEL` and pass the desired dim through `hk embed`'s provider construction — see the [handbook embedding section](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions) for details.
 
 **Schema version mismatch / corrupted database**
 

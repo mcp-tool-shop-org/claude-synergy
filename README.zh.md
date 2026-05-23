@@ -65,7 +65,7 @@ claude-synergy/
 │   └── plugins-{official,community,knowledge-work}/  # Plugin marketplaces
 ├── synergies/               # 12 curated cross-product workflows
 ├── src/                     # TypeScript implementation
-├── test/                    # 382 tests (unit, integration, regression, smoke)
+├── test/                    # 508 tests (unit, integration, regression, smoke)
 ├── data/claude-synergy.db   # SQLite database (created by `hk init`)
 ├── schema.sql               # Tier 2a tables (products, releases, changes, entities, FTS5, …)
 ├── schema-vec.sql           # Tier 2b tables (chunks, chunks_vec, chunks_fts)
@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**实时数据（截至 v1.0.0 版本）：** 44 个产品 / 1,186 个发布文件 / 6,042 次变更 / 1,225 个实体 / 12 个协同关系 / 382 个测试。
+**实时数据 (截至 v1.1.0 版本):** 44 个产品 / 1,186 个发布文件 / 6,042 个变更 / 1,225 个实体 / 12 个协同功能 / 508 个测试 / 11 个 MCP 工具 / 17 个 CLI 命令。
 
 ---
 
@@ -84,11 +84,12 @@ claude-synergy/
 | 1. -- bootstrap (Markdown 文档) | ✅ 已发货。 | “Study-swarm”项目在2026年1月至5月期间发布了706个文件，随后，在第四阶段的扩展中，该数量增加到1186个。 |
 | 2a - SQLite + FTS5 + 命令行界面。 | ✅ 已发货。 | `hk` 命令行工具；包含 15 个子命令；数据摄取速度低于 300 毫秒。 |
 | 2b — sqlite-vec + 上下文检索 | ✅ 已发货。 | 提供商接口（无/结构化/ollama/claude-haiku 上下文 × ollama/voyage 嵌入 × 无/ollama-judge/voyage/cohere 重新排序）。 |
-| 3. 同步 + MCP 服务器。 | ✅ 已发货。 | `hk fetch / sync / seed-markers`；`claude-synergy-mcp` 通过标准输入/输出接口提供了 8 个工具。 |
+| 3. 同步 + MCP 服务器。 | ✅ 已发货。 | `hk fetch / sync / seed-markers`；`claude-synergy-mcp` 通过标准输入 (stdio) 提供了 11 个工具 (最初的 Tier-3 版本有 8 个，v1.1 版本新增了 3 个)。 |
 | 4a — 扩展范围，超越 Anthropic 的范畴。 | ✅ 已发货。 | +15 个 MCP SDK，Cursor (RSS)，Aider (HISTORY.md)，Continue.dev，Cody Enterprise (已过滤的 RSS)。 |
 | 4b — HTML 网页抓取工具。 | ✅ 已发货。 | GitHub Copilot + VS Code 聊天功能 (Windsurf 需要 Playwright — v0.7) |
 | 4c - 将HTML内容转换为Markdown格式并导入。 | ✅ 已发货。 | HTML 代码块（在 Copilot、VS Code 或 Cursor 中）现在针对 FTS5 和实体提取功能，会生成每条要点对应的一行数据。 |
 | 4d — playwright + MCP 注册 + YAML 配置文件。 | ✅ 已发货。 | 使用 Playwright 进行网页抓取；Smithery + 官方 MCP 注册信息作为第四级目录；产品信息已整合到 `products.yaml` 文件中。 |
+| **5 — v1.1 版本：窗口浏览 + OpenAI 嵌入** | ✅ 已发货。 | `hk diff` / `hk breaking`，所有浏览命令都支持日期范围；3 个新的 MCP 工具 (总共 11 个)；OpenAI 嵌入提供程序；可配置的嵌入维度；`claude-code` 自动同步；通用的 `keep-a-changelog` 解析器。 |
 
 v0.8 及后续版本的开发计划，请参考 [URGENT_FINDINGS.md](URGENT_FINDINGS.md) 文件以及相关问题列表。
 
@@ -126,8 +127,12 @@ hk sync                              # combined fetch → ingest → embed (cron
 hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 keyword search
-hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ optional --rerank)
+hk query "managed agents"            # FTS5 keyword search (+ --until <date>)
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --rerank, --until)
+
+# Windowed change browsing
+hk diff [product] --since 7d         # what changed in a window, grouped by product+version
+hk breaking --since 30d              # filter-browse of breaking changes (no search term)
 
 # Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
@@ -136,13 +141,15 @@ hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases
+hk latest [--product X] [--limit N]  # recent releases (+ --since <date>)
 hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
                                      #  hook_event, setting_key)
 ```
+
+**v1.1 版本的更新：** `hk diff` 和 `hk breaking` 命令可以在不指定搜索词的情况下回答“最近发生了哪些变化？”。日期范围统一：所有浏览命令都支持 `--since` 和 `--until` 参数，格式为 `YYYY-MM-DD` (或完整的 ISO 8601 格式)，或者相对时间格式 (例如 `7d`、`2w`、`3m`、`1y`)。
 
 ---
 
@@ -186,6 +193,30 @@ $ hk hybrid "credential exfiltration" --limit 3
 
 查询中永远不会出现 "env_scrub"，vec 通过语义相似性将其呈现出来。 纯 FTS5 完全无法识别它。
 
+**本周 claude-code 的变化：**
+```
+$ hk diff claude-code --since 7d
+claude-code@2.1.147  2026-05-21  (3 changes)
+  [added]     Added the `Workflow` tool for deterministic multi-agent orchestration.
+  [changed]   Slash commands now lazy-load until first invocation.
+  [fixed]     Race condition in MCP server discovery on Windows.
+
+claude-code@2.1.146  2026-05-19  (1 change)
+  [fixed]     Restored `--debug` flag accidentally removed in 2.1.144.
+```
+
+**浏览所有代码库中的重大变更：**
+```
+$ hk breaking --since 30d --limit 5
+2026-05-15  claude-agent-sdk-python@0.2.82       Headless and SDK sessions now use Task tools by default.
+2026-05-14  claude-agent-sdk-typescript@0.3.142  Headless and SDK sessions now use Task tools by default.
+2026-05-08  anthropic-sdk-go@1.42.0              Removed deprecated `client.Beta()` namespace.
+2026-04-29  cursor@0.49.0                        MCP server config moved from `cursor.json` to `.cursor/mcp.json`.
+2026-04-22  windsurf@1.10.0                      Removed `cascade.run` JSON-RPC method.
+```
+
+无需搜索词 — `hk breaking` 命令可以回答“最近是否有任何关键部分发生了变化？”
+
 ---
 
 ## MCP 服务器 — 允许您的代理访问此语料库
@@ -211,14 +242,19 @@ $ hk hybrid "credential exfiltration" --limit 3
 
 | 工具 | 用途 |
 |---|---|
-| `search` | 混合 FTS5 + vec；可选的重新排序。 默认模式用于自然语言查询。 |
+| `search` | 混合 FTS5 + vec；可选的重新排序。默认模式用于自然语言查询。（+ `until` 日期上限） |
 | `lookup_entity` | 精确的实体历史记录：环境变量、斜杠命令、模型 ID、CVE 等。 |
-| `latest_releases` | 产品（或单个产品）的最新发布版本 |
+| `latest_releases` | 产品 (或单个产品) 的最新发布版本。（+ `since` 日期下限） |
 | `get_release` | 单个发布版本的完整内容 |
 | `list_products` | 带有计数和最新版本的枚举 |
 | `top_entities` | 按类型提及最多的实体 |
-| `list_synergies` | 精心策划的跨产品工作流程 |
+| `list_synergies` | 精心设计的跨产品工作流程。（+ 可选的 `product` 过滤器） |
 | `read_synergy` | 单个协同文件（synergy file）的完整文本 |
+| `get_changes_since` | **新增。** 按时间窗口分组的产品 + 版本变更。输入：`since` (必需)、`until?`、`product?`、`kind?`、`limit?`。 |
+| `search_breaking_changes` | **新增。** 包含所有重大变更的列表，无需搜索词。输入：`product?`、`since?`、`until?`、`limit?`。 |
+| `compare_versions` | **新增。** 一个产品的所有版本之间的变更。输入：`product`、`from_version`、`to_version`。 |
+
+这三个新的工具模仿了 `hk diff` / `hk breaking` 命令，以及之前需要脚本才能实现的版本比较工作流程。有关完整的输入模式，请参阅 [手册 → MCP 服务器](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/)。
 
 ---
 
@@ -226,11 +262,11 @@ $ hk hybrid "credential exfiltration" --limit 3
 
 完整的详细信息请参阅 [SOURCES.md](SOURCES.md)。
 
-- **第一层级 (GitHub 发布):** `gh api repos/<owner>/<repo>/releases`，涵盖 22 个产品，包括 Anthropic SDK（7 种语言）、Agent SDK（2 个）、ant CLI、claude-code-action、claude-code-security-review 以及 15 个 MCP 生态系统 SDK。
-- **第二层级 (原始 markdown):** `anthropics/claude-code/CHANGELOG.md` + `Aider-AI/aider/HISTORY.md`
-- **第三层级 (HTML / RSS):** `platform.claude.com/docs/release-notes`、`support.claude.com/articles/12138966`、`cursor.com/changelog/rss.xml`（已过滤）、`sourcegraph.com/changelog/featured.rss`、`github.blog/changelog/label/copilot/`、`code.visualstudio.com/updates/v1_NNN`
-- **第四层级 (目录):** `anthropics/skills`、`claude-plugins-{official,community}`、`knowledge-work-plugins`
-- **第五层级 (建议):** `@ClaudeCodeLog` X 账号；marckrenn 变更日志镜像
+- **Tier 1 (GitHub 发布):** `gh api repos/<owner>/<repo>/releases`，涵盖 23 个产品，包括 Anthropic SDK (7 种语言)、Agent SDK (2 个)、ant CLI、**claude-code** (现在通过 gh-releases 自动同步，v1.1 版本之前是手动同步)、claude-code-action、claude-code-security-review，以及 15 个 MCP 生态系统 SDK。
+- **Tier 2 (原始 Markdown):** `Aider-AI/aider/HISTORY.md`。通用的 `keep-a-changelog` 解析器 (v1.1 版本及更高版本) 也适用于任何其源代码为 `CHANGELOG.md` 且符合 Keep-a-Changelog 格式的产品，可以通过 `products.yaml` 文件中的一个条目进行配置。
+- **Tier 3 (HTML / RSS):** `platform.claude.com/docs/release-notes`、`support.claude.com/articles/12138966`、`cursor.com/changelog/rss.xml`、`sourcegraph.com/changelog/featured.rss` (已过滤)、`github.blog/changelog/label/copilot/`、`code.visualstudio.com/updates/v1_NNN`。
+- **Tier 4 (目录):** `anthropics/skills`、`claude-plugins-{official,community}`、`knowledge-work-plugins`。
+- **Tier 5 (建议):** `@ClaudeCodeLog` X 账号；marckrenn 的变更日志镜像。
 
 抓取策略：`gh-releases | rss | raw-changelog | html-scrape | catalog | playwright`。 增加一个新产品，就在 `products.yaml` 文件中增加一条记录。
 
@@ -255,7 +291,7 @@ $ hk hybrid "credential exfiltration" --limit 3
 Vitest 测试套件覆盖单元测试、集成测试、回归测试和初步测试。 **[test-spec-3.md](test-spec-3.md) 是当前版本 (v0.7.0) 的权威文档**；[test-spec.md](test-spec.md) (v1) 和 [test-spec-2.md](test-spec-2.md) (v2) 仍然保存在代码库中，作为设计演进的历史记录。
 
 ```bash
-pnpm test               # unit + integration + regression (~16s, 382 tests)
+pnpm test               # unit + integration + regression (~18s, 508 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -265,9 +301,9 @@ pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 
 | 目录 | 涵盖内容 |
 |-----|----------------|
-| `test/unit/` | 模块级别 — 提取、导入、查询、数据库、嵌入、混合、获取 + 所有提供商 + 获取 RSS/变更日志/HTML + 获取 MCP 注册表 + 获取 Playwright + 产品配置 |
-| `test/integration/` | 端到端 — 流水线、同步、MCP 服务器 (stdio JSON-RPC)、命令行界面 |
-| `test/regression/` | §8.1–§8.18 — 每个部分都用于防止开发过程中出现的实际错误。 |
+| `test/unit/` | 每个模块：提取、导入、查询 (包括 `until` / 浏览 / since / 比较)、数据库 (包括 dim-config v3 迁移)、嵌入、混合、导入 + 所有提供程序 (Ollama / Voyage / **OpenAI**) + 导入 RSS/变更日志 (包括 **keep-a-changelog** 解析器)/HTML + 导入 MCP 注册表 + 导入 Playwright + 产品配置 + 协同功能导入/查询。 |
+| `test/integration/` | 端到端：流水线、同步、MCP 服务器 (stdio JSON-RPC，11 个工具)、CLI (包括 `hk diff`、`hk breaking`)。 |
+| `test/regression/` | §8.1–§8.19 — 每个部分都旨在防止开发过程中出现的实际错误 (§8.19：ghReleases 的早期退出分页保留了窗口内的项目)。 |
 | `test/smoke/` | 可选的完整语料库，用于测试 `products/` 目录下的文件 (1143 个文件)。 |
 | `test/fixtures/` | 3 个模拟产品 + 模拟 HTTP 响应 (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / 官方 MCP 注册表) |
 | `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts`, `playwright-mock.ts`, `yaml-fixtures.ts` |
@@ -308,8 +344,22 @@ CI：`.github/workflows/test.yml` 在代码提交和拉取请求时运行 `pnpm 
 
 `hk embed` 命令会调用外部嵌入服务：
 
-- **Ollama (默认)** — 确保 Ollama 正在运行 (`ollama serve`)，并且已下载嵌入模型 (`ollama pull nomic-embed-text`)。
-- **Voyage** — 在您的环境中设置 `VOYAGE_API_KEY`。 检查您的 API 密钥，请访问 [dash.voyageai.com](https://dash.voyageai.com)。
+- **Ollama (默认，768维)** — 确保 Ollama 正在运行 (`ollama serve`)，并且已下载嵌入模型 (`ollama pull nomic-embed-text`)。
+- **Voyage (1024维)** — 在您的环境中设置 `VOYAGE_API_KEY`。您可以在 [dash.voyageai.com](https://dash.voyageai.com) 上查看您的 API 密钥。
+- **OpenAI (默认 1536 维，可配置)** — 设置 `OPENAI_API_KEY`。默认模型是 `text-embedding-3-small`；可以使用 `OPENAI_EMBED_MODEL` 覆盖该设置（例如，使用 `text-embedding-3-large`，其维度为 3072）。通过 `hk hybrid --embed openai` 或 `hk embed --embed openai` 使用。
+
+**在切换提供商时，嵌入维度不匹配**
+
+每个提供商生成固定维度的向量（Ollama 默认 768 维，Voyage 默认 1024 维，OpenAI 默认 1536 维——OpenAI 支持在模型原生尺寸范围内配置维度）。数据库将当前使用的维度存储在 `schema_meta.embedding_dim` 中。在存在分块的情况下，在不同维度之间切换提供商，会引发 `EMBEDDING_DIM_MISMATCH` 错误（`AppError`），而不是静默地损坏向量表。要切换：
+
+```bash
+rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
+hk init
+hk ingest
+hk embed --embed openai     # new provider, new dim, fresh chunks_vec
+```
+
+对于 OpenAI Matryoshka 截断（小于原生维度的嵌入），请设置 `OPENAI_EMBED_MODEL`，并通过 `hk embed` 的提供商配置传递所需的维度。有关详细信息，请参阅 [手册中的嵌入部分](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions)。
 
 **模式版本不匹配/数据库损坏**
 

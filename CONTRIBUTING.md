@@ -30,7 +30,8 @@ Thanks for your interest in contributing. This guide covers adding new products,
 |---|---|---|
 | `gh-releases` | Repo publishes GitHub Releases | `repo` (owner/repo). Optional: `multi_package: true` for monorepos with scoped tags. |
 | `rss` | Source has an RSS feed | `url` (feed URL). Optional: `title_filter` (regex to filter entries). |
-| `raw-changelog` | Source is a raw CHANGELOG/HISTORY.md file | `url` (raw file URL), `parser` (currently only `aider-history`). |
+| `raw-changelog` | Source is a raw CHANGELOG/HISTORY.md file (aider-style only) | `url` (raw file URL), `parser` (currently only `aider-history`). |
+| `keep-a-changelog` | Source is a CHANGELOG.md in [Keep-a-Changelog](https://keepachangelog.com/) format | `url` (raw file URL). |
 | `html-scrape` | Source is a blog/changelog page | `parser` (`github-copilot-blog`, `vscode-updates`). |
 | `playwright` | Source is client-rendered (no SSR) | No extra fields. Currently hardcoded to Windsurf. |
 | `catalog` | Source is an MCP registry | `catalog_type` (`official-mcp-registry` or `smithery`). Optional: `max_entries`. |
@@ -50,8 +51,8 @@ hk query "some keyword"       # verify releases appear in search
 
 | Tier | Meaning | Examples |
 |------|---------|---------|
-| 1 | Structured API (GitHub Releases) — highest fidelity | SDKs, MCP ecosystem |
-| 2 | Raw markdown changelog | claude-code, aider |
+| 1 | Structured API (GitHub Releases) — highest fidelity | SDKs, MCP ecosystem, claude-code (since v1.1) |
+| 2 | Raw markdown changelog | aider |
 | 3 | HTML/RSS scrape | Cursor, Copilot, Cody |
 | 4 | Catalog snapshot (not versioned releases) | Skills, plugins, MCP registries |
 | 5 | Advisory / manual | X accounts, community mirrors |
@@ -59,7 +60,7 @@ hk query "some keyword"       # verify releases appear in search
 ## Running tests
 
 ```bash
-pnpm test               # unit + integration + regression (~13s, ~294 tests)
+pnpm test               # unit + integration + regression (~18s, 508 tests)
 pnpm test:watch         # interactive mode (re-runs on file change)
 pnpm test:coverage      # generates coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke test (set RUN_SMOKE=1)

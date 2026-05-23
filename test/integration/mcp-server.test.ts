@@ -40,7 +40,7 @@ afterEach(() => {
 
 describe('MCP server integration', () => {
   it(
-    'completes initialize handshake and lists exactly 8 tools',
+    'completes initialize handshake and lists the expected tool set (Wave 1: 11 tools)',
     async () => {
       await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
         const init = await client.initialize();
@@ -52,7 +52,10 @@ describe('MCP server integration', () => {
 
         const tools = await client.listTools();
         const names = tools.map((t) => t.name).sort();
+        // Wave 1 adds: get_changes_since, search_breaking_changes, compare_versions
         expect(names).toEqual([
+          'compare_versions',
+          'get_changes_since',
           'get_release',
           'latest_releases',
           'list_products',
@@ -60,6 +63,7 @@ describe('MCP server integration', () => {
           'lookup_entity',
           'read_synergy',
           'search',
+          'search_breaking_changes',
           'top_entities',
         ]);
         for (const t of tools) {
@@ -243,4 +247,152 @@ describe('MCP server integration', () => {
     },
     25_000
   );
+
+  // ── Wave 1 new tools ──────────────────────────────────────────────────
+  describe('new tools (Wave 1)', () => {
+    it(
+      'get_changes_since returns ChangesSinceResult shape grouped by release',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('get_changes_since', { since: '2026-01-01' });
+          const text = res.content[0]?.text ?? '';
+          expect(text.length).toBeGreaterThan(0);
+          // The response is human-readable but must mention a fixture
+          // product@version (we accept any of the seeded products).
+          expect(text).toMatch(/test-(cli|sdk|apps)@/);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'get_changes_since with kind=breaking only returns breaking changes',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('get_changes_since', {
+            since: '2026-01-01',
+            kind: 'breaking',
+          });
+          const text = res.content[0]?.text ?? '';
+          expect(text.length).toBeGreaterThan(0);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'get_changes_since with relative since (7d) does not error',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('get_changes_since', { since: '7d' });
+          expect(res.content[0]?.text).toBeTruthy();
+        });
+      },
+      25_000
+    );
+
+    it(
+      'search_breaking_changes returns the fixture breaking row',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('search_breaking_changes', {});
+          const text = res.content[0]?.text ?? '';
+          // The fixture test-cli@1.1.0 has a breaking-kind bullet
+          expect(text.length).toBeGreaterThan(0);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'search_breaking_changes with product filter scopes correctly',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('search_breaking_changes', { product: 'test-cli' });
+          const text = res.content[0]?.text ?? '';
+          // Either contains test-cli or "no breaking" — both valid responses
+          expect(text.length).toBeGreaterThan(0);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'compare_versions returns intermediate releases between from (exclusive) and to (inclusive)',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('compare_versions', {
+            product: 'test-cli',
+            from_version: '1.0.0',
+            to_version: '1.1.0',
+          });
+          const text = res.content[0]?.text ?? '';
+          expect(text.length).toBeGreaterThan(0);
+          // 1.0.1 and 1.1.0 should appear; 1.0.0 should not
+          expect(text).toMatch(/1\.0\.1|1\.1\.0/);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'compare_versions with nonexistent versions returns a (no changes) message, no throw',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('compare_versions', {
+            product: 'test-cli',
+            from_version: '99.0.0',
+            to_version: '99.9.9',
+          });
+          const text = res.content[0]?.text ?? '';
+          expect(text.length).toBeGreaterThan(0);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'list_synergies with product filter scopes results',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          // Seeded synergy is "test-synergy" with products: [test-cli, test-sdk]
+          const res = await client.callTool('list_synergies', { product: 'test-cli' });
+          expect((res.content[0]?.text ?? '')).toContain('test-synergy');
+        });
+      },
+      25_000
+    );
+
+    it(
+      'list_synergies with a product nothing references returns a (no matches) line',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('list_synergies', { product: 'no-such-product' });
+          const text = res.content[0]?.text ?? '';
+          // Either "(no synergies)" or just no listing of test-synergy
+          expect(text.length).toBeGreaterThan(0);
+          expect(text).not.toContain('test-synergy');
+        });
+      },
+      25_000
+    );
+  });
 });

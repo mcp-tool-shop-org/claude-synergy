@@ -65,7 +65,7 @@ claude-synergy/
 │   └── plugins-{official,community,knowledge-work}/  # Plugin marketplaces
 ├── synergies/               # 12 curated cross-product workflows
 ├── src/                     # TypeScript implementation
-├── test/                    # 382 tests (unit, integration, regression, smoke)
+├── test/                    # 508 tests (unit, integration, regression, smoke)
 ├── data/claude-synergy.db   # SQLite database (created by `hk init`)
 ├── schema.sql               # Tier 2a tables (products, releases, changes, entities, FTS5, …)
 ├── schema-vec.sql           # Tier 2b tables (chunks, chunks_vec, chunks_fts)
@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**現在の状況（v1.0.0時点）：** 44製品 / 1,186件のリリースファイル / 6,042件の変更 / 1,225件のエンティティ / 12件の連携 / 382件のテスト。
+**現在の数値 (v1.1.0 時点):** 44製品 / 1,186リリースファイル / 6,042変更点 / 1,225エンティティ / 12の連携 / 508テスト / 11のMCPツール / 17のCLIコマンド。
 
 ---
 
@@ -84,11 +84,12 @@ claude-synergy/
 | **1 — ブートストラップ（Markdownコーパス）** | ✅ リリース済み | Study-swarmが706のリリースファイルを2026年1月から5月までに収集し、Tier 4で1,186に拡張。 |
 | **2a — SQLite + FTS5 + CLI** | ✅ リリース済み | `hk` CLI; 15のサブコマンド; 300ms未満のインジェスト速度 |
 | **2b — sqlite-vec + コンテキスト検索** | ✅ リリース済み | プロバイダープラグ可能（なし/構造化/Ollama/Claude-Haiku コンテキスト × Ollama/Voyage埋め込み × なし/Ollama-Judge/Voyage/Cohere リランク） |
-| **3 — 同期 + MCPサーバー** | ✅ リリース済み | `hk fetch / sync / seed-markers`; `claude-synergy-mcp`が8つのツールをstdio経由で公開 |
+| **3 — 同期 + MCPサーバー** | ✅ リリース済み | `hk fetch / sync / seed-markers`; `claude-synergy-mcp`は、標準入出力経由で11のツールを提供します（v1.1で追加された3つを含む、元々のTier-3で提供されていた8つに加え）。 |
 | **4a — Anthropic社以外の拡張** | ✅ リリース済み | +15のMCP SDK、Cursor（RSS）、Aider（HISTORY.md）、Continue.dev、Cody Enterprise（RSSフィルタリング） |
 | **4b — HTMLスクレイピングフェッチャー** | ✅ リリース済み | GitHub Copilot + VS Code Chat（WindsurfはPlaywrightが必要 — v0.7） |
 | **4c — turndown HTML→Markdownインジェスト** | ✅ リリース済み | HTMLの本文（Copilot/VS Code/Cursor）が、FTS5とエンティティ抽出のための、行ごとのリストを生成 |
 | **4d — Playwright + MCPレジストリ + YAML設定** | ✅ リリース済み | WindsurfはPlaywright経由; Smitheryと公式MCPレジストリをTier-4カタログとして使用; 製品は`products.yaml`に統合 |
+| **5 — v1.1：ウィンドウ表示機能 + OpenAIの埋め込み機能** | ✅ リリース済み | `hk diff` / `hk breaking`：すべての閲覧コマンドで日付範囲を指定可能。3つの新しいMCPツール（合計11個）、OpenAIの埋め込み機能、設定可能な埋め込み次元、`claude-code`の自動同期、汎用的な`keep-a-changelog`パーサー。 |
 
 v0.8以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)およびissueで追跡中。
 
@@ -126,8 +127,12 @@ hk sync                              # combined fetch → ingest → embed (cron
 hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 keyword search
-hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ optional --rerank)
+hk query "managed agents"            # FTS5 keyword search (+ --until <date>)
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --rerank, --until)
+
+# Windowed change browsing
+hk diff [product] --since 7d         # what changed in a window, grouped by product+version
+hk breaking --since 30d              # filter-browse of breaking changes (no search term)
 
 # Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
@@ -136,13 +141,15 @@ hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases
+hk latest [--product X] [--limit N]  # recent releases (+ --since <date>)
 hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
                                      #  hook_event, setting_key)
 ```
+
+**v1.1の新機能:** `hk diff`と`hk breaking`は、検索語句なしで「最近何が変わったか」を教えてくれます。日付範囲はすべて統一されており、すべての閲覧コマンドで`--since`と`--until`を`YYYY-MM-DD`形式（または完全なISO 8601形式）、または相対形式（`7d`、`2w`、`3m`、`1y`）で指定できます。
 
 ---
 
@@ -186,6 +193,30 @@ $ hk hybrid "credential exfiltration" --limit 3
 
 この検索クエリは「env_scrub」という文字列を含みません。代わりに、意味的な類似性に基づいて表示されます。従来の完全一致検索では、該当する情報を見つけることができません。
 
+**今週のclaude-codeの変更点:**
+```
+$ hk diff claude-code --since 7d
+claude-code@2.1.147  2026-05-21  (3 changes)
+  [added]     Added the `Workflow` tool for deterministic multi-agent orchestration.
+  [changed]   Slash commands now lazy-load until first invocation.
+  [fixed]     Race condition in MCP server discovery on Windows.
+
+claude-code@2.1.146  2026-05-19  (1 change)
+  [fixed]     Restored `--debug` flag accidentally removed in 2.1.144.
+```
+
+**コーパス全体における変更点を閲覧:**
+```
+$ hk breaking --since 30d --limit 5
+2026-05-15  claude-agent-sdk-python@0.2.82       Headless and SDK sessions now use Task tools by default.
+2026-05-14  claude-agent-sdk-typescript@0.3.142  Headless and SDK sessions now use Task tools by default.
+2026-05-08  anthropic-sdk-go@1.42.0              Removed deprecated `client.Beta()` namespace.
+2026-04-29  cursor@0.49.0                        MCP server config moved from `cursor.json` to `.cursor/mcp.json`.
+2026-04-22  windsurf@1.10.0                      Removed `cascade.run` JSON-RPC method.
+```
+
+検索語句は不要 — `hk breaking`は「最近、重要な変更はありましたか？」という質問への答えです。
+
 ---
 
 ## MCPサーバー：エージェントがこのドキュメント群にアクセスできるようにします
@@ -211,14 +242,19 @@ GitHub Copilotの`.vscode/mcp.json`ファイルでは、`mcpServers`ではなく
 
 | ツール | 目的 |
 |---|---|
-| `search` | ハイブリッドFTS5 + ベクトル検索；オプションで再ランキング。自然言語クエリのデフォルトモード。 |
+| `search` | ハイブリッドFTS5 + ベクトル; オプションで再ランキング。自然言語クエリのデフォルトモード。（`until`の日付上限付き） |
 | `lookup_entity` | 環境変数、コマンド、モデルID、CVEなどのエンティティの履歴。 |
-| `latest_releases` | 製品（または特定の製品）の最新リリース情報。 |
+| `latest_releases` | 製品（または単一の製品）における最近のリリース。（`since`の日付下限付き） |
 | `get_release` | 特定のリリースに関する完全な内容。 |
 | `list_products` | カウント付きの列挙と最新バージョン。 |
 | `top_entities` | 種類ごとの最も言及されているエンティティ。 |
-| `list_synergies` | 製品を横断したワークフローのコレクション。 |
+| `list_synergies` | 複数の製品を横断したワークフロー。 （オプションで`product`フィルターを使用可能） |
 | `read_synergy` | 特定のシナジーファイルの内容全体。 |
+| `get_changes_since` | **新規。** 製品とバージョンごとにグループ化された、時間範囲内の変更点。入力：`since`（必須）、`until?`、`product?`、`kind?`、`limit?`。 |
+| `search_breaking_changes` | **新規。** 検索語句不要の、変更点のフラットリスト。入力：`product?`、`since?`、`until?`、`limit?`。 |
+| `compare_versions` | **新規。** 単一の製品の2つのバージョン間のすべての変更点。入力：`product`、`from_version`、`to_version`。 |
+
+これらの3つの新しいツールは、`hk diff` / `hk breaking`と、以前はスクリプトが必要だったバージョン比較のワークフローを反映しています。入力スキーマの詳細については、[マニュアル → MCPサーバー](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/)を参照してください。
 
 ---
 
@@ -226,11 +262,11 @@ GitHub Copilotの`.vscode/mcp.json`ファイルでは、`mcpServers`ではなく
 
 データソースの詳細については、[SOURCES.md](SOURCES.md)を参照してください。
 
-- **レベル1 (GitHub Releases)**：`gh api repos/<owner>/<repo>/releases`。Anthropic SDK（7言語）、Agent SDK（2）、ant CLI、claude-code-action、claude-code-security-review、および15のMCPエコシステムSDKを含む、22の製品。
-- **レベル2 (raw markdown)**：`anthropics/claude-code/CHANGELOG.md` + `Aider-AI/aider/HISTORY.md`
-- **レベル3 (HTML / RSS)**：`platform.claude.com/docs/release-notes`、`support.claude.com/articles/12138966`、`cursor.com/changelog/rss.xml`、`sourcegraph.com/changelog/featured.rss`（フィルタリング済み）、`github.blog/changelog/label/copilot/`、`code.visualstudio.com/updates/v1_NNN`
-- **レベル4 (catalog)**：`anthropics/skills`、`claude-plugins-{official,community}`、`knowledge-work-plugins`
-- **レベル5 (advisory)**：`@ClaudeCodeLog`のXアカウント、marckrennの変更履歴ミラー
+- **Tier 1 (GitHub Releases):** `gh api repos/<owner>/<repo>/releases`。Anthropic SDK（7言語）、Agent SDK（2）、ant CLI、**claude-code**（v1.1以降はgh-releasesで自動同期 — 以前は手動で初期化）、claude-code-action、claude-code-security-review、および15のMCPエコシステムSDKを含む、23製品。
+- **Tier 2 (raw markdown):** `Aider-AI/aider/HISTORY.md`。汎用的な`keep-a-changelog`パーサー（v1.1以降）は、ソースコードがKeep-a-Changelog形式のCHANGELOG.mdファイルである製品にも利用可能です。`products.yaml`で設定します。
+- **Tier 3 (HTML / RSS):** `platform.claude.com/docs/release-notes`、`support.claude.com/articles/12138966`、`cursor.com/changelog/rss.xml`、`sourcegraph.com/changelog/featured.rss`（フィルタリング済み）、`github.blog/changelog/label/copilot/`、`code.visualstudio.com/updates/v1_NNN`
+- **Tier 4 (catalog):** `anthropics/skills`、`claude-plugins-{official,community}`、`knowledge-work-plugins`
+- **Tier 5 (advisory):** `@ClaudeCodeLog`のXアカウント; marckrennの変更ログミラー
 
 取得戦略：`gh-releases`、`rss`、`raw-changelog`、`html-scrape`、`catalog`、`playwright`。新しい製品ごとに、`products.yaml`に1つのエントリを追加します。
 
@@ -255,7 +291,7 @@ GitHub Copilotの`.vscode/mcp.json`ファイルでは、`mcpServers`ではなく
 Vitestスイートは、ユニットテスト、統合テスト、回帰テスト、および初期動作確認（smoke）の各レベルをカバーします。**[test-spec-3.md](test-spec-3.md)が現在の仕様**です（v0.7.0時点）。[test-spec.md](test-spec.md)（v1）および[test-spec-2.md](test-spec-2.md)（v2）は、設計の経緯を示すための履歴として、リポジトリに残っています。
 
 ```bash
-pnpm test               # unit + integration + regression (~16s, 382 tests)
+pnpm test               # unit + integration + regression (~18s, 508 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -265,9 +301,9 @@ pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 
 | ディレクトリ | 内容 |
 |-----|----------------|
-| `test/unit/` | モジュールごと：抽出、取り込み、検索、データベース、埋め込み、ハイブリッド検索、取得（すべてのプロバイダー、fetch-rss/changelog/html、fetch-mcp-registry、fetch-playwright、製品構成） |
-| `test/integration/` | エンドツーエンド：パイプライン、同期、MCPサーバー（stdio JSON-RPC）、CLI |
-| `test/regression/` | §8.1–§8.18：それぞれが、開発中に修正された実際のバグに対する保護を提供します。 |
+| `test/unit/` | モジュールごと — 抽出、取り込み、クエリ（`until` / 閲覧 / `since` / 比較を含む）、データベース（次元設定v3移行を含む）、埋め込み、ハイブリッド、取り込み + すべてのプロバイダー（Ollama / Voyage / **OpenAI**）+ RSS/変更ログの取り込み（**keep-a-changelog**パーサーを含む）/HTML + MCPレジストリの取り込み + Playwrightの取り込み + 製品設定 + 連携の取り込み/クエリ |
+| `test/integration/` | エンドツーエンド — パイプライン、同期、MCPサーバー（標準入出力JSON-RPC、11のツール）、CLI（`hk diff`、`hk breaking`を含む） |
+| `test/regression/` | §8.1–§8.19 — それぞれが、開発中に修正された実際のバグに対する対策。（§8.19：ghReleasesの早期終了ページネーションは、指定範囲内のアイテムを保持します） |
 | `test/smoke/` | 実際の`products/`ディレクトリ（1,143個のファイル）に対するフルコーパスのテスト。 |
 | `test/fixtures/` | 3つのダミー製品と、モックHTTPレスポンス（RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / 公式MCPレジストリ）。 |
 | `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts`, `playwright-mock.ts`, `yaml-fixtures.ts` |
@@ -308,8 +344,22 @@ CI：`.github/workflows/test.yml`は、`pnpm test:coverage`をpushおよびプ�
 
 `hk embed`は、外部の埋め込みサービスを呼び出します。
 
-- **Ollama (デフォルト)**：Ollamaが実行中であることを確認してください（`ollama serve`）。また、埋め込みモデルがダウンロードされていることを確認してください（`ollama pull nomic-embed-text`）。
-- **Voyage**：環境変数に`VOYAGE_API_KEY`を設定してください。APIキーは[dash.voyageai.com](https://dash.voyageai.com)で確認できます。
+- **Ollama (デフォルト、768次元)**：Ollamaが実行されていることを確認します (`ollama serve`)。また、埋め込みモデルをダウンロードします (`ollama pull nomic-embed-text`)。
+- **Voyage (1024次元)**：環境変数 `VOYAGE_API_KEY` を設定します。APIキーは [dash.voyageai.com](https://dash.voyageai.com) で確認できます。
+- **OpenAI (デフォルト1536次元、設定可能)**：`OPENAI_API_KEY` を設定します。デフォルトのモデルは `text-embedding-3-small` です。`OPENAI_EMBED_MODEL` で別のモデルを指定できます（例：3072次元の `text-embedding-3-large`）。`hk hybrid --embed openai` または `hk embed --embed openai` コマンドで利用できます。
+
+**プロバイダーの切り替え時の埋め込み次元の不一致**
+
+各プロバイダーは、固定の次元を持つベクトルを生成します（Ollama: 768、Voyage: 1024、OpenAI: デフォルト1536。OpenAIは、モデルのネイティブサイズ内で設定可能な次元をサポートしています）。データベースは、アクティブな次元を `schema_meta.embedding_dim` に保存します。チャンクが存在する状態で、次元が異なるプロバイダーに切り替えると、ベクトルテーブルが静かに破損するのではなく、`EMBEDDING_DIM_MISMATCH` (`AppError`) エラーが発生します。切り替えるには、以下の手順に従ってください。
+
+```bash
+rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
+hk init
+hk ingest
+hk embed --embed openai     # new provider, new dim, fresh chunks_vec
+```
+
+OpenAIのMatryoshka切り詰め（ネイティブサイズよりも小さい次元を使用する場合）では、`OPENAI_EMBED_MODEL` を設定し、`hk embed` コマンドのプロバイダー設定を通じて、希望する次元を指定します。詳細は、[マニュアルの埋め込みに関するセクション](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions) を参照してください。
 
 **スキーマのバージョン不一致/データベースの破損**
 

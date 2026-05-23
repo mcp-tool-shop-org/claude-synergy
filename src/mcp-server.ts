@@ -30,7 +30,20 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import matter from 'gray-matter';
 import { openDb } from './db.js';
-import { searchChanges, lookupEntity, recentReleases, listProducts, entityFrequency } from './query.js';
+import {
+  searchChanges,
+  lookupEntity,
+  recentReleases,
+  listProducts,
+  entityFrequency,
+  browseChanges,
+  getChangesSince,
+  compareVersions,
+  listSynergies,
+  getSynergy,
+  type ChangesSinceResult,
+  type QueryResult,
+} from './query.js';
 import { hybridSearch } from './hybrid.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -92,6 +105,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           mode: { type: 'string', enum: ['hybrid', 'fts'], description: 'hybrid = FTS5+vec via RRF (best for concepts); fts = BM25 only (best for exact terms)', default: 'hybrid' },
           product: { type: 'string', description: 'Limit to one product (e.g. claude-code, claude-agent-sdk-python, anthropic-cli)' },
           since: { type: 'string', description: 'YYYY-MM-DD lower bound on release date' },
+          until: { type: 'string', description: 'YYYY-MM-DD upper bound on release date' },
           kind: { type: 'string', description: 'Filter by change kind: added | fixed | breaking | deprecated | renamed | removed | improved | changed' },
           rerank: { type: 'string', enum: ['none', 'ollama-judge'], description: 'Rerank top-K candidates (hybrid mode only). Defaults to none for speed.', default: 'none' },
           limit: { type: 'number', description: 'Max results (default 10)', default: 10 },
@@ -123,6 +137,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         type: 'object',
         properties: {
           product: { type: 'string', description: 'Limit to one product' },
+          since: { type: 'string', description: 'YYYY-MM-DD lower bound on release date' },
           limit: { type: 'number', description: 'Max releases', default: 20 },
         },
       },
@@ -162,7 +177,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'list_synergies',
       description: 'List curated cross-product workflows (Claude Design ↔ Code bundle, MCP server portability, etc). Each synergy describes a composition pattern with evidence.',
-      inputSchema: { type: 'object', properties: {} },
+      inputSchema: {
+        type: 'object',
+        properties: {
+          product: { type: 'string', description: 'Filter to synergies that mention this product (e.g. claude-code)' },
+        },
+      },
     },
     {
       name: 'read_synergy',
@@ -171,6 +191,50 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         type: 'object',
         properties: { name: { type: 'string', description: 'Synergy name from list_synergies (e.g. skill-portability)' } },
         required: ['name'],
+      },
+    },
+    {
+      name: 'get_changes_since',
+      description:
+        'Get all changes in a date window, grouped by product+version. The LLM-orientation tool: "what shipped in the last 7 days" without needing a search term. Use this before recommending features to know the current ground truth.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          since: { type: 'string', description: 'Lower bound — YYYY-MM-DD, full ISO, or relative (e.g. 7d, 2w, 1m, 1y)' },
+          until: { type: 'string', description: 'Upper bound — YYYY-MM-DD, full ISO, or relative; defaults to now' },
+          product: { type: 'string', description: 'Limit to one product' },
+          kind: { type: 'string', description: 'Filter by change kind: added | fixed | breaking | deprecated | renamed | removed | improved | changed' },
+          limit: { type: 'number', description: 'Max change rows returned (default 200)', default: 200 },
+        },
+        required: ['since'],
+      },
+    },
+    {
+      name: 'search_breaking_changes',
+      description:
+        'Browse breaking changes in a date window. No search term required — returns all changes with kind=breaking, most recent first. Use this for upgrade-planning and migration workflows.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          product: { type: 'string', description: 'Limit to one product' },
+          since: { type: 'string', description: 'Lower bound — YYYY-MM-DD, full ISO, or relative (e.g. 7d)' },
+          until: { type: 'string', description: 'Upper bound — YYYY-MM-DD, full ISO, or relative; defaults to now' },
+          limit: { type: 'number', description: 'Max results (default 50)', default: 50 },
+        },
+      },
+    },
+    {
+      name: 'compare_versions',
+      description:
+        'Cumulative diff between two versions of a product, grouped by intermediate release. Use for upgrade planning ("I am on python 0.88.0, what changed through 0.94.0?"). Single call replaces N+1 get_release lookups.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          product: { type: 'string', description: 'Product slug (e.g. anthropic-sdk-python)' },
+          from_version: { type: 'string', description: 'Starting version, exclusive (you are already on this)' },
+          to_version: { type: 'string', description: 'Target version, inclusive' },
+        },
+        required: ['product', 'from_version', 'to_version'],
       },
     },
   ],
@@ -281,6 +345,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             mode: optEnum<'hybrid' | 'fts'>(r, 'mode', SEARCH_MODES, 'search'),
             product: optString(r, 'product', 'search'),
             since: optString(r, 'since', 'search'),
+            until: optString(r, 'until', 'search'),
             kind: optString(r, 'kind', 'search'),
             rerank: optEnum<'none' | 'ollama-judge'>(r, 'rerank', RERANK_MODES, 'search'),
             limit: optInt(r, 'limit', 'search'),
@@ -318,6 +383,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               type: 'text',
               text: handleLatestReleases({
                 product: optString(r, 'product', 'latest_releases'),
+                since: optString(r, 'since', 'latest_releases'),
                 limit: optInt(r, 'limit', 'latest_releases'),
               }),
             },
@@ -358,8 +424,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         };
       }
-      case 'list_synergies':
-        return { content: [{ type: 'text', text: handleListSynergies() }] };
+      case 'list_synergies': {
+        const r = asRecord(args ?? {}, 'list_synergies');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleListSynergies({ product: optString(r, 'product', 'list_synergies') }),
+            },
+          ],
+        };
+      }
       case 'read_synergy': {
         const r = asRecord(args, 'read_synergy');
         const synName = requireString(r, 'name', 'read_synergy');
@@ -371,6 +446,54 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
         return { content: [{ type: 'text', text: handleReadSynergy({ name: synName }) }] };
       }
+      case 'get_changes_since': {
+        const r = asRecord(args, 'get_changes_since');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleGetChangesSince({
+                since: requireString(r, 'since', 'get_changes_since'),
+                until: optString(r, 'until', 'get_changes_since'),
+                product: optString(r, 'product', 'get_changes_since'),
+                kind: optString(r, 'kind', 'get_changes_since'),
+                limit: optInt(r, 'limit', 'get_changes_since'),
+              }),
+            },
+          ],
+        };
+      }
+      case 'search_breaking_changes': {
+        const r = asRecord(args ?? {}, 'search_breaking_changes');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleSearchBreakingChanges({
+                product: optString(r, 'product', 'search_breaking_changes'),
+                since: optString(r, 'since', 'search_breaking_changes'),
+                until: optString(r, 'until', 'search_breaking_changes'),
+                limit: optInt(r, 'limit', 'search_breaking_changes'),
+              }),
+            },
+          ],
+        };
+      }
+      case 'compare_versions': {
+        const r = asRecord(args, 'compare_versions');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleCompareVersions({
+                product: requireString(r, 'product', 'compare_versions'),
+                from_version: requireString(r, 'from_version', 'compare_versions'),
+                to_version: requireString(r, 'to_version', 'compare_versions'),
+              }),
+            },
+          ],
+        };
+      }
       default:
         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
@@ -380,7 +503,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; product?: string; since?: string; kind?: string; rerank?: 'none' | 'ollama-judge'; limit?: number }): Promise<string> {
+async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; product?: string; since?: string; until?: string; kind?: string; rerank?: 'none' | 'ollama-judge'; limit?: number }): Promise<string> {
   const mode = args.mode ?? 'hybrid';
   const limit = args.limit ?? 10;
 
@@ -388,6 +511,7 @@ async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; prod
     const results = searchChanges(db, args.query, {
       product: args.product,
       since: args.since,
+      until: args.until,
       kind: args.kind,
       limit,
     });
@@ -413,6 +537,7 @@ async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; prod
   const results = await hybridSearch(db, args.query, {
     product: args.product,
     since: args.since,
+    until: args.until,
     kind: args.kind,
     rerankProviderName: args.rerank ?? 'none',
     limit,
@@ -454,9 +579,9 @@ function handleLookupEntity(args: { type: string; value: string }): string {
   return lines.join('\n');
 }
 
-function handleLatestReleases(args: { product?: string; limit?: number }): string {
+function handleLatestReleases(args: { product?: string; since?: string; limit?: number }): string {
   const limit = args.limit ?? 20;
-  const releases = recentReleases(db, args.product, limit);
+  const releases = recentReleases(db, args.product, limit, args.since);
   if (releases.length === 0) return '(no releases)';
   return releases
     .map((r) => `${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`)
@@ -508,55 +633,197 @@ function handleTopEntities(args: { type: string; limit?: number }): string {
     .join('\n');
 }
 
-function handleListSynergies(): string {
+// ── Synergy handlers ───────────────────────────────────────────────────────
+// Prefer DB-backed reads (populated by `ingestSynergies()` in CORE). Fall
+// back to filesystem when the DB tables are empty — "lazy migration": existing
+// installs that haven't re-ingested still get an answer.
+
+function dbSynergiesEmpty(): boolean {
+  try {
+    const row = db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='synergies'`)
+      .get();
+    if (!row) return true;
+    const count = db.prepare(`SELECT COUNT(*) AS n FROM synergies`).get() as { n: number } | undefined;
+    return !count || count.n === 0;
+  } catch {
+    return true;
+  }
+}
+
+function handleListSynergies(args: { product?: string } = {}): string {
+  // Try DB first
+  if (!dbSynergiesEmpty()) {
+    try {
+      const rows = listSynergies(db, args.product ? { product: args.product } : undefined);
+      if (rows.length === 0) {
+        return args.product
+          ? `(no synergies mention product "${args.product}")`
+          : '(no synergies)';
+      }
+      const lines = [`Synergies (${rows.length}):\n`];
+      for (const s of rows as any[]) {
+        const name = s.name ?? '';
+        const title = s.title ?? name;
+        const products = Array.isArray(s.products)
+          ? s.products.join(', ')
+          : (s.products as string | undefined) ?? 'unknown';
+        const trigger = (s.trigger as string | undefined) ?? '';
+        lines.push(`- ${name}: ${title}`);
+        lines.push(`    products: ${products}`);
+        if (trigger) lines.push(`    trigger:  ${trigger}`);
+        lines.push('');
+      }
+      return lines.join('\n');
+    } catch {
+      // fall through to filesystem
+    }
+  }
+  // Filesystem fallback
+  return listSynergiesFromDisk(args.product);
+}
+
+function listSynergiesFromDisk(productFilter?: string): string {
   if (!existsSync(SYNERGIES_DIR)) return '(synergies dir not found)';
   const files = readdirSync(SYNERGIES_DIR).filter((f) => f.endsWith('.md') && f !== 'INDEX.md');
   if (files.length === 0) return '(no synergies)';
-  const lines = [`Synergies (${files.length}):\n`];
+  const lines: string[] = [];
+  let count = 0;
   for (const f of files) {
     try {
       const raw = readFileSync(join(SYNERGIES_DIR, f), 'utf-8');
       const { data } = matter(raw);
+      const products = Array.isArray(data.products) ? (data.products as string[]) : [];
+      if (productFilter && !products.includes(productFilter)) continue;
       const name = (data.name as string) ?? f.replace(/\.md$/, '');
       const title = (data.title as string) ?? name;
-      const products = Array.isArray(data.products) ? (data.products as string[]).join(', ') : 'unknown';
       const trigger = (data.trigger as string) ?? '';
       lines.push(`- ${name}: ${title}`);
-      lines.push(`    products: ${products}`);
+      lines.push(`    products: ${products.length > 0 ? products.join(', ') : 'unknown'}`);
       if (trigger) lines.push(`    trigger:  ${trigger}`);
       lines.push('');
+      count += 1;
     } catch {}
   }
-  return lines.join('\n');
+  if (count === 0) {
+    return productFilter
+      ? `(no synergies mention product "${productFilter}")`
+      : '(no synergies)';
+  }
+  return [`Synergies (${count}):\n`, ...lines].join('\n');
 }
 
 function handleReadSynergy(args: { name: string }): string {
-  if (!existsSync(SYNERGIES_DIR)) return '(synergies dir not found)';
-  // Name shape is validated upstream in the CallTool handler against
-  // SYNERGY_NAME_RE — defense-in-depth recheck here as well.
+  // Defense-in-depth recheck (upstream also validates)
   if (!SYNERGY_NAME_RE.test(args.name)) {
     return `(synergy not found: ${args.name})`;
   }
+  // Try DB first
+  if (!dbSynergiesEmpty()) {
+    try {
+      const synergy = getSynergy(db, args.name) as any;
+      if (synergy && synergy.body) {
+        return synergy.body as string;
+      }
+    } catch {
+      // fall through to filesystem
+    }
+  }
+  // Filesystem fallback
+  if (!existsSync(SYNERGIES_DIR)) return `(synergy not found: ${args.name})`;
   const files = readdirSync(SYNERGIES_DIR).filter((f) => f.endsWith('.md'));
-  // Exact basename match (no suffix-match — previously `endsWith` permitted
-  // empty/partial matches and would pick up an unrelated file).
   const targetFile = files.find((f) => basename(f, '.md') === args.name);
   if (targetFile) {
-    const raw = readFileSync(join(SYNERGIES_DIR, targetFile), 'utf-8');
-    return raw;
+    return readFileSync(join(SYNERGIES_DIR, targetFile), 'utf-8');
   }
-  // Fall back to frontmatter `name:` lookup (some synergies set an explicit
-  // name in frontmatter that differs from the filename slug).
   for (const f of files) {
     try {
       const raw = readFileSync(join(SYNERGIES_DIR, f), 'utf-8');
       const { data } = matter(raw);
-      if (data.name === args.name) {
-        return raw;
-      }
+      if (data.name === args.name) return raw;
     } catch {}
   }
   return `(synergy not found: ${args.name})`;
+}
+
+// ── New tool handlers (Wave 1: get_changes_since / search_breaking_changes / compare_versions) ──
+
+function formatChangesSinceResults(results: ChangesSinceResult[]): string {
+  if (results.length === 0) {
+    return '(no changes in window — try widening --since)';
+  }
+  const lines: string[] = [];
+  let total = 0;
+  for (const rel of results) {
+    const date = rel.released_at ?? '????-??-??';
+    lines.push(`${date}  ${rel.product}@${rel.version}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
+    for (const c of rel.changes) {
+      lines.push(`  - [${c.kind}] ${c.text}`);
+    }
+    lines.push('');
+    total += rel.changes.length;
+  }
+  lines.push(`${total} change${total === 1 ? '' : 's'} across ${results.length} release${results.length === 1 ? '' : 's'}`);
+  return lines.join('\n');
+}
+
+function handleGetChangesSince(args: { since: string; until?: string; product?: string; kind?: string; limit?: number }): string {
+  let results: ChangesSinceResult[];
+  try {
+    results = getChangesSince(db, {
+      since: args.since,
+      until: args.until,
+      product: args.product,
+      kind: args.kind,
+      limit: args.limit ?? 200,
+    });
+  } catch (e: any) {
+    throw new McpError(ErrorCode.InvalidParams, `get_changes_since: ${e.message}`);
+  }
+  return formatChangesSinceResults(results);
+}
+
+function handleSearchBreakingChanges(args: { product?: string; since?: string; until?: string; limit?: number }): string {
+  let results: QueryResult[];
+  try {
+    results = browseChanges(db, {
+      product: args.product,
+      since: args.since,
+      until: args.until,
+      kind: 'breaking',
+      limit: args.limit ?? 50,
+    });
+  } catch (e: any) {
+    throw new McpError(ErrorCode.InvalidParams, `search_breaking_changes: ${e.message}`);
+  }
+  if (results.length === 0) {
+    return '(no breaking changes — note: ingest may not have classified any changes as breaking yet)';
+  }
+  const lines: string[] = [];
+  for (const r of results) {
+    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+    lines.push(`  ${r.text}`);
+    lines.push('');
+  }
+  lines.push(`${results.length} breaking change${results.length === 1 ? '' : 's'}`);
+  return lines.join('\n');
+}
+
+function handleCompareVersions(args: { product: string; from_version: string; to_version: string }): string {
+  let results: ChangesSinceResult[];
+  try {
+    results = compareVersions(db, {
+      product: args.product,
+      fromVersion: args.from_version,
+      toVersion: args.to_version,
+    });
+  } catch (e: any) {
+    throw new McpError(ErrorCode.InvalidParams, `compare_versions: ${e.message}`);
+  }
+  if (results.length === 0) {
+    return `(no intermediate releases between ${args.product}@${args.from_version} and ${args.product}@${args.to_version})`;
+  }
+  return formatChangesSinceResults(results);
 }
 
 // ── Graceful shutdown ────────────────────────────────────────────────────────

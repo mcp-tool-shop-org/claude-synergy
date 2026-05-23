@@ -61,14 +61,31 @@ hk query "streaming"
 # Filter by product
 hk query --product anthropic-sdk-typescript "tool use"
 
-# Filter by date
-hk query --since 2026-01-01 "breaking"
+# Filter by date (--since and --until)
+hk query --since 2026-01-01 --until 2026-03-01 "breaking"
 
 # Entity lookup
 hk env-var ANTHROPIC_API_KEY
 hk command /review
 hk model claude-sonnet-4-20250514
 ```
+
+## "What changed lately?" — no search term needed
+
+The `hk diff` and `hk breaking` commands answer windowed-browse questions without requiring a search query:
+
+```bash
+# What changed in claude-code in the last week
+hk diff claude-code --since 7d
+
+# What broke anywhere in the last 30 days
+hk breaking --since 30d
+
+# Everything new in April 2026
+hk diff --since 2026-04-01 --until 2026-05-01
+```
+
+Both commands accept `--json` for machine output. See the [CLI reference](./cli-reference/#windowed-browsing-commands-new-in-v11) for the full flag set.
 
 ## JSON output
 
@@ -82,23 +99,32 @@ hk products --json
 
 ## Hybrid search (optional)
 
-For semantic search, first generate embeddings:
+For semantic search, first generate embeddings. Three providers are supported:
 
 ```bash
-# Requires Ollama running with nomic-embed-text
+# Ollama (local, 768-dim) — requires Ollama running with nomic-embed-text
 ollama pull nomic-embed-text
 hk embed --embed ollama --context structured
+
+# Voyage (remote, 1024-dim) — requires VOYAGE_API_KEY
+hk embed --embed voyage --context structured
+
+# OpenAI (remote, 1536-dim default) — requires OPENAI_API_KEY
+hk embed --embed openai --context structured
 ```
 
 Then use hybrid search:
 
 ```bash
 hk hybrid "how do I use tool use with streaming?"
+hk hybrid --embed openai "MCP error handling"
 hk hybrid --rerank voyage "best practices for MCP server error handling"
 ```
 
+The provider's vector dimension is stamped into `schema_meta.embedding_dim` on first embed. Switching to a provider with a different dimension requires `--force`, which re-embeds the entire corpus.
+
 ## Next steps
 
-- [CLI Reference](./cli-reference/) — all 15 commands
+- [CLI Reference](./cli-reference/) — all 17 commands
 - [MCP Server](./mcp-server/) — wire into your agent harness
 - [Architecture](./architecture/) — understand the data model

@@ -10,7 +10,7 @@ export const config: SiteConfig = {
   footerText: 'MIT Licensed — built by <a href="https://mcp-tool-shop.github.io/" style="color:var(--color-muted);text-decoration:underline">MCP Tool Shop</a>',
 
   hero: {
-    badge: 'v1.0 — 44 products',
+    badge: 'v1.1 — 44 products',
     headline: 'Claude Synergy',
     headlineAccent: 'knows what the harness can do.',
     description: 'A local, queryable mirror of every Anthropic + adjacent AI dev tool changelog — plus a curated Synergy layer describing cross-product workflows.',
@@ -40,7 +40,7 @@ export const config: SiteConfig = {
         },
         {
           title: 'MCP server',
-          desc: '8-tool MCP server over stdio. Wire it into Claude Code, Cline, or any MCP-compatible harness for live changelog queries.',
+          desc: '11-tool MCP server over stdio. Wire it into Claude Code, Cline, or any MCP-compatible harness for live changelog queries.',
         },
         {
           title: '12 synergies',
@@ -51,7 +51,7 @@ export const config: SiteConfig = {
           desc: 'Runs locally. No analytics, no crash reporting, no network calls unless you explicitly invoke fetch/sync/embed.',
         },
         {
-          title: '382 tests',
+          title: '508 tests',
           desc: 'Comprehensive test suite covering fetchers, ingest, query, embed, security validators, and CLI integration.',
         },
       ],

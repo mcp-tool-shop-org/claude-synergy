@@ -9,12 +9,18 @@ import { OllamaContextProvider } from './providers/context/ollama.js';
 import { ClaudeHaikuContextProvider } from './providers/context/claude-haiku.js';
 import { OllamaEmbeddingProvider } from './providers/embedding/ollama.js';
 import { VoyageEmbeddingProvider } from './providers/embedding/voyage.js';
+import { OpenAIEmbeddingProvider } from './providers/embedding/openai.js';
+import { DEFAULT_EMBEDDING_DIM, getEmbeddingDim, setEmbeddingDim } from './db.js';
+import { AppError } from './errors.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/** Canonical set of embedding provider names accepted by makeEmbeddingProvider. */
+export type EmbedProviderName = 'ollama' | 'voyage' | 'openai';
+
 export interface EmbedOptions {
   contextProviderName: 'none' | 'structured' | 'ollama' | 'claude-haiku';
-  embeddingProviderName: 'ollama' | 'voyage';
+  embeddingProviderName: EmbedProviderName;
   product?: string;
   limit?: number;
   batchSize?: number;
@@ -70,15 +76,41 @@ export interface EmbedStats {
   stopReason?: 'cancelled' | 'budget_requests' | 'budget_tokens';
 }
 
-export function initVecSchema(db: Database.Database): void {
-  // Idempotent — only creates if missing
+/**
+ * Initialize the Tier 2b vector-layer schema for a DB.
+ *
+ * Reads the static `schema-vec.sql` (creates `chunks`, `chunks_fts`,
+ * triggers) and then creates `chunks_vec` dynamically using the configured
+ * embedding dim recorded in `schema_meta`. When `opts.dim` is supplied it
+ * is recorded first (used during `hk init` to lock the dim before first
+ * embed).
+ *
+ * Idempotent: skips if `chunks` already exists. A pre-existing `chunks_vec`
+ * is left untouched (dim mismatch is caught at `setEmbeddingDim` time).
+ */
+export function initVecSchema(db: Database.Database, opts: { dim?: number } = {}): void {
+  // Lock in the dim if the caller supplied one (e.g. CLI init with explicit provider)
+  if (opts.dim !== undefined) {
+    setEmbeddingDim(db, opts.dim);
+  }
+
   const existing = db
     .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks'`)
     .get();
-  if (existing) return;
-  const schemaPath = resolveSchemaVecPath();
-  const sql = readFileSync(schemaPath, 'utf-8');
-  db.exec(sql);
+  if (!existing) {
+    const schemaPath = resolveSchemaVecPath();
+    const sql = readFileSync(schemaPath, 'utf-8');
+    db.exec(sql);
+  }
+
+  // Create chunks_vec at the configured dim if it doesn't yet exist.
+  const hasVec = db
+    .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks_vec'`)
+    .get();
+  if (!hasVec) {
+    const dim = getEmbeddingDim(db) ?? DEFAULT_EMBEDDING_DIM;
+    db.exec(`CREATE VIRTUAL TABLE IF NOT EXISTS chunks_vec USING vec0(embedding FLOAT[${dim}])`);
+  }
 }
 
 function resolveSchemaVecPath(): string {
@@ -96,10 +128,20 @@ function resolveSchemaVecPath(): string {
 }
 
 export async function embedAll(db: Database.Database, opts: EmbedOptions): Promise<EmbedStats> {
-  initVecSchema(db);
-
+  // Resolve provider first so we can lock the dim before creating chunks_vec.
   const ctx = makeContextProvider(opts.contextProviderName);
-  const emb = makeEmbeddingProvider(opts.embeddingProviderName);
+  // If the DB already has a configured dim, pass it through so providers that
+  // support truncation (OpenAI) align with the existing vector index.
+  const existingDim = getEmbeddingDim(db);
+  const emb = makeEmbeddingProvider(opts.embeddingProviderName, {
+    dim: existingDim ?? undefined,
+  });
+
+  // Negotiate dimension: setEmbeddingDim throws EMBEDDING_DIM_MISMATCH when
+  // a different dim is already in use AND chunks exist. On fresh DBs or when
+  // chunks are empty, it just records the dim.
+  setEmbeddingDim(db, emb.dimension);
+  initVecSchema(db);
 
   // Pull changes that don't yet have a chunk (unless --force)
   const productFilter = opts.product ? 'AND c.product = @product' : '';
@@ -330,13 +372,33 @@ function makeContextProvider(name: string): ContextProvider {
   }
 }
 
-function makeEmbeddingProvider(name: string): EmbeddingProvider {
+/**
+ * Construct an embedding provider by name.
+ *
+ * `opts.dim` is a target dimension for providers that support truncation
+ * (currently OpenAI's text-embedding-3 family). Passing dim to Ollama or
+ * Voyage is a no-op — those providers are pinned to 768.
+ *
+ * `opts.model` overrides the model for the provider (e.g. text-embedding-3-large).
+ */
+export function makeEmbeddingProvider(
+  name: EmbedProviderName,
+  opts: { dim?: number; model?: string } = {}
+): EmbeddingProvider {
   switch (name) {
     case 'ollama':
-      return new OllamaEmbeddingProvider();
+      return new OllamaEmbeddingProvider({ model: opts.model });
     case 'voyage':
-      return new VoyageEmbeddingProvider();
-    default:
-      throw new Error(`unknown embedding provider: ${name}`);
+      return new VoyageEmbeddingProvider({ model: opts.model });
+    case 'openai':
+      return new OpenAIEmbeddingProvider({ model: opts.model, dim: opts.dim });
+    default: {
+      const _exhaustive: never = name;
+      throw new AppError({
+        code: 'EMBED_PROVIDER_UNKNOWN',
+        message: `unknown embedding provider: ${String(_exhaustive)}`,
+        hint: 'use one of: ollama | voyage | openai',
+      });
+    }
   }
 }

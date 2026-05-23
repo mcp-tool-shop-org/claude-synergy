@@ -1,14 +1,19 @@
-// Incremental release sync — Tier 4 extends to three fetch strategies:
-//   - gh-releases: GitHub Releases API (uniform; preferred when available)
-//   - rss:         RSS 2.0 feed (Cursor, Cody Enterprise)
-//   - raw-changelog: raw markdown CHANGELOG/HISTORY.md (Aider)
+// Incremental release sync — fetch strategies:
+//   - gh-releases:   GitHub Releases API (uniform; preferred when available)
+//   - rss:           RSS 2.0 feed (Cursor, Cody Enterprise)
+//   - raw-changelog: raw markdown CHANGELOG/HISTORY.md — dispatches on parser:
+//                      • aider-history    (Aider HISTORY.md)
+//                      • keep-a-changelog (generic Keep-a-Changelog format)
+//   - html-scrape:   cheerio-based HTML parser (GitHub blog, VS Code updates)
+//   - playwright:    headless Chromium for client-rendered pages (Windsurf)
+//   - catalog:       MCP registry snapshots (Official + Smithery)
 
 import { execFileSync } from 'node:child_process';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import type Database from 'better-sqlite3';
 import { fetchRssReleases } from './fetch-rss.js';
-import { fetchAiderHistory } from './fetch-changelog.js';
+import { fetchAiderHistory, fetchKeepAChangelog, type ChangelogParserName, type ChangelogItem } from './fetch-changelog.js';
 import { fetchHtmlReleases, type HtmlParserName, type HtmlItem } from './fetch-html.js';
 import { fetchCatalog, writeCatalog, type CatalogType } from './fetch-mcp-registry.js';
 import { loadProductsConfig } from './products-config.js';
@@ -81,7 +86,7 @@ export interface FetchTarget {
   rssTitleFilter?: RegExp;
   // raw-changelog
   rawChangelogUrl?: string;
-  rawChangelogParser?: 'aider-history';
+  rawChangelogParser?: ChangelogParserName;
   // html-scrape
   htmlParser?: HtmlParserName;
   // catalog
@@ -94,6 +99,9 @@ export interface FetchTarget {
 // Single source of truth lives in products.yaml at repo root.
 const HARDCODED_FALLBACK_TARGETS: FetchTarget[] = [
   // ── Existing Anthropic GH-Releases sources ────────────────────────────────
+  // FE-1: claude-code is the flagship product — wired to gh-releases because the
+  // repo publishes Releases whose bodies mirror CHANGELOG.md but carry real dates.
+  { product: 'claude-code', strategy: 'gh-releases', repo: 'anthropics/claude-code' },
   { product: 'claude-agent-sdk-python', strategy: 'gh-releases', repo: 'anthropics/claude-agent-sdk-python' },
   { product: 'claude-agent-sdk-typescript', strategy: 'gh-releases', repo: 'anthropics/claude-agent-sdk-typescript' },
   { product: 'anthropic-cli', strategy: 'gh-releases', repo: 'anthropics/anthropic-cli' },
@@ -360,6 +368,19 @@ function ghReleases(repo: string, sinceIso: string): GhRelease[] {
   // F-007: paginate past the GitHub default 100/page cap. Repos with >100 releases
   // (continue-dev, anthropic-sdk-typescript with multi-package tagging, etc.) need
   // multiple pages. Hard ceiling at 50 pages = 5,000 releases as a sanity cap.
+  //
+  // FE-3: short-circuit pagination once we see a full page whose LAST release is
+  // older than sinceIso. GitHub returns releases in `created_at` DESC order by
+  // default, which for the overwhelming majority of repos matches `published_at`
+  // ordering. We filter on `published_at` (it's the production-visible timestamp)
+  // and accept the tiny risk that a release was drafted long before publish — the
+  // user can always force a full re-sync with `--since 2024-01-01`.
+  //
+  // Correctness contract: we only early-exit when EVERY release on the current
+  // page is <= sinceIso. That guarantees no in-window release on a later page
+  // (since the API order is monotonic-ish DESC). This trades a small chance of
+  // missing a backdated release for huge API-quota savings on high-velocity
+  // repos (continue-dev publishes 100+/month).
   const all: GhRelease[] = [];
   const MAX_PAGES = 50;
   for (let page = 1; page <= MAX_PAGES; page++) {
@@ -375,7 +396,7 @@ function ghReleases(repo: string, sinceIso: string): GhRelease[] {
       // First-page 404 = repo unreachable; later-page 404 should not normally happen,
       // but if it does we stop pagination and return what we have.
       const stderr = (e.stderr ?? '').toString();
-      if (stderr.includes('404')) return page === 1 ? [] : all;
+      if (stderr.includes('404')) return page === 1 ? [] : filterAndShape(all, sinceIso);
       // Enrich rate-limit errors with GITHUB_TOKEN guidance
       if (stderr.includes('403') || stderr.includes('429') || stderr.includes('rate limit')) {
         throw new Error(
@@ -392,13 +413,30 @@ function ghReleases(repo: string, sinceIso: string): GhRelease[] {
       batch = JSON.parse(out) as GhRelease[];
     } catch {
       // Malformed JSON on first page = bail entirely; later pages = stop pagination.
-      return page === 1 ? [] : all;
+      return page === 1 ? [] : filterAndShape(all, sinceIso);
     }
     if (!Array.isArray(batch) || batch.length === 0) break;
     all.push(...batch);
+
+    // FE-3 early exit — if the LAST release on this full page is already <= sinceIso,
+    // every release on later pages will be too (DESC order). Save the next API call.
+    // Skip this check for partial pages — we already know there's no next page.
+    if (batch.length === 100) {
+      const lastPubAt = batch[batch.length - 1]?.published_at;
+      if (lastPubAt && lastPubAt <= sinceIso) break;
+    }
+
     if (batch.length < 100) break; // last page (partial)
   }
 
+  return filterAndShape(all, sinceIso);
+}
+
+/**
+ * Filter releases newer than sinceIso and project to the minimal shape downstream consumers expect.
+ * Extracted so the early-exit code paths in ghReleases() can short-circuit cleanly.
+ */
+function filterAndShape(all: GhRelease[], sinceIso: string): GhRelease[] {
   return all
     .filter((r) => r.published_at && r.published_at > sinceIso)
     .map((r) => ({
@@ -524,11 +562,21 @@ async function fetchRawChangelog(
   signal?: AbortSignal
 ): Promise<FetchStats> {
   if (!target.rawChangelogUrl) throw new Error(`${target.product}: raw-changelog requires url`);
-  if (target.rawChangelogParser !== 'aider-history') {
-    throw new Error(`${target.product}: unsupported parser ${target.rawChangelogParser}`);
-  }
 
-  const items = await fetchAiderHistory(target.rawChangelogUrl, since, signal);
+  // FE-2: dispatch on parser field instead of hardcoding aider-history. Each
+  // parser implementation lives in fetch-changelog.ts; this switch is the only
+  // place that grows when a new format is added.
+  let items: ChangelogItem[];
+  switch (target.rawChangelogParser) {
+    case 'aider-history':
+      items = await fetchAiderHistory(target.rawChangelogUrl, since, signal);
+      break;
+    case 'keep-a-changelog':
+      items = await fetchKeepAChangelog(target.rawChangelogUrl, since, signal);
+      break;
+    default:
+      throw new Error(`${target.product}: unsupported parser ${target.rawChangelogParser}`);
+  }
   let latest: string | null = null;
   let fetched = 0;
   const errors: string[] = [];

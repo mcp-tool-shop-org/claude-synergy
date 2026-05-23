@@ -50,7 +50,7 @@ export interface FetchTarget {
   rssTitleFilter?: RegExp;
   // raw-changelog
   rawChangelogUrl?: string;
-  rawChangelogParser?: 'aider-history';
+  rawChangelogParser?: 'aider-history' | 'keep-a-changelog';
   // html-scrape
   htmlParser?: 'github-copilot-blog' | 'vscode-updates' | 'windsurf-changelog';
 }
@@ -186,8 +186,15 @@ function buildFetchTarget(name: string, fetch: NonNullable<RawYaml['products']>[
     case 'raw-changelog':
       if (!fetch.url) throw new Error(`[claude-synergy] ${name}: raw-changelog requires 'url'`);
       if (!fetch.parser) throw new Error(`[claude-synergy] ${name}: raw-changelog requires 'parser'`);
+      // FE-2: parser is now a closed set. Validate at load time so a typo in
+      // products.yaml fails fast instead of at fetch time.
+      if (fetch.parser !== 'aider-history' && fetch.parser !== 'keep-a-changelog') {
+        throw new Error(
+          `[claude-synergy] ${name}: raw-changelog 'parser' must be one of: aider-history, keep-a-changelog (got '${fetch.parser}')`
+        );
+      }
       target.rawChangelogUrl = fetch.url;
-      target.rawChangelogParser = fetch.parser as 'aider-history';
+      target.rawChangelogParser = fetch.parser;
       break;
 
     case 'html-scrape':

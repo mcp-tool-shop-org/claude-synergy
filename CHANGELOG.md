@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-05-22
+
+### Added
+- **`hk diff [product] --since N(d|w|m|y)`** — "what changed in this window," grouped by product+version. Default `--since` is `7d`. Accepts `--until`, `--kind`, `--limit` (default 200; caps total change rows, not releases), `--json`, `--db`. Answers "what landed lately?" without a search term. Relative dates: `7d`, `2w`, `3m`, `1y` (resolved to ISO at the CLI boundary).
+- **`hk breaking`** — filter-browse of breaking changes across the corpus. No search term required. Accepts `--product`, `--since`, `--until`, `--limit` (default 50), `--json`, `--db`.
+- **Three new MCP tools** (8 → 11):
+  - `get_changes_since` — `{since (required), until?, product?, kind?, limit?}` → changes grouped by product+version.
+  - `search_breaking_changes` — `{product?, since?, until?, limit?}` → flat list of breaking changes.
+  - `compare_versions` — `{product, from_version, to_version}` → all changes between two versions of one product.
+- **OpenAI embedding provider** — `text-embedding-3-small` (1536-dim) default, configurable model via `OPENAI_EMBED_MODEL` (`text-embedding-3-large` → 3072, `text-embedding-ada-002` → 1536). Env: `OPENAI_API_KEY`, optional `OPENAI_BASE_URL` for OpenAI-compatible gateways. Supports Matryoshka dim truncation when a smaller dim is requested. Use `--embed openai` on `hk hybrid` / `hk embed`.
+- **Configurable embedding dimension** — `schema_meta.embedding_dim` stamps the active vector dimension. The `chunks_vec` sqlite-vec table is now created dynamically at the stamped dim rather than hard-coded to 768. Switching to a provider with a different dim while chunks exist raises `EMBEDDING_DIM_MISMATCH` (`AppError`) instead of silently corrupting the vector table.
+- **Synergy DB ingestion** — `hk ingest` now populates the previously dead synergy schema (`synergies`, `synergy_products`, `synergy_steps`, `synergy_evidence`, `synergy_change_refs`) from `synergies/*.md` frontmatter + body sections. Powers the `list_synergies` / `read_synergy` MCP tools off the DB. Filesystem fallback retained for lazy migration of existing installs that haven't re-ingested. `INSERT … ON CONFLICT DO UPDATE` preserves synergy IDs across re-ingest. Stub product rows (`source_tier = 0`, `notes = 'synergy-stub'`) are created for synergy-referenced products that have no fetch pipeline yet.
+- **`claude-code` auto-sync** — Anthropic's `claude-code` product is now fetched automatically on every `hk sync` via the GitHub Releases API (Tier 1 / `gh-releases`). Previously the corpus was manually seeded with no incremental sync path. Tier reclassified 2 → 1 to reflect the structured-API source.
+- **Generic `keep-a-changelog` parser** — any product whose source is a CHANGELOG.md in [Keep-a-Changelog](https://keepachangelog.com/) format can be wired with a single entry in `products.yaml` (`fetch_strategy: raw-changelog`, `parser: keep-a-changelog`). Handles bracketed/unbracketed versions, optional `v` prefix, paren or hyphen date separators, pre-release and build-metadata suffixes. `[Unreleased]` and other non-version headings are skipped; undated version headings (`## 1.2.3` with no date) are preserved with `releasedAt: null` so the parser is lossless. The network fetcher (`fetchKeepAChangelog`) drops undated entries on incremental sync since `null > since` can't be evaluated.
+- **GitHub Releases sync — early-exit pagination** — `gh-releases` fetcher now stops paginating once an entire page falls below the `--since` watermark. Repos with 500+ releases (e.g. continue-dev) drop from 5 pages to 1–2 on a daily sync — ~80% reduction in GitHub API quota.
+
+### Changed
+- `hk query` gained `--until <date>` (date upper bound).
+- `hk hybrid` gained `--until <date>` (date upper bound).
+- `hk latest` gained `--since <date>` (date lower bound).
+- MCP `search` tool gained optional `until` input.
+- MCP `latest_releases` tool gained optional `since` input.
+- MCP `list_synergies` tool gained optional `product` filter.
+- MCP tool count 8 → 11.
+- CLI command count 15 → 17.
+- Test suite 382 → 508 (+126 tests across 6 new unit files, 3 extended integration files, and §8.19 regression for ghReleases pagination).
+- claude-code product reclassified Tier 2 → Tier 1 in `products.yaml` and docs to reflect structured-API source (GitHub Releases).
+- README CLI surface and MCP tools tables updated to reflect new commands and flags.
+- Handbook `cli-reference` and `mcp-server` pages updated with new commands and tool input schemas.
+
+### Migration notes
+- **Schema v2 → v3 auto-migrates on first `hk init` after upgrade.** The migration stamps `embedding_dim = 768` into `schema_meta` to preserve existing Ollama-embedded DBs at their current dimension. No data is moved. Migration is one-way — a v3 DB cannot be opened by older tool versions.
+- **Existing 768-dim Ollama embeddings continue to work without re-embed.** The dim guard only triggers if you switch to a provider that produces a different vector size (e.g. Ollama 768 → OpenAI 1536).
+- **Switching embedding providers across different dimensions on a populated DB:** `hk embed` will refuse with `EMBEDDING_DIM_MISMATCH`. To switch, wipe and re-initialize the DB:
+  ```bash
+  rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
+  hk init
+  hk ingest
+  hk embed --embed <new-provider>
+  ```
+  Alternatively, OpenAI supports Matryoshka truncation — pass a target dim within the model's native size (e.g. truncate `text-embedding-3-small` from 1536 to 768 to stay compatible with an existing Ollama DB).
+- **Synergies still live as markdown** in `synergies/*.md` — the DB tables (`synergies`, `synergy_products`, `synergy_steps`, `synergy_evidence`, `synergy_change_refs`) are a cache populated on `hk ingest`. Edits to synergy files take effect on next ingest. The MCP server prefers the DB but falls back to the filesystem when the DB is empty (lazy migration for existing installs).
+- **Stub product rows** may appear in `products` table with `source_tier = 0`, `notes = 'synergy-stub'` for synergy-referenced products that have no fetch pipeline yet (e.g. `claude-cowork`, `claude-design`). These satisfy FK constraints without polluting the changelog corpus.
+
 ## [1.0.1] - 2026-05-22
 
 ### Changed
@@ -120,6 +164,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fetcher strategies: `gh-releases`, `rss`, `raw-changelog`.
   - SQLite + FTS5 corpus, sqlite-vec semantic search with Contextual Retrieval, `claude-synergy-mcp` MCP server exposing 8 tools over stdio.
 
+[1.1.0]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v1.1.0
 [1.0.1]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v1.0.1
 [1.0.0]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v1.0.0
 [0.7.2]: https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/v0.7.2
