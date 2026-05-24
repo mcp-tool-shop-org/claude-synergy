@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.108-7",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.108",
+    "released_at": "2026-04-14",
+    "kind_hint": "improved",
+    "change_text": "Improved error messages: server rate limits are now distinguished from plan usage limits; 5xx/529 errors show a link to status.claude.com; unknown slash commands suggest the closest match",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-108",
+    "change_id": "claude-code/2.1.108/7"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Clearer error messages for rate limits, 5xx/529s, and unknown slash commands",
+    "action_text": "Upgrade Claude Code to 2.1.108+ to get error messages that distinguish server rate limits from plan usage limits, link to `status.claude.com` on 5xx/529, and suggest the closest match for unknown slash commands. Cosmetic — same conditions trigger, now easier to diagnose.",
+    "deadline": null,
+    "tags": ["error-messages", "rate-limits", "slash-commands"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

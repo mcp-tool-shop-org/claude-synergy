@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-python-0.95.0-1",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-python",
+    "version": "0.95.0",
+    "released_at": "2026-04-14",
+    "kind_hint": "deprecated",
+    "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([0c1e773](https://github.com/anthropics/anthropic-sdk-python/commit/0c1e7736394585dd021b53c1f87383c4fae29a6b))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.95.0",
+    "change_id": "anthropic-sdk-python/0.95.0/1"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "high",
+    "subject": "Sonnet 4 and Opus 4 marked deprecated in anthropic-sdk-python",
+    "action_text": "Migrate Python SDK callers from `claude-sonnet-4-20250514` and `claude-opus-4-20250514` to `claude-sonnet-4-6` and `claude-opus-4-7`. Upstream retires both models on the Claude API 2026-06-15; calls to the retired IDs will fail after that date.",
+    "deadline": "2026-06-15",
+    "tags": ["model-retirement", "claude-sonnet-4", "claude-opus-4", "python-sdk"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,256 @@
+{
+  "batch_index": 4,
+  "count": 25,
+  "candidates": [
+    {
+      "id": "syn-claude-code-2.1.119-4",
+      "product": "claude-code",
+      "version": "2.1.119",
+      "released_at": "2026-04-23",
+      "kind_hint": "changed",
+      "change_text": "`--from-pr` now accepts GitLab merge-request, Bitbucket pull-request, and GitHub Enterprise PR URLs",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-119",
+      "change_id": "claude-code/2.1.119/4"
+    },
+    {
+      "id": "syn-claude-code-2.1.73-24",
+      "product": "claude-code",
+      "version": "2.1.73",
+      "released_at": "2026-03-11",
+      "kind_hint": "changed",
+      "change_text": "Changed default Opus model on Bedrock, Vertex, and Microsoft Foundry to Opus 4.6 (was Opus 4.1)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-73",
+      "change_id": "claude-code/2.1.73/24"
+    },
+    {
+      "id": "syn-claude-code-2.1.63-19",
+      "product": "claude-code",
+      "version": "2.1.63",
+      "released_at": "2026-02-28",
+      "kind_hint": "changed",
+      "change_text": "VSCode: Fixed remote sessions not appearing in conversation history",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-63",
+      "change_id": "claude-code/2.1.63/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.7-13",
+      "product": "claude-code",
+      "version": "2.1.7",
+      "released_at": "2026-01-14",
+      "kind_hint": "changed",
+      "change_text": "Enabled MCP tool search auto mode by default for all users. When MCP tool descriptions exceed 10% of the context window, they are automatically deferred and discovered via the MCPSearch tool instead of being loaded upfront. This reduces context usage for users with many MCP tools configured. Users can disable this by adding `MCPSearch` to `disallowedTools` in their settings.",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-7",
+      "change_id": "claude-code/2.1.7/13"
+    },
+    {
+      "id": "syn-claude-code-2.1.145-6",
+      "product": "claude-code",
+      "version": "2.1.145",
+      "released_at": "2026-05-19",
+      "kind_hint": "changed",
+      "change_text": "Slash command and @-mention suggestion list now supports mouse hover and click in fullscreen mode",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-145",
+      "change_id": "claude-code/2.1.145/6"
+    },
+    {
+      "id": "syn-claude-code-2.1.121-17",
+      "product": "claude-code",
+      "version": "2.1.121",
+      "released_at": "2026-04-28",
+      "kind_hint": "changed",
+      "change_text": "SDK: `mcp_authenticate` now supports `redirectUri` for custom scheme completion and claude.ai connectors",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-121",
+      "change_id": "claude-code/2.1.121/17"
+    },
+    {
+      "id": "syn-claude-code-2.1.27-7",
+      "product": "claude-code",
+      "version": "2.1.27",
+      "released_at": "2026-01-30",
+      "kind_hint": "changed",
+      "change_text": "Windows: Fixed bash command execution failing for users with `.bashrc` files",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-27",
+      "change_id": "claude-code/2.1.27/7"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v1.3.0-12",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v1.3.0",
+      "released_at": "2026-03-26",
+      "kind_hint": "fixed",
+      "change_text": "fix all clippy warnings across workspace ([#746](https://github.com/modelcontextprotocol/rust-sdk/pull/746))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.3.0",
+      "change_id": "mcp-rust-sdk/rmcp-v1.3.0/12"
+    },
+    {
+      "id": "syn-mcp-ruby-sdk-0.7.1-1",
+      "product": "mcp-ruby-sdk",
+      "version": "0.7.1",
+      "released_at": "2026-02-21",
+      "kind_hint": "fixed",
+      "change_text": "Fix `logging/setLevel` to return empty hash per MCP specification (#230)",
+      "source_url": "https://github.com/modelcontextprotocol/ruby-sdk/releases/tag/v0.7.1",
+      "change_id": "mcp-ruby-sdk/0.7.1/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v1.3.0-2",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v1.3.0",
+      "released_at": "2026-03-26",
+      "kind_hint": "fixed",
+      "change_text": "fix all clippy warnings across workspace ([#746](https://github.com/modelcontextprotocol/rust-sdk/pull/746))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.3.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v1.3.0/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.69-7",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.69",
+      "released_at": "2026-03-05",
+      "kind_hint": "improved",
+      "change_text": "Improved memory usage of `getSessionMessages()` for large sessions with compacted history",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.69",
+      "change_id": "claude-agent-sdk-typescript/0.2.69/7"
+    },
+    {
+      "id": "syn-anthropic-sdk-php-0.5.0-10",
+      "product": "anthropic-sdk-php",
+      "version": "0.5.0",
+      "released_at": "2026-01-30",
+      "kind_hint": "improved",
+      "change_text": "improved phpstan type annotations ([cc981bb](https://github.com/anthropics/anthropic-sdk-php/commit/cc981bb99a71dfad9ba113504c144102962348fc))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-php/releases/tag/v0.5.0",
+      "change_id": "anthropic-sdk-php/0.5.0/10"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.101-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.101",
+      "released_at": "2026-04-10",
+      "kind_hint": "fixed",
+      "change_text": "Fixed resume-session temp directory leaking on Windows when subprocess file handles weren't released before cleanup, and on macOS/APFS when `await using` disposal raced its own cleanup callback",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.101",
+      "change_id": "claude-agent-sdk-typescript/0.2.101/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.101-3",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.101",
+      "released_at": "2026-04-10",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `MaxListenersExceededWarning` when running 11+ concurrent `query()` calls",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.101",
+      "change_id": "claude-agent-sdk-typescript/0.2.101/3"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.110-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.110",
+      "released_at": "2026-04-15",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `unstable_v2_createSession` not respecting `cwd`, `settingSources`, and `allowDangerouslySkipPermissions` options",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.110",
+      "change_id": "claude-agent-sdk-typescript/0.2.110/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.94-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.94",
+      "released_at": "2026-04-07",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `getContextUsage()` to include agents passed via `options.agents` in the `agents` breakdown",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.94",
+      "change_id": "claude-agent-sdk-typescript/0.2.94/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.19-3",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.19",
+      "released_at": "2026-01-08",
+      "kind_hint": "fixed",
+      "change_text": "Fixed YAML syntax error in create-release-tag workflow (#429)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.19",
+      "change_id": "claude-agent-sdk-python/0.1.19/3"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.73-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.73",
+      "released_at": "2026-03-11",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `options.env` being overridden by the `~/.claude/settings.json` env block when not using `user` as a `settingSources` option",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.73",
+      "change_id": "claude-agent-sdk-typescript/0.2.73/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.21-4",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.21",
+      "released_at": "2026-01-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed PermissionRequest hooks not being executed in SDK mode (e.g., VS Code extension)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.21",
+      "change_id": "claude-agent-sdk-typescript/0.2.21/4"
+    },
+    {
+      "id": "syn-anthropic-sdk-csharp-Anthropic-12.1.0-5",
+      "product": "anthropic-sdk-csharp",
+      "version": "Anthropic-12.1.0",
+      "released_at": "2026-01-07",
+      "kind_hint": "fixed",
+      "change_text": "fix lint error ([d3bef74](https://github.com/anthropics/anthropic-sdk-csharp/commit/d3bef74a70da9faf737a80f6e9251a30c16f223e))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-csharp/releases/tag/Anthropic-v12.1.0",
+      "change_id": "anthropic-sdk-csharp/Anthropic-12.1.0/5"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.74-3",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.74",
+      "released_at": "2026-03-12",
+      "kind_hint": "fixed",
+      "change_text": "Fixed skills with `user-invocable: false` being included in `supportedCommands()` and the `system:init` message's `slash_commands` / `skills` lists",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.74",
+      "change_id": "claude-agent-sdk-typescript/0.2.74/3"
+    },
+    {
+      "id": "syn-cursor-3-0-7",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated the previous worktree and best-of-n selection from the Editor.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/7"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.36-1",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.36",
+      "released_at": "2026-02-13",
+      "kind_hint": "deprecated",
+      "change_text": "**Thinking configuration**: Added `ThinkingConfig` types (`ThinkingConfigAdaptive`, `ThinkingConfigEnabled`, `ThinkingConfigDisabled`) and `thinking` field to `ClaudeAgentOptions` for fine-grained control over extended thinking behavior. The new `thinking` field takes precedence over the now-deprecated `max_thinking_tokens` field (#565)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.36",
+      "change_id": "claude-agent-sdk-python/0.1.36/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.17.0-5",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.17.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "deprecated",
+      "change_text": "**client:** mark claude-3-5-haiku as deprecated ([2ed73fd](https://github.com/anthropics/anthropic-sdk-ruby/commit/2ed73fde07fa480ff55d67b47442deebb76bc1e5))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.17.0",
+      "change_id": "anthropic-sdk-ruby/1.17.0/5"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.28.0-2",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.28.0",
+      "released_at": "2026-04-03",
+      "kind_hint": "deprecated",
+      "change_text": "**client:** deprecate client-side compaction helpers ([f9dd745](https://github.com/anthropics/anthropic-sdk-ruby/commit/f9dd7457ecee0a7f6fb86dd5f2f13e742d7edb9b))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.28.0",
+      "change_id": "anthropic-sdk-ruby/1.28.0/2"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-php-0.5.0-10",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-php",
+    "version": "0.5.0",
+    "released_at": "2026-01-30",
+    "kind_hint": "improved",
+    "change_text": "improved phpstan type annotations ([cc981bb](https://github.com/anthropics/anthropic-sdk-php/commit/cc981bb99a71dfad9ba113504c144102962348fc))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-php/releases/tag/v0.5.0",
+    "change_id": "anthropic-sdk-php/0.5.0/10"
+  },
+  "output": {
+    "kind": "docs",
+    "severity": "low",
+    "subject": "Tighter phpstan type annotations in anthropic-sdk-php",
+    "action_text": "Upgrade to anthropic-sdk-php 0.5.0+ if you run `phpstan` at strict levels in CI. Type-only refinement; runtime behavior unchanged, but downstream consumers may surface new (correct) type errors.",
+    "deadline": null,
+    "tags": ["php", "phpstan", "types"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

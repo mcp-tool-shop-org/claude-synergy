@@ -1,0 +1,33 @@
+{
+  "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-18",
+  "schema_version": "1",
+  "input": {
+    "product": "github-copilot",
+    "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "released_at": "2026-05-13",
+    "kind_hint": "improved",
+    "change_text": "Improved sub-agent rendering and styling for current file context.",
+    "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/18"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Sub-agent rendering and styling polish for current-file context (Copilot)",
+    "action_text": "Skim Copilot sub-agent output if you rely on current-file context cues; upstream notes only say `sub-agent rendering and styling` improved without naming the specific surface or behavior change. No action derivable without more detail.",
+    "deadline": null,
+    "tags": ["copilot", "ui-polish", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

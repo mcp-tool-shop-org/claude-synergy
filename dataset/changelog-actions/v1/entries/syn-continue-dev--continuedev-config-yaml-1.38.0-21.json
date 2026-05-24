@@ -1,0 +1,33 @@
+{
+  "id": "syn-continue-dev--continuedev-config-yaml-1.38.0-21",
+  "schema_version": "1",
+  "input": {
+    "product": "continue-dev",
+    "version": "@continuedev/config-yaml@1.38.0",
+    "released_at": "2026-01-13",
+    "kind_hint": "changed",
+    "change_text": "Initialize usage field in createSession and startNewSession ([5c50e91](https://github.com/continuedev/continue/commit/5c50e911d203fc0a7ae6407f84bdfafd8c1f19f4))",
+    "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/config-yaml%401.38.0",
+    "change_id": "continue-dev/@continuedev/config-yaml@1.38.0/21"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "createSession/startNewSession now initialize usage field",
+    "action_text": "Upgrade `@continuedev/config-yaml` to 1.38.0+ if you read the `usage` field from `createSession` or `startNewSession`. Pre-fix returns left the field uninitialized; reads against fresh sessions could silently surface stale or missing data.",
+    "deadline": null,
+    "tags": ["config-yaml", "session", "usage-tracking"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

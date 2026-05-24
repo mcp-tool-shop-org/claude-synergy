@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.27-7",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.27",
+    "released_at": "2026-01-30",
+    "kind_hint": "changed",
+    "change_text": "Windows: Fixed bash command execution failing for users with `.bashrc` files",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-27",
+    "change_id": "claude-code/2.1.27/7"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "Windows bash execution failed when user had a .bashrc file",
+    "action_text": "Upgrade to 2.1.27+ on Windows if you have a `.bashrc` in your home directory. Pre-fix Bash tool calls failed outright for those users — full feature lost, no workaround beyond renaming the rc file.",
+    "deadline": null,
+    "tags": ["windows", "bash", "bashrc"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

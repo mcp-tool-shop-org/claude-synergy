@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-rust-sdk-rmcp-v1.3.0-12",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-rust-sdk",
+    "version": "rmcp-v1.3.0",
+    "released_at": "2026-03-26",
+    "kind_hint": "fixed",
+    "change_text": "fix all clippy warnings across workspace ([#746](https://github.com/modelcontextprotocol/rust-sdk/pull/746))",
+    "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.3.0",
+    "change_id": "mcp-rust-sdk/rmcp-v1.3.0/12"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "rmcp workspace clean of clippy warnings",
+    "action_text": "Upgrade to `rmcp` 1.3.0+ if you build with `-D warnings` or include rmcp in a strict-clippy CI. No runtime behavior change; lint-only.",
+    "deadline": null,
+    "tags": ["rust", "clippy", "lint"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

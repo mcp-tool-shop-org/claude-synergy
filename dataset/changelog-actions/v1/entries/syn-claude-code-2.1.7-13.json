@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.7-13",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.7",
+    "released_at": "2026-01-14",
+    "kind_hint": "changed",
+    "change_text": "Enabled MCP tool search auto mode by default for all users. When MCP tool descriptions exceed 10% of the context window, they are automatically deferred and discovered via the MCPSearch tool instead of being loaded upfront. This reduces context usage for users with many MCP tools configured. Users can disable this by adding `MCPSearch` to `disallowedTools` in their settings.",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-7",
+    "change_id": "claude-code/2.1.7/13"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "MCP tool search auto mode now default when MCP descriptions exceed 10% context",
+    "action_text": "Add `MCPSearch` to `disallowedTools` in settings to keep MCP tools loaded upfront. Default behavior now defers MCP tools past the 10% context threshold and surfaces them via the `MCPSearch` tool — workflows that assumed all MCP tools were always visible to the model may regress.",
+    "deadline": null,
+    "tags": ["mcp", "mcpsearch", "default-change", "context-window"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

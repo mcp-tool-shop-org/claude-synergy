@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-3-0-8",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "3-0",
+    "released_at": "2026-04-02",
+    "kind_hint": "removed",
+    "change_text": "Removed cloud agents from the Editor.",
+    "source_url": "https://cursor.com/changelog/3-0",
+    "change_id": "cursor/3-0/8"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "Cloud agents removed from the Cursor Editor",
+    "action_text": "Migrate any workflow built on `cursor` Editor cloud agents off that surface before upgrading to 3.0 — they have been removed with no in-Editor replacement named upstream. Visible-failure mode: the entry point is gone.",
+    "deadline": null,
+    "tags": ["cursor", "cloud-agents", "removal"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

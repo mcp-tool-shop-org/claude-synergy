@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.105-13",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.105",
+    "released_at": "2026-04-13",
+    "kind_hint": "improved",
+    "change_text": "Improved MCP large-output truncation prompt to give format-specific recipes (e.g. `jq` for JSON, computed Read chunk sizes for text)",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-105",
+    "change_id": "claude-code/2.1.105/13"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "MCP large-output truncation prompt now gives format-specific recipes",
+    "action_text": "Upgrade Claude Code to 2.1.105+ to get format-aware recipes (`jq` for JSON, computed `Read` chunk sizes for text) when an MCP tool returns oversize output. No config required; prompt fires automatically when truncation triggers.",
+    "deadline": null,
+    "tags": ["mcp", "truncation", "prompt"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

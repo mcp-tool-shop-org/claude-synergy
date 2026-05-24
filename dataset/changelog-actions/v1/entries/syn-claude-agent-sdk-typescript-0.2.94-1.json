@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.94-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.94",
+    "released_at": "2026-04-07",
+    "kind_hint": "fixed",
+    "change_text": "Fixed `getContextUsage()` to include agents passed via `options.agents` in the `agents` breakdown",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.94",
+    "change_id": "claude-agent-sdk-typescript/0.2.94/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "getContextUsage() now counts options.agents in the breakdown",
+    "action_text": "Upgrade to 0.2.94+ if you pass agents via `options.agents` and rely on `getContextUsage()` for budgeting. Pre-fix the `agents` breakdown undercounted, silently misleading any caller that gated work on the returned numbers.",
+    "deadline": null,
+    "tags": ["context-usage", "agents", "silent-undercount"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-3-0-6",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "3-0",
+    "released_at": "2026-04-02",
+    "kind_hint": "added",
+    "change_text": "Added a new command \\`/best-of-n\\` that runs the same task in parallel across multiple models, each in its own isolated worktree, then compares outcomes.",
+    "source_url": "https://cursor.com/changelog/3-0",
+    "change_id": "cursor/3-0/6"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "/best-of-n slash command runs the same task across multiple models",
+    "action_text": "Try `/best-of-n` in `cursor` 3.0+ when you want to A/B a task across models — it runs the same prompt in parallel, each in an isolated worktree, then compares outcomes. Opt-in; no impact on consumers who don't invoke it.",
+    "deadline": null,
+    "tags": ["cursor", "slash-command", "worktree", "best-of-n"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

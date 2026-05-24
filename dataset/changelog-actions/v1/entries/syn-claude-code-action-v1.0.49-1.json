@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-action-v1.0.49-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code-action",
+    "version": "v1.0.49",
+    "released_at": "2026-02-12",
+    "kind_hint": "deprecated",
+    "change_text": "fix: replace deprecated :* with modern * wildcard in git permissions by @Dave-London in https://github.com/anthropics/claude-code-action/pull/929",
+    "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.49",
+    "change_id": "claude-code-action/v1.0.49/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Git-permission wildcard updated from :* to * in claude-code-action",
+    "action_text": "Upgrade `claude-code-action` to v1.0.49+ to pick up the modern `*` wildcard for git permissions (replacing the deprecated `:*` form). Internal fix; no user-side workflow change required.",
+    "deadline": null,
+    "tags": ["claude-code-action", "git", "permissions"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

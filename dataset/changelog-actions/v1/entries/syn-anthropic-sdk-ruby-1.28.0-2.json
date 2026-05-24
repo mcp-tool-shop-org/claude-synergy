@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-ruby-1.28.0-2",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-ruby",
+    "version": "1.28.0",
+    "released_at": "2026-04-03",
+    "kind_hint": "deprecated",
+    "change_text": "**client:** deprecate client-side compaction helpers ([f9dd745](https://github.com/anthropics/anthropic-sdk-ruby/commit/f9dd7457ecee0a7f6fb86dd5f2f13e742d7edb9b))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.28.0",
+    "change_id": "anthropic-sdk-ruby/1.28.0/2"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "Client-side compaction helpers deprecated in anthropic-sdk-ruby",
+    "action_text": "Move client-side compaction work to server-side compaction in `anthropic-sdk-ruby` 1.28.0+. Old helpers still callable but marked deprecated; upstream notes don't name a removal version, but plan migration before it lands.",
+    "deadline": null,
+    "tags": ["ruby", "compaction", "client-side"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

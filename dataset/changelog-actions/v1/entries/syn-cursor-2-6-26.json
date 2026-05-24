@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-6-26",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-6",
+    "released_at": "2026-03-03",
+    "kind_hint": "improved",
+    "change_text": "Improved dashboard and account management with clearer visibility into overview, analytics, and collections.",
+    "source_url": "https://cursor.com/changelog/2-6",
+    "change_id": "cursor/2-6/26"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Cursor dashboard/account UI clarity pass (unspecified)",
+    "action_text": "Open the Cursor dashboard on 2-6+ to see refreshed overview, analytics, and collections views. Upstream notes don't name removed fields or moved controls — a sweep through the UI is the only way to confirm nothing you relied on shifted.",
+    "deadline": null,
+    "tags": ["cursor", "ui", "dashboard"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

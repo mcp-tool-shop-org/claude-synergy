@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.90-19",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.90",
+    "released_at": "2026-04-01",
+    "kind_hint": "removed",
+    "change_text": "Removed `Get-DnsClientCache` and `ipconfig /displaydns` from auto-allow (DNS cache privacy)",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-90",
+    "change_id": "claude-code/2.1.90/19"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "low",
+    "subject": "`Get-DnsClientCache` and `ipconfig /displaydns` no longer auto-allowed (DNS-cache privacy)",
+    "action_text": "Expect a permission prompt the first time the agent runs `Get-DnsClientCache` or `ipconfig /displaydns` in 2.1.90+; both were removed from auto-allow for DNS-cache privacy. Add explicit allow rules to settings if you intentionally want these silent.",
+    "deadline": null,
+    "tags": ["claude-code", "auto-allow", "dns", "privacy", "permissions"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

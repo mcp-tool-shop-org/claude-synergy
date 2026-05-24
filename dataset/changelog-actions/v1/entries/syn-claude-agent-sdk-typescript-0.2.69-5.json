@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.69-5",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.69",
+    "released_at": "2026-03-05",
+    "kind_hint": "breaking",
+    "change_text": "Fixed breaking change: `system:init` and `result` events now emit `'Task'` as the Agent tool name again (reverted from `'Agent'`, which was an unintentional breaking change in a patch release). The wire name will migrate to `'Agent'` in the next minor release.",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.69",
+    "change_id": "claude-agent-sdk-typescript/0.2.69/5"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "system:init + result events emit 'Task' (reverted from 'Agent')",
+    "action_text": "Update `system:init` and `result` event consumers to expect `'Task'` as the Agent tool name in 0.2.69+ — the prior patch unintentionally emitted `'Agent'`. Plan a follow-up: the wire name migrates to `'Agent'` in the next minor release.",
+    "deadline": null,
+    "tags": ["sdk", "events", "regression-recovery", "tool-name"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

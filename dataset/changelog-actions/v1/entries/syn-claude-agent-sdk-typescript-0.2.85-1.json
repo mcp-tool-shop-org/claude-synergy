@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.85-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.85",
+    "released_at": "2026-03-26",
+    "kind_hint": "added",
+    "change_text": "Added `reloadPlugins()` SDK method to reload plugins and receive refreshed commands, agents, and MCP server status",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.85",
+    "change_id": "claude-agent-sdk-typescript/0.2.85/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "reloadPlugins() SDK method",
+    "action_text": "Upgrade to `claude-agent-sdk-typescript` 0.2.85+ to call `reloadPlugins()` and pick up refreshed commands, agents, and MCP server status without tearing down the `Query`. Use after editing plugin manifests on disk so the running session sees the new surfaces.",
+    "deadline": null,
+    "tags": ["agent-sdk", "plugins", "hot-reload"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

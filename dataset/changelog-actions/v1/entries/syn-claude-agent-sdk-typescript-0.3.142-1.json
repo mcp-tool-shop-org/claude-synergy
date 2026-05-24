@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.3.142-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.3.142",
+    "released_at": "2026-05-14",
+    "kind_hint": "breaking",
+    "change_text": "**Breaking:** Removed the v2 session API (`unstable_v2_createSession`, `unstable_v2_resumeSession`, `unstable_v2_prompt`, `SDKSession`, `SDKSessionOptions`), deprecated since 0.2.133. Use `query()` — pass an `AsyncIterable<SDKUserMessage>` for multi-turn, or `options.resume` to continue a session.",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+    "change_id": "claude-agent-sdk-typescript/0.3.142/1"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "high",
+    "subject": "v2 session API (unstable_v2_*) removed; use query()",
+    "action_text": "Replace `unstable_v2_createSession` / `unstable_v2_resumeSession` / `unstable_v2_prompt` / `SDKSession` / `SDKSessionOptions` with `query()`. Pass an `AsyncIterable<SDKUserMessage>` for multi-turn, or `options.resume` to continue. Build-broken for any caller still on the v2 surface in 0.3.142+.",
+    "deadline": null,
+    "tags": ["sdk", "removal", "session-api", "query"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-api-2026-05-06-4",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-api",
+    "version": "2026-05-06",
+    "released_at": "2026-05-06",
+    "kind_hint": "changed",
+    "change_text": "Additional filtering and sorting options are now supported for Claude Managed Agents. Sessions can be filtered by status, and events can be filtered by type. Events can now be filtered by creation time.",
+    "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-6-2026",
+    "change_id": "claude-api/2026-05-06/4"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Filtering and sorting for Claude Managed Agents sessions and events",
+    "action_text": "Use the new filter params on `Claude Managed Agents` list endpoints to narrow sessions by status and events by type or creation time. Existing unfiltered list calls keep their old behavior; the filters are additive query params.",
+    "deadline": null,
+    "tags": ["api", "managed-agents", "filtering"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

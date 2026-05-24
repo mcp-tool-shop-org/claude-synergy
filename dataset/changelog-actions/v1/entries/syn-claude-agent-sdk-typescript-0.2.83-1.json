@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.83-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.83",
+    "released_at": "2026-03-25",
+    "kind_hint": "added",
+    "change_text": "Added `seed_read_state` control subtype to seed `readFileState` with `{path, mtime}` so `Edit` works after the originating `Read` was removed from context",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.83",
+    "change_id": "claude-agent-sdk-typescript/0.2.83/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "seed_read_state control subtype seeds readFileState",
+    "action_text": "Upgrade to `claude-agent-sdk-typescript` 0.2.83+ to send the new `seed_read_state` control subtype with `{path, mtime}` entries. Seeds `readFileState` so `Edit` keeps working after the originating `Read` is compacted out of context — fixes the silent \"file not read first\" error in long sessions.",
+    "deadline": null,
+    "tags": ["agent-sdk", "edit", "read-file-state", "control"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

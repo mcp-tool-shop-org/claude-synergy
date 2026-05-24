@@ -1,0 +1,33 @@
+{
+  "id": "syn-continue-dev--continuedev-config-yaml-1.40.0-41",
+  "schema_version": "1",
+  "input": {
+    "product": "continue-dev",
+    "version": "@continuedev/config-yaml@1.40.0",
+    "released_at": "2026-01-31",
+    "kind_hint": "changed",
+    "change_text": "**cli:** detect wsl and spawn appropriate shell ([a9ae420](https://github.com/continuedev/continue/commit/a9ae4205e12c7974d5b6c0feea964af9b97e1630))",
+    "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/config-yaml%401.40.0",
+    "change_id": "continue-dev/@continuedev/config-yaml@1.40.0/41"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "continue CLI detects WSL and spawns appropriate shell",
+    "action_text": "Upgrade `@continuedev/config-yaml` to 1.40.0+ if you run the `continue` CLI under WSL. Pre-fix it spawned the wrong shell on WSL hosts, breaking commands that assumed a Linux-style environment.",
+    "deadline": null,
+    "tags": ["cli", "wsl", "shell-spawn", "windows"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

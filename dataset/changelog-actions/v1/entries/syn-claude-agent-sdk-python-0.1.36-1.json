@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-python-0.1.36-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-python",
+    "version": "0.1.36",
+    "released_at": "2026-02-13",
+    "kind_hint": "deprecated",
+    "change_text": "**Thinking configuration**: Added `ThinkingConfig` types (`ThinkingConfigAdaptive`, `ThinkingConfigEnabled`, `ThinkingConfigDisabled`) and `thinking` field to `ClaudeAgentOptions` for fine-grained control over extended thinking behavior. The new `thinking` field takes precedence over the now-deprecated `max_thinking_tokens` field (#565)",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.36",
+    "change_id": "claude-agent-sdk-python/0.1.36/1"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "max_thinking_tokens deprecated in favor of ThinkingConfig",
+    "action_text": "Replace `max_thinking_tokens` with the `thinking` field on `ClaudeAgentOptions`, using `ThinkingConfigAdaptive`, `ThinkingConfigEnabled`, or `ThinkingConfigDisabled`. The new `thinking` field already takes precedence; old field still accepted but on a removal path.",
+    "deadline": null,
+    "tags": ["python", "thinking-config", "max-thinking-tokens", "options"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

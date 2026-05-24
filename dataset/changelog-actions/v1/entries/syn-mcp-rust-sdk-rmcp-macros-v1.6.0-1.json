@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-rust-sdk-rmcp-macros-v1.6.0-1",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-rust-sdk",
+    "version": "rmcp-macros-v1.6.0",
+    "released_at": "2026-05-01",
+    "kind_hint": "changed",
+    "change_text": "*(docs)* use correct Parameters<T> syntax in tool examples ([#814](https://github.com/modelcontextprotocol/rust-sdk/pull/814))",
+    "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.6.0",
+    "change_id": "mcp-rust-sdk/rmcp-macros-v1.6.0/1"
+  },
+  "output": {
+    "kind": "docs",
+    "severity": "low",
+    "subject": "rmcp-macros tool examples corrected to use Parameters<T>",
+    "action_text": "Read the updated `rmcp-macros` tool examples for the correct `Parameters<T>` syntax. Doc-only fix; runtime behavior unchanged. Older examples copy-pasted from docs may fail to compile against the documented macro shape.",
+    "deadline": null,
+    "tags": ["docs", "rmcp-macros", "rust"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

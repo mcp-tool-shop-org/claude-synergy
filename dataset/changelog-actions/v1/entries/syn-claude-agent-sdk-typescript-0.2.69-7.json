@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.69-7",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.69",
+    "released_at": "2026-03-05",
+    "kind_hint": "improved",
+    "change_text": "Improved memory usage of `getSessionMessages()` for large sessions with compacted history",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.69",
+    "change_id": "claude-agent-sdk-typescript/0.2.69/7"
+  },
+  "output": {
+    "kind": "performance",
+    "severity": "medium",
+    "subject": "getSessionMessages() memory usage reduced for compacted-history sessions",
+    "action_text": "Upgrade to 0.2.69+ if you call `getSessionMessages()` on long-running sessions with compacted history. Memory footprint is reduced; previously, loading a heavily compacted session could spike RSS enough to OOM workers on small instances.",
+    "deadline": null,
+    "tags": ["memory", "performance", "session", "compaction"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

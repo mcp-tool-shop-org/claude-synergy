@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.85.2-1",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.85.2",
+    "released_at": null,
+    "kind_hint": "added",
+    "change_text": "Added support for Grok-4 via `xai/grok-4` and `openrouter/x-ai/grok-4` model names.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.85.2/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Grok-4 support via xai/grok-4 + openrouter/x-ai/grok-4",
+    "action_text": "Pass `--model xai/grok-4` or `--model openrouter/x-ai/grok-4` to `aider` 0.85.2+ to route through Grok-4. Opt-in; existing model choices are unaffected.",
+    "deadline": null,
+    "tags": ["aider", "model-support", "grok-4", "xai", "openrouter"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

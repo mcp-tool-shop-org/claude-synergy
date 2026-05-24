@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.23-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.23",
+    "released_at": "2026-01-29",
+    "kind_hint": "added",
+    "change_text": "Added customizable spinner verbs setting (`spinnerVerbs`)",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-23",
+    "change_id": "claude-code/2.1.23/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "spinnerVerbs setting to customize spinner labels",
+    "action_text": "Add `spinnerVerbs` to settings.json with an array of strings to override the default spinner labels in Claude Code 2.1.23+. Pure cosmetic — defaults remain for users who skip the setting.",
+    "deadline": null,
+    "tags": ["claude-code", "settings", "cosmetic"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

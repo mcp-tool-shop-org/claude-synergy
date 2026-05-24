@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.144-20",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.144",
+    "released_at": "2026-05-19",
+    "kind_hint": "breaking",
+    "change_text": "Fixed MCP images with unsupported MIME types (e.g. SVG) breaking the conversation — now saved to disk and referenced in the tool result",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-144",
+    "change_id": "claude-code/2.1.144/20"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "MCP images with unsupported MIME types (e.g. SVG) no longer break the conversation",
+    "action_text": "Upgrade Claude Code to 2.1.144 if any MCP tool returns images with unsupported MIME types (SVG, etc.). Pre-fix, such returns broke the conversation; the fix saves the image to disk and references it from the tool result — recovers from a hard runtime-crash mode.",
+    "deadline": null,
+    "tags": ["mcp", "images", "mime"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

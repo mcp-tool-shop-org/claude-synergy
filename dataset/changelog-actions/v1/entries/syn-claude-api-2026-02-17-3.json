@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-api-2026-02-17-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-api",
+    "version": "2026-02-17",
+    "released_at": "2026-02-17",
+    "kind_hint": "changed",
+    "change_text": "The [web search tool](/docs/en/agents-and-tools/tool-use/web-search-tool) and [programmatic tool calling](/docs/en/agents-and-tools/tool-use/programmatic-tool-calling) are now generally available (no beta header required). Web search and web fetch now support [dynamic filtering](/docs/en/agents-and-tools/tool-use/web-search-tool#dynamic-filtering), which uses code execution to filter results before they reach the context window for better performance and reduced token cost.",
+    "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-17-2026",
+    "change_id": "claude-api/2026-02-17/3"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "web search + programmatic tool calling GA; dynamic filtering added",
+    "action_text": "Drop the beta header from `web_search` and programmatic-tool-calling requests — both are now GA. Opt into `dynamic_filtering` on web search and web fetch to cut token cost by filtering results via code execution before they enter the context window.",
+    "deadline": null,
+    "tags": ["api", "web-search", "tool-use", "ga"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

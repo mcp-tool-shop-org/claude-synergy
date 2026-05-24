@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-registry-1.7.4-1",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-registry",
+    "version": "1.7.4",
+    "released_at": "2026-04-29",
+    "kind_hint": "changed",
+    "change_text": "deploy: update prod to v1.7.3 by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1223",
+    "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.4",
+    "change_id": "mcp-registry/1.7.4/1"
+  },
+  "output": {
+    "kind": "docs",
+    "severity": "low",
+    "subject": "mcp-registry prod deployment bumped to v1.7.3",
+    "action_text": "Read PR #1223 in `mcp-registry` for the operator-facing record that prod was bumped to v1.7.3. No client-side action — this is the upstream-operated registry deployment log, not a library change consumers need to track.",
+    "deadline": null,
+    "tags": ["mcp-registry", "deploy", "operator-log"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-3-0-5",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "3-0",
+    "released_at": "2026-04-02",
+    "kind_hint": "added",
+    "change_text": "Added a new command \\`/worktree\\` that creates a separate git worktree so changes happen in isolation.",
+    "source_url": "https://cursor.com/changelog/3-0",
+    "change_id": "cursor/3-0/5"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "/worktree slash command creates an isolated git worktree",
+    "action_text": "Run `/worktree` in `cursor` 3.0+ when you want agent changes isolated in a separate git worktree rather than mixed into your active branch. Opt-in; existing workflows are unaffected.",
+    "deadline": null,
+    "tags": ["cursor", "slash-command", "worktree", "git"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

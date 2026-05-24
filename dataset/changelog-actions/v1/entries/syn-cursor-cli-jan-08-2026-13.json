@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-cli-jan-08-2026-13",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "cli-jan-08-2026",
+    "released_at": "2026-01-08",
+    "kind_hint": "changed",
+    "change_text": "\\*\\*\\`Shift+Enter\\`\\*\\* now inserts a newline instead of submitting, making it easier to write multi-line prompts.",
+    "source_url": "https://cursor.com/changelog/cli-jan-08-2026",
+    "change_id": "cursor/cli-jan-08-2026/13"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "`Shift+Enter` now inserts newline instead of submitting in cursor CLI",
+    "action_text": "Retrain muscle memory: in `cursor` CLI, `Shift+Enter` now inserts a newline; press plain `Enter` to submit. Scripts or muscle memory that relied on `Shift+Enter` to submit will silently start composing multi-line prompts instead.",
+    "deadline": null,
+    "tags": ["cli", "keybinding", "shift-enter"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

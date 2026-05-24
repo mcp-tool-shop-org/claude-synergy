@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.110-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.110",
+    "released_at": "2026-04-15",
+    "kind_hint": "fixed",
+    "change_text": "Fixed `unstable_v2_createSession` not respecting `cwd`, `settingSources`, and `allowDangerouslySkipPermissions` options",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.110",
+    "change_id": "claude-agent-sdk-typescript/0.2.110/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "unstable_v2_createSession ignored cwd, settingSources, and permission bypass options",
+    "action_text": "Upgrade to 0.2.110+ if you call `unstable_v2_createSession`. Pre-fix `cwd`, `settingSources`, and `allowDangerouslySkipPermissions` were silently ignored — sessions ran in the wrong directory, loaded the wrong settings, or refused permission bypass that the caller had explicitly requested.",
+    "deadline": null,
+    "tags": ["sdk-v2", "session", "cwd", "permissions", "silent-failure"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

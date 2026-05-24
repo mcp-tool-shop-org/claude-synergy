@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-python-0.1.52-7",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-python",
+    "version": "0.1.52",
+    "released_at": "2026-03-29",
+    "kind_hint": "changed",
+    "change_text": "Updated bundled Claude CLI to version 2.1.87",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.52",
+    "change_id": "claude-agent-sdk-python/0.1.52/7"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Bundled Claude CLI bumped to 2.1.87 inside claude-agent-sdk-python 0.1.52",
+    "action_text": "Upgrade `claude-agent-sdk-python` to 0.1.52 to pick up bundled Claude CLI 2.1.87. Release notes don't enumerate the CLI deltas — read the Claude Code 2.1.87 changelog for the actual surface changes the subprocess will exhibit.",
+    "deadline": null,
+    "tags": ["bundled-cli", "claude-code", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

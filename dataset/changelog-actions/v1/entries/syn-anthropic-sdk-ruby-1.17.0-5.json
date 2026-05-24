@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-ruby-1.17.0-5",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-ruby",
+    "version": "1.17.0",
+    "released_at": "2026-01-29",
+    "kind_hint": "deprecated",
+    "change_text": "**client:** mark claude-3-5-haiku as deprecated ([2ed73fd](https://github.com/anthropics/anthropic-sdk-ruby/commit/2ed73fde07fa480ff55d67b47442deebb76bc1e5))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.17.0",
+    "change_id": "anthropic-sdk-ruby/1.17.0/5"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "claude-3-5-haiku marked deprecated in anthropic-sdk-ruby",
+    "action_text": "Migrate `claude-3-5-haiku` callers in the Ruby SDK to a current Haiku model ID. The client now marks `claude-3-5-haiku` as deprecated; upstream notes name no removal date in this release, but plan migration before the API-side retirement lands.",
+    "deadline": null,
+    "tags": ["ruby", "claude-3-5-haiku", "model-deprecation"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

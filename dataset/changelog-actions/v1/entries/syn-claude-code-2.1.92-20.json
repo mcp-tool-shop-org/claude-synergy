@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.92-20",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.92",
+    "released_at": "2026-04-04",
+    "kind_hint": "removed",
+    "change_text": "Removed `/vim` command (toggle vim mode via `/config` → Editor mode)",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-92",
+    "change_id": "claude-code/2.1.92/20"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "low",
+    "subject": "`/vim` slash command removed; toggle via `/config` → Editor mode",
+    "action_text": "Replace `/vim` invocations with `/config` and toggle Editor mode in the settings panel. The slash command is gone in 2.1.92; update muscle memory, hooks, and any wrapper scripts that piped `/vim` into the CLI.",
+    "deadline": null,
+    "tags": ["claude-code", "slash-command", "vim-mode", "removal"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

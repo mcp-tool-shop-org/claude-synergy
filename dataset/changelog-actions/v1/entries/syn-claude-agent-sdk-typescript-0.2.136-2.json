@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.136-2",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.136",
+    "released_at": "2026-05-08",
+    "kind_hint": "deprecated",
+    "change_text": "Deprecated `TodoWrite` tool — future versions will switch to Task tools (`TaskCreate`, `TaskGet`, `TaskUpdate`, `TaskList`)",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.136",
+    "change_id": "claude-agent-sdk-typescript/0.2.136/2"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "TodoWrite tool deprecated in favor of Task tools",
+    "action_text": "Migrate `TodoWrite` callers to the new Task tools — `TaskCreate`, `TaskGet`, `TaskUpdate`, `TaskList`. Old tool still works in 0.2.136 but a future minor version will switch over; replace at your next maintenance window.",
+    "deadline": null,
+    "tags": ["tool-deprecation", "todowrite", "task-tools"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.111-13",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.111",
+    "released_at": "2026-04-16",
+    "kind_hint": "improved",
+    "change_text": "Improved `/setup-vertex` and `/setup-bedrock` to show the actual `settings.json` path when `CLAUDE_CONFIG_DIR` is set, seed model candidates from existing pins on re-run, and offer a \"with 1M context\" option for supported models",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-111",
+    "change_id": "claude-code/2.1.111/13"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "/setup-vertex + /setup-bedrock honor CLAUDE_CONFIG_DIR, seed pins, offer 1M context",
+    "action_text": "Upgrade Claude Code to 2.1.111+ to get `/setup-vertex` and `/setup-bedrock` that print the resolved `settings.json` path when `CLAUDE_CONFIG_DIR` is set, prefill model candidates from existing pins on re-run, and surface a 'with 1M context' option for supported models.",
+    "deadline": null,
+    "tags": ["slash-commands", "vertex", "bedrock", "1m-context"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-rust-sdk-rmcp-macros-v0.13.0-4",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-rust-sdk",
+    "version": "rmcp-macros-v0.13.0",
+    "released_at": "2026-01-15",
+    "kind_hint": "changed",
+    "change_text": "clarity and formatting ([#602](https://github.com/modelcontextprotocol/rust-sdk/pull/602))",
+    "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v0.13.0",
+    "change_id": "mcp-rust-sdk/rmcp-macros-v0.13.0/4"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "rmcp-macros clarity and formatting changes (unspecified)",
+    "action_text": "Upgrade `rmcp-macros` to 0.13.0+ if upstream changes affect you; release note says only 'clarity and formatting' without naming a surface. Canonical vague-release-note — no targeted adjustment derivable.",
+    "deadline": null,
+    "tags": ["rmcp-macros", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

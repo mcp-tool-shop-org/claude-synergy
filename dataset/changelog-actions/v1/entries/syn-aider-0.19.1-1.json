@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.19.1-1",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.19.1",
+    "released_at": null,
+    "kind_hint": "removed",
+    "change_text": "Removed stray debug output.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.19.1/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Stray debug output removed from aider",
+    "action_text": "Upgrade `aider` to 0.19.1+ to silence stray debug output in normal runs. Cosmetic; if you scraped logs expecting that output to be present, adjust your parser.",
+    "deadline": null,
+    "tags": ["aider", "logging", "cleanup"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

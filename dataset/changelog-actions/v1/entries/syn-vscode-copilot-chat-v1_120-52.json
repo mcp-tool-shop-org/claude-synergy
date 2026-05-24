@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_120-52",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_120",
+    "released_at": "2026-12-15",
+    "kind_hint": "changed",
+    "change_text": "@EhabY (Ehab Younes) (https://github.com/EhabY): Detect dead connections via keepalive timeout PR #310131 (https://github.com/microsoft/vscode/pull/310131)",
+    "source_url": "https://code.visualstudio.com/updates/v1_120",
+    "change_id": "vscode-copilot-chat/v1_120/52"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Dead-connection detection via keepalive timeout (PR #310131)",
+    "action_text": "Upgrade VS Code to v1_120+ to benefit from keepalive-timeout detection of dead connections. The runtime change is internal; no user config or surface change required.",
+    "deadline": null,
+    "tags": ["vscode", "networking", "keepalive"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

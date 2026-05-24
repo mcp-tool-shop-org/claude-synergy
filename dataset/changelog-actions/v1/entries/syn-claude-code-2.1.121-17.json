@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.121-17",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.121",
+    "released_at": "2026-04-28",
+    "kind_hint": "changed",
+    "change_text": "SDK: `mcp_authenticate` now supports `redirectUri` for custom scheme completion and claude.ai connectors",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-121",
+    "change_id": "claude-code/2.1.121/17"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "mcp_authenticate now accepts redirectUri for custom schemes",
+    "action_text": "Pass `redirectUri` to `mcp_authenticate` when building a custom-scheme OAuth callback or a claude.ai connector. Lets desktop apps complete OAuth via `myapp://callback` style URIs instead of localhost-only flows.",
+    "deadline": null,
+    "tags": ["sdk", "mcp-authenticate", "oauth", "connectors"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-05-16-bug-fixes-and-improvements-1",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-05-16-bug-fixes-and-improvements",
+    "released_at": "2026-05-16",
+    "kind_hint": "fixed",
+    "change_text": "Fixed availability issues with swe-check model for some users.",
+    "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+    "change_id": "windsurf/2026-05-16-bug-fixes-and-improvements/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "`swe-check` model availability fix in Windsurf",
+    "action_text": "Update Windsurf if the `swe-check` model has been intermittently unavailable for your account. Pre-fix some users could not reach the model at all; upstream notes don't specify the trigger.",
+    "deadline": null,
+    "tags": ["swe-check", "model-availability"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

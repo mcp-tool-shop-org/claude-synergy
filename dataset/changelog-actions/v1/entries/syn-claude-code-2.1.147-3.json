@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.147-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.147",
+    "released_at": "2026-05-21",
+    "kind_hint": "renamed",
+    "change_text": "Renamed `/simplify` to `/code-review`. It now reports correctness bugs at a chosen effort level (e.g., `/code-review high`); pass `--comment` to post findings as inline GitHub PR comments. The old cleanup-and-fix behavior has been removed",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-147",
+    "change_id": "claude-code/2.1.147/3"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "`/simplify` replaced by `/code-review` with new semantics (cleanup-and-fix removed)",
+    "action_text": "Replace `/simplify` with `/code-review` and accept the new effort suffix (`/code-review high`). The old cleanup-and-fix behavior is gone in 2.1.147; the new command reports correctness bugs and posts inline GitHub PR comments when you pass `--comment`.",
+    "deadline": null,
+    "tags": ["claude-code", "slash-command", "rename", "behavior-change", "pr-review"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

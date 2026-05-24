@@ -1,0 +1,33 @@
+{
+  "id": "syn-continue-dev--continuedev-openai-adapters-1.37.0-9",
+  "schema_version": "1",
+  "input": {
+    "product": "continue-dev",
+    "version": "@continuedev/openai-adapters@1.37.0",
+    "released_at": "2026-01-14",
+    "kind_hint": "changed",
+    "change_text": "don't fallback to relative path if not markdown file ([d93b432](https://github.com/continuedev/continue/commit/d93b4321a550acf7151949d1fee1c436945e2ee0))",
+    "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/openai-adapters%401.37.0",
+    "change_id": "continue-dev/@continuedev/openai-adapters@1.37.0/9"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "openai-adapters no longer falls back to relative path for non-markdown files",
+    "action_text": "Upgrade `@continuedev/openai-adapters` to 1.37.0+ if you pass non-markdown file paths through the adapter. Pre-fix non-markdown inputs silently fell back to a relative path resolution that could produce wrong-file reads.",
+    "deadline": null,
+    "tags": ["openai-adapters", "path-resolution", "markdown"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

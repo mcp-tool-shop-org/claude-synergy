@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.69-10",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.69",
+    "released_at": "2026-03-05",
+    "kind_hint": "added",
+    "change_text": "Added `/reload-plugins` command to activate pending plugin changes without restarting",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-69",
+    "change_id": "claude-code/2.1.69/10"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "/reload-plugins slash command (no restart needed)",
+    "action_text": "Run `/reload-plugins` in Claude Code 2.1.69+ to activate pending plugin changes without restarting the session. Useful during plugin development; non-plugin users are unaffected.",
+    "deadline": null,
+    "tags": ["claude-code", "slash-command", "plugins", "dx"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

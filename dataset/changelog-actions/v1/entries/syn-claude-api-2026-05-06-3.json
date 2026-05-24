@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-api-2026-05-06-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-api",
+    "version": "2026-05-06",
+    "released_at": "2026-05-06",
+    "kind_hint": "changed",
+    "change_text": "Webhooks for Claude Managed Agents are now supported. Webhook event types include session and vault lifecycle events. See [Subscribe to webhooks](/docs/en/managed-agents/webhooks).",
+    "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-6-2026",
+    "change_id": "claude-api/2026-05-06/3"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Webhooks for Claude Managed Agents",
+    "action_text": "Subscribe to `Claude Managed Agents` webhooks to receive session and vault lifecycle events instead of polling. See the 'Subscribe to webhooks' doc for the available event types and registration flow; opt-in only.",
+    "deadline": null,
+    "tags": ["api", "managed-agents", "webhooks"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.48.1-1",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.48.1",
+    "released_at": null,
+    "kind_hint": "added",
+    "change_text": "Added `openai/gpt-4o-2024-08-06`.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.48.1/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "openai/gpt-4o-2024-08-06 model added to aider",
+    "action_text": "Pass `--model openai/gpt-4o-2024-08-06` to aider 0.48.1+ to use the new model. Existing model selections are unaffected; this is an additive entry to the model registry.",
+    "deadline": null,
+    "tags": ["aider", "model", "openai"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

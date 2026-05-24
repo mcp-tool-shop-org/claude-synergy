@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.80.1-2",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.80.1",
+    "released_at": null,
+    "kind_hint": "removed",
+    "change_text": "Removed redundant dependency check during OpenRouter OAuth flow, by Claudia Pellegrino.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.80.1/2"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Redundant dependency check removed from OpenRouter OAuth flow",
+    "action_text": "Upgrade `aider` to 0.80.1+ if you authenticate with OpenRouter via OAuth — a redundant dependency check has been removed from the flow. No caller-side action required; internal cleanup only.",
+    "deadline": null,
+    "tags": ["aider", "openrouter", "oauth", "internal"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

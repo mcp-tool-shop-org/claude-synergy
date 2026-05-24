@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-cli-feb-18-2026-34",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "cli-feb-18-2026",
+    "released_at": "2026-02-18",
+    "kind_hint": "fixed",
+    "change_text": "Fixed \\`resume\\` in non-git workspaces.",
+    "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+    "change_id": "cursor/cli-feb-18-2026/34"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "`resume` works in non-git workspaces",
+    "action_text": "Update `cursor` CLI to call `resume` from directories that aren't git repos. Pre-fix the command required a git workspace and failed otherwise; no `.git` initialization is needed after this version.",
+    "deadline": null,
+    "tags": ["cli", "resume", "non-git", "workspace"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

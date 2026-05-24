@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-3-0-21",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "3-0",
+    "released_at": "2026-04-02",
+    "kind_hint": "added",
+    "change_text": "Added a \"scroll to bottom\" button in the agent panel that appears when content overflows.",
+    "source_url": "https://cursor.com/changelog/3-0",
+    "change_id": "cursor/3-0/21"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "'Scroll to bottom' button in Cursor agent panel",
+    "action_text": "Click the `scroll to bottom` button that appears in the agent panel when content overflows. Cosmetic ergonomic addition; manual scrolling still works as before.",
+    "deadline": null,
+    "tags": ["cursor", "ui"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

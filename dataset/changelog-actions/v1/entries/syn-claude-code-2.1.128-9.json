@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.128-9",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.128",
+    "released_at": "2026-05-04",
+    "kind_hint": "changed",
+    "change_text": "SDK hosts now receive a persistent `localSettings` suggestion for Bash permission prompts, so \"Always allow\" writes to `.claude/settings.local.json`",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-128",
+    "change_id": "claude-code/2.1.128/9"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "medium",
+    "subject": "SDK hosts get localSettings suggestion for Bash 'Always allow'",
+    "action_text": "Upgrade Claude Code to 2.1.128+ if your SDK host shows Bash permission prompts. 'Always allow' now writes to `.claude/settings.local.json` via the new persistent `localSettings` suggestion, so the grant survives across sessions instead of resetting.",
+    "deadline": null,
+    "tags": ["sdk", "permissions", "settings-local"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

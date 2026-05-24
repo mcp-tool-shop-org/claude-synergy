@@ -1,0 +1,33 @@
+{
+  "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-39",
+  "schema_version": "1",
+  "input": {
+    "product": "github-copilot",
+    "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "released_at": "2026-05-13",
+    "kind_hint": "deprecated",
+    "change_text": "Deprecation (#deprecation)",
+    "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/39"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "GitHub Copilot 2026-05-13 release — `#deprecation` section anchor only, no item body",
+    "action_text": "Read the 2026-05-13 GitHub Copilot changelog at `source_url` directly; this entry is a `#deprecation` section anchor with no item body. Open the page to see what was deprecated — specifics are not in this row.",
+    "deadline": null,
+    "tags": ["github-copilot", "release-notes-vague", "section-anchor"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

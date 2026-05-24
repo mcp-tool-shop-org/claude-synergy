@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.85-2",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.85",
+    "released_at": "2026-03-26",
+    "kind_hint": "added",
+    "change_text": "Added conditional `if` field for hooks using permission rule syntax (e.g., `Bash(git *)`) to filter when they run, reducing process spawning overhead",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-85",
+    "change_id": "claude-code/2.1.85/2"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Conditional `if` field on hooks (permission rule syntax)",
+    "action_text": "Add an `if` field to hook entries in settings.json using permission-rule syntax (e.g., `Bash(git *)`) to gate when they run in Claude Code 2.1.85+. Cuts process-spawn overhead for hooks that only care about a subset of tool calls; existing unconditional hooks unchanged.",
+    "deadline": null,
+    "tags": ["claude-code", "hooks", "performance", "settings"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

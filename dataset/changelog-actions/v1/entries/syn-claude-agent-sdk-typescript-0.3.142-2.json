@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.3.142-2",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.3.142",
+    "released_at": "2026-05-14",
+    "kind_hint": "breaking",
+    "change_text": "**Breaking:** MCP servers now connect in the background by default; sessions start immediately and slow servers report `status: \"pending\"` in `init` until ready. Set `MCP_CONNECTION_NONBLOCKING=0` to restore the old behavior of waiting up to 5s before the first query, or mark a server `alwaysLoad: true` to require it in turn 1.",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+    "change_id": "claude-agent-sdk-typescript/0.3.142/2"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "high",
+    "subject": "MCP servers connect non-blocking by default; init may report pending",
+    "action_text": "Audit MCP server consumers in 0.3.142+ — sessions now start before slow servers finish connecting, and `init` reports `status: \"pending\"`. Set `MCP_CONNECTION_NONBLOCKING=0` to restore the up-to-5s blocking wait, or mark must-have servers `alwaysLoad: true` to require them in turn 1. Silent-failure risk if turn-1 logic assumes all servers are ready.",
+    "deadline": null,
+    "tags": ["sdk", "mcp", "env-var", "non-blocking", "silent-failure"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

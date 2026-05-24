@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.147-5",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.147",
+    "released_at": "2026-05-21",
+    "kind_hint": "improved",
+    "change_text": "Improved auto-updater: retries transient network failures, reports specific error categories and OS error codes on failure, and shows the current version when an update fails",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-147",
+    "change_id": "claude-code/2.1.147/5"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Auto-updater retries transient failures and reports error categories + OS codes",
+    "action_text": "Upgrade Claude Code to 2.1.147+ to get an auto-updater that retries transient network failures, reports specific error categories and OS error codes on failure, and shows the current version when an update fails. Behavior change only on failure paths — successful updates are unchanged.",
+    "deadline": null,
+    "tags": ["auto-updater", "error-messages", "retry"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_108-29",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_108",
+    "released_at": "2026-01-08",
+    "kind_hint": "improved",
+    "change_text": "Improved completions for `npm` and `git`",
+    "source_url": "https://code.visualstudio.com/updates/v1_108",
+    "change_id": "vscode-copilot-chat/v1_108/29"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "improved completions for npm and git CLIs",
+    "action_text": "Update VS Code to v1.108+ to pick up improved Copilot Chat completions for `npm` and `git` commands. No configuration change required; the upgraded suggestions surface automatically wherever you invoke completions on those CLIs.",
+    "deadline": null,
+    "tags": ["vscode", "completions", "npm", "git"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

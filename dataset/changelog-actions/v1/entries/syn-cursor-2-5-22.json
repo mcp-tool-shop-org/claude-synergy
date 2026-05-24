@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-5-22",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-5",
+    "released_at": "2026-02-17",
+    "kind_hint": "fixed",
+    "change_text": "Fixed an auto-run mode switching bug.",
+    "source_url": "https://cursor.com/changelog/2-5",
+    "change_id": "cursor/2-5/22"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Auto-run mode switching bug (unspecified)",
+    "action_text": "Upgrade `cursor` to 2.5+ if you've hit issues switching auto-run mode; upstream notes don't specify symptoms or trigger. Re-verify your auto-run workflow after upgrade.",
+    "deadline": null,
+    "tags": ["cursor", "auto-run", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

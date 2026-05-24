@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.97-20",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.97",
+    "released_at": "2026-04-08",
+    "kind_hint": "fixed",
+    "change_text": "Fixed prompt-type `Stop`/`SubagentStop` hooks failing on long sessions, and hook evaluator API errors displaying \"JSON validation failed\" instead of the actual message",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+    "change_id": "claude-code/2.1.97/20"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Stop/SubagentStop hooks failed on long sessions; hook errors hidden behind generic JSON message",
+    "action_text": "Upgrade to `claude-code` 2.1.97+ to keep prompt-type `Stop` and `SubagentStop` hooks running on long sessions and surface the real hook-evaluator error instead of the generic \"JSON validation failed\". Re-test any custom Stop hooks you have wired before relying on them on multi-hour sessions.",
+    "deadline": null,
+    "tags": ["claude-code", "hooks", "stop", "subagent-stop"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-apps-2026-04-09-claude-cowork-3",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-apps",
+    "version": "2026-04-09-claude-cowork",
+    "released_at": "2026-04-09",
+    "kind_hint": "changed",
+    "change_text": "Claude Cowork OpenTelemetry support. For more information, see Monitor Claude Cowork activity with OpenTelemetry.",
+    "source_url": "https://support.claude.com/en/articles/12138966-release-notes",
+    "change_id": "anthropic-apps/2026-04-09-claude-cowork/3"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Claude Cowork OpenTelemetry export support",
+    "action_text": "Wire `Claude Cowork` activity into your OTel collector to monitor session usage and tool calls alongside existing telemetry. See the upstream 'Monitor Claude Cowork activity with OpenTelemetry' doc for the exporter setup; opt-in only.",
+    "deadline": null,
+    "tags": ["cowork", "opentelemetry", "observability"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-ruby-1.24.0-2",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-ruby",
+    "version": "1.24.0",
+    "released_at": "2026-03-16",
+    "kind_hint": "changed",
+    "change_text": "**api:** GA thinking-display-setting ([227f58a](https://github.com/anthropics/anthropic-sdk-ruby/commit/227f58acb9944be56d21ea9fe46af8b5d9e1c891))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.24.0",
+    "change_id": "anthropic-sdk-ruby/1.24.0/2"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "thinking-display-setting promoted to GA in anthropic-sdk-ruby",
+    "action_text": "Drop any `thinking-display-setting` beta gating in `anthropic-sdk-ruby` 1.24.0+ — the setting is now GA. Opt-in surface only; existing callers that did not pass it continue unchanged.",
+    "deadline": null,
+    "tags": ["ga", "thinking", "display"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

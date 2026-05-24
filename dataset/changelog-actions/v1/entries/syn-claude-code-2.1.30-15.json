@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.30-15",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.30",
+    "released_at": "2026-02-03",
+    "kind_hint": "improved",
+    "change_text": "Improved memory usage for `--resume` (68% reduction for users with many sessions) by replacing the session index with lightweight stat-based loading and progressive enrichment",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-30",
+    "change_id": "claude-code/2.1.30/15"
+  },
+  "output": {
+    "kind": "performance",
+    "severity": "medium",
+    "subject": "--resume memory usage cut 68% via stat-based loading",
+    "action_text": "Upgrade Claude Code to 2.1.30+ if you maintain many resumable sessions and have been hitting `--resume` memory pressure. The full session index is replaced with stat-based loading + progressive enrichment, cutting RSS ~68% on heavy-session users. No flag required.",
+    "deadline": null,
+    "tags": ["resume", "memory", "performance"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

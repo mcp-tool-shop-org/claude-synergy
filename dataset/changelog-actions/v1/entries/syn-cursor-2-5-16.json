@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-5-16",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-5",
+    "released_at": "2026-02-17",
+    "kind_hint": "removed",
+    "change_text": "Removed Auto-Accept on Commit setting so pending diffs are automatically accepted when you commit.",
+    "source_url": "https://cursor.com/changelog/2-5",
+    "change_id": "cursor/2-5/16"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "'Auto-Accept on Commit' setting removed in Cursor 2.5",
+    "action_text": "Remove `Auto-Accept on Commit` from `cursor` settings assumptions in 2.5+ — the toggle is gone and pending diffs are now always auto-accepted at commit time. Review pending diffs before `git commit` if you relied on the toggle to gate them.",
+    "deadline": null,
+    "tags": ["cursor", "auto-accept", "removal", "commit"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

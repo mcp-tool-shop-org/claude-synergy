@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-3-4-9",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "3-4",
+    "released_at": "2026-05-13",
+    "kind_hint": "removed",
+    "change_text": "Removed noisy in-app terminal notifications and improved shortcut behavior.",
+    "source_url": "https://cursor.com/changelog/3-4",
+    "change_id": "cursor/3-4/9"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "In-app terminal notification noise reduced + shortcut behavior",
+    "action_text": "Upgrade `cursor` to 3.4+ to drop noisy in-app terminal notifications and pick up shortcut-behavior tweaks. Cosmetic change; no surface name removed and no user action required.",
+    "deadline": null,
+    "tags": ["cursor", "terminal", "notifications", "shortcuts"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

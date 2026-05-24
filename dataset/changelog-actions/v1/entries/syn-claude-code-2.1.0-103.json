@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.0-103",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.0",
+    "released_at": "2026-01-07",
+    "kind_hint": "removed",
+    "change_text": "Removed underline styling from image reference links",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-0",
+    "change_id": "claude-code/2.1.0/103"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Image reference links no longer rendered with underline styling",
+    "action_text": "Upgrade to claude-code 2.1.0+ to drop the underline styling from image reference links in rendered output. Cosmetic terminal-rendering fix; behavior of the links themselves is unchanged.",
+    "deadline": null,
+    "tags": ["claude-code", "rendering", "cosmetic"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.48.1-5",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.48.1",
+    "released_at": null,
+    "kind_hint": "removed",
+    "change_text": "Removed obsolete 16k token limit on commit diffs, use per-model limits.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.48.1/5"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "16k commit-diff token cap removed; per-model limits apply",
+    "action_text": "Upgrade `aider` to 0.48.1+ if you generate large commit diffs — the obsolete 16k token cap is gone and per-model limits now govern. Re-run any commit-diff workflow truncated by the old cap.",
+    "deadline": null,
+    "tags": ["aider", "commit-diff", "token-limit"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

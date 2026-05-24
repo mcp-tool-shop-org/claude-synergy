@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-3-0-30",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "3-0",
+    "released_at": "2026-04-02",
+    "kind_hint": "fixed",
+    "change_text": "Fixed a bug where expanding/collapsing thinking blocks didn't work while streaming was still in progress.",
+    "source_url": "https://cursor.com/changelog/3-0",
+    "change_id": "cursor/3-0/30"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "expand/collapse thinking blocks works during stream",
+    "action_text": "Update Cursor to expand and collapse `thinking` blocks while streaming is still in progress. Pre-fix the toggle was a no-op until the stream completed; no setting change needed.",
+    "deadline": null,
+    "tags": ["thinking-blocks", "streaming", "ui"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

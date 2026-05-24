@@ -1,0 +1,256 @@
+{
+  "batch_index": 9,
+  "count": 25,
+  "candidates": [
+    {
+      "id": "syn-cursor-3-4-17",
+      "product": "cursor",
+      "version": "3-4",
+      "released_at": "2026-05-13",
+      "kind_hint": "fixed",
+      "change_text": "Fixed keyboard shortcuts bugs in modals, vim/emacs caret style leakage, and other key handling.",
+      "source_url": "https://cursor.com/changelog/3-4",
+      "change_id": "cursor/3-4/17"
+    },
+    {
+      "id": "syn-aider-0.72.1-1",
+      "product": "aider",
+      "version": "0.72.1",
+      "released_at": null,
+      "kind_hint": "fixed",
+      "change_text": "Fix model metadata for `openrouter/deepseek/deepseek-r1`",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.72.1/1"
+    },
+    {
+      "id": "syn-aider-0.85.2-5",
+      "product": "aider",
+      "version": "0.85.2",
+      "released_at": null,
+      "kind_hint": "fixed",
+      "change_text": "Fixed an issue where new settings for an existing model didn't replace the old ones, by Andrew Grigorev.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.85.2/5"
+    },
+    {
+      "id": "syn-cursor-2-4-41",
+      "product": "cursor",
+      "version": "2-4",
+      "released_at": "2026-01-22",
+      "kind_hint": "fixed",
+      "change_text": "Fixed some cases of input lag when handling rapid text changes in CLI.",
+      "source_url": "https://cursor.com/changelog/2-4",
+      "change_id": "cursor/2-4/41"
+    },
+    {
+      "id": "syn-cursor-2-5-22",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "fixed",
+      "change_text": "Fixed an auto-run mode switching bug.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/22"
+    },
+    {
+      "id": "syn-cursor-2-4-40",
+      "product": "cursor",
+      "version": "2-4",
+      "released_at": "2026-01-22",
+      "kind_hint": "fixed",
+      "change_text": "Fixed the accept/reject diff UI sometimes not appearing when edits were made to dotfiles.",
+      "source_url": "https://cursor.com/changelog/2-4",
+      "change_id": "cursor/2-4/40"
+    },
+    {
+      "id": "syn-cursor-2-6-23",
+      "product": "cursor",
+      "version": "2-6",
+      "released_at": "2026-03-03",
+      "kind_hint": "fixed",
+      "change_text": "Fixed team permission and access control inconsistencies across organization setups.",
+      "source_url": "https://cursor.com/changelog/2-6",
+      "change_id": "cursor/2-6/23"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.3.142-3",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.3.142",
+      "released_at": "2026-05-14",
+      "kind_hint": "breaking",
+      "change_text": "**Breaking:** Headless and SDK sessions now use Task tools (`TaskCreate` / `TaskUpdate` / `TaskGet` / `TaskList`) instead of `TodoWrite`, deprecated since 0.2.136. Tool consumers should accumulate by task ID instead of replacing a snapshot list.",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+      "change_id": "claude-agent-sdk-typescript/0.3.142/3"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.3.142-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.3.142",
+      "released_at": "2026-05-14",
+      "kind_hint": "breaking",
+      "change_text": "**Breaking:** MCP servers now connect in the background by default; sessions start immediately and slow servers report `status: \"pending\"` in `init` until ready. Set `MCP_CONNECTION_NONBLOCKING=0` to restore the old behavior of waiting up to 5s before the first query, or mark a server `alwaysLoad: true` to require it in turn 1.",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+      "change_id": "claude-agent-sdk-typescript/0.3.142/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.69-5",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.69",
+      "released_at": "2026-03-05",
+      "kind_hint": "breaking",
+      "change_text": "Fixed breaking change: `system:init` and `result` events now emit `'Task'` as the Agent tool name again (reverted from `'Agent'`, which was an unintentional breaking change in a patch release). The wire name will migrate to `'Agent'` in the next minor release.",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.69",
+      "change_id": "claude-agent-sdk-typescript/0.2.69/5"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.70-2",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.70",
+      "released_at": "2026-04-28",
+      "kind_hint": "breaking",
+      "change_text": "**Trio nursery corruption on early cancellation**: Fixed `RuntimeError: Nursery stack corrupted` when breaking out of `query()` iteration inside a trio nursery with `options.stderr` set. The stderr reader now uses `spawn_detached()` instead of manually managing a task group, matching the approach already used for the read loop (#885)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.70",
+      "change_id": "claude-agent-sdk-python/0.1.70/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.77.0-6",
+      "product": "anthropic-sdk-python",
+      "version": "0.77.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "breaking",
+      "change_text": "remove class causing breaking change ([#1333](https://github.com/anthropics/anthropic-sdk-python/issues/1333)) ([81ee953](https://github.com/anthropics/anthropic-sdk-python/commit/81ee9533d14f9dc3753a4a1320ea744825b17e92))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.77.0",
+      "change_id": "anthropic-sdk-python/0.77.0/6"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.3.142-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.3.142",
+      "released_at": "2026-05-14",
+      "kind_hint": "breaking",
+      "change_text": "**Breaking:** Removed the v2 session API (`unstable_v2_createSession`, `unstable_v2_resumeSession`, `unstable_v2_prompt`, `SDKSession`, `SDKSessionOptions`), deprecated since 0.2.133. Use `query()` — pass an `AsyncIterable<SDKUserMessage>` for multi-turn, or `options.resume` to continue a session.",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+      "change_id": "claude-agent-sdk-typescript/0.3.142/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-typescript-0.72.0-3",
+      "product": "anthropic-sdk-typescript",
+      "version": "0.72.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "breaking",
+      "change_text": "**ci:** add breaking change detection workflow ([b181568](https://github.com/anthropics/anthropic-sdk-typescript/commit/b181568601537957f91f7123420d8d0f4625c2b7))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/sdk-v0.72.0",
+      "change_id": "anthropic-sdk-typescript/0.72.0/3"
+    },
+    {
+      "id": "syn-cursor-3-0-8",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "removed",
+      "change_text": "Removed cloud agents from the Editor.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/8"
+    },
+    {
+      "id": "syn-cursor-3-4-9",
+      "product": "cursor",
+      "version": "3-4",
+      "released_at": "2026-05-13",
+      "kind_hint": "removed",
+      "change_text": "Removed noisy in-app terminal notifications and improved shortcut behavior.",
+      "source_url": "https://cursor.com/changelog/3-4",
+      "change_id": "cursor/3-4/9"
+    },
+    {
+      "id": "syn-aider-0.48.1-5",
+      "product": "aider",
+      "version": "0.48.1",
+      "released_at": null,
+      "kind_hint": "removed",
+      "change_text": "Removed obsolete 16k token limit on commit diffs, use per-model limits.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.48.1/5"
+    },
+    {
+      "id": "syn-cursor-2-5-15",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "removed",
+      "change_text": "Removed Default Mode setting so each new agent conversation begins fresh.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/15"
+    },
+    {
+      "id": "syn-aider-0.80.1-2",
+      "product": "aider",
+      "version": "0.80.1",
+      "released_at": null,
+      "kind_hint": "removed",
+      "change_text": "Removed redundant dependency check during OpenRouter OAuth flow, by Claudia Pellegrino.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.80.1/2"
+    },
+    {
+      "id": "syn-aider-0.19.1-1",
+      "product": "aider",
+      "version": "0.19.1",
+      "released_at": null,
+      "kind_hint": "removed",
+      "change_text": "Removed stray debug output.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.19.1/1"
+    },
+    {
+      "id": "syn-cursor-2-5-14",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "removed",
+      "change_text": "Removed the Dotfile Protection setting to remove unexpected approval prompts when the agent tried to edit dotfiles.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/14"
+    },
+    {
+      "id": "syn-cursor-2-5-16",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "removed",
+      "change_text": "Removed Auto-Accept on Commit setting so pending diffs are automatically accepted when you commit.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/16"
+    },
+    {
+      "id": "syn-cursor-3-0-6",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "added",
+      "change_text": "Added a new command \\`/best-of-n\\` that runs the same task in parallel across multiple models, each in its own isolated worktree, then compares outcomes.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/6"
+    },
+    {
+      "id": "syn-aider-0.85.2-1",
+      "product": "aider",
+      "version": "0.85.2",
+      "released_at": null,
+      "kind_hint": "added",
+      "change_text": "Added support for Grok-4 via `xai/grok-4` and `openrouter/x-ai/grok-4` model names.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.85.2/1"
+    },
+    {
+      "id": "syn-cursor-3-0-5",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "added",
+      "change_text": "Added a new command \\`/worktree\\` that creates a separate git worktree so changes happen in isolation.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/5"
+    }
+  ]
+}

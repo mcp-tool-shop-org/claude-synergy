@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.140-9",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.140",
+    "released_at": "2026-05-12",
+    "kind_hint": "fixed",
+    "change_text": "Fixed `/loop` scheduling redundant wakeups to poll for background tasks that already notify on completion",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-140",
+    "change_id": "claude-code/2.1.140/9"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "/loop scheduled redundant wakeups for self-notifying background tasks",
+    "action_text": "Upgrade to `claude-code` 2.1.140+ to drop the redundant `/loop` wakeups that polled background tasks already wired to notify on completion. Cuts wasted scheduler activity in long-running loops; no behavior change for callers.",
+    "deadline": null,
+    "tags": ["claude-code", "loop", "scheduler"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

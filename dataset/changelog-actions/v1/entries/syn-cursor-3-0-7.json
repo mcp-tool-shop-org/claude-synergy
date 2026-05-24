@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-3-0-7",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "3-0",
+    "released_at": "2026-04-02",
+    "kind_hint": "deprecated",
+    "change_text": "Deprecated the previous worktree and best-of-n selection from the Editor.",
+    "source_url": "https://cursor.com/changelog/3-0",
+    "change_id": "cursor/3-0/7"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "Editor's previous worktree and best-of-n selection deprecated in Cursor 3.0",
+    "action_text": "Migrate any Editor workflows depending on the previous worktree picker or best-of-n result selection in Cursor 3.0. Upstream notes name no replacement and no removal deadline; treat as on a path to removal and plan an alternative now.",
+    "deadline": null,
+    "tags": ["cursor", "editor", "worktree", "best-of-n"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

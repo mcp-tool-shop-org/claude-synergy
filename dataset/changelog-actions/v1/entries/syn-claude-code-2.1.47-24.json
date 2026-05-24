@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.47-24",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.47",
+    "released_at": "2026-02-18",
+    "kind_hint": "breaking",
+    "change_text": "Fixed an issue where bash commands with backslash-newline continuation lines (e.g., long commands split across multiple lines with `\\`) would produce spurious empty arguments, potentially breaking command execution.",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-47",
+    "change_id": "claude-code/2.1.47/24"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "Bash backslash-newline continuations no longer produce spurious empty arguments",
+    "action_text": "Upgrade Claude Code to 2.1.47 if you run multi-line bash commands joined with `\\`. Pre-fix, continuation lines emitted spurious empty arguments — silent argv corruption that could change command meaning without raising a visible error.",
+    "deadline": null,
+    "tags": ["bash", "argv", "silent-failure"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

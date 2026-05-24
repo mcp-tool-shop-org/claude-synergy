@@ -1,0 +1,33 @@
+{
+  "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-17",
+  "schema_version": "1",
+  "input": {
+    "product": "github-copilot",
+    "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "released_at": "2026-05-13",
+    "kind_hint": "added",
+    "change_text": "Added confirmation when starting a new command to cancel the active one.",
+    "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/17"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Copilot CLI now confirms before cancelling the active command",
+    "action_text": "Expect a confirmation prompt before a new command interrupts the active one in the GitHub Copilot CLI agent (2026-05-13 release). Adjust scripted workflows that fired back-to-back commands assuming silent preemption; you now need to accept the cancel explicitly.",
+    "deadline": null,
+    "tags": ["github-copilot", "cli-agent", "confirmation", "ux"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

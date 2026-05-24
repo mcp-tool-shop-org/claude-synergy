@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-java-2.15.0-2",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-java",
+    "version": "2.15.0",
+    "released_at": "2026-02-19",
+    "kind_hint": "deprecated",
+    "change_text": "**api:** Deprecate haiku-3 ([a04dca8](https://github.com/anthropics/anthropic-sdk-java/commit/a04dca8b80e54b8452f17c325bae0cd56e238346))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-java/releases/tag/v2.15.0",
+    "change_id": "anthropic-sdk-java/2.15.0/2"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "low",
+    "subject": "Claude Haiku 3 marked deprecated in anthropic-sdk-java",
+    "action_text": "Audit Java SDK callers for `claude-3-haiku-20240307` and plan migration to a current Haiku model (`claude-haiku-4-5` or newer). No retirement date is named in this release; the deprecation surfaces as a compile-time hint only.",
+    "deadline": null,
+    "tags": ["model-deprecation", "claude-haiku-3", "java-sdk"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

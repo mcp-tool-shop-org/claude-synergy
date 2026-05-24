@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-05-07-26-6",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "05-07-26",
+    "released_at": "2026-05-07",
+    "kind_hint": "changed",
+    "change_text": "\\`/multitask\\` is now available in the editor for running async subagents to parallelize your requests instead of adding them to the queue.",
+    "source_url": "https://cursor.com/changelog/05-07-26",
+    "change_id": "cursor/05-07-26/6"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "`/multitask` slash command parallelizes requests via async subagents",
+    "action_text": "Use `/multitask` in the cursor editor to dispatch parallel async subagents instead of queuing requests. Opt-in; default queuing behavior unchanged for prompts that don't invoke the command.",
+    "deadline": null,
+    "tags": ["slash-command", "multitask", "parallel", "subagents"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

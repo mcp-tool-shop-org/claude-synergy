@@ -1,0 +1,256 @@
+{
+  "batch_index": 7,
+  "count": 25,
+  "candidates": [
+    {
+      "id": "syn-vscode-copilot-chat-v1_115-43",
+      "product": "vscode-copilot-chat",
+      "version": "v1_115",
+      "released_at": "2026-07-15",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+      "source_url": "https://code.visualstudio.com/updates/v1_115",
+      "change_id": "vscode-copilot-chat/v1_115/43"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_119-54",
+      "product": "vscode-copilot-chat",
+      "version": "v1_119",
+      "released_at": "2026-11-15",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+      "source_url": "https://code.visualstudio.com/updates/v1_119",
+      "change_id": "vscode-copilot-chat/v1_119/54"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_112-34",
+      "product": "vscode-copilot-chat",
+      "version": "v1_112",
+      "released_at": "2026-04-15",
+      "kind_hint": "deprecated",
+      "change_text": "**Edit Mode** is officially deprecated as of VS Code version 1.110. Users can temporarily re-enable Edit Mode via VS Code setting chat.editMode.hidden Open in VS Code Open in VS Code Insiders This setting is managed at the organization level. Contact your administrator to change it.ORG. This setting will remain supported through version 1.125. Beginning with version 1.125, Edit Mode will be fully removed and can no longer be enabled via settings.",
+      "source_url": "https://code.visualstudio.com/updates/v1_112",
+      "change_id": "vscode-copilot-chat/v1_112/34"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_116-73",
+      "product": "vscode-copilot-chat",
+      "version": "v1_116",
+      "released_at": "2026-08-15",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+      "source_url": "https://code.visualstudio.com/updates/v1_116",
+      "change_id": "vscode-copilot-chat/v1_116/73"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-39",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecation (#deprecation)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/39"
+    },
+    {
+      "id": "syn-claude-api-2026-02-17-3",
+      "product": "claude-api",
+      "version": "2026-02-17",
+      "released_at": "2026-02-17",
+      "kind_hint": "changed",
+      "change_text": "The [web search tool](/docs/en/agents-and-tools/tool-use/web-search-tool) and [programmatic tool calling](/docs/en/agents-and-tools/tool-use/programmatic-tool-calling) are now generally available (no beta header required). Web search and web fetch now support [dynamic filtering](/docs/en/agents-and-tools/tool-use/web-search-tool#dynamic-filtering), which uses code execution to filter results before they reach the context window for better performance and reduced token cost.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-17-2026",
+      "change_id": "claude-api/2026-02-17/3"
+    },
+    {
+      "id": "syn-claude-api-2026-05-11-1",
+      "product": "claude-api",
+      "version": "2026-05-11",
+      "released_at": "2026-05-11",
+      "kind_hint": "changed",
+      "change_text": "We've launched **Claude Platform on AWS**, bringing the Claude API to Anthropic-managed infrastructure accessible through AWS, with AWS billing and IAM authentication. Access the full Messages API, Files API, Message Batches API, Claude Managed Agents, Agent Skills, code execution, and tool use through native AWS endpoints. Learn more in [Claude Platform on AWS](/docs/en/build-with-claude/claude-platform-on-aws).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-11-2026",
+      "change_id": "claude-api/2026-05-11/1"
+    },
+    {
+      "id": "syn-anthropic-apps-2026-04-09-claude-cowork-3",
+      "product": "anthropic-apps",
+      "version": "2026-04-09-claude-cowork",
+      "released_at": "2026-04-09",
+      "kind_hint": "changed",
+      "change_text": "Claude Cowork OpenTelemetry support. For more information, see Monitor Claude Cowork activity with OpenTelemetry.",
+      "source_url": "https://support.claude.com/en/articles/12138966-release-notes",
+      "change_id": "anthropic-apps/2026-04-09-claude-cowork/3"
+    },
+    {
+      "id": "syn-anthropic-cli-1.3.0-9",
+      "product": "anthropic-cli",
+      "version": "1.3.0",
+      "released_at": "2026-04-23",
+      "kind_hint": "changed",
+      "change_text": "**cli:** use `ShowJSONOpts` as argument to `formatJSON` instead of many positionals ([a9ac5e1](https://github.com/anthropics/anthropic-cli/commit/a9ac5e1e6a65abfbb1001aabdb7d804e723644d4))",
+      "source_url": "https://github.com/anthropics/anthropic-cli/releases/tag/v1.3.0",
+      "change_id": "anthropic-cli/1.3.0/9"
+    },
+    {
+      "id": "syn-claude-api-2026-05-06-3",
+      "product": "claude-api",
+      "version": "2026-05-06",
+      "released_at": "2026-05-06",
+      "kind_hint": "changed",
+      "change_text": "Webhooks for Claude Managed Agents are now supported. Webhook event types include session and vault lifecycle events. See [Subscribe to webhooks](/docs/en/managed-agents/webhooks).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-6-2026",
+      "change_id": "claude-api/2026-05-06/3"
+    },
+    {
+      "id": "syn-claude-api-2026-05-06-4",
+      "product": "claude-api",
+      "version": "2026-05-06",
+      "released_at": "2026-05-06",
+      "kind_hint": "changed",
+      "change_text": "Additional filtering and sorting options are now supported for Claude Managed Agents. Sessions can be filtered by status, and events can be filtered by type. Events can now be filtered by creation time.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-6-2026",
+      "change_id": "claude-api/2026-05-06/4"
+    },
+    {
+      "id": "syn-anthropic-apps-2026-03-11-claude-excel-2",
+      "product": "anthropic-apps",
+      "version": "2026-03-11-claude-excel",
+      "released_at": "2026-03-11",
+      "kind_hint": "changed",
+      "change_text": "Use Claude for Excel and PowerPoint with an LLM gateway",
+      "source_url": "https://support.claude.com/en/articles/12138966-release-notes",
+      "change_id": "anthropic-apps/2026-03-11-claude-excel/2"
+    },
+    {
+      "id": "syn-anthropic-cli-1.3.0-1",
+      "product": "anthropic-cli",
+      "version": "1.3.0",
+      "released_at": "2026-04-23",
+      "kind_hint": "changed",
+      "change_text": "**api:** CMA Memory public beta ([926d861](https://github.com/anthropics/anthropic-cli/commit/926d861abb348b8279019e2c95822592b2dd68f7))",
+      "source_url": "https://github.com/anthropics/anthropic-cli/releases/tag/v1.3.0",
+      "change_id": "anthropic-cli/1.3.0/1"
+    },
+    {
+      "id": "syn-claude-api-2026-03-30-2",
+      "product": "claude-api",
+      "version": "2026-03-30",
+      "released_at": "2026-03-30",
+      "kind_hint": "changed",
+      "change_text": "We're retiring the 1M token context window beta for Claude Sonnet 4.5 and Claude Sonnet 4 on **April 30, 2026**. After that date, the `context-1m-2025-08-07` beta header will have no effect on these models, and requests that exceed the standard 200k-token context window will return an error. To continue using 1M context windows, migrate to [Claude Sonnet 4.6](/docs/en/about-claude/models/overview#latest-models-comparison) or [Claude Opus 4.6](/docs/en/about-claude/models/overview#latest-models-comparison), which support the full 1M token context window at standard pricing with no beta header required.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#march-30-2026",
+      "change_id": "claude-api/2026-03-30/2"
+    },
+    {
+      "id": "syn-claude-api-2026-02-05-3",
+      "product": "claude-api",
+      "version": "2026-02-05",
+      "released_at": "2026-02-05",
+      "kind_hint": "changed",
+      "change_text": "We've launched the [compaction API](/docs/en/build-with-claude/compaction) in beta, providing server-side context summarization for effectively infinite conversations. Available on Opus 4.6.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-5-2026",
+      "change_id": "claude-api/2026-02-05/3"
+    },
+    {
+      "id": "syn-claude-api-2026-02-19-3",
+      "product": "claude-api",
+      "version": "2026-02-19",
+      "released_at": "2026-02-19",
+      "kind_hint": "deprecated",
+      "change_text": "We announced the deprecation of the Claude Haiku 3 model (`claude-3-haiku-20240307`), with retirement scheduled for April 20, 2026. We recommend migrating to [Claude Haiku 4.5](/docs/en/about-claude/models/overview#latest-models-comparison). Read more in [Model deprecations](/docs/en/about-claude/model-deprecations).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-19-2026",
+      "change_id": "claude-api/2026-02-19/3"
+    },
+    {
+      "id": "syn-claude-api-2026-02-05-1",
+      "product": "claude-api",
+      "version": "2026-02-05",
+      "released_at": "2026-02-05",
+      "kind_hint": "deprecated",
+      "change_text": "We've launched [Claude Opus 4.6](https://www.anthropic.com/news/claude-opus-4-6), our most intelligent model for complex agentic tasks and long-horizon work. Opus 4.6 recommends [adaptive thinking](/docs/en/build-with-claude/adaptive-thinking) (`thinking: {type: \"adaptive\"}`); manual thinking (`type: \"enabled\"` with `budget_tokens`) is deprecated. Opus 4.6 does not support prefilling assistant messages. Learn more in [What's new in Claude 4.6](/docs/en/about-claude/models/whats-new-claude-4-6).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-5-2026",
+      "change_id": "claude-api/2026-02-05/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.18-1",
+      "product": "claude-code",
+      "version": "2.1.18",
+      "released_at": "2026-01-23",
+      "kind_hint": "added",
+      "change_text": "Added customizable keyboard shortcuts. Configure keybindings per context, create chord sequences, and personalize your workflow. Run `/keybindings` to get started. Learn more at https://code.claude.com/docs/en/keybindings",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-18",
+      "change_id": "claude-code/2.1.18/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.69-9",
+      "product": "claude-code",
+      "version": "2.1.69",
+      "released_at": "2026-03-05",
+      "kind_hint": "added",
+      "change_text": "Added `includeGitInstructions` setting (and `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS` env var) to remove built-in commit and PR workflow instructions from Claude's system prompt",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-69",
+      "change_id": "claude-code/2.1.69/9"
+    },
+    {
+      "id": "syn-claude-code-2.1.23-1",
+      "product": "claude-code",
+      "version": "2.1.23",
+      "released_at": "2026-01-29",
+      "kind_hint": "added",
+      "change_text": "Added customizable spinner verbs setting (`spinnerVerbs`)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-23",
+      "change_id": "claude-code/2.1.23/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.89-3",
+      "product": "claude-code",
+      "version": "2.1.89",
+      "released_at": "2026-04-01",
+      "kind_hint": "added",
+      "change_text": "Added `PermissionDenied` hook that fires after auto mode classifier denials — return `{retry: true}` to tell the model it can retry",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-89",
+      "change_id": "claude-code/2.1.89/3"
+    },
+    {
+      "id": "syn-claude-code-2.1.81-1",
+      "product": "claude-code",
+      "version": "2.1.81",
+      "released_at": "2026-03-20",
+      "kind_hint": "added",
+      "change_text": "Added `--bare` flag for scripted `-p` calls — skips hooks, LSP, plugin sync, and skill directory walks; requires `ANTHROPIC_API_KEY` or an `apiKeyHelper` via `--settings` (OAuth and keychain auth disabled); auto-memory fully disabled",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-81",
+      "change_id": "claude-code/2.1.81/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.85-2",
+      "product": "claude-code",
+      "version": "2.1.85",
+      "released_at": "2026-03-26",
+      "kind_hint": "added",
+      "change_text": "Added conditional `if` field for hooks using permission rule syntax (e.g., `Bash(git *)`) to filter when they run, reducing process spawning overhead",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-85",
+      "change_id": "claude-code/2.1.85/2"
+    },
+    {
+      "id": "syn-claude-code-2.1.20-4",
+      "product": "claude-code",
+      "version": "2.1.20",
+      "released_at": "2026-01-27",
+      "kind_hint": "added",
+      "change_text": "Added support for loading `CLAUDE.md` files from additional directories specified via `--add-dir` flag (requires setting `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1`)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-20",
+      "change_id": "claude-code/2.1.20/4"
+    },
+    {
+      "id": "syn-claude-code-2.1.69-10",
+      "product": "claude-code",
+      "version": "2.1.69",
+      "released_at": "2026-03-05",
+      "kind_hint": "added",
+      "change_text": "Added `/reload-plugins` command to activate pending plugin changes without restarting",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-69",
+      "change_id": "claude-code/2.1.69/10"
+    }
+  ]
+}

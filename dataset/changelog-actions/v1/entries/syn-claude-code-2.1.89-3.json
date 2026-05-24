@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.89-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.89",
+    "released_at": "2026-04-01",
+    "kind_hint": "added",
+    "change_text": "Added `PermissionDenied` hook that fires after auto mode classifier denials — return `{retry: true}` to tell the model it can retry",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-89",
+    "change_id": "claude-code/2.1.89/3"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "PermissionDenied hook for auto-mode classifier denials",
+    "action_text": "Register a `PermissionDenied` hook in settings.json to intercept auto-mode classifier denials in Claude Code 2.1.89+. Return `{retry: true}` from the hook to tell the model it can retry the action; omit the field to let the denial stand. Opt-in.",
+    "deadline": null,
+    "tags": ["claude-code", "hooks", "auto-mode", "permissions"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

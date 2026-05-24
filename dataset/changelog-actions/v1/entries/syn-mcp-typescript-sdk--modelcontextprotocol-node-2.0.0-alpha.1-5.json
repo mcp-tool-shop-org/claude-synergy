@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-typescript-sdk--modelcontextprotocol-node-2.0.0-alpha.1-5",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-typescript-sdk",
+    "version": "@modelcontextprotocol/node@2.0.0-alpha.1",
+    "released_at": "2026-04-01",
+    "kind_hint": "changed",
+    "change_text": "[#1534](https://github.com/modelcontextprotocol/typescript-sdk/pull/1534) [`69a0626`](https://github.com/modelcontextprotocol/typescript-sdk/commit/69a062693f61e024d7a366db0c3e3ba74ff59d8e) Thanks [@josefaidt](https://github.com/josefaidt)! - clean up package manager usage, all pnpm",
+    "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/node%402.0.0-alpha.1",
+    "change_id": "mcp-typescript-sdk/@modelcontextprotocol/node@2.0.0-alpha.1/5"
+  },
+  "output": {
+    "kind": "docs",
+    "severity": "low",
+    "subject": "@modelcontextprotocol/node repo standardized on pnpm",
+    "action_text": "Use `pnpm` when contributing to `@modelcontextprotocol/node`; the repo's package-manager docs and scripts are now pnpm-only. Consumers of the published package are unaffected — this is a repository-tooling change, not an API change.",
+    "deadline": null,
+    "tags": ["pnpm", "repo-tooling", "contributors"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

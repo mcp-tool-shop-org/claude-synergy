@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.139-42",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.139",
+    "released_at": "2026-05-11",
+    "kind_hint": "breaking",
+    "change_text": "Fixed skill argument names containing regex metacharacters breaking argument substitution",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-139",
+    "change_id": "claude-code/2.1.139/42"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Skill argument names with regex metacharacters no longer break substitution",
+    "action_text": "Upgrade Claude Code to 2.1.139 if any skill argument name contains regex metacharacters (`.`, `*`, `+`, `?`, `[`, `(`, `\\`, etc.). Pre-fix, substitution would break — likely silently, producing wrong text in skill invocations.",
+    "deadline": null,
+    "tags": ["skills", "regex", "substitution"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-typescript-sdk--modelcontextprotocol-node-2.0.0-alpha.1-6",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-typescript-sdk",
+    "version": "@modelcontextprotocol/node@2.0.0-alpha.1",
+    "released_at": "2026-04-01",
+    "kind_hint": "deprecated",
+    "change_text": "[#1419](https://github.com/modelcontextprotocol/typescript-sdk/pull/1419) [`dcf708d`](https://github.com/modelcontextprotocol/typescript-sdk/commit/dcf708d892b7ca5f137c74109d42cdeb05e2ee3a) Thanks [@KKonstantinov](https://github.com/KKonstantinov)! - deprecated .tool, .prompt, .resource method removal",
+    "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/node%402.0.0-alpha.1",
+    "change_id": "mcp-typescript-sdk/@modelcontextprotocol/node@2.0.0-alpha.1/6"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "Deprecated `.tool`, `.prompt`, `.resource` methods removed from @modelcontextprotocol/node",
+    "action_text": "Rewrite any `.tool`, `.prompt`, or `.resource` calls against `@modelcontextprotocol/node` to the current method signatures. PR #1419 removes the deprecated overloads in 2.0.0-alpha.1; pre-fix callers will hit type errors and runtime failures.",
+    "deadline": null,
+    "tags": ["mcp", "api-removal", "breaking-change"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

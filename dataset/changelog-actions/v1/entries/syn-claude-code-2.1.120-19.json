@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.120-19",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.120",
+    "released_at": "2026-04-28",
+    "kind_hint": "fixed",
+    "change_text": "Fixed `/plugin` marketplace failing to load when one entry uses an unrecognized source format — that entry is shown but installing it prompts you to update",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-120",
+    "change_id": "claude-code/2.1.120/19"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "/plugin marketplace failed to load on any unrecognized source format",
+    "action_text": "Upgrade to `claude-code` 2.1.120+ so `/plugin` marketplace tolerates entries with an unrecognized source format. Pre-fix one bad entry blocked the whole list from loading; post-fix the entry still appears and installing it prompts you to update.",
+    "deadline": null,
+    "tags": ["claude-code", "plugin", "marketplace"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.82.3-1",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.82.3",
+    "released_at": null,
+    "kind_hint": "changed",
+    "change_text": "Add support for `gemini-2.5-flash-preview-04-17` models.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.82.3/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "aider adds `gemini-2.5-flash-preview-04-17` model support",
+    "action_text": "Upgrade `aider` to 0.82.3+ to use `gemini-2.5-flash-preview-04-17` as a model option. Opt-in; existing model selections continue to work unchanged.",
+    "deadline": null,
+    "tags": ["model-support", "gemini", "gemini-2-5-flash"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

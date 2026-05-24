@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-04-27-devin-for-terminal-8",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-04-27-devin-for-terminal",
+    "released_at": "2026-04-27",
+    "kind_hint": "added",
+    "change_text": "Added support for server-driven extension deny lists",
+    "source_url": "https://windsurf.com/changelog#devin-for-terminal",
+    "change_id": "windsurf/2026-04-27-devin-for-terminal/8"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Windsurf supports server-driven extension deny lists",
+    "action_text": "Configure `server-driven extension deny lists` in Windsurf (2026-04-27 release) if your org needs central control over which IDE extensions clients can load. Opt-in capability; existing per-client extension policy continues to work unchanged when the server list is absent.",
+    "deadline": null,
+    "tags": ["windsurf", "extensions", "deny-list", "enterprise"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

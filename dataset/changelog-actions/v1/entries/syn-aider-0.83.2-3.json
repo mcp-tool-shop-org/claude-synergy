@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.83.2-3",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.83.2",
+    "released_at": null,
+    "kind_hint": "improved",
+    "change_text": "Improved OpenRouter model metadata handling by introducing a local cache, increasing reliability and performance.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.83.2/3"
+  },
+  "output": {
+    "kind": "performance",
+    "severity": "low",
+    "subject": "aider caches OpenRouter model metadata locally",
+    "action_text": "Upgrade `aider` to 0.83.2+ if you route through OpenRouter — the SDK now caches model metadata locally instead of fetching on every invocation. Faster startup and fewer transient failures when OpenRouter's metadata endpoint hiccups.",
+    "deadline": null,
+    "tags": ["aider", "openrouter", "cache"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.142-24",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.142",
+    "released_at": "2026-05-14",
+    "kind_hint": "removed",
+    "change_text": "Removed stale `/model claude-sonnet-4-20250514` suggestion from Usage Policy refusal messages",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-142",
+    "change_id": "claude-code/2.1.142/24"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Usage Policy refusal no longer suggests retired `claude-sonnet-4-20250514`",
+    "action_text": "Upgrade to claude-code 2.1.142+ to drop the stale `/model claude-sonnet-4-20250514` suggestion from Usage Policy refusal messages. The suggested ID retires 2026-06-15 so the prompt was already misleading users into picking a soon-dead model.",
+    "deadline": null,
+    "tags": ["claude-code", "model-retirement", "refusal-copy"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

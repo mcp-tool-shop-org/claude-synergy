@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_111-34",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_111",
+    "released_at": "2026-03-15",
+    "kind_hint": "changed",
+    "change_text": "@Rohan5commit (Rohan Santhosh) (https://github.com/Rohan5commit): docs: fix duplicated wording in proposed API comment PR #298522 (https://github.com/microsoft/vscode/pull/298522)",
+    "source_url": "https://code.visualstudio.com/updates/v1_111",
+    "change_id": "vscode-copilot-chat/v1_111/34"
+  },
+  "output": {
+    "kind": "docs",
+    "severity": "low",
+    "subject": "Docs typo fix in proposed-API comment (PR #298522)",
+    "action_text": "Skip this entry unless reading internal `proposed API` comments. PR #298522 fixed duplicated wording in a comment; no public-surface or runtime change.",
+    "deadline": null,
+    "tags": ["vscode", "docs", "typo"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

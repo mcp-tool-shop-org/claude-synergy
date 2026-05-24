@@ -1,0 +1,33 @@
+{
+  "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-23",
+  "schema_version": "1",
+  "input": {
+    "product": "github-copilot",
+    "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "released_at": "2026-05-13",
+    "kind_hint": "fixed",
+    "change_text": "Fixed **Shift+Home** and **Shift+End** issues for inline selection.",
+    "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/23"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "`Shift+Home` and `Shift+End` inline-selection fix in Copilot for JetBrains",
+    "action_text": "Update GitHub Copilot for JetBrains to restore correct `Shift+Home` and `Shift+End` inline-selection behavior. No setting toggle needed; pre-fix selections could under- or over-extend in inline suggestions.",
+    "deadline": null,
+    "tags": ["github-copilot", "jetbrains", "keybinding", "inline-selection"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

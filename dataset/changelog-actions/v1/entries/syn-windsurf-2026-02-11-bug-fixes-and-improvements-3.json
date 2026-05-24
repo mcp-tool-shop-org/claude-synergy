@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-02-11-bug-fixes-and-improvements-3",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-02-11-bug-fixes-and-improvements",
+    "released_at": "2026-02-11",
+    "kind_hint": "fixed",
+    "change_text": "Fixed osascript privilege escalation being incorrectly triggered on Linux for shell command installation",
+    "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+    "change_id": "windsurf/2026-02-11-bug-fixes-and-improvements/3"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "spurious `osascript` privilege-escalation prompt fixed on Linux",
+    "action_text": "Update Windsurf on Linux if shell-command installation has prompted for `osascript` privilege escalation. Pre-fix the macOS-only escalation path was incorrectly triggered on Linux hosts during shell command installation.",
+    "deadline": null,
+    "tags": ["linux", "osascript", "privilege-escalation", "shell-install"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.72.1-1",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.72.1",
+    "released_at": null,
+    "kind_hint": "fixed",
+    "change_text": "Fix model metadata for `openrouter/deepseek/deepseek-r1`",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.72.1/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Model metadata for openrouter/deepseek/deepseek-r1",
+    "action_text": "Upgrade `aider` to 0.72.1+ if you route through `openrouter/deepseek/deepseek-r1`. Pre-fix metadata likely surfaced wrong context-window or pricing values; the change is config-only, not behavioral.",
+    "deadline": null,
+    "tags": ["aider", "model-metadata", "openrouter", "deepseek"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

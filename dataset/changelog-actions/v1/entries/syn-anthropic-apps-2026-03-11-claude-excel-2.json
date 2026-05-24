@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-apps-2026-03-11-claude-excel-2",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-apps",
+    "version": "2026-03-11-claude-excel",
+    "released_at": "2026-03-11",
+    "kind_hint": "changed",
+    "change_text": "Use Claude for Excel and PowerPoint with an LLM gateway",
+    "source_url": "https://support.claude.com/en/articles/12138966-release-notes",
+    "change_id": "anthropic-apps/2026-03-11-claude-excel/2"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Claude for Excel and PowerPoint supports LLM gateway routing",
+    "action_text": "Point `Claude for Excel` and `Claude for PowerPoint` at your enterprise LLM gateway if you route Claude traffic through one. Upstream entry is one-liner — see the linked release-notes page for the configuration surface; opt-in only.",
+    "deadline": null,
+    "tags": ["claude-apps", "excel", "powerpoint", "llm-gateway"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

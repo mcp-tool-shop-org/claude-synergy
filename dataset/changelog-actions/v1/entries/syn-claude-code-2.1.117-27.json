@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.117-27",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.117",
+    "released_at": "2026-04-22",
+    "kind_hint": "breaking",
+    "change_text": "[VSCode] Fixed \"Manage Plugins\" panel breaking when multiple large marketplaces are configured",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-117",
+    "change_id": "claude-code/2.1.117/27"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "VSCode `Manage Plugins` panel no longer breaks with multiple large marketplaces",
+    "action_text": "Upgrade Claude Code to 2.1.117 in VSCode if you configure multiple large plugin marketplaces. Pre-fix, the `Manage Plugins` panel would break and become unusable; the fix restores normal panel behavior at scale.",
+    "deadline": null,
+    "tags": ["vscode", "plugins", "marketplaces"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

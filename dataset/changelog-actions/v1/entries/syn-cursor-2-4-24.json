@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-4-24",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-4",
+    "released_at": "2026-01-22",
+    "kind_hint": "improved",
+    "change_text": "Improved \\`Ctrl+C\\` detection prevents accidental exits when canceling agent runsin CLI.",
+    "source_url": "https://cursor.com/changelog/2-4",
+    "change_id": "cursor/2-4/24"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Cursor CLI Ctrl+C no longer exits when cancelling an agent run",
+    "action_text": "Upgrade Cursor CLI to 2-4+ if `Ctrl+C` was killing your shell session when you meant to cancel an in-flight agent run. The single-press cancel-vs-exit distinction is now disambiguated; existing hotkey muscle memory is preserved.",
+    "deadline": null,
+    "tags": ["cursor", "cli", "ctrl-c", "ux-fix"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

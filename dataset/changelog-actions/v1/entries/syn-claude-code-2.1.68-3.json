@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.68-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.68",
+    "released_at": "2026-03-04",
+    "kind_hint": "removed",
+    "change_text": "Removed Opus 4 and 4.1 from Claude Code on the first-party API — users with these models pinned are automatically moved to Opus 4.6",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-68",
+    "change_id": "claude-code/2.1.68/3"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "high",
+    "subject": "Opus 4 and 4.1 removed from Claude Code on first-party API; pinned users auto-migrated to Opus 4.6",
+    "action_text": "Update any Claude Code config or scripts pinning `claude-opus-4-20250514` or `claude-opus-4-1` to `claude-opus-4-6` explicitly. Upstream silently auto-migrates pinned users to 4.6 — behavior, cost, and rate limits may shift without warning if you don't update the pin yourself.",
+    "deadline": null,
+    "tags": ["claude-code", "model-removal", "claude-opus-4", "claude-opus-4-1"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.71-28",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.71",
+    "released_at": "2026-03-07",
+    "kind_hint": "removed",
+    "change_text": "Removed startup notification noise for unauthenticated org-registered claude.ai connectors",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-71",
+    "change_id": "claude-code/2.1.71/28"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Startup no longer warns about unauthenticated org-registered claude.ai connectors",
+    "action_text": "Upgrade to claude-code 2.1.71+ to silence the startup-notification spam for unauthenticated org-registered claude.ai connectors. No behavioral change beyond the visual cleanup; connector auth state still surfaces when you actually invoke one.",
+    "deadline": null,
+    "tags": ["claude-code", "connectors", "startup", "ux"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-cli-feb-18-2026-24",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "cli-feb-18-2026",
+    "released_at": "2026-02-18",
+    "kind_hint": "changed",
+    "change_text": "CLI output now detects your terminal's dark or light background and adjusts colors to match.",
+    "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+    "change_id": "cursor/cli-feb-18-2026/24"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "cursor CLI auto-detects terminal light/dark background",
+    "action_text": "Update `cursor` CLI to get terminal-aware color output that adapts to dark or light backgrounds. No flag needed; detection runs automatically per session.",
+    "deadline": null,
+    "tags": ["cli", "terminal", "theming"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

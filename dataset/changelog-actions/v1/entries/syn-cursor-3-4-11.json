@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-3-4-11",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "3-4",
+    "released_at": "2026-05-13",
+    "kind_hint": "improved",
+    "change_text": "Improved search and navigation to make it faster and more reliable in large workspaces.",
+    "source_url": "https://cursor.com/changelog/3-4",
+    "change_id": "cursor/3-4/11"
+  },
+  "output": {
+    "kind": "performance",
+    "severity": "low",
+    "subject": "Cursor search and navigation faster in large workspaces",
+    "action_text": "Upgrade Cursor to 3-4+ if search or jump-to-file felt sluggish in large workspaces. Upstream cites both speed and reliability gains but does not specify the size threshold or which indexing path changed — re-measure on your monorepo to confirm impact.",
+    "deadline": null,
+    "tags": ["cursor", "search", "navigation", "performance"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

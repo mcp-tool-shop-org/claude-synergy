@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-rust-sdk-rmcp-v1.1.1-1",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-rust-sdk",
+    "version": "rmcp-v1.1.1",
+    "released_at": "2026-03-09",
+    "kind_hint": "changed",
+    "change_text": "accept logging/setLevel and ping before initialized notification ([#730](https://github.com/modelcontextprotocol/rust-sdk/pull/730))",
+    "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.1.1",
+    "change_id": "mcp-rust-sdk/rmcp-v1.1.1/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "rmcp accepts logging/setLevel and ping before initialized notification",
+    "action_text": "Upgrade `rmcp` to 1.1.1+ if clients send `logging/setLevel` or `ping` before the `initialized` notification. Pre-fix the server rejected these requests during the early handshake window; the spec permits both at any time, so callers will now succeed instead of erroring.",
+    "deadline": null,
+    "tags": ["rmcp", "mcp-spec", "handshake"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

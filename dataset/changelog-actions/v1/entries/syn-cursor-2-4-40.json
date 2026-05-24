@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-4-40",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-4",
+    "released_at": "2026-01-22",
+    "kind_hint": "fixed",
+    "change_text": "Fixed the accept/reject diff UI sometimes not appearing when edits were made to dotfiles.",
+    "source_url": "https://cursor.com/changelog/2-4",
+    "change_id": "cursor/2-4/40"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Accept/reject diff UI missing on dotfile edits",
+    "action_text": "Upgrade `cursor` to 2.4+ if you edit dotfiles via the agent — pre-fix the accept/reject diff UI sometimes did not appear, leaving changes ambiguously applied. Re-review any unreviewed dotfile edits made on earlier versions.",
+    "deadline": null,
+    "tags": ["cursor", "diff-ui", "dotfiles"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

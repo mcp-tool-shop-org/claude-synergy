@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-api-2026-02-05-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-api",
+    "version": "2026-02-05",
+    "released_at": "2026-02-05",
+    "kind_hint": "changed",
+    "change_text": "We've launched the [compaction API](/docs/en/build-with-claude/compaction) in beta, providing server-side context summarization for effectively infinite conversations. Available on Opus 4.6.",
+    "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-5-2026",
+    "change_id": "claude-api/2026-02-05/3"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Compaction API beta for Opus 4.6 (server-side context summarization)",
+    "action_text": "Call the new `compaction API` beta on Opus 4.6 to offload context summarization to the server for long conversations. Beta surface — review the compaction docs for stability caveats before relying on it in production.",
+    "deadline": null,
+    "tags": ["api", "compaction", "opus-4.6", "beta"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

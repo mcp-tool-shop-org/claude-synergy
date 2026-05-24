@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.113-19",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.113",
+    "released_at": "2026-04-17",
+    "kind_hint": "breaking",
+    "change_text": "Fixed markdown tables breaking when a cell contains an inline code span with a pipe character",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-113",
+    "change_id": "claude-code/2.1.113/19"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Markdown tables with `|` inside inline code spans no longer break",
+    "action_text": "Upgrade Claude Code to 2.1.113 if assistant output includes markdown tables whose cells contain inline code spans with `|`. Pre-fix, the renderer treated the pipe as a column separator and corrupted the table layout.",
+    "deadline": null,
+    "tags": ["markdown", "rendering", "tables"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

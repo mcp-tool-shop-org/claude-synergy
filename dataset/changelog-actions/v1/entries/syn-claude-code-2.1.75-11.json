@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.75-11",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.75",
+    "released_at": "2026-03-13",
+    "kind_hint": "fixed",
+    "change_text": "Fixed token estimation over-counting for thinking and `tool_use` blocks, preventing premature context compaction",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-75",
+    "change_id": "claude-code/2.1.75/11"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "token estimation over-counted thinking and tool_use blocks",
+    "action_text": "Upgrade to `claude-code` 2.1.75+ to restore accurate token estimation for `thinking` and `tool_use` blocks. Pre-fix sessions hit premature context compaction because the estimator over-counted; long sessions with heavy tool use were the worst-affected.",
+    "deadline": null,
+    "tags": ["claude-code", "context-window", "tool-use"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

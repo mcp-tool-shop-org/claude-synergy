@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.85.2-5",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.85.2",
+    "released_at": null,
+    "kind_hint": "fixed",
+    "change_text": "Fixed an issue where new settings for an existing model didn't replace the old ones, by Andrew Grigorev.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.85.2/5"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "New model settings now replace old ones",
+    "action_text": "Upgrade `aider` to 0.85.2+ if you reconfigure existing models via overrides — pre-fix settings silently kept the stale values. Re-apply any model override after upgrade to confirm the new values stick.",
+    "deadline": null,
+    "tags": ["aider", "model-config", "silent-failure"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

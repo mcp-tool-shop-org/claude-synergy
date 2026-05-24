@@ -1,0 +1,256 @@
+{
+  "batch_index": 3,
+  "count": 25,
+  "candidates": [
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.49-9",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.49",
+      "released_at": "2026-03-20",
+      "kind_hint": "added",
+      "change_text": "Added macOS x86_64 wheel to the published matrix (#661)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.49",
+      "change_id": "claude-agent-sdk-python/0.1.49/9"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.19-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.19",
+      "released_at": "2026-01-23",
+      "kind_hint": "added",
+      "change_text": "Added `CLAUDE_CODE_ENABLE_TASKS` env var, set to `true` to opt into the new task system",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.19",
+      "change_id": "claude-agent-sdk-typescript/0.2.19/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v1.6.0-1",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v1.6.0",
+      "released_at": "2026-05-01",
+      "kind_hint": "changed",
+      "change_text": "*(docs)* use correct Parameters<T> syntax in tool examples ([#814](https://github.com/modelcontextprotocol/rust-sdk/pull/814))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.6.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v1.6.0/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v1.2.0-1",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v1.2.0",
+      "released_at": "2026-03-11",
+      "kind_hint": "changed",
+      "change_text": "*(rmcp-macros)* use re-exported serde_json path in task_handler ([#735](https://github.com/modelcontextprotocol/rust-sdk/pull/735))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.2.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v1.2.0/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.17.0-10",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.17.0",
+      "released_at": "2026-02-27",
+      "kind_hint": "changed",
+      "change_text": "*(schema)* remove AddNullable from draft2020_12 settings ([#664](https://github.com/modelcontextprotocol/rust-sdk/pull/664))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.17.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.17.0/10"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/node@2.0.0-alpha.1-5",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/node@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "changed",
+      "change_text": "[#1534](https://github.com/modelcontextprotocol/typescript-sdk/pull/1534) [`69a0626`](https://github.com/modelcontextprotocol/typescript-sdk/commit/69a062693f61e024d7a366db0c3e3ba74ff59d8e) Thanks [@josefaidt](https://github.com/josefaidt)! - clean up package manager usage, all pnpm",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/node%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/node@2.0.0-alpha.1/5"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v1.1.1-1",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v1.1.1",
+      "released_at": "2026-03-09",
+      "kind_hint": "changed",
+      "change_text": "accept logging/setLevel and ping before initialized notification ([#730](https://github.com/modelcontextprotocol/rust-sdk/pull/730))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.1.1",
+      "change_id": "mcp-rust-sdk/rmcp-v1.1.1/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.13.0-5",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.13.0",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "*(task)* add task support (SEP-1686) ([#536](https://github.com/modelcontextprotocol/rust-sdk/pull/536))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.13.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.13.0/5"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/client@2.0.0-alpha.1-12",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/client@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "changed",
+      "change_text": "[#1632](https://github.com/modelcontextprotocol/typescript-sdk/pull/1632) [`d99f3ee`](https://github.com/modelcontextprotocol/typescript-sdk/commit/d99f3ee5274bb17bb0eb02c85381200feb4b43e6) Thanks [@matantsach](https://github.com/matantsach)! - Continue OAuth metadata discovery on 502 (Bad Gateway) responses, matching the existing behavior for 4xx. This fixes MCP servers behind reverse proxies that return 502 for path-aware metadata URLs. Other 5xx errors still throw to avoid retrying against overloaded servers.",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/client%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/client@2.0.0-alpha.1/12"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.15.0-5",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.15.0",
+      "released_at": "2026-02-10",
+      "kind_hint": "changed",
+      "change_text": "*(tasks)* avoid dropping completed task results during collection ([#639](https://github.com/modelcontextprotocol/rust-sdk/pull/639))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.15.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.15.0/5"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.16.0-4",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.16.0",
+      "released_at": "2026-02-17",
+      "kind_hint": "changed",
+      "change_text": "duplicate meta serialization ([#662](https://github.com/modelcontextprotocol/rust-sdk/pull/662))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.16.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.16.0/4"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v0.13.0-4",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v0.13.0",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "clarity and formatting ([#602](https://github.com/modelcontextprotocol/rust-sdk/pull/602))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v0.13.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v0.13.0/4"
+    },
+    {
+      "id": "syn-claude-code-2.1.105-13",
+      "product": "claude-code",
+      "version": "2.1.105",
+      "released_at": "2026-04-13",
+      "kind_hint": "improved",
+      "change_text": "Improved MCP large-output truncation prompt to give format-specific recipes (e.g. `jq` for JSON, computed Read chunk sizes for text)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-105",
+      "change_id": "claude-code/2.1.105/13"
+    },
+    {
+      "id": "syn-claude-code-2.1.105-7",
+      "product": "claude-code",
+      "version": "2.1.105",
+      "released_at": "2026-04-13",
+      "kind_hint": "improved",
+      "change_text": "Improved file write display: long single-line writes (e.g. minified JSON) are now truncated in the UI instead of paginating across many screens",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-105",
+      "change_id": "claude-code/2.1.105/7"
+    },
+    {
+      "id": "syn-claude-code-2.1.108-7",
+      "product": "claude-code",
+      "version": "2.1.108",
+      "released_at": "2026-04-14",
+      "kind_hint": "improved",
+      "change_text": "Improved error messages: server rate limits are now distinguished from plan usage limits; 5xx/529 errors show a link to status.claude.com; unknown slash commands suggest the closest match",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-108",
+      "change_id": "claude-code/2.1.108/7"
+    },
+    {
+      "id": "syn-claude-code-2.1.101-15",
+      "product": "claude-code",
+      "version": "2.1.101",
+      "released_at": "2026-04-10",
+      "kind_hint": "improved",
+      "change_text": "Improved SDK `query()` to clean up subprocess and temp files when consumers `break` from `for await` or use `await using`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-101",
+      "change_id": "claude-code/2.1.101/15"
+    },
+    {
+      "id": "syn-claude-code-2.1.147-5",
+      "product": "claude-code",
+      "version": "2.1.147",
+      "released_at": "2026-05-21",
+      "kind_hint": "improved",
+      "change_text": "Improved auto-updater: retries transient network failures, reports specific error categories and OS error codes on failure, and shows the current version when an update fails",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-147",
+      "change_id": "claude-code/2.1.147/5"
+    },
+    {
+      "id": "syn-claude-code-2.1.30-15",
+      "product": "claude-code",
+      "version": "2.1.30",
+      "released_at": "2026-02-03",
+      "kind_hint": "improved",
+      "change_text": "Improved memory usage for `--resume` (68% reduction for users with many sessions) by replacing the session index with lightweight stat-based loading and progressive enrichment",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-30",
+      "change_id": "claude-code/2.1.30/15"
+    },
+    {
+      "id": "syn-claude-code-2.1.45-12",
+      "product": "claude-code",
+      "version": "2.1.45",
+      "released_at": "2026-02-17",
+      "kind_hint": "improved",
+      "change_text": "Improved startup performance by removing eager loading of session history for stats caching",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-45",
+      "change_id": "claude-code/2.1.45/12"
+    },
+    {
+      "id": "syn-claude-code-2.1.111-13",
+      "product": "claude-code",
+      "version": "2.1.111",
+      "released_at": "2026-04-16",
+      "kind_hint": "improved",
+      "change_text": "Improved `/setup-vertex` and `/setup-bedrock` to show the actual `settings.json` path when `CLAUDE_CONFIG_DIR` is set, seed model candidates from existing pins on re-run, and offer a \"with 1M context\" option for supported models",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-111",
+      "change_id": "claude-code/2.1.111/13"
+    },
+    {
+      "id": "syn-claude-code-2.1.97-40",
+      "product": "claude-code",
+      "version": "2.1.97",
+      "released_at": "2026-04-08",
+      "kind_hint": "improved",
+      "change_text": "Improved footer layout: indicators (Focus, notifications) now stay on the mode-indicator row instead of wrapping below",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+      "change_id": "claude-code/2.1.97/40"
+    },
+    {
+      "id": "syn-claude-code-2.1.97-42",
+      "product": "claude-code",
+      "version": "2.1.97",
+      "released_at": "2026-04-08",
+      "kind_hint": "improved",
+      "change_text": "Improved markdown blockquotes to show a continuous left bar across wrapped lines",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+      "change_id": "claude-code/2.1.97/42"
+    },
+    {
+      "id": "syn-claude-code-action-v1.0.28-1",
+      "product": "claude-code-action",
+      "version": "v1.0.28",
+      "released_at": "2026-01-05",
+      "kind_hint": "changed",
+      "change_text": "fix: update broken link in cloud-providers.md by @ashwin-ant in https://github.com/anthropics/claude-code-action/pull/758",
+      "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.28",
+      "change_id": "claude-code-action/v1.0.28/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.7-15",
+      "product": "claude-code",
+      "version": "2.1.7",
+      "released_at": "2026-01-14",
+      "kind_hint": "changed",
+      "change_text": "[VSCode] Fixed `claudeProcessWrapper` setting passing the wrapper path instead of the Claude binary path",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-7",
+      "change_id": "claude-code/2.1.7/15"
+    },
+    {
+      "id": "syn-claude-code-2.1.128-9",
+      "product": "claude-code",
+      "version": "2.1.128",
+      "released_at": "2026-05-04",
+      "kind_hint": "changed",
+      "change_text": "SDK hosts now receive a persistent `localSettings` suggestion for Bash permission prompts, so \"Always allow\" writes to `.claude/settings.local.json`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-128",
+      "change_id": "claude-code/2.1.128/9"
+    }
+  ]
+}

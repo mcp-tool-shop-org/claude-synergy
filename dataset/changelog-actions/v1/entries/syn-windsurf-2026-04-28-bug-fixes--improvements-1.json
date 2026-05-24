@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-04-28-bug-fixes--improvements-1",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-04-28-bug-fixes--improvements",
+    "released_at": "2026-04-28",
+    "kind_hint": "fixed",
+    "change_text": "Fixed a crash that could occur when switching between Cascade conversations",
+    "source_url": "https://windsurf.com/changelog#bug-fixes--improvements",
+    "change_id": "windsurf/2026-04-28-bug-fixes--improvements/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Cascade conversation-switch crash fixed in Windsurf",
+    "action_text": "Update Windsurf if you crash when switching between `Cascade` conversations. Pre-fix the switch could surface an unhandled state transition that took down the agent window.",
+    "deadline": null,
+    "tags": ["cascade", "crash", "conversation-switch"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

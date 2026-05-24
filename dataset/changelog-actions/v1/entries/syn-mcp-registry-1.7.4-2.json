@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-registry-1.7.4-2",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-registry",
+    "version": "1.7.4",
+    "released_at": "2026-04-29",
+    "kind_hint": "changed",
+    "change_text": "fix(deploy): bump registry pod memory to match doubled pgxpool size by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1225",
+    "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.4",
+    "change_id": "mcp-registry/1.7.4/2"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "mcp-registry pod memory raised to match doubled pgxpool size",
+    "action_text": "Audit your `mcp-registry` self-host pod memory request if you mirror upstream's pgxpool size — PR #1225 doubled the pool and the pod limit needed a matching bump to avoid OOMKilled events. Re-check your Helm values or k8s manifests against the new upstream baseline.",
+    "deadline": null,
+    "tags": ["mcp-registry", "deploy", "memory", "pgxpool"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

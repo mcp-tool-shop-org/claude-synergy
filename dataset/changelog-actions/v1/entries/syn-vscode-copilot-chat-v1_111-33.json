@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_111-33",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_111",
+    "released_at": "2026-03-15",
+    "kind_hint": "changed",
+    "change_text": "@RajeshKumar11 (https://github.com/RajeshKumar11): MCP Gateway: avoid blocking list calls on startup PR #298040 (https://github.com/microsoft/vscode/pull/298040)",
+    "source_url": "https://code.visualstudio.com/updates/v1_111",
+    "change_id": "vscode-copilot-chat/v1_111/33"
+  },
+  "output": {
+    "kind": "performance",
+    "severity": "medium",
+    "subject": "MCP Gateway no longer blocks on list calls during startup",
+    "action_text": "Upgrade VS Code to v1_111+ if `MCP Gateway` startup has been slow. PR #298040 removes blocking `list` calls during startup; no user-side config change required.",
+    "deadline": null,
+    "tags": ["vscode", "mcp", "startup", "performance"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

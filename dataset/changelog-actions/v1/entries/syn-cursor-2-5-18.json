@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-5-18",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-5",
+    "released_at": "2026-02-17",
+    "kind_hint": "added",
+    "change_text": "Added a Close button to the agent chat pane.",
+    "source_url": "https://cursor.com/changelog/2-5",
+    "change_id": "cursor/2-5/18"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Close button on Cursor agent chat pane",
+    "action_text": "Click the new `Close` button on the agent chat pane to dismiss it directly. Cosmetic addition; existing close paths (keyboard, menu) remain functional.",
+    "deadline": null,
+    "tags": ["cursor", "ui"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

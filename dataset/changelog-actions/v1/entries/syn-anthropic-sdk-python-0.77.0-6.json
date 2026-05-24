@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-python-0.77.0-6",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-python",
+    "version": "0.77.0",
+    "released_at": "2026-01-29",
+    "kind_hint": "breaking",
+    "change_text": "remove class causing breaking change ([#1333](https://github.com/anthropics/anthropic-sdk-python/issues/1333)) ([81ee953](https://github.com/anthropics/anthropic-sdk-python/commit/81ee9533d14f9dc3753a4a1320ea744825b17e92))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.77.0",
+    "change_id": "anthropic-sdk-python/0.77.0/6"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "medium",
+    "subject": "Unnamed class removed in anthropic-sdk-python 0.77.0",
+    "action_text": "Read `anthropic-sdk-python` PR #1333 before upgrading to 0.77.0 — release notes say a class was removed but do not name it. Diff your import sites against the release commit (81ee953) to identify the affected symbol.",
+    "deadline": null,
+    "tags": ["sdk", "removal", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

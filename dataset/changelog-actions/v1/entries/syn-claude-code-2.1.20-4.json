@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.20-4",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.20",
+    "released_at": "2026-01-27",
+    "kind_hint": "added",
+    "change_text": "Added support for loading `CLAUDE.md` files from additional directories specified via `--add-dir` flag (requires setting `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1`)",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-20",
+    "change_id": "claude-code/2.1.20/4"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Load CLAUDE.md from --add-dir directories (env-gated)",
+    "action_text": "Set `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1` and pass `--add-dir <path>` to have Claude Code 2.1.20+ pick up `CLAUDE.md` files from extra directories. Env gate keeps the behavior opt-in; existing single-directory loading is unchanged when the flag is absent.",
+    "deadline": null,
+    "tags": ["claude-code", "cli-flag", "env-var", "claude-md"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

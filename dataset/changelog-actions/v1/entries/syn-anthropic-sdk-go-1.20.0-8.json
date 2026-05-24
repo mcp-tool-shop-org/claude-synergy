@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-go-1.20.0-8",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-go",
+    "version": "1.20.0",
+    "released_at": "2026-01-29",
+    "kind_hint": "changed",
+    "change_text": "**mcp:** correct code tool API endpoint ([6c8a083](https://github.com/anthropics/anthropic-sdk-go/commit/6c8a0831e6f084d316179a9288c4fa1c5420ea59))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.20.0",
+    "change_id": "anthropic-sdk-go/1.20.0/8"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Corrected MCP code-tool API endpoint in anthropic-sdk-go",
+    "action_text": "Upgrade `anthropic-sdk-go` to 1.20.0+ if calling the MCP `code tool` API. Pre-fix callers hit the wrong endpoint and saw visible failures; no caller-side code change required after upgrade.",
+    "deadline": null,
+    "tags": ["anthropic-sdk-go", "mcp", "endpoint"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

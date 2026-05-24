@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.74-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.74",
+    "released_at": "2026-03-12",
+    "kind_hint": "fixed",
+    "change_text": "Fixed skills with `user-invocable: false` being included in `supportedCommands()` and the `system:init` message's `slash_commands` / `skills` lists",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.74",
+    "change_id": "claude-agent-sdk-typescript/0.2.74/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "user-invocable: false skills leaked into supportedCommands() and system:init",
+    "action_text": "Upgrade to 0.2.74+ if you author skills with `user-invocable: false`. Pre-fix those skills appeared in `supportedCommands()` and the `system:init` message's `slash_commands` / `skills` lists — users saw and could invoke skills explicitly marked non-invocable.",
+    "deadline": null,
+    "tags": ["skills", "user-invocable", "system-init", "supportedcommands"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

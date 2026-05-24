@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.3.142-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.3.142",
+    "released_at": "2026-05-14",
+    "kind_hint": "breaking",
+    "change_text": "**Breaking:** Headless and SDK sessions now use Task tools (`TaskCreate` / `TaskUpdate` / `TaskGet` / `TaskList`) instead of `TodoWrite`, deprecated since 0.2.136. Tool consumers should accumulate by task ID instead of replacing a snapshot list.",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+    "change_id": "claude-agent-sdk-typescript/0.3.142/3"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "high",
+    "subject": "TodoWrite replaced by TaskCreate/TaskUpdate/TaskGet/TaskList in SDK sessions",
+    "action_text": "Replace any `TodoWrite` consumer in headless/SDK sessions with the `TaskCreate` / `TaskUpdate` / `TaskGet` / `TaskList` tool family. Accumulate by task ID rather than replacing a snapshot list — tool shape changed, not just the name. Silent-failure risk if old `TodoWrite` handlers are wired and never fire.",
+    "deadline": null,
+    "tags": ["sdk", "tools", "task", "todowrite", "silent-failure"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

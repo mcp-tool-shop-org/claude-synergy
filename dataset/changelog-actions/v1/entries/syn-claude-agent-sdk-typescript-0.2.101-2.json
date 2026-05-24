@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.101-2",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.101",
+    "released_at": "2026-04-10",
+    "kind_hint": "fixed",
+    "change_text": "Fixed resume-session temp directory leaking on Windows when subprocess file handles weren't released before cleanup, and on macOS/APFS when `await using` disposal raced its own cleanup callback",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.101",
+    "change_id": "claude-agent-sdk-typescript/0.2.101/2"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "Resume-session temp dir leak on Windows + macOS/APFS race",
+    "action_text": "Upgrade to 0.2.101+ if you use resume-session on Windows or macOS/APFS. Pre-fix runs leaked temp directories silently — disk filled over long-running services, and `await using` disposal could race its own cleanup on APFS, leaving stale state behind.",
+    "deadline": null,
+    "tags": ["resume-session", "windows", "macos", "apfs", "temp-leak"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

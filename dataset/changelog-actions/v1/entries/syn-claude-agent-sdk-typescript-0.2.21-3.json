@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.21-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.21",
+    "released_at": "2026-01-28",
+    "kind_hint": "added",
+    "change_text": "Added `disabled` status to `McpServerStatus`",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.21",
+    "change_id": "claude-agent-sdk-typescript/0.2.21/3"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "disabled status added to McpServerStatus",
+    "action_text": "Upgrade to `claude-agent-sdk-typescript` 0.2.21+ to read the new `disabled` value from `McpServerStatus`. Widen any exhaustive switch over the status enum to handle `disabled` so TypeScript stops narrowing it away as `never`.",
+    "deadline": null,
+    "tags": ["agent-sdk", "mcp", "status-enum"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

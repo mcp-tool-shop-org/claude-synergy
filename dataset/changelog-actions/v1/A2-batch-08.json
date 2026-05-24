@@ -1,0 +1,256 @@
+{
+  "batch_index": 8,
+  "count": 25,
+  "candidates": [
+    {
+      "id": "syn-claude-code-2.1.14-1",
+      "product": "claude-code",
+      "version": "2.1.14",
+      "released_at": "2026-01-20",
+      "kind_hint": "added",
+      "change_text": "Added history-based autocomplete in bash mode (`!`) - type a partial command and press Tab to complete from your bash command history",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-14",
+      "change_id": "claude-code/2.1.14/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.27-1",
+      "product": "claude-code",
+      "version": "2.1.27",
+      "released_at": "2026-01-30",
+      "kind_hint": "added",
+      "change_text": "Added tool call failures and denials to debug logs",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-27",
+      "change_id": "claude-code/2.1.27/1"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-24",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "changed",
+      "change_text": "CLI output now detects your terminal's dark or light background and adjusts colors to match.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/24"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-6",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "changed",
+      "change_text": "CLI now stores conversation transcripts that the agent can use as context.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/6"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/config-yaml@1.38.0-21",
+      "product": "continue-dev",
+      "version": "@continuedev/config-yaml@1.38.0",
+      "released_at": "2026-01-13",
+      "kind_hint": "changed",
+      "change_text": "Initialize usage field in createSession and startNewSession ([5c50e91](https://github.com/continuedev/continue/commit/5c50e911d203fc0a7ae6407f84bdfafd8c1f19f4))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/config-yaml%401.38.0",
+      "change_id": "continue-dev/@continuedev/config-yaml@1.38.0/21"
+    },
+    {
+      "id": "syn-cursor-cli-jan-08-2026-13",
+      "product": "cursor",
+      "version": "cli-jan-08-2026",
+      "released_at": "2026-01-08",
+      "kind_hint": "changed",
+      "change_text": "\\*\\*\\`Shift+Enter\\`\\*\\* now inserts a newline instead of submitting, making it easier to write multi-line prompts.",
+      "source_url": "https://cursor.com/changelog/cli-jan-08-2026",
+      "change_id": "cursor/cli-jan-08-2026/13"
+    },
+    {
+      "id": "syn-cursor-05-07-26-6",
+      "product": "cursor",
+      "version": "05-07-26",
+      "released_at": "2026-05-07",
+      "kind_hint": "changed",
+      "change_text": "\\`/multitask\\` is now available in the editor for running async subagents to parallelize your requests instead of adding them to the queue.",
+      "source_url": "https://cursor.com/changelog/05-07-26",
+      "change_id": "cursor/05-07-26/6"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/fetch@1.8.0-2",
+      "product": "continue-dev",
+      "version": "@continuedev/fetch@1.8.0",
+      "released_at": "2026-01-22",
+      "kind_hint": "changed",
+      "change_text": "add GH_TOKEN to continue-agents workflow ([dd93919](https://github.com/continuedev/continue/commit/dd939190701be55917d4d224f012017e8ea17be9)), closes [#9493](https://github.com/continuedev/continue/issues/9493)",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/fetch%401.8.0",
+      "change_id": "continue-dev/@continuedev/fetch@1.8.0/2"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/config-yaml@1.40.0-41",
+      "product": "continue-dev",
+      "version": "@continuedev/config-yaml@1.40.0",
+      "released_at": "2026-01-31",
+      "kind_hint": "changed",
+      "change_text": "**cli:** detect wsl and spawn appropriate shell ([a9ae420](https://github.com/continuedev/continue/commit/a9ae4205e12c7974d5b6c0feea964af9b97e1630))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/config-yaml%401.40.0",
+      "change_id": "continue-dev/@continuedev/config-yaml@1.40.0/41"
+    },
+    {
+      "id": "syn-aider-0.82.3-1",
+      "product": "aider",
+      "version": "0.82.3",
+      "released_at": null,
+      "kind_hint": "changed",
+      "change_text": "Add support for `gemini-2.5-flash-preview-04-17` models.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.82.3/1"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/openai-adapters@1.37.0-9",
+      "product": "continue-dev",
+      "version": "@continuedev/openai-adapters@1.37.0",
+      "released_at": "2026-01-14",
+      "kind_hint": "changed",
+      "change_text": "don't fallback to relative path if not markdown file ([d93b432](https://github.com/continuedev/continue/commit/d93b4321a550acf7151949d1fee1c436945e2ee0))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/openai-adapters%401.37.0",
+      "change_id": "continue-dev/@continuedev/openai-adapters@1.37.0/9"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/fetch@1.8.0-18",
+      "product": "continue-dev",
+      "version": "@continuedev/fetch@1.8.0",
+      "released_at": "2026-01-22",
+      "kind_hint": "changed",
+      "change_text": "Constrain root eslint to v8 to match core dependency ([ad6ab80](https://github.com/continuedev/continue/commit/ad6ab8024b888816dcf0c8eb39921a98777ec5ab))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/fetch%401.8.0",
+      "change_id": "continue-dev/@continuedev/fetch@1.8.0/18"
+    },
+    {
+      "id": "syn-windsurf-2026-04-27-devin-for-terminal-6",
+      "product": "windsurf",
+      "version": "2026-04-27-devin-for-terminal",
+      "released_at": "2026-04-27",
+      "kind_hint": "fixed",
+      "change_text": "Fixed file drag-and-drop in agent window Cascade tabs",
+      "source_url": "https://windsurf.com/changelog#devin-for-terminal",
+      "change_id": "windsurf/2026-04-27-devin-for-terminal/6"
+    },
+    {
+      "id": "syn-windsurf-2026-04-28-bug-fixes--improvements-2",
+      "product": "windsurf",
+      "version": "2026-04-28-bug-fixes--improvements",
+      "released_at": "2026-04-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed an authentication issue that could prevent Devin Cloud sessions from starting",
+      "source_url": "https://windsurf.com/changelog#bug-fixes--improvements",
+      "change_id": "windsurf/2026-04-28-bug-fixes--improvements/2"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-23",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "fixed",
+      "change_text": "Fixed **Shift+Home** and **Shift+End** issues for inline selection.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/23"
+    },
+    {
+      "id": "syn-windsurf-2026-04-15-bug-fixes-and-improvements-2",
+      "product": "windsurf",
+      "version": "2026-04-15-bug-fixes-and-improvements",
+      "released_at": "2026-04-15",
+      "kind_hint": "fixed",
+      "change_text": "Fixed bug with spawning Terminal sessions on Windows",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-04-15-bug-fixes-and-improvements/2"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-23",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "fixed",
+      "change_text": "Fixed **Shift+Home** and **Shift+End** issues for inline selection.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/23"
+    },
+    {
+      "id": "syn-windsurf-2026-04-28-bug-fixes--improvements-1",
+      "product": "windsurf",
+      "version": "2026-04-28-bug-fixes--improvements",
+      "released_at": "2026-04-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed a crash that could occur when switching between Cascade conversations",
+      "source_url": "https://windsurf.com/changelog#bug-fixes--improvements",
+      "change_id": "windsurf/2026-04-28-bug-fixes--improvements/1"
+    },
+    {
+      "id": "syn-windsurf-2026-05-16-bug-fixes-and-improvements-1",
+      "product": "windsurf",
+      "version": "2026-05-16-bug-fixes-and-improvements",
+      "released_at": "2026-05-16",
+      "kind_hint": "fixed",
+      "change_text": "Fixed availability issues with swe-check model for some users.",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-05-16-bug-fixes-and-improvements/1"
+    },
+    {
+      "id": "syn-windsurf-2026-02-11-bug-fixes-and-improvements-3",
+      "product": "windsurf",
+      "version": "2026-02-11-bug-fixes-and-improvements",
+      "released_at": "2026-02-11",
+      "kind_hint": "fixed",
+      "change_text": "Fixed osascript privilege escalation being incorrectly triggered on Linux for shell command installation",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-02-11-bug-fixes-and-improvements/3"
+    },
+    {
+      "id": "syn-windsurf-2026-02-16-bug-fixes-and-improvements-1",
+      "product": "windsurf",
+      "version": "2026-02-16-bug-fixes-and-improvements",
+      "released_at": "2026-02-16",
+      "kind_hint": "fixed",
+      "change_text": "Fix for self-updating on Windows",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-02-16-bug-fixes-and-improvements/1"
+    },
+    {
+      "id": "syn-windsurf-2026-02-16-bug-fixes-and-improvements-2",
+      "product": "windsurf",
+      "version": "2026-02-16-bug-fixes-and-improvements",
+      "released_at": "2026-02-16",
+      "kind_hint": "fixed",
+      "change_text": "Fix for macOS UI flickering",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-02-16-bug-fixes-and-improvements/2"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-34",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "fixed",
+      "change_text": "Fixed \\`resume\\` in non-git workspaces.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/34"
+    },
+    {
+      "id": "syn-cursor-3-0-30",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "fixed",
+      "change_text": "Fixed a bug where expanding/collapsing thinking blocks didn't work while streaming was still in progress.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/30"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-33",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "fixed",
+      "change_text": "Fixed abort restore so when no checkpoint exists, state rolls back cleanly and user text is preserved.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/33"
+    }
+  ]
+}

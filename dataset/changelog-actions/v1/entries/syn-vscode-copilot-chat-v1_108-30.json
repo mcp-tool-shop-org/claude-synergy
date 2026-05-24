@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_108-30",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_108",
+    "released_at": "2026-01-08",
+    "kind_hint": "improved",
+    "change_text": "Improved validation of file and folder suggestions",
+    "source_url": "https://code.visualstudio.com/updates/v1_108",
+    "change_id": "vscode-copilot-chat/v1_108/30"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "File / folder suggestion validation improvements in vscode-copilot-chat v1_108",
+    "action_text": "Upgrade `vscode-copilot-chat` to v1_108 if you've seen bad file or folder suggestions; upstream notes say validation improved but don't name the input class, error mode, or affected surface. No targeted adjustment derivable.",
+    "deadline": null,
+    "tags": ["vscode", "suggestions", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

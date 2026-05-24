@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-python-0.1.70-2",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-python",
+    "version": "0.1.70",
+    "released_at": "2026-04-28",
+    "kind_hint": "breaking",
+    "change_text": "**Trio nursery corruption on early cancellation**: Fixed `RuntimeError: Nursery stack corrupted` when breaking out of `query()` iteration inside a trio nursery with `options.stderr` set. The stderr reader now uses `spawn_detached()` instead of manually managing a task group, matching the approach already used for the read loop (#885)",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.70",
+    "change_id": "claude-agent-sdk-python/0.1.70/2"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "Trio nursery corruption on early query() cancellation with options.stderr",
+    "action_text": "Upgrade `claude-agent-sdk-python` to 0.1.70+ if you call `query()` inside a trio nursery with `options.stderr` set — pre-fix early-break raised `RuntimeError: Nursery stack corrupted`. Internal fix uses `spawn_detached()`; no caller-side changes required.",
+    "deadline": null,
+    "tags": ["sdk", "trio", "nursery", "stderr", "cancellation"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

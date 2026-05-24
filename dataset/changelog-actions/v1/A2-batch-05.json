@@ -1,0 +1,256 @@
+{
+  "batch_index": 5,
+  "count": 25,
+  "candidates": [
+    {
+      "id": "syn-anthropic-sdk-ruby-1.34.0-1",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.34.0",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([287e6c4](https://github.com/anthropics/anthropic-sdk-ruby/commit/287e6c471b24ef580260224675dddd08218dcd68))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.34.0",
+      "change_id": "anthropic-sdk-ruby/1.34.0/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-csharp-Anthropic-12.15.0-2",
+      "product": "anthropic-sdk-csharp",
+      "version": "Anthropic-12.15.0",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([711457c](https://github.com/anthropics/anthropic-sdk-csharp/commit/711457cd6af3454ea860ce6b9e2b5594f3e5b5a2))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-csharp/releases/tag/Anthropic-v12.15.0",
+      "change_id": "anthropic-sdk-csharp/Anthropic-12.15.0/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.95.0-1",
+      "product": "anthropic-sdk-python",
+      "version": "0.95.0",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([0c1e773](https://github.com/anthropics/anthropic-sdk-python/commit/0c1e7736394585dd021b53c1f87383c4fae29a6b))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.95.0",
+      "change_id": "anthropic-sdk-python/0.95.0/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-java-2.15.0-2",
+      "product": "anthropic-sdk-java",
+      "version": "2.15.0",
+      "released_at": "2026-02-19",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** Deprecate haiku-3 ([a04dca8](https://github.com/anthropics/anthropic-sdk-java/commit/a04dca8b80e54b8452f17c325bae0cd56e238346))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-java/releases/tag/v2.15.0",
+      "change_id": "anthropic-sdk-java/2.15.0/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-go-1.36.0-1",
+      "product": "anthropic-sdk-go",
+      "version": "1.36.0",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([fc49d21](https://github.com/anthropics/anthropic-sdk-go/commit/fc49d213a3de80dd37836ef3ede4199943a81b12))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.36.0",
+      "change_id": "anthropic-sdk-go/1.36.0/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.136-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.136",
+      "released_at": "2026-05-08",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated `TodoWrite` tool — future versions will switch to Task tools (`TaskCreate`, `TaskGet`, `TaskUpdate`, `TaskList`)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.136",
+      "change_id": "claude-agent-sdk-typescript/0.2.136/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.23.0-2",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.23.0",
+      "released_at": "2026-02-19",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** Deprecate haiku-3 ([66ac4a8](https://github.com/anthropics/anthropic-sdk-ruby/commit/66ac4a8ceca44fc2b4d3a68c1ce87c0c05bea5f5))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.23.0",
+      "change_id": "anthropic-sdk-ruby/1.23.0/2"
+    },
+    {
+      "id": "syn-aider-0.48.1-3",
+      "product": "aider",
+      "version": "0.48.1",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved progress indication during repo map processing.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.48.1/3"
+    },
+    {
+      "id": "syn-aider-0.83.2-3",
+      "product": "aider",
+      "version": "0.83.2",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved OpenRouter model metadata handling by introducing a local cache, increasing reliability and performance.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.83.2/3"
+    },
+    {
+      "id": "syn-aider-0.79.1-1",
+      "product": "aider",
+      "version": "0.79.1",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved model listing to include all models in fuzzy matching, including those provided by aider (not litellm).",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.79.1/1"
+    },
+    {
+      "id": "syn-aider-0.69.1-4",
+      "product": "aider",
+      "version": "0.69.1",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved environment variable setup messages on Windows.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.69.1/4"
+    },
+    {
+      "id": "syn-cursor-2-6-26",
+      "product": "cursor",
+      "version": "2-6",
+      "released_at": "2026-03-03",
+      "kind_hint": "improved",
+      "change_text": "Improved dashboard and account management with clearer visibility into overview, analytics, and collections.",
+      "source_url": "https://cursor.com/changelog/2-6",
+      "change_id": "cursor/2-6/26"
+    },
+    {
+      "id": "syn-cursor-2-4-8",
+      "product": "cursor",
+      "version": "2-4",
+      "released_at": "2026-01-22",
+      "kind_hint": "improved",
+      "change_text": "Improved capabilities & coverage for hooks (https://cursor.com/docs/agent/hooks): \\`stop\\` hook; modify prompts \\`beforeSubmitPrompt\\` ; \\`PreToolUse\\` and \\`PostToolUse\\` hooks.",
+      "source_url": "https://cursor.com/changelog/2-4",
+      "change_id": "cursor/2-4/8"
+    },
+    {
+      "id": "syn-cursor-2-5-10",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "improved",
+      "change_text": "Improved permission request flow for subagents.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/10"
+    },
+    {
+      "id": "syn-cursor-2-4-24",
+      "product": "cursor",
+      "version": "2-4",
+      "released_at": "2026-01-22",
+      "kind_hint": "improved",
+      "change_text": "Improved \\`Ctrl+C\\` detection prevents accidental exits when canceling agent runsin CLI.",
+      "source_url": "https://cursor.com/changelog/2-4",
+      "change_id": "cursor/2-4/24"
+    },
+    {
+      "id": "syn-cursor-3-4-11",
+      "product": "cursor",
+      "version": "3-4",
+      "released_at": "2026-05-13",
+      "kind_hint": "improved",
+      "change_text": "Improved search and navigation to make it faster and more reliable in large workspaces.",
+      "source_url": "https://cursor.com/changelog/3-4",
+      "change_id": "cursor/3-4/11"
+    },
+    {
+      "id": "syn-aider-0.29.2-1",
+      "product": "aider",
+      "version": "0.29.2",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved [model warnings](https://aider.chat/docs/llms.html#model-warnings) for unknown or unfamiliar models",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.29.2/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v1.0.0-alpha-2",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v1.0.0-alpha",
+      "released_at": "2026-03-03",
+      "kind_hint": "breaking",
+      "change_text": "*(auth)* [**breaking**] support returning extra fields from token exchange ([#700](https://github.com/modelcontextprotocol/rust-sdk/pull/700))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.0.0-alpha",
+      "change_id": "mcp-rust-sdk/rmcp-v1.0.0-alpha/2"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.2-3",
+      "product": "mcp-registry",
+      "version": "1.7.2",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "fix(list): use row-constructor cursor + restore per-phase publish timings + enable pg_stat_statements by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1215",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.2",
+      "change_id": "mcp-registry/1.7.2/3"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.1-2",
+      "product": "mcp-registry",
+      "version": "1.7.1",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "fix: harden registry availability and add publish phase timings by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1211",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.1",
+      "change_id": "mcp-registry/1.7.1/2"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.2-2",
+      "product": "mcp-registry",
+      "version": "1.7.2",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "deploy: update prod to v1.7.1 by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1212",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.2",
+      "change_id": "mcp-registry/1.7.2/2"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.4-1",
+      "product": "mcp-registry",
+      "version": "1.7.4",
+      "released_at": "2026-04-29",
+      "kind_hint": "changed",
+      "change_text": "deploy: update prod to v1.7.3 by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1223",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.4",
+      "change_id": "mcp-registry/1.7.4/1"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.4-2",
+      "product": "mcp-registry",
+      "version": "1.7.4",
+      "released_at": "2026-04-29",
+      "kind_hint": "changed",
+      "change_text": "fix(deploy): bump registry pod memory to match doubled pgxpool size by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1225",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.4",
+      "change_id": "mcp-registry/1.7.4/2"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.1-1",
+      "product": "mcp-registry",
+      "version": "1.7.1",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "deploy: update prod to v1.7.0 by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1205",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.1",
+      "change_id": "mcp-registry/1.7.1/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.68-3",
+      "product": "claude-code",
+      "version": "2.1.68",
+      "released_at": "2026-03-04",
+      "kind_hint": "removed",
+      "change_text": "Removed Opus 4 and 4.1 from Claude Code on the first-party API — users with these models pinned are automatically moved to Opus 4.6",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-68",
+      "change_id": "claude-code/2.1.68/3"
+    }
+  ]
+}

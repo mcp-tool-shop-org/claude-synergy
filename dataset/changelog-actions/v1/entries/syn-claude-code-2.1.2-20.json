@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.2-20",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.2",
+    "released_at": "2026-01-09",
+    "kind_hint": "deprecated",
+    "change_text": "Deprecated Windows managed settings path `C:\\ProgramData\\ClaudeCode\\managed-settings.json` - administrators should migrate to `C:\\Program Files\\ClaudeCode\\managed-settings.json`",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-2",
+    "change_id": "claude-code/2.1.2/20"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "Windows managed-settings path moved from ProgramData to Program Files",
+    "action_text": "Migrate `C:\\ProgramData\\ClaudeCode\\managed-settings.json` to `C:\\Program Files\\ClaudeCode\\managed-settings.json` for Windows administrators. The legacy path still resolves in 2.1.2 but is marked deprecated; no removal deadline announced upstream.",
+    "deadline": null,
+    "tags": ["claude-code", "windows", "managed-settings", "deprecation"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

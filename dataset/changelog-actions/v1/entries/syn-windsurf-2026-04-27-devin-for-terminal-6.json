@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-04-27-devin-for-terminal-6",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-04-27-devin-for-terminal",
+    "released_at": "2026-04-27",
+    "kind_hint": "fixed",
+    "change_text": "Fixed file drag-and-drop in agent window Cascade tabs",
+    "source_url": "https://windsurf.com/changelog#devin-for-terminal",
+    "change_id": "windsurf/2026-04-27-devin-for-terminal/6"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "drag-and-drop fixed in agent-window Cascade tabs",
+    "action_text": "Update Windsurf to drag files into agent-window `Cascade` tabs again. Pre-fix the drop target was non-responsive; no replacement workflow was needed beyond the fix.",
+    "deadline": null,
+    "tags": ["cascade", "drag-drop", "agent-window"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

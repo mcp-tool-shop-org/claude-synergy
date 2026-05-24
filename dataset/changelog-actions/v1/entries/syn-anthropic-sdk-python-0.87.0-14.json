@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-python-0.87.0-14",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-python",
+    "version": "0.87.0",
+    "released_at": "2026-03-31",
+    "kind_hint": "changed",
+    "change_text": "**tests:** bump steady to v0.19.7 ([bfa40e5](https://github.com/anthropics/anthropic-sdk-python/commit/bfa40e5c5bed65da0f3f664082e58e85c26b9c66))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.87.0",
+    "change_id": "anthropic-sdk-python/0.87.0/14"
+  },
+  "output": {
+    "kind": "docs",
+    "severity": "low",
+    "subject": "Test dependency `steady` bumped to v0.19.7",
+    "action_text": "Skip unless you run the `anthropic-sdk-python` test suite yourself. Internal test-only bump of `steady` to v0.19.7; no runtime dependency change for consumers, no public-surface effect.",
+    "deadline": null,
+    "tags": ["tests", "internal", "deps"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

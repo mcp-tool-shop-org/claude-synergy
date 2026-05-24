@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-api-2026-02-05-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-api",
+    "version": "2026-02-05",
+    "released_at": "2026-02-05",
+    "kind_hint": "deprecated",
+    "change_text": "We've launched [Claude Opus 4.6](https://www.anthropic.com/news/claude-opus-4-6), our most intelligent model for complex agentic tasks and long-horizon work. Opus 4.6 recommends [adaptive thinking](/docs/en/build-with-claude/adaptive-thinking) (`thinking: {type: \"adaptive\"}`); manual thinking (`type: \"enabled\"` with `budget_tokens`) is deprecated. Opus 4.6 does not support prefilling assistant messages. Learn more in [What's new in Claude 4.6](/docs/en/about-claude/models/whats-new-claude-4-6).",
+    "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-5-2026",
+    "change_id": "claude-api/2026-02-05/1"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "Opus 4.6 launch; manual thinking deprecated; no assistant prefill",
+    "action_text": "Switch Opus 4.6 callers from `thinking: {type: 'enabled', budget_tokens: ...}` to `thinking: {type: 'adaptive'}` — the manual form is deprecated on this model. Also drop assistant-message prefill from Opus 4.6 requests; the model does not support it. No upstream-named removal date.",
+    "deadline": null,
+    "tags": ["api", "opus-4.6", "thinking", "assistant-prefill"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

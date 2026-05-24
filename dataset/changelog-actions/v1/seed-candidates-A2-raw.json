@@ -1,0 +1,3226 @@
+{
+  "seed": 2026052402,
+  "count": 320,
+  "generated_at": "2026-05-24T10:10:12.133Z",
+  "family_distribution": {
+    "anthropic-sdk-family": 71,
+    "mcp-sdk-family": 25,
+    "claude-code-family": 83,
+    "third-party-other-family": 63,
+    "third-party-ide-family": 55,
+    "mcp-infra-family": 7,
+    "anthropic-app-family": 16
+  },
+  "kind_distribution": {
+    "changed": 107,
+    "deprecated": 33,
+    "breaking": 20,
+    "improved": 33,
+    "fixed": 55,
+    "added": 48,
+    "removed": 19,
+    "renamed": 5
+  },
+  "candidates": [
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.70-1",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.70",
+      "released_at": "2026-04-28",
+      "kind_hint": "changed",
+      "change_text": "**In-process MCP tool results silently lost with older `mcp` versions**: Bumped the `mcp` dependency floor to `>=1.19.0`. Older versions mishandled `CallToolResult` returns from SDK MCP tool handlers, causing the model to receive a validation-error blob instead of the actual tool output (#891)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.70",
+      "change_id": "claude-agent-sdk-python/0.1.70/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.88.0-2",
+      "product": "anthropic-sdk-python",
+      "version": "0.88.0",
+      "released_at": "2026-04-01",
+      "kind_hint": "changed",
+      "change_text": "bedrock api key auth ([#1623](https://github.com/anthropics/anthropic-sdk-python/issues/1623)) ([a95a3fc](https://github.com/anthropics/anthropic-sdk-python/commit/a95a3fc586b8de63e3c2b386cee5e312d96bf5d8))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.88.0",
+      "change_id": "anthropic-sdk-python/0.88.0/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.52-8",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.52",
+      "released_at": "2026-03-29",
+      "kind_hint": "changed",
+      "change_text": "Increased CI timeout for example tests and reduced sleep duration in error handling example (#760)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.52",
+      "change_id": "claude-agent-sdk-python/0.1.52/8"
+    },
+    {
+      "id": "syn-anthropic-sdk-go-1.45.0-1",
+      "product": "anthropic-sdk-go",
+      "version": "1.45.0",
+      "released_at": "2026-05-21",
+      "kind_hint": "changed",
+      "change_text": "**api:** Add support for thinking-token-count beta for estimated tokens in thinking block deltas when streaming ([dedeb6d](https://github.com/anthropics/anthropic-sdk-go/commit/dedeb6d263a651d63c95bd360befbd53dd26ec12))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.45.0",
+      "change_id": "anthropic-sdk-go/1.45.0/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.24.0-2",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.24.0",
+      "released_at": "2026-03-16",
+      "kind_hint": "changed",
+      "change_text": "**api:** GA thinking-display-setting ([227f58a](https://github.com/anthropics/anthropic-sdk-ruby/commit/227f58acb9944be56d21ea9fe46af8b5d9e1c891))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.24.0",
+      "change_id": "anthropic-sdk-ruby/1.24.0/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.97.0-7",
+      "product": "anthropic-sdk-python",
+      "version": "0.97.0",
+      "released_at": "2026-04-23",
+      "kind_hint": "changed",
+      "change_text": "**tests:** bump steady to v0.22.1 ([a4b7184](https://github.com/anthropics/anthropic-sdk-python/commit/a4b7184e57410ae92a409db5ee6fec90edceaa51))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.97.0",
+      "change_id": "anthropic-sdk-python/0.97.0/7"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.52-1",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.52",
+      "released_at": "2026-03-29",
+      "kind_hint": "changed",
+      "change_text": "**Context usage**: Added `get_context_usage()` method to `ClaudeSDKClient` for querying context window usage by category (#764)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.52",
+      "change_id": "claude-agent-sdk-python/0.1.52/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.87.0-14",
+      "product": "anthropic-sdk-python",
+      "version": "0.87.0",
+      "released_at": "2026-03-31",
+      "kind_hint": "changed",
+      "change_text": "**tests:** bump steady to v0.19.7 ([bfa40e5](https://github.com/anthropics/anthropic-sdk-python/commit/bfa40e5c5bed65da0f3f664082e58e85c26b9c66))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.87.0",
+      "change_id": "anthropic-sdk-python/0.87.0/14"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.37-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.37",
+      "released_at": "2026-02-07",
+      "kind_hint": "changed",
+      "change_text": "Updated to parity with Claude Code v2.1.37",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.37",
+      "change_id": "claude-agent-sdk-typescript/0.2.37/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.52-7",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.52",
+      "released_at": "2026-03-29",
+      "kind_hint": "changed",
+      "change_text": "Updated bundled Claude CLI to version 2.1.87",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.52",
+      "change_id": "claude-agent-sdk-python/0.1.52/7"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v1.1.1-1",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v1.1.1",
+      "released_at": "2026-03-09",
+      "kind_hint": "deprecated",
+      "change_text": "*(rmcp-macros)* replace deprecated *Param type aliases with *Params ([#727](https://github.com/modelcontextprotocol/rust-sdk/pull/727))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.1.1",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v1.1.1/1"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/server@2.0.0-alpha.1-12",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/server@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "deprecated",
+      "change_text": "[#1419](https://github.com/modelcontextprotocol/typescript-sdk/pull/1419) [`dcf708d`](https://github.com/modelcontextprotocol/typescript-sdk/commit/dcf708d892b7ca5f137c74109d42cdeb05e2ee3a) Thanks [@KKonstantinov](https://github.com/KKonstantinov)! - remove deprecated .tool, .prompt, .resource method signatures",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/server%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/server@2.0.0-alpha.1/12"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/node@2.0.0-alpha.1-3",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/node@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "deprecated",
+      "change_text": "[#1419](https://github.com/modelcontextprotocol/typescript-sdk/pull/1419) [`dcf708d`](https://github.com/modelcontextprotocol/typescript-sdk/commit/dcf708d892b7ca5f137c74109d42cdeb05e2ee3a) Thanks [@KKonstantinov](https://github.com/KKonstantinov)! - remove deprecated .tool, .prompt, .resource method signatures",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/node%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/node@2.0.0-alpha.1/3"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/server@2.0.0-alpha.1-16",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/server@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "deprecated",
+      "change_text": "[#1419](https://github.com/modelcontextprotocol/typescript-sdk/pull/1419) [`dcf708d`](https://github.com/modelcontextprotocol/typescript-sdk/commit/dcf708d892b7ca5f137c74109d42cdeb05e2ee3a) Thanks [@KKonstantinov](https://github.com/KKonstantinov)! - deprecated .tool, .prompt, .resource method removal",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/server%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/server@2.0.0-alpha.1/16"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/node@2.0.0-alpha.1-6",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/node@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "deprecated",
+      "change_text": "[#1419](https://github.com/modelcontextprotocol/typescript-sdk/pull/1419) [`dcf708d`](https://github.com/modelcontextprotocol/typescript-sdk/commit/dcf708d892b7ca5f137c74109d42cdeb05e2ee3a) Thanks [@KKonstantinov](https://github.com/KKonstantinov)! - deprecated .tool, .prompt, .resource method removal",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/node%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/node@2.0.0-alpha.1/6"
+    },
+    {
+      "id": "syn-claude-code-2.1.117-27",
+      "product": "claude-code",
+      "version": "2.1.117",
+      "released_at": "2026-04-22",
+      "kind_hint": "breaking",
+      "change_text": "[VSCode] Fixed \"Manage Plugins\" panel breaking when multiple large marketplaces are configured",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-117",
+      "change_id": "claude-code/2.1.117/27"
+    },
+    {
+      "id": "syn-claude-code-2.1.97-24",
+      "product": "claude-code",
+      "version": "2.1.97",
+      "released_at": "2026-04-08",
+      "kind_hint": "breaking",
+      "change_text": "Fixed slash command picker breaking when a plugin's frontmatter `name` is a YAML boolean keyword",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+      "change_id": "claude-code/2.1.97/24"
+    },
+    {
+      "id": "syn-claude-code-2.1.47-24",
+      "product": "claude-code",
+      "version": "2.1.47",
+      "released_at": "2026-02-18",
+      "kind_hint": "breaking",
+      "change_text": "Fixed an issue where bash commands with backslash-newline continuation lines (e.g., long commands split across multiple lines with `\\`) would produce spurious empty arguments, potentially breaking command execution.",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-47",
+      "change_id": "claude-code/2.1.47/24"
+    },
+    {
+      "id": "syn-claude-code-2.1.75-19",
+      "product": "claude-code",
+      "version": "2.1.75",
+      "released_at": "2026-03-13",
+      "kind_hint": "breaking",
+      "change_text": "Breaking change: Removed deprecated Windows managed settings fallback at `C:\\ProgramData\\ClaudeCode\\managed-settings.json` — use `C:\\Program Files\\ClaudeCode\\managed-settings.json`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-75",
+      "change_id": "claude-code/2.1.75/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.105-17",
+      "product": "claude-code",
+      "version": "2.1.105",
+      "released_at": "2026-04-13",
+      "kind_hint": "breaking",
+      "change_text": "Fixed leading whitespace being trimmed from assistant messages, breaking ASCII art and indented diagrams",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-105",
+      "change_id": "claude-code/2.1.105/17"
+    },
+    {
+      "id": "syn-claude-code-2.1.139-42",
+      "product": "claude-code",
+      "version": "2.1.139",
+      "released_at": "2026-05-11",
+      "kind_hint": "breaking",
+      "change_text": "Fixed skill argument names containing regex metacharacters breaking argument substitution",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-139",
+      "change_id": "claude-code/2.1.139/42"
+    },
+    {
+      "id": "syn-claude-code-2.1.113-19",
+      "product": "claude-code",
+      "version": "2.1.113",
+      "released_at": "2026-04-17",
+      "kind_hint": "breaking",
+      "change_text": "Fixed markdown tables breaking when a cell contains an inline code span with a pipe character",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-113",
+      "change_id": "claude-code/2.1.113/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.126-12",
+      "product": "claude-code",
+      "version": "2.1.126",
+      "released_at": "2026-05-01",
+      "kind_hint": "breaking",
+      "change_text": "Fixed pasting an image larger than 2000px breaking the session — images are now downscaled on paste, and oversized images in history are automatically removed and the request retried",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-126",
+      "change_id": "claude-code/2.1.126/12"
+    },
+    {
+      "id": "syn-claude-code-2.1.144-20",
+      "product": "claude-code",
+      "version": "2.1.144",
+      "released_at": "2026-05-19",
+      "kind_hint": "breaking",
+      "change_text": "Fixed MCP images with unsupported MIME types (e.g. SVG) breaking the conversation — now saved to disk and referenced in the tool result",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-144",
+      "change_id": "claude-code/2.1.144/20"
+    },
+    {
+      "id": "syn-claude-code-2.1.71-9",
+      "product": "claude-code",
+      "version": "2.1.71",
+      "released_at": "2026-03-07",
+      "kind_hint": "breaking",
+      "change_text": "Fixed the Read tool putting oversized images into context when image processing failed, breaking subsequent turns in long image-heavy sessions",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-71",
+      "change_id": "claude-code/2.1.71/9"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-18",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "improved",
+      "change_text": "Improved sub-agent rendering and styling for current file context.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/18"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_108-30",
+      "product": "vscode-copilot-chat",
+      "version": "v1_108",
+      "released_at": "2026-01-08",
+      "kind_hint": "improved",
+      "change_text": "Improved validation of file and folder suggestions",
+      "source_url": "https://code.visualstudio.com/updates/v1_108",
+      "change_id": "vscode-copilot-chat/v1_108/30"
+    },
+    {
+      "id": "syn-windsurf-2026-01-13-bug-fixes-and-improvements-2",
+      "product": "windsurf",
+      "version": "2026-01-13-bug-fixes-and-improvements",
+      "released_at": "2026-01-13",
+      "kind_hint": "improved",
+      "change_text": "Improved stability and reliability",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-01-13-bug-fixes-and-improvements/2"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-20",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "improved",
+      "change_text": "Improved hover and pressed states for code block actions.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/20"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_108-29",
+      "product": "vscode-copilot-chat",
+      "version": "v1_108",
+      "released_at": "2026-01-08",
+      "kind_hint": "improved",
+      "change_text": "Improved completions for `npm` and `git`",
+      "source_url": "https://code.visualstudio.com/updates/v1_108",
+      "change_id": "vscode-copilot-chat/v1_108/29"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-25",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "improved",
+      "change_text": "Improved UI responsiveness and reduced occasional freezes.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/25"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-24",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "improved",
+      "change_text": "Improved drag-and-drop behavior when adding files to Copilot Chat.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/24"
+    },
+    {
+      "id": "syn-windsurf-2026-02-11-bug-fixes-and-improvements-5",
+      "product": "windsurf",
+      "version": "2026-02-11-bug-fixes-and-improvements",
+      "released_at": "2026-02-11",
+      "kind_hint": "improved",
+      "change_text": "Improved RTL language rendering in todo lists",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-02-11-bug-fixes-and-improvements/5"
+    },
+    {
+      "id": "syn-windsurf-2026-04-14-windsurf-20-10",
+      "product": "windsurf",
+      "version": "2026-04-14-windsurf-20",
+      "released_at": "2026-04-14",
+      "kind_hint": "improved",
+      "change_text": "Improved .gitignore and .codeiumignore handling across the product",
+      "source_url": "https://windsurf.com/changelog#windsurf-20",
+      "change_id": "windsurf/2026-04-14-windsurf-20/10"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-19",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "improved",
+      "change_text": "Improved auto-approval panel UI.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.75-11",
+      "product": "claude-code",
+      "version": "2.1.75",
+      "released_at": "2026-03-13",
+      "kind_hint": "fixed",
+      "change_text": "Fixed token estimation over-counting for thinking and `tool_use` blocks, preventing premature context compaction",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-75",
+      "change_id": "claude-code/2.1.75/11"
+    },
+    {
+      "id": "syn-claude-code-2.1.120-14",
+      "product": "claude-code",
+      "version": "2.1.120",
+      "released_at": "2026-04-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `DISABLE_TELEMETRY` / `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` not suppressing usage metrics telemetry for API and enterprise users",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-120",
+      "change_id": "claude-code/2.1.120/14"
+    },
+    {
+      "id": "syn-claude-code-2.1.140-9",
+      "product": "claude-code",
+      "version": "2.1.140",
+      "released_at": "2026-05-12",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `/loop` scheduling redundant wakeups to poll for background tasks that already notify on completion",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-140",
+      "change_id": "claude-code/2.1.140/9"
+    },
+    {
+      "id": "syn-claude-code-2.1.111-25",
+      "product": "claude-code",
+      "version": "2.1.111",
+      "released_at": "2026-04-16",
+      "kind_hint": "fixed",
+      "change_text": "Fixed LSP diagnostics from before an edit appearing after it, causing the model to re-read files it just edited",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-111",
+      "change_id": "claude-code/2.1.111/25"
+    },
+    {
+      "id": "syn-claude-code-2.1.113-33",
+      "product": "claude-code",
+      "version": "2.1.113",
+      "released_at": "2026-04-17",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `plugin install` succeeding when a dependency version conflicts with an already-installed plugin — now reports `range-conflict`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-113",
+      "change_id": "claude-code/2.1.113/33"
+    },
+    {
+      "id": "syn-claude-code-2.1.140-6",
+      "product": "claude-code",
+      "version": "2.1.140",
+      "released_at": "2026-05-12",
+      "kind_hint": "fixed",
+      "change_text": "Fixed background service startup failing on machines with enterprise endpoint security by allowing more time",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-140",
+      "change_id": "claude-code/2.1.140/6"
+    },
+    {
+      "id": "syn-claude-code-2.1.120-19",
+      "product": "claude-code",
+      "version": "2.1.120",
+      "released_at": "2026-04-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `/plugin` marketplace failing to load when one entry uses an unrecognized source format — that entry is shown but installing it prompts you to update",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-120",
+      "change_id": "claude-code/2.1.120/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.77-19",
+      "product": "claude-code",
+      "version": "2.1.77",
+      "released_at": "2026-03-17",
+      "kind_hint": "fixed",
+      "change_text": "Fixed a race condition where stale-worktree cleanup could delete an agent worktree just resumed from a previous crash",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-77",
+      "change_id": "claude-code/2.1.77/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.90-10",
+      "product": "claude-code",
+      "version": "2.1.90",
+      "released_at": "2026-04-01",
+      "kind_hint": "fixed",
+      "change_text": "Fixed click-to-expand hover text being nearly invisible on light terminal themes",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-90",
+      "change_id": "claude-code/2.1.90/10"
+    },
+    {
+      "id": "syn-claude-code-2.1.97-20",
+      "product": "claude-code",
+      "version": "2.1.97",
+      "released_at": "2026-04-08",
+      "kind_hint": "fixed",
+      "change_text": "Fixed prompt-type `Stop`/`SubagentStop` hooks failing on long sessions, and hook evaluator API errors displaying \"JSON validation failed\" instead of the actual message",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+      "change_id": "claude-code/2.1.97/20"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.21-3",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.21",
+      "released_at": "2026-01-28",
+      "kind_hint": "added",
+      "change_text": "Added `disabled` status to `McpServerStatus`",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.21",
+      "change_id": "claude-agent-sdk-typescript/0.2.21/3"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.86-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.86",
+      "released_at": "2026-03-27",
+      "kind_hint": "added",
+      "change_text": "Added `getContextUsage()` control method to retrieve a breakdown of context window usage by category",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.86",
+      "change_id": "claude-agent-sdk-typescript/0.2.86/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.89-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.89",
+      "released_at": "2026-04-01",
+      "kind_hint": "added",
+      "change_text": "Added `includeSystemMessages` option to `getSessionMessages()` to optionally include system messages in session history",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.89",
+      "change_id": "claude-agent-sdk-typescript/0.2.89/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.15-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.15",
+      "released_at": "2026-01-21",
+      "kind_hint": "added",
+      "change_text": "Added `close()` method to Query interface for forcefully terminating running queries",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.15",
+      "change_id": "claude-agent-sdk-typescript/0.2.15/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.83-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.83",
+      "released_at": "2026-03-25",
+      "kind_hint": "added",
+      "change_text": "Added `seed_read_state` control subtype to seed `readFileState` with `{path, mtime}` so `Edit` works after the originating `Read` was removed from context",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.83",
+      "change_id": "claude-agent-sdk-typescript/0.2.83/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.30-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.30",
+      "released_at": "2026-02-03",
+      "kind_hint": "added",
+      "change_text": "Added `debug` and `debugFile` options for programmatic control of debug logging",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.30",
+      "change_id": "claude-agent-sdk-typescript/0.2.30/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.21-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.21",
+      "released_at": "2026-01-28",
+      "kind_hint": "added",
+      "change_text": "Added `reconnectMcpServer()` and `toggleMcpServer()` methods for managing MCP server connections",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.21",
+      "change_id": "claude-agent-sdk-typescript/0.2.21/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.85-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.85",
+      "released_at": "2026-03-26",
+      "kind_hint": "added",
+      "change_text": "Added `reloadPlugins()` SDK method to reload plugins and receive refreshed commands, agents, and MCP server status",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.85",
+      "change_id": "claude-agent-sdk-typescript/0.2.85/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.49-9",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.49",
+      "released_at": "2026-03-20",
+      "kind_hint": "added",
+      "change_text": "Added macOS x86_64 wheel to the published matrix (#661)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.49",
+      "change_id": "claude-agent-sdk-python/0.1.49/9"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.19-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.19",
+      "released_at": "2026-01-23",
+      "kind_hint": "added",
+      "change_text": "Added `CLAUDE_CODE_ENABLE_TASKS` env var, set to `true` to opt into the new task system",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.19",
+      "change_id": "claude-agent-sdk-typescript/0.2.19/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v1.6.0-1",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v1.6.0",
+      "released_at": "2026-05-01",
+      "kind_hint": "changed",
+      "change_text": "*(docs)* use correct Parameters<T> syntax in tool examples ([#814](https://github.com/modelcontextprotocol/rust-sdk/pull/814))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.6.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v1.6.0/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v1.2.0-1",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v1.2.0",
+      "released_at": "2026-03-11",
+      "kind_hint": "changed",
+      "change_text": "*(rmcp-macros)* use re-exported serde_json path in task_handler ([#735](https://github.com/modelcontextprotocol/rust-sdk/pull/735))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.2.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v1.2.0/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.17.0-10",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.17.0",
+      "released_at": "2026-02-27",
+      "kind_hint": "changed",
+      "change_text": "*(schema)* remove AddNullable from draft2020_12 settings ([#664](https://github.com/modelcontextprotocol/rust-sdk/pull/664))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.17.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.17.0/10"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/node@2.0.0-alpha.1-5",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/node@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "changed",
+      "change_text": "[#1534](https://github.com/modelcontextprotocol/typescript-sdk/pull/1534) [`69a0626`](https://github.com/modelcontextprotocol/typescript-sdk/commit/69a062693f61e024d7a366db0c3e3ba74ff59d8e) Thanks [@josefaidt](https://github.com/josefaidt)! - clean up package manager usage, all pnpm",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/node%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/node@2.0.0-alpha.1/5"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v1.1.1-1",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v1.1.1",
+      "released_at": "2026-03-09",
+      "kind_hint": "changed",
+      "change_text": "accept logging/setLevel and ping before initialized notification ([#730](https://github.com/modelcontextprotocol/rust-sdk/pull/730))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.1.1",
+      "change_id": "mcp-rust-sdk/rmcp-v1.1.1/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.13.0-5",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.13.0",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "*(task)* add task support (SEP-1686) ([#536](https://github.com/modelcontextprotocol/rust-sdk/pull/536))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.13.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.13.0/5"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/client@2.0.0-alpha.1-12",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/client@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "changed",
+      "change_text": "[#1632](https://github.com/modelcontextprotocol/typescript-sdk/pull/1632) [`d99f3ee`](https://github.com/modelcontextprotocol/typescript-sdk/commit/d99f3ee5274bb17bb0eb02c85381200feb4b43e6) Thanks [@matantsach](https://github.com/matantsach)! - Continue OAuth metadata discovery on 502 (Bad Gateway) responses, matching the existing behavior for 4xx. This fixes MCP servers behind reverse proxies that return 502 for path-aware metadata URLs. Other 5xx errors still throw to avoid retrying against overloaded servers.",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/client%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/client@2.0.0-alpha.1/12"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.15.0-5",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.15.0",
+      "released_at": "2026-02-10",
+      "kind_hint": "changed",
+      "change_text": "*(tasks)* avoid dropping completed task results during collection ([#639](https://github.com/modelcontextprotocol/rust-sdk/pull/639))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.15.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.15.0/5"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.16.0-4",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.16.0",
+      "released_at": "2026-02-17",
+      "kind_hint": "changed",
+      "change_text": "duplicate meta serialization ([#662](https://github.com/modelcontextprotocol/rust-sdk/pull/662))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.16.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.16.0/4"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v0.13.0-4",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v0.13.0",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "clarity and formatting ([#602](https://github.com/modelcontextprotocol/rust-sdk/pull/602))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v0.13.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v0.13.0/4"
+    },
+    {
+      "id": "syn-claude-code-2.1.105-13",
+      "product": "claude-code",
+      "version": "2.1.105",
+      "released_at": "2026-04-13",
+      "kind_hint": "improved",
+      "change_text": "Improved MCP large-output truncation prompt to give format-specific recipes (e.g. `jq` for JSON, computed Read chunk sizes for text)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-105",
+      "change_id": "claude-code/2.1.105/13"
+    },
+    {
+      "id": "syn-claude-code-2.1.105-7",
+      "product": "claude-code",
+      "version": "2.1.105",
+      "released_at": "2026-04-13",
+      "kind_hint": "improved",
+      "change_text": "Improved file write display: long single-line writes (e.g. minified JSON) are now truncated in the UI instead of paginating across many screens",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-105",
+      "change_id": "claude-code/2.1.105/7"
+    },
+    {
+      "id": "syn-claude-code-2.1.108-7",
+      "product": "claude-code",
+      "version": "2.1.108",
+      "released_at": "2026-04-14",
+      "kind_hint": "improved",
+      "change_text": "Improved error messages: server rate limits are now distinguished from plan usage limits; 5xx/529 errors show a link to status.claude.com; unknown slash commands suggest the closest match",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-108",
+      "change_id": "claude-code/2.1.108/7"
+    },
+    {
+      "id": "syn-claude-code-2.1.101-15",
+      "product": "claude-code",
+      "version": "2.1.101",
+      "released_at": "2026-04-10",
+      "kind_hint": "improved",
+      "change_text": "Improved SDK `query()` to clean up subprocess and temp files when consumers `break` from `for await` or use `await using`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-101",
+      "change_id": "claude-code/2.1.101/15"
+    },
+    {
+      "id": "syn-claude-code-2.1.147-5",
+      "product": "claude-code",
+      "version": "2.1.147",
+      "released_at": "2026-05-21",
+      "kind_hint": "improved",
+      "change_text": "Improved auto-updater: retries transient network failures, reports specific error categories and OS error codes on failure, and shows the current version when an update fails",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-147",
+      "change_id": "claude-code/2.1.147/5"
+    },
+    {
+      "id": "syn-claude-code-2.1.30-15",
+      "product": "claude-code",
+      "version": "2.1.30",
+      "released_at": "2026-02-03",
+      "kind_hint": "improved",
+      "change_text": "Improved memory usage for `--resume` (68% reduction for users with many sessions) by replacing the session index with lightweight stat-based loading and progressive enrichment",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-30",
+      "change_id": "claude-code/2.1.30/15"
+    },
+    {
+      "id": "syn-claude-code-2.1.45-12",
+      "product": "claude-code",
+      "version": "2.1.45",
+      "released_at": "2026-02-17",
+      "kind_hint": "improved",
+      "change_text": "Improved startup performance by removing eager loading of session history for stats caching",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-45",
+      "change_id": "claude-code/2.1.45/12"
+    },
+    {
+      "id": "syn-claude-code-2.1.111-13",
+      "product": "claude-code",
+      "version": "2.1.111",
+      "released_at": "2026-04-16",
+      "kind_hint": "improved",
+      "change_text": "Improved `/setup-vertex` and `/setup-bedrock` to show the actual `settings.json` path when `CLAUDE_CONFIG_DIR` is set, seed model candidates from existing pins on re-run, and offer a \"with 1M context\" option for supported models",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-111",
+      "change_id": "claude-code/2.1.111/13"
+    },
+    {
+      "id": "syn-claude-code-2.1.97-40",
+      "product": "claude-code",
+      "version": "2.1.97",
+      "released_at": "2026-04-08",
+      "kind_hint": "improved",
+      "change_text": "Improved footer layout: indicators (Focus, notifications) now stay on the mode-indicator row instead of wrapping below",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+      "change_id": "claude-code/2.1.97/40"
+    },
+    {
+      "id": "syn-claude-code-2.1.97-42",
+      "product": "claude-code",
+      "version": "2.1.97",
+      "released_at": "2026-04-08",
+      "kind_hint": "improved",
+      "change_text": "Improved markdown blockquotes to show a continuous left bar across wrapped lines",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+      "change_id": "claude-code/2.1.97/42"
+    },
+    {
+      "id": "syn-claude-code-action-v1.0.28-1",
+      "product": "claude-code-action",
+      "version": "v1.0.28",
+      "released_at": "2026-01-05",
+      "kind_hint": "changed",
+      "change_text": "fix: update broken link in cloud-providers.md by @ashwin-ant in https://github.com/anthropics/claude-code-action/pull/758",
+      "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.28",
+      "change_id": "claude-code-action/v1.0.28/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.7-15",
+      "product": "claude-code",
+      "version": "2.1.7",
+      "released_at": "2026-01-14",
+      "kind_hint": "changed",
+      "change_text": "[VSCode] Fixed `claudeProcessWrapper` setting passing the wrapper path instead of the Claude binary path",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-7",
+      "change_id": "claude-code/2.1.7/15"
+    },
+    {
+      "id": "syn-claude-code-2.1.128-9",
+      "product": "claude-code",
+      "version": "2.1.128",
+      "released_at": "2026-05-04",
+      "kind_hint": "changed",
+      "change_text": "SDK hosts now receive a persistent `localSettings` suggestion for Bash permission prompts, so \"Always allow\" writes to `.claude/settings.local.json`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-128",
+      "change_id": "claude-code/2.1.128/9"
+    },
+    {
+      "id": "syn-claude-code-2.1.119-4",
+      "product": "claude-code",
+      "version": "2.1.119",
+      "released_at": "2026-04-23",
+      "kind_hint": "changed",
+      "change_text": "`--from-pr` now accepts GitLab merge-request, Bitbucket pull-request, and GitHub Enterprise PR URLs",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-119",
+      "change_id": "claude-code/2.1.119/4"
+    },
+    {
+      "id": "syn-claude-code-2.1.73-24",
+      "product": "claude-code",
+      "version": "2.1.73",
+      "released_at": "2026-03-11",
+      "kind_hint": "changed",
+      "change_text": "Changed default Opus model on Bedrock, Vertex, and Microsoft Foundry to Opus 4.6 (was Opus 4.1)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-73",
+      "change_id": "claude-code/2.1.73/24"
+    },
+    {
+      "id": "syn-claude-code-2.1.63-19",
+      "product": "claude-code",
+      "version": "2.1.63",
+      "released_at": "2026-02-28",
+      "kind_hint": "changed",
+      "change_text": "VSCode: Fixed remote sessions not appearing in conversation history",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-63",
+      "change_id": "claude-code/2.1.63/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.7-13",
+      "product": "claude-code",
+      "version": "2.1.7",
+      "released_at": "2026-01-14",
+      "kind_hint": "changed",
+      "change_text": "Enabled MCP tool search auto mode by default for all users. When MCP tool descriptions exceed 10% of the context window, they are automatically deferred and discovered via the MCPSearch tool instead of being loaded upfront. This reduces context usage for users with many MCP tools configured. Users can disable this by adding `MCPSearch` to `disallowedTools` in their settings.",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-7",
+      "change_id": "claude-code/2.1.7/13"
+    },
+    {
+      "id": "syn-claude-code-2.1.145-6",
+      "product": "claude-code",
+      "version": "2.1.145",
+      "released_at": "2026-05-19",
+      "kind_hint": "changed",
+      "change_text": "Slash command and @-mention suggestion list now supports mouse hover and click in fullscreen mode",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-145",
+      "change_id": "claude-code/2.1.145/6"
+    },
+    {
+      "id": "syn-claude-code-2.1.121-17",
+      "product": "claude-code",
+      "version": "2.1.121",
+      "released_at": "2026-04-28",
+      "kind_hint": "changed",
+      "change_text": "SDK: `mcp_authenticate` now supports `redirectUri` for custom scheme completion and claude.ai connectors",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-121",
+      "change_id": "claude-code/2.1.121/17"
+    },
+    {
+      "id": "syn-claude-code-2.1.27-7",
+      "product": "claude-code",
+      "version": "2.1.27",
+      "released_at": "2026-01-30",
+      "kind_hint": "changed",
+      "change_text": "Windows: Fixed bash command execution failing for users with `.bashrc` files",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-27",
+      "change_id": "claude-code/2.1.27/7"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v1.3.0-12",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v1.3.0",
+      "released_at": "2026-03-26",
+      "kind_hint": "fixed",
+      "change_text": "fix all clippy warnings across workspace ([#746](https://github.com/modelcontextprotocol/rust-sdk/pull/746))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.3.0",
+      "change_id": "mcp-rust-sdk/rmcp-v1.3.0/12"
+    },
+    {
+      "id": "syn-mcp-ruby-sdk-0.7.1-1",
+      "product": "mcp-ruby-sdk",
+      "version": "0.7.1",
+      "released_at": "2026-02-21",
+      "kind_hint": "fixed",
+      "change_text": "Fix `logging/setLevel` to return empty hash per MCP specification (#230)",
+      "source_url": "https://github.com/modelcontextprotocol/ruby-sdk/releases/tag/v0.7.1",
+      "change_id": "mcp-ruby-sdk/0.7.1/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v1.3.0-2",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v1.3.0",
+      "released_at": "2026-03-26",
+      "kind_hint": "fixed",
+      "change_text": "fix all clippy warnings across workspace ([#746](https://github.com/modelcontextprotocol/rust-sdk/pull/746))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.3.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v1.3.0/2"
+    },
+    {
+      "id": "syn-mcp-ruby-sdk-0.16.0-1",
+      "product": "mcp-ruby-sdk",
+      "version": "0.16.0",
+      "released_at": "2026-05-14",
+      "kind_hint": "fixed",
+      "change_text": "Fix missing `output_schema` argument in `define_tool` API (#301)",
+      "source_url": "https://github.com/modelcontextprotocol/ruby-sdk/releases/tag/v0.16.0",
+      "change_id": "mcp-ruby-sdk/0.16.0/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.69-7",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.69",
+      "released_at": "2026-03-05",
+      "kind_hint": "improved",
+      "change_text": "Improved memory usage of `getSessionMessages()` for large sessions with compacted history",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.69",
+      "change_id": "claude-agent-sdk-typescript/0.2.69/7"
+    },
+    {
+      "id": "syn-anthropic-sdk-php-0.5.0-10",
+      "product": "anthropic-sdk-php",
+      "version": "0.5.0",
+      "released_at": "2026-01-30",
+      "kind_hint": "improved",
+      "change_text": "improved phpstan type annotations ([cc981bb](https://github.com/anthropics/anthropic-sdk-php/commit/cc981bb99a71dfad9ba113504c144102962348fc))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-php/releases/tag/v0.5.0",
+      "change_id": "anthropic-sdk-php/0.5.0/10"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.45-4",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.45",
+      "released_at": "2026-02-17",
+      "kind_hint": "improved",
+      "change_text": "Improved memory usage for shell commands that produce large output — RSS no longer grows unboundedly with command output size",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.45",
+      "change_id": "claude-agent-sdk-typescript/0.2.45/4"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.101-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.101",
+      "released_at": "2026-04-10",
+      "kind_hint": "fixed",
+      "change_text": "Fixed resume-session temp directory leaking on Windows when subprocess file handles weren't released before cleanup, and on macOS/APFS when `await using` disposal raced its own cleanup callback",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.101",
+      "change_id": "claude-agent-sdk-typescript/0.2.101/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.101-3",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.101",
+      "released_at": "2026-04-10",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `MaxListenersExceededWarning` when running 11+ concurrent `query()` calls",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.101",
+      "change_id": "claude-agent-sdk-typescript/0.2.101/3"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.110-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.110",
+      "released_at": "2026-04-15",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `unstable_v2_createSession` not respecting `cwd`, `settingSources`, and `allowDangerouslySkipPermissions` options",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.110",
+      "change_id": "claude-agent-sdk-typescript/0.2.110/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.94-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.94",
+      "released_at": "2026-04-07",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `getContextUsage()` to include agents passed via `options.agents` in the `agents` breakdown",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.94",
+      "change_id": "claude-agent-sdk-typescript/0.2.94/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.19-3",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.19",
+      "released_at": "2026-01-08",
+      "kind_hint": "fixed",
+      "change_text": "Fixed YAML syntax error in create-release-tag workflow (#429)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.19",
+      "change_id": "claude-agent-sdk-python/0.1.19/3"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.73-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.73",
+      "released_at": "2026-03-11",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `options.env` being overridden by the `~/.claude/settings.json` env block when not using `user` as a `settingSources` option",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.73",
+      "change_id": "claude-agent-sdk-typescript/0.2.73/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.21-4",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.21",
+      "released_at": "2026-01-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed PermissionRequest hooks not being executed in SDK mode (e.g., VS Code extension)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.21",
+      "change_id": "claude-agent-sdk-typescript/0.2.21/4"
+    },
+    {
+      "id": "syn-anthropic-sdk-csharp-Anthropic-12.1.0-5",
+      "product": "anthropic-sdk-csharp",
+      "version": "Anthropic-12.1.0",
+      "released_at": "2026-01-07",
+      "kind_hint": "fixed",
+      "change_text": "fix lint error ([d3bef74](https://github.com/anthropics/anthropic-sdk-csharp/commit/d3bef74a70da9faf737a80f6e9251a30c16f223e))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-csharp/releases/tag/Anthropic-v12.1.0",
+      "change_id": "anthropic-sdk-csharp/Anthropic-12.1.0/5"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.72-3",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.72",
+      "released_at": "2026-03-10",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `toggleMcpServer` and `reconnectMcpServer` failing with \"Server not found\" for servers passed via `query({mcpServers})`",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.72",
+      "change_id": "claude-agent-sdk-typescript/0.2.72/3"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.74-3",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.74",
+      "released_at": "2026-03-12",
+      "kind_hint": "fixed",
+      "change_text": "Fixed skills with `user-invocable: false` being included in `supportedCommands()` and the `system:init` message's `slash_commands` / `skills` lists",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.74",
+      "change_id": "claude-agent-sdk-typescript/0.2.74/3"
+    },
+    {
+      "id": "syn-cursor-3-0-7",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated the previous worktree and best-of-n selection from the Editor.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/7"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.36-1",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.36",
+      "released_at": "2026-02-13",
+      "kind_hint": "deprecated",
+      "change_text": "**Thinking configuration**: Added `ThinkingConfig` types (`ThinkingConfigAdaptive`, `ThinkingConfigEnabled`, `ThinkingConfigDisabled`) and `thinking` field to `ClaudeAgentOptions` for fine-grained control over extended thinking behavior. The new `thinking` field takes precedence over the now-deprecated `max_thinking_tokens` field (#565)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.36",
+      "change_id": "claude-agent-sdk-python/0.1.36/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.17.0-5",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.17.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "deprecated",
+      "change_text": "**client:** mark claude-3-5-haiku as deprecated ([2ed73fd](https://github.com/anthropics/anthropic-sdk-ruby/commit/2ed73fde07fa480ff55d67b47442deebb76bc1e5))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.17.0",
+      "change_id": "anthropic-sdk-ruby/1.17.0/5"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.28.0-2",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.28.0",
+      "released_at": "2026-04-03",
+      "kind_hint": "deprecated",
+      "change_text": "**client:** deprecate client-side compaction helpers ([f9dd745](https://github.com/anthropics/anthropic-sdk-ruby/commit/f9dd7457ecee0a7f6fb86dd5f2f13e742d7edb9b))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.28.0",
+      "change_id": "anthropic-sdk-ruby/1.28.0/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.34.0-1",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.34.0",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([287e6c4](https://github.com/anthropics/anthropic-sdk-ruby/commit/287e6c471b24ef580260224675dddd08218dcd68))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.34.0",
+      "change_id": "anthropic-sdk-ruby/1.34.0/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-csharp-Anthropic-12.15.0-2",
+      "product": "anthropic-sdk-csharp",
+      "version": "Anthropic-12.15.0",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([711457c](https://github.com/anthropics/anthropic-sdk-csharp/commit/711457cd6af3454ea860ce6b9e2b5594f3e5b5a2))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-csharp/releases/tag/Anthropic-v12.15.0",
+      "change_id": "anthropic-sdk-csharp/Anthropic-12.15.0/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.95.0-1",
+      "product": "anthropic-sdk-python",
+      "version": "0.95.0",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([0c1e773](https://github.com/anthropics/anthropic-sdk-python/commit/0c1e7736394585dd021b53c1f87383c4fae29a6b))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.95.0",
+      "change_id": "anthropic-sdk-python/0.95.0/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-java-2.15.0-2",
+      "product": "anthropic-sdk-java",
+      "version": "2.15.0",
+      "released_at": "2026-02-19",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** Deprecate haiku-3 ([a04dca8](https://github.com/anthropics/anthropic-sdk-java/commit/a04dca8b80e54b8452f17c325bae0cd56e238346))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-java/releases/tag/v2.15.0",
+      "change_id": "anthropic-sdk-java/2.15.0/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-go-1.36.0-1",
+      "product": "anthropic-sdk-go",
+      "version": "1.36.0",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([fc49d21](https://github.com/anthropics/anthropic-sdk-go/commit/fc49d213a3de80dd37836ef3ede4199943a81b12))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.36.0",
+      "change_id": "anthropic-sdk-go/1.36.0/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.136-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.136",
+      "released_at": "2026-05-08",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated `TodoWrite` tool — future versions will switch to Task tools (`TaskCreate`, `TaskGet`, `TaskUpdate`, `TaskList`)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.136",
+      "change_id": "claude-agent-sdk-typescript/0.2.136/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.23.0-2",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.23.0",
+      "released_at": "2026-02-19",
+      "kind_hint": "deprecated",
+      "change_text": "**api:** Deprecate haiku-3 ([66ac4a8](https://github.com/anthropics/anthropic-sdk-ruby/commit/66ac4a8ceca44fc2b4d3a68c1ce87c0c05bea5f5))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.23.0",
+      "change_id": "anthropic-sdk-ruby/1.23.0/2"
+    },
+    {
+      "id": "syn-aider-0.48.1-3",
+      "product": "aider",
+      "version": "0.48.1",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved progress indication during repo map processing.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.48.1/3"
+    },
+    {
+      "id": "syn-aider-0.83.2-3",
+      "product": "aider",
+      "version": "0.83.2",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved OpenRouter model metadata handling by introducing a local cache, increasing reliability and performance.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.83.2/3"
+    },
+    {
+      "id": "syn-aider-0.79.1-1",
+      "product": "aider",
+      "version": "0.79.1",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved model listing to include all models in fuzzy matching, including those provided by aider (not litellm).",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.79.1/1"
+    },
+    {
+      "id": "syn-aider-0.69.1-4",
+      "product": "aider",
+      "version": "0.69.1",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved environment variable setup messages on Windows.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.69.1/4"
+    },
+    {
+      "id": "syn-cursor-2-6-26",
+      "product": "cursor",
+      "version": "2-6",
+      "released_at": "2026-03-03",
+      "kind_hint": "improved",
+      "change_text": "Improved dashboard and account management with clearer visibility into overview, analytics, and collections.",
+      "source_url": "https://cursor.com/changelog/2-6",
+      "change_id": "cursor/2-6/26"
+    },
+    {
+      "id": "syn-cursor-2-4-8",
+      "product": "cursor",
+      "version": "2-4",
+      "released_at": "2026-01-22",
+      "kind_hint": "improved",
+      "change_text": "Improved capabilities & coverage for hooks (https://cursor.com/docs/agent/hooks): \\`stop\\` hook; modify prompts \\`beforeSubmitPrompt\\` ; \\`PreToolUse\\` and \\`PostToolUse\\` hooks.",
+      "source_url": "https://cursor.com/changelog/2-4",
+      "change_id": "cursor/2-4/8"
+    },
+    {
+      "id": "syn-cursor-2-5-10",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "improved",
+      "change_text": "Improved permission request flow for subagents.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/10"
+    },
+    {
+      "id": "syn-cursor-2-4-24",
+      "product": "cursor",
+      "version": "2-4",
+      "released_at": "2026-01-22",
+      "kind_hint": "improved",
+      "change_text": "Improved \\`Ctrl+C\\` detection prevents accidental exits when canceling agent runsin CLI.",
+      "source_url": "https://cursor.com/changelog/2-4",
+      "change_id": "cursor/2-4/24"
+    },
+    {
+      "id": "syn-cursor-3-4-11",
+      "product": "cursor",
+      "version": "3-4",
+      "released_at": "2026-05-13",
+      "kind_hint": "improved",
+      "change_text": "Improved search and navigation to make it faster and more reliable in large workspaces.",
+      "source_url": "https://cursor.com/changelog/3-4",
+      "change_id": "cursor/3-4/11"
+    },
+    {
+      "id": "syn-aider-0.29.2-1",
+      "product": "aider",
+      "version": "0.29.2",
+      "released_at": null,
+      "kind_hint": "improved",
+      "change_text": "Improved [model warnings](https://aider.chat/docs/llms.html#model-warnings) for unknown or unfamiliar models",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.29.2/1"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v1.0.0-alpha-2",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v1.0.0-alpha",
+      "released_at": "2026-03-03",
+      "kind_hint": "breaking",
+      "change_text": "*(auth)* [**breaking**] support returning extra fields from token exchange ([#700](https://github.com/modelcontextprotocol/rust-sdk/pull/700))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.0.0-alpha",
+      "change_id": "mcp-rust-sdk/rmcp-v1.0.0-alpha/2"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.2-3",
+      "product": "mcp-registry",
+      "version": "1.7.2",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "fix(list): use row-constructor cursor + restore per-phase publish timings + enable pg_stat_statements by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1215",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.2",
+      "change_id": "mcp-registry/1.7.2/3"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.1-2",
+      "product": "mcp-registry",
+      "version": "1.7.1",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "fix: harden registry availability and add publish phase timings by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1211",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.1",
+      "change_id": "mcp-registry/1.7.1/2"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.2-2",
+      "product": "mcp-registry",
+      "version": "1.7.2",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "deploy: update prod to v1.7.1 by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1212",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.2",
+      "change_id": "mcp-registry/1.7.2/2"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.2-1",
+      "product": "mcp-registry",
+      "version": "1.7.2",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "fix(deploy): manage Cloud Resource Manager API enablement in Pulumi by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1213",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.2",
+      "change_id": "mcp-registry/1.7.2/1"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.4-1",
+      "product": "mcp-registry",
+      "version": "1.7.4",
+      "released_at": "2026-04-29",
+      "kind_hint": "changed",
+      "change_text": "deploy: update prod to v1.7.3 by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1223",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.4",
+      "change_id": "mcp-registry/1.7.4/1"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.4-2",
+      "product": "mcp-registry",
+      "version": "1.7.4",
+      "released_at": "2026-04-29",
+      "kind_hint": "changed",
+      "change_text": "fix(deploy): bump registry pod memory to match doubled pgxpool size by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1225",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.4",
+      "change_id": "mcp-registry/1.7.4/2"
+    },
+    {
+      "id": "syn-mcp-registry-1.7.1-1",
+      "product": "mcp-registry",
+      "version": "1.7.1",
+      "released_at": "2026-04-27",
+      "kind_hint": "changed",
+      "change_text": "deploy: update prod to v1.7.0 by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1205",
+      "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.1",
+      "change_id": "mcp-registry/1.7.1/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.68-3",
+      "product": "claude-code",
+      "version": "2.1.68",
+      "released_at": "2026-03-04",
+      "kind_hint": "removed",
+      "change_text": "Removed Opus 4 and 4.1 from Claude Code on the first-party API — users with these models pinned are automatically moved to Opus 4.6",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-68",
+      "change_id": "claude-code/2.1.68/3"
+    },
+    {
+      "id": "syn-claude-code-2.1.92-19",
+      "product": "claude-code",
+      "version": "2.1.92",
+      "released_at": "2026-04-04",
+      "kind_hint": "removed",
+      "change_text": "Removed `/tag` command",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-92",
+      "change_id": "claude-code/2.1.92/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.142-24",
+      "product": "claude-code",
+      "version": "2.1.142",
+      "released_at": "2026-05-14",
+      "kind_hint": "removed",
+      "change_text": "Removed stale `/model claude-sonnet-4-20250514` suggestion from Usage Policy refusal messages",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-142",
+      "change_id": "claude-code/2.1.142/24"
+    },
+    {
+      "id": "syn-claude-code-2.1.6-24",
+      "product": "claude-code",
+      "version": "2.1.6",
+      "released_at": "2026-01-13",
+      "kind_hint": "removed",
+      "change_text": "Removed ability to @-mention MCP servers to enable/disable - use `/mcp enable <name>` instead",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-6",
+      "change_id": "claude-code/2.1.6/24"
+    },
+    {
+      "id": "syn-claude-code-2.1.92-20",
+      "product": "claude-code",
+      "version": "2.1.92",
+      "released_at": "2026-04-04",
+      "kind_hint": "removed",
+      "change_text": "Removed `/vim` command (toggle vim mode via `/config` → Editor mode)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-92",
+      "change_id": "claude-code/2.1.92/20"
+    },
+    {
+      "id": "syn-claude-code-2.1.71-28",
+      "product": "claude-code",
+      "version": "2.1.71",
+      "released_at": "2026-03-07",
+      "kind_hint": "removed",
+      "change_text": "Removed startup notification noise for unauthenticated org-registered claude.ai connectors",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-71",
+      "change_id": "claude-code/2.1.71/28"
+    },
+    {
+      "id": "syn-claude-code-2.1.31-11",
+      "product": "claude-code",
+      "version": "2.1.31",
+      "released_at": "2026-02-04",
+      "kind_hint": "removed",
+      "change_text": "Removed misleading Anthropic API pricing from model selector for third-party provider (Bedrock, Vertex, Foundry) users",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-31",
+      "change_id": "claude-code/2.1.31/11"
+    },
+    {
+      "id": "syn-claude-code-2.1.0-103",
+      "product": "claude-code",
+      "version": "2.1.0",
+      "released_at": "2026-01-07",
+      "kind_hint": "removed",
+      "change_text": "Removed underline styling from image reference links",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-0",
+      "change_id": "claude-code/2.1.0/103"
+    },
+    {
+      "id": "syn-claude-code-2.1.0-102",
+      "product": "claude-code",
+      "version": "2.1.0",
+      "released_at": "2026-01-07",
+      "kind_hint": "removed",
+      "change_text": "Removed permission prompt when entering plan mode - users can now enter plan mode without approval",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-0",
+      "change_id": "claude-code/2.1.0/102"
+    },
+    {
+      "id": "syn-claude-code-2.1.90-19",
+      "product": "claude-code",
+      "version": "2.1.90",
+      "released_at": "2026-04-01",
+      "kind_hint": "removed",
+      "change_text": "Removed `Get-DnsClientCache` and `ipconfig /displaydns` from auto-allow (DNS cache privacy)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-90",
+      "change_id": "claude-code/2.1.90/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.144-5",
+      "product": "claude-code",
+      "version": "2.1.144",
+      "released_at": "2026-05-19",
+      "kind_hint": "renamed",
+      "change_text": "Renamed \"extra usage\" to \"usage credits\" across CLI copy; `/extra-usage` is now `/usage-credits` (old name still works)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-144",
+      "change_id": "claude-code/2.1.144/5"
+    },
+    {
+      "id": "syn-claude-code-2.1.77-42",
+      "product": "claude-code",
+      "version": "2.1.77",
+      "released_at": "2026-03-17",
+      "kind_hint": "renamed",
+      "change_text": "Renamed `/fork` to `/branch` (`/fork` still works as an alias)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-77",
+      "change_id": "claude-code/2.1.77/42"
+    },
+    {
+      "id": "syn-claude-code-2.1.146-1",
+      "product": "claude-code",
+      "version": "2.1.146",
+      "released_at": "2026-05-21",
+      "kind_hint": "renamed",
+      "change_text": "Renamed `/simplify` to `/code-review` with an optional effort level (e.g. `/code-review high`)",
+      "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.146",
+      "change_id": "claude-code/2.1.146/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.147-3",
+      "product": "claude-code",
+      "version": "2.1.147",
+      "released_at": "2026-05-21",
+      "kind_hint": "renamed",
+      "change_text": "Renamed `/simplify` to `/code-review`. It now reports correctness bugs at a chosen effort level (e.g., `/code-review high`); pass `--comment` to post findings as inline GitHub PR comments. The old cleanup-and-fix behavior has been removed",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-147",
+      "change_id": "claude-code/2.1.147/3"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-35",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/35"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-28",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/28"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-1",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/1"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-35",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/35"
+    },
+    {
+      "id": "syn-windsurf-2026-04-14-windsurf-20-5",
+      "product": "windsurf",
+      "version": "2026-04-14-windsurf-20",
+      "released_at": "2026-04-14",
+      "kind_hint": "added",
+      "change_text": "New Kanban-style view showing all local and cloud agent sessions, organized by status",
+      "source_url": "https://windsurf.com/changelog#windsurf-20",
+      "change_id": "windsurf/2026-04-14-windsurf-20/5"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-17",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "Added confirmation when starting a new command to cancel the active one.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/17"
+    },
+    {
+      "id": "syn-windsurf-2026-04-27-devin-for-terminal-8",
+      "product": "windsurf",
+      "version": "2026-04-27-devin-for-terminal",
+      "released_at": "2026-04-27",
+      "kind_hint": "added",
+      "change_text": "Added support for server-driven extension deny lists",
+      "source_url": "https://windsurf.com/changelog#devin-for-terminal",
+      "change_id": "windsurf/2026-04-27-devin-for-terminal/8"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-8",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/8"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-28",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/28"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_110-96",
+      "product": "vscode-copilot-chat",
+      "version": "v1_110",
+      "released_at": "2026-02-15",
+      "kind_hint": "added",
+      "change_text": "Added `ChatSessionItemControllerNewItemHandler` so that controllers can specify the URI used for new sessions.",
+      "source_url": "https://code.visualstudio.com/updates/v1_110",
+      "change_id": "vscode-copilot-chat/v1_110/96"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_118-64",
+      "product": "vscode-copilot-chat",
+      "version": "v1_118",
+      "released_at": "2026-10-15",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+      "source_url": "https://code.visualstudio.com/updates/v1_118",
+      "change_id": "vscode-copilot-chat/v1_118/64"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_118-34",
+      "product": "vscode-copilot-chat",
+      "version": "v1_118",
+      "released_at": "2026-10-15",
+      "kind_hint": "deprecated",
+      "change_text": "**Edit Mode** is officially deprecated as of VS Code version 1.110. Users can temporarily re-enable Edit Mode via VS Code setting chat.editMode.hidden Open in VS Code Open in VS Code Insiders This setting is managed at the organization level. Contact your administrator to change it.ORG. This setting will remain supported through version 1.125. Beginning with version 1.125, Edit Mode will be fully removed and can no longer be enabled via settings.",
+      "source_url": "https://code.visualstudio.com/updates/v1_118",
+      "change_id": "vscode-copilot-chat/v1_118/34"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_119-30",
+      "product": "vscode-copilot-chat",
+      "version": "v1_119",
+      "released_at": "2026-11-15",
+      "kind_hint": "deprecated",
+      "change_text": "**Edit Mode** is officially deprecated as of VS Code version 1.110. Users can temporarily re-enable Edit Mode via VS Code setting chat.editMode.hidden Open in VS Code Open in VS Code Insiders This setting is managed at the organization level. Contact your administrator to change it.ORG. This setting will remain supported through version 1.125. Beginning with version 1.125, Edit Mode will be fully removed and can no longer be enabled via settings.",
+      "source_url": "https://code.visualstudio.com/updates/v1_119",
+      "change_id": "vscode-copilot-chat/v1_119/30"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-39",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecation (#deprecation)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/39"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-32",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecation (#deprecation)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/32"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_115-43",
+      "product": "vscode-copilot-chat",
+      "version": "v1_115",
+      "released_at": "2026-07-15",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+      "source_url": "https://code.visualstudio.com/updates/v1_115",
+      "change_id": "vscode-copilot-chat/v1_115/43"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_119-54",
+      "product": "vscode-copilot-chat",
+      "version": "v1_119",
+      "released_at": "2026-11-15",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+      "source_url": "https://code.visualstudio.com/updates/v1_119",
+      "change_id": "vscode-copilot-chat/v1_119/54"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_112-34",
+      "product": "vscode-copilot-chat",
+      "version": "v1_112",
+      "released_at": "2026-04-15",
+      "kind_hint": "deprecated",
+      "change_text": "**Edit Mode** is officially deprecated as of VS Code version 1.110. Users can temporarily re-enable Edit Mode via VS Code setting chat.editMode.hidden Open in VS Code Open in VS Code Insiders This setting is managed at the organization level. Contact your administrator to change it.ORG. This setting will remain supported through version 1.125. Beginning with version 1.125, Edit Mode will be fully removed and can no longer be enabled via settings.",
+      "source_url": "https://code.visualstudio.com/updates/v1_112",
+      "change_id": "vscode-copilot-chat/v1_112/34"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_116-73",
+      "product": "vscode-copilot-chat",
+      "version": "v1_116",
+      "released_at": "2026-08-15",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+      "source_url": "https://code.visualstudio.com/updates/v1_116",
+      "change_id": "vscode-copilot-chat/v1_116/73"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-39",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecation (#deprecation)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/39"
+    },
+    {
+      "id": "syn-claude-api-2026-02-17-3",
+      "product": "claude-api",
+      "version": "2026-02-17",
+      "released_at": "2026-02-17",
+      "kind_hint": "changed",
+      "change_text": "The [web search tool](/docs/en/agents-and-tools/tool-use/web-search-tool) and [programmatic tool calling](/docs/en/agents-and-tools/tool-use/programmatic-tool-calling) are now generally available (no beta header required). Web search and web fetch now support [dynamic filtering](/docs/en/agents-and-tools/tool-use/web-search-tool#dynamic-filtering), which uses code execution to filter results before they reach the context window for better performance and reduced token cost.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-17-2026",
+      "change_id": "claude-api/2026-02-17/3"
+    },
+    {
+      "id": "syn-claude-api-2026-05-11-1",
+      "product": "claude-api",
+      "version": "2026-05-11",
+      "released_at": "2026-05-11",
+      "kind_hint": "changed",
+      "change_text": "We've launched **Claude Platform on AWS**, bringing the Claude API to Anthropic-managed infrastructure accessible through AWS, with AWS billing and IAM authentication. Access the full Messages API, Files API, Message Batches API, Claude Managed Agents, Agent Skills, code execution, and tool use through native AWS endpoints. Learn more in [Claude Platform on AWS](/docs/en/build-with-claude/claude-platform-on-aws).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-11-2026",
+      "change_id": "claude-api/2026-05-11/1"
+    },
+    {
+      "id": "syn-anthropic-apps-2026-04-09-claude-cowork-3",
+      "product": "anthropic-apps",
+      "version": "2026-04-09-claude-cowork",
+      "released_at": "2026-04-09",
+      "kind_hint": "changed",
+      "change_text": "Claude Cowork OpenTelemetry support. For more information, see Monitor Claude Cowork activity with OpenTelemetry.",
+      "source_url": "https://support.claude.com/en/articles/12138966-release-notes",
+      "change_id": "anthropic-apps/2026-04-09-claude-cowork/3"
+    },
+    {
+      "id": "syn-anthropic-cli-1.3.0-9",
+      "product": "anthropic-cli",
+      "version": "1.3.0",
+      "released_at": "2026-04-23",
+      "kind_hint": "changed",
+      "change_text": "**cli:** use `ShowJSONOpts` as argument to `formatJSON` instead of many positionals ([a9ac5e1](https://github.com/anthropics/anthropic-cli/commit/a9ac5e1e6a65abfbb1001aabdb7d804e723644d4))",
+      "source_url": "https://github.com/anthropics/anthropic-cli/releases/tag/v1.3.0",
+      "change_id": "anthropic-cli/1.3.0/9"
+    },
+    {
+      "id": "syn-claude-api-2026-05-06-3",
+      "product": "claude-api",
+      "version": "2026-05-06",
+      "released_at": "2026-05-06",
+      "kind_hint": "changed",
+      "change_text": "Webhooks for Claude Managed Agents are now supported. Webhook event types include session and vault lifecycle events. See [Subscribe to webhooks](/docs/en/managed-agents/webhooks).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-6-2026",
+      "change_id": "claude-api/2026-05-06/3"
+    },
+    {
+      "id": "syn-claude-api-2026-05-06-4",
+      "product": "claude-api",
+      "version": "2026-05-06",
+      "released_at": "2026-05-06",
+      "kind_hint": "changed",
+      "change_text": "Additional filtering and sorting options are now supported for Claude Managed Agents. Sessions can be filtered by status, and events can be filtered by type. Events can now be filtered by creation time.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-6-2026",
+      "change_id": "claude-api/2026-05-06/4"
+    },
+    {
+      "id": "syn-anthropic-apps-2026-03-11-claude-excel-2",
+      "product": "anthropic-apps",
+      "version": "2026-03-11-claude-excel",
+      "released_at": "2026-03-11",
+      "kind_hint": "changed",
+      "change_text": "Use Claude for Excel and PowerPoint with an LLM gateway",
+      "source_url": "https://support.claude.com/en/articles/12138966-release-notes",
+      "change_id": "anthropic-apps/2026-03-11-claude-excel/2"
+    },
+    {
+      "id": "syn-anthropic-cli-1.3.0-1",
+      "product": "anthropic-cli",
+      "version": "1.3.0",
+      "released_at": "2026-04-23",
+      "kind_hint": "changed",
+      "change_text": "**api:** CMA Memory public beta ([926d861](https://github.com/anthropics/anthropic-cli/commit/926d861abb348b8279019e2c95822592b2dd68f7))",
+      "source_url": "https://github.com/anthropics/anthropic-cli/releases/tag/v1.3.0",
+      "change_id": "anthropic-cli/1.3.0/1"
+    },
+    {
+      "id": "syn-claude-api-2026-03-30-2",
+      "product": "claude-api",
+      "version": "2026-03-30",
+      "released_at": "2026-03-30",
+      "kind_hint": "changed",
+      "change_text": "We're retiring the 1M token context window beta for Claude Sonnet 4.5 and Claude Sonnet 4 on **April 30, 2026**. After that date, the `context-1m-2025-08-07` beta header will have no effect on these models, and requests that exceed the standard 200k-token context window will return an error. To continue using 1M context windows, migrate to [Claude Sonnet 4.6](/docs/en/about-claude/models/overview#latest-models-comparison) or [Claude Opus 4.6](/docs/en/about-claude/models/overview#latest-models-comparison), which support the full 1M token context window at standard pricing with no beta header required.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#march-30-2026",
+      "change_id": "claude-api/2026-03-30/2"
+    },
+    {
+      "id": "syn-claude-api-2026-02-05-3",
+      "product": "claude-api",
+      "version": "2026-02-05",
+      "released_at": "2026-02-05",
+      "kind_hint": "changed",
+      "change_text": "We've launched the [compaction API](/docs/en/build-with-claude/compaction) in beta, providing server-side context summarization for effectively infinite conversations. Available on Opus 4.6.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-5-2026",
+      "change_id": "claude-api/2026-02-05/3"
+    },
+    {
+      "id": "syn-claude-api-2026-02-19-3",
+      "product": "claude-api",
+      "version": "2026-02-19",
+      "released_at": "2026-02-19",
+      "kind_hint": "deprecated",
+      "change_text": "We announced the deprecation of the Claude Haiku 3 model (`claude-3-haiku-20240307`), with retirement scheduled for April 20, 2026. We recommend migrating to [Claude Haiku 4.5](/docs/en/about-claude/models/overview#latest-models-comparison). Read more in [Model deprecations](/docs/en/about-claude/model-deprecations).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-19-2026",
+      "change_id": "claude-api/2026-02-19/3"
+    },
+    {
+      "id": "syn-claude-api-2026-04-14-1",
+      "product": "claude-api",
+      "version": "2026-04-14",
+      "released_at": "2026-04-14",
+      "kind_hint": "deprecated",
+      "change_text": "We announced the deprecation of the Claude Sonnet 4 model (`claude-sonnet-4-20250514`) and the Claude Opus 4 model (`claude-opus-4-20250514`), with retirement on the Claude API scheduled for June 15, 2026. We recommend migrating to [Claude Sonnet 4.6](/docs/en/about-claude/models/overview#latest-models-comparison) and [Claude Opus 4.7](/docs/en/about-claude/models/overview#latest-models-comparison) respectively. Read more in [model deprecations](/docs/en/about-claude/model-deprecations).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#april-14-2026",
+      "change_id": "claude-api/2026-04-14/1"
+    },
+    {
+      "id": "syn-claude-api-2026-02-05-1",
+      "product": "claude-api",
+      "version": "2026-02-05",
+      "released_at": "2026-02-05",
+      "kind_hint": "deprecated",
+      "change_text": "We've launched [Claude Opus 4.6](https://www.anthropic.com/news/claude-opus-4-6), our most intelligent model for complex agentic tasks and long-horizon work. Opus 4.6 recommends [adaptive thinking](/docs/en/build-with-claude/adaptive-thinking) (`thinking: {type: \"adaptive\"}`); manual thinking (`type: \"enabled\"` with `budget_tokens`) is deprecated. Opus 4.6 does not support prefilling assistant messages. Learn more in [What's new in Claude 4.6](/docs/en/about-claude/models/whats-new-claude-4-6).",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#february-5-2026",
+      "change_id": "claude-api/2026-02-05/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.18-1",
+      "product": "claude-code",
+      "version": "2.1.18",
+      "released_at": "2026-01-23",
+      "kind_hint": "added",
+      "change_text": "Added customizable keyboard shortcuts. Configure keybindings per context, create chord sequences, and personalize your workflow. Run `/keybindings` to get started. Learn more at https://code.claude.com/docs/en/keybindings",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-18",
+      "change_id": "claude-code/2.1.18/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.69-9",
+      "product": "claude-code",
+      "version": "2.1.69",
+      "released_at": "2026-03-05",
+      "kind_hint": "added",
+      "change_text": "Added `includeGitInstructions` setting (and `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS` env var) to remove built-in commit and PR workflow instructions from Claude's system prompt",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-69",
+      "change_id": "claude-code/2.1.69/9"
+    },
+    {
+      "id": "syn-claude-code-2.1.23-1",
+      "product": "claude-code",
+      "version": "2.1.23",
+      "released_at": "2026-01-29",
+      "kind_hint": "added",
+      "change_text": "Added customizable spinner verbs setting (`spinnerVerbs`)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-23",
+      "change_id": "claude-code/2.1.23/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.89-3",
+      "product": "claude-code",
+      "version": "2.1.89",
+      "released_at": "2026-04-01",
+      "kind_hint": "added",
+      "change_text": "Added `PermissionDenied` hook that fires after auto mode classifier denials — return `{retry: true}` to tell the model it can retry",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-89",
+      "change_id": "claude-code/2.1.89/3"
+    },
+    {
+      "id": "syn-claude-code-2.1.81-1",
+      "product": "claude-code",
+      "version": "2.1.81",
+      "released_at": "2026-03-20",
+      "kind_hint": "added",
+      "change_text": "Added `--bare` flag for scripted `-p` calls — skips hooks, LSP, plugin sync, and skill directory walks; requires `ANTHROPIC_API_KEY` or an `apiKeyHelper` via `--settings` (OAuth and keychain auth disabled); auto-memory fully disabled",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-81",
+      "change_id": "claude-code/2.1.81/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.85-2",
+      "product": "claude-code",
+      "version": "2.1.85",
+      "released_at": "2026-03-26",
+      "kind_hint": "added",
+      "change_text": "Added conditional `if` field for hooks using permission rule syntax (e.g., `Bash(git *)`) to filter when they run, reducing process spawning overhead",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-85",
+      "change_id": "claude-code/2.1.85/2"
+    },
+    {
+      "id": "syn-claude-code-2.1.20-4",
+      "product": "claude-code",
+      "version": "2.1.20",
+      "released_at": "2026-01-27",
+      "kind_hint": "added",
+      "change_text": "Added support for loading `CLAUDE.md` files from additional directories specified via `--add-dir` flag (requires setting `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1`)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-20",
+      "change_id": "claude-code/2.1.20/4"
+    },
+    {
+      "id": "syn-claude-code-2.1.69-10",
+      "product": "claude-code",
+      "version": "2.1.69",
+      "released_at": "2026-03-05",
+      "kind_hint": "added",
+      "change_text": "Added `/reload-plugins` command to activate pending plugin changes without restarting",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-69",
+      "change_id": "claude-code/2.1.69/10"
+    },
+    {
+      "id": "syn-claude-code-2.1.14-1",
+      "product": "claude-code",
+      "version": "2.1.14",
+      "released_at": "2026-01-20",
+      "kind_hint": "added",
+      "change_text": "Added history-based autocomplete in bash mode (`!`) - type a partial command and press Tab to complete from your bash command history",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-14",
+      "change_id": "claude-code/2.1.14/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.27-1",
+      "product": "claude-code",
+      "version": "2.1.27",
+      "released_at": "2026-01-30",
+      "kind_hint": "added",
+      "change_text": "Added tool call failures and denials to debug logs",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-27",
+      "change_id": "claude-code/2.1.27/1"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-24",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "changed",
+      "change_text": "CLI output now detects your terminal's dark or light background and adjusts colors to match.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/24"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-6",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "changed",
+      "change_text": "CLI now stores conversation transcripts that the agent can use as context.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/6"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/config-yaml@1.38.0-21",
+      "product": "continue-dev",
+      "version": "@continuedev/config-yaml@1.38.0",
+      "released_at": "2026-01-13",
+      "kind_hint": "changed",
+      "change_text": "Initialize usage field in createSession and startNewSession ([5c50e91](https://github.com/continuedev/continue/commit/5c50e911d203fc0a7ae6407f84bdfafd8c1f19f4))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/config-yaml%401.38.0",
+      "change_id": "continue-dev/@continuedev/config-yaml@1.38.0/21"
+    },
+    {
+      "id": "syn-cursor-cli-jan-08-2026-13",
+      "product": "cursor",
+      "version": "cli-jan-08-2026",
+      "released_at": "2026-01-08",
+      "kind_hint": "changed",
+      "change_text": "\\*\\*\\`Shift+Enter\\`\\*\\* now inserts a newline instead of submitting, making it easier to write multi-line prompts.",
+      "source_url": "https://cursor.com/changelog/cli-jan-08-2026",
+      "change_id": "cursor/cli-jan-08-2026/13"
+    },
+    {
+      "id": "syn-cursor-05-07-26-6",
+      "product": "cursor",
+      "version": "05-07-26",
+      "released_at": "2026-05-07",
+      "kind_hint": "changed",
+      "change_text": "\\`/multitask\\` is now available in the editor for running async subagents to parallelize your requests instead of adding them to the queue.",
+      "source_url": "https://cursor.com/changelog/05-07-26",
+      "change_id": "cursor/05-07-26/6"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/fetch@1.8.0-2",
+      "product": "continue-dev",
+      "version": "@continuedev/fetch@1.8.0",
+      "released_at": "2026-01-22",
+      "kind_hint": "changed",
+      "change_text": "add GH_TOKEN to continue-agents workflow ([dd93919](https://github.com/continuedev/continue/commit/dd939190701be55917d4d224f012017e8ea17be9)), closes [#9493](https://github.com/continuedev/continue/issues/9493)",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/fetch%401.8.0",
+      "change_id": "continue-dev/@continuedev/fetch@1.8.0/2"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/config-yaml@1.40.0-41",
+      "product": "continue-dev",
+      "version": "@continuedev/config-yaml@1.40.0",
+      "released_at": "2026-01-31",
+      "kind_hint": "changed",
+      "change_text": "**cli:** detect wsl and spawn appropriate shell ([a9ae420](https://github.com/continuedev/continue/commit/a9ae4205e12c7974d5b6c0feea964af9b97e1630))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/config-yaml%401.40.0",
+      "change_id": "continue-dev/@continuedev/config-yaml@1.40.0/41"
+    },
+    {
+      "id": "syn-aider-0.82.3-1",
+      "product": "aider",
+      "version": "0.82.3",
+      "released_at": null,
+      "kind_hint": "changed",
+      "change_text": "Add support for `gemini-2.5-flash-preview-04-17` models.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.82.3/1"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/openai-adapters@1.37.0-9",
+      "product": "continue-dev",
+      "version": "@continuedev/openai-adapters@1.37.0",
+      "released_at": "2026-01-14",
+      "kind_hint": "changed",
+      "change_text": "don't fallback to relative path if not markdown file ([d93b432](https://github.com/continuedev/continue/commit/d93b4321a550acf7151949d1fee1c436945e2ee0))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/openai-adapters%401.37.0",
+      "change_id": "continue-dev/@continuedev/openai-adapters@1.37.0/9"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/fetch@1.8.0-18",
+      "product": "continue-dev",
+      "version": "@continuedev/fetch@1.8.0",
+      "released_at": "2026-01-22",
+      "kind_hint": "changed",
+      "change_text": "Constrain root eslint to v8 to match core dependency ([ad6ab80](https://github.com/continuedev/continue/commit/ad6ab8024b888816dcf0c8eb39921a98777ec5ab))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/fetch%401.8.0",
+      "change_id": "continue-dev/@continuedev/fetch@1.8.0/18"
+    },
+    {
+      "id": "syn-windsurf-2026-04-27-devin-for-terminal-6",
+      "product": "windsurf",
+      "version": "2026-04-27-devin-for-terminal",
+      "released_at": "2026-04-27",
+      "kind_hint": "fixed",
+      "change_text": "Fixed file drag-and-drop in agent window Cascade tabs",
+      "source_url": "https://windsurf.com/changelog#devin-for-terminal",
+      "change_id": "windsurf/2026-04-27-devin-for-terminal/6"
+    },
+    {
+      "id": "syn-windsurf-2026-04-28-bug-fixes--improvements-2",
+      "product": "windsurf",
+      "version": "2026-04-28-bug-fixes--improvements",
+      "released_at": "2026-04-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed an authentication issue that could prevent Devin Cloud sessions from starting",
+      "source_url": "https://windsurf.com/changelog#bug-fixes--improvements",
+      "change_id": "windsurf/2026-04-28-bug-fixes--improvements/2"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-23",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "fixed",
+      "change_text": "Fixed **Shift+Home** and **Shift+End** issues for inline selection.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/23"
+    },
+    {
+      "id": "syn-windsurf-2026-04-15-bug-fixes-and-improvements-2",
+      "product": "windsurf",
+      "version": "2026-04-15-bug-fixes-and-improvements",
+      "released_at": "2026-04-15",
+      "kind_hint": "fixed",
+      "change_text": "Fixed bug with spawning Terminal sessions on Windows",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-04-15-bug-fixes-and-improvements/2"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-23",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "fixed",
+      "change_text": "Fixed **Shift+Home** and **Shift+End** issues for inline selection.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/23"
+    },
+    {
+      "id": "syn-windsurf-2026-04-28-bug-fixes--improvements-1",
+      "product": "windsurf",
+      "version": "2026-04-28-bug-fixes--improvements",
+      "released_at": "2026-04-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed a crash that could occur when switching between Cascade conversations",
+      "source_url": "https://windsurf.com/changelog#bug-fixes--improvements",
+      "change_id": "windsurf/2026-04-28-bug-fixes--improvements/1"
+    },
+    {
+      "id": "syn-windsurf-2026-05-16-bug-fixes-and-improvements-1",
+      "product": "windsurf",
+      "version": "2026-05-16-bug-fixes-and-improvements",
+      "released_at": "2026-05-16",
+      "kind_hint": "fixed",
+      "change_text": "Fixed availability issues with swe-check model for some users.",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-05-16-bug-fixes-and-improvements/1"
+    },
+    {
+      "id": "syn-windsurf-2026-02-11-bug-fixes-and-improvements-3",
+      "product": "windsurf",
+      "version": "2026-02-11-bug-fixes-and-improvements",
+      "released_at": "2026-02-11",
+      "kind_hint": "fixed",
+      "change_text": "Fixed osascript privilege escalation being incorrectly triggered on Linux for shell command installation",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-02-11-bug-fixes-and-improvements/3"
+    },
+    {
+      "id": "syn-windsurf-2026-02-16-bug-fixes-and-improvements-1",
+      "product": "windsurf",
+      "version": "2026-02-16-bug-fixes-and-improvements",
+      "released_at": "2026-02-16",
+      "kind_hint": "fixed",
+      "change_text": "Fix for self-updating on Windows",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-02-16-bug-fixes-and-improvements/1"
+    },
+    {
+      "id": "syn-windsurf-2026-02-16-bug-fixes-and-improvements-2",
+      "product": "windsurf",
+      "version": "2026-02-16-bug-fixes-and-improvements",
+      "released_at": "2026-02-16",
+      "kind_hint": "fixed",
+      "change_text": "Fix for macOS UI flickering",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-02-16-bug-fixes-and-improvements/2"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-34",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "fixed",
+      "change_text": "Fixed \\`resume\\` in non-git workspaces.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/34"
+    },
+    {
+      "id": "syn-cursor-3-0-30",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "fixed",
+      "change_text": "Fixed a bug where expanding/collapsing thinking blocks didn't work while streaming was still in progress.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/30"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-33",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "fixed",
+      "change_text": "Fixed abort restore so when no checkpoint exists, state rolls back cleanly and user text is preserved.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/33"
+    },
+    {
+      "id": "syn-cursor-3-4-17",
+      "product": "cursor",
+      "version": "3-4",
+      "released_at": "2026-05-13",
+      "kind_hint": "fixed",
+      "change_text": "Fixed keyboard shortcuts bugs in modals, vim/emacs caret style leakage, and other key handling.",
+      "source_url": "https://cursor.com/changelog/3-4",
+      "change_id": "cursor/3-4/17"
+    },
+    {
+      "id": "syn-aider-0.72.1-1",
+      "product": "aider",
+      "version": "0.72.1",
+      "released_at": null,
+      "kind_hint": "fixed",
+      "change_text": "Fix model metadata for `openrouter/deepseek/deepseek-r1`",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.72.1/1"
+    },
+    {
+      "id": "syn-aider-0.85.2-5",
+      "product": "aider",
+      "version": "0.85.2",
+      "released_at": null,
+      "kind_hint": "fixed",
+      "change_text": "Fixed an issue where new settings for an existing model didn't replace the old ones, by Andrew Grigorev.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.85.2/5"
+    },
+    {
+      "id": "syn-cursor-2-4-41",
+      "product": "cursor",
+      "version": "2-4",
+      "released_at": "2026-01-22",
+      "kind_hint": "fixed",
+      "change_text": "Fixed some cases of input lag when handling rapid text changes in CLI.",
+      "source_url": "https://cursor.com/changelog/2-4",
+      "change_id": "cursor/2-4/41"
+    },
+    {
+      "id": "syn-cursor-2-5-22",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "fixed",
+      "change_text": "Fixed an auto-run mode switching bug.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/22"
+    },
+    {
+      "id": "syn-cursor-2-4-40",
+      "product": "cursor",
+      "version": "2-4",
+      "released_at": "2026-01-22",
+      "kind_hint": "fixed",
+      "change_text": "Fixed the accept/reject diff UI sometimes not appearing when edits were made to dotfiles.",
+      "source_url": "https://cursor.com/changelog/2-4",
+      "change_id": "cursor/2-4/40"
+    },
+    {
+      "id": "syn-cursor-2-6-23",
+      "product": "cursor",
+      "version": "2-6",
+      "released_at": "2026-03-03",
+      "kind_hint": "fixed",
+      "change_text": "Fixed team permission and access control inconsistencies across organization setups.",
+      "source_url": "https://cursor.com/changelog/2-6",
+      "change_id": "cursor/2-6/23"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.3.142-3",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.3.142",
+      "released_at": "2026-05-14",
+      "kind_hint": "breaking",
+      "change_text": "**Breaking:** Headless and SDK sessions now use Task tools (`TaskCreate` / `TaskUpdate` / `TaskGet` / `TaskList`) instead of `TodoWrite`, deprecated since 0.2.136. Tool consumers should accumulate by task ID instead of replacing a snapshot list.",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+      "change_id": "claude-agent-sdk-typescript/0.3.142/3"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.3.142-2",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.3.142",
+      "released_at": "2026-05-14",
+      "kind_hint": "breaking",
+      "change_text": "**Breaking:** MCP servers now connect in the background by default; sessions start immediately and slow servers report `status: \"pending\"` in `init` until ready. Set `MCP_CONNECTION_NONBLOCKING=0` to restore the old behavior of waiting up to 5s before the first query, or mark a server `alwaysLoad: true` to require it in turn 1.",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+      "change_id": "claude-agent-sdk-typescript/0.3.142/2"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.69-5",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.69",
+      "released_at": "2026-03-05",
+      "kind_hint": "breaking",
+      "change_text": "Fixed breaking change: `system:init` and `result` events now emit `'Task'` as the Agent tool name again (reverted from `'Agent'`, which was an unintentional breaking change in a patch release). The wire name will migrate to `'Agent'` in the next minor release.",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.69",
+      "change_id": "claude-agent-sdk-typescript/0.2.69/5"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.70-2",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.70",
+      "released_at": "2026-04-28",
+      "kind_hint": "breaking",
+      "change_text": "**Trio nursery corruption on early cancellation**: Fixed `RuntimeError: Nursery stack corrupted` when breaking out of `query()` iteration inside a trio nursery with `options.stderr` set. The stderr reader now uses `spawn_detached()` instead of manually managing a task group, matching the approach already used for the read loop (#885)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.70",
+      "change_id": "claude-agent-sdk-python/0.1.70/2"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.77.0-6",
+      "product": "anthropic-sdk-python",
+      "version": "0.77.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "breaking",
+      "change_text": "remove class causing breaking change ([#1333](https://github.com/anthropics/anthropic-sdk-python/issues/1333)) ([81ee953](https://github.com/anthropics/anthropic-sdk-python/commit/81ee9533d14f9dc3753a4a1320ea744825b17e92))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.77.0",
+      "change_id": "anthropic-sdk-python/0.77.0/6"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.3.142-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.3.142",
+      "released_at": "2026-05-14",
+      "kind_hint": "breaking",
+      "change_text": "**Breaking:** Removed the v2 session API (`unstable_v2_createSession`, `unstable_v2_resumeSession`, `unstable_v2_prompt`, `SDKSession`, `SDKSessionOptions`), deprecated since 0.2.133. Use `query()` — pass an `AsyncIterable<SDKUserMessage>` for multi-turn, or `options.resume` to continue a session.",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.142",
+      "change_id": "claude-agent-sdk-typescript/0.3.142/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.113-5",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.113",
+      "released_at": "2026-04-17",
+      "kind_hint": "breaking",
+      "change_text": "**Breaking**: `options.env` once again replaces `process.env` for the CLI subprocess instead of overlaying it. To add or override individual variables, pass `env: { ...process.env, MY_VAR: \"x\" }`",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.113",
+      "change_id": "claude-agent-sdk-typescript/0.2.113/5"
+    },
+    {
+      "id": "syn-anthropic-sdk-typescript-0.72.0-3",
+      "product": "anthropic-sdk-typescript",
+      "version": "0.72.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "breaking",
+      "change_text": "**ci:** add breaking change detection workflow ([b181568](https://github.com/anthropics/anthropic-sdk-typescript/commit/b181568601537957f91f7123420d8d0f4625c2b7))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/sdk-v0.72.0",
+      "change_id": "anthropic-sdk-typescript/0.72.0/3"
+    },
+    {
+      "id": "syn-aider-main-7",
+      "product": "aider",
+      "version": "main",
+      "released_at": null,
+      "kind_hint": "removed",
+      "change_text": "Removed deprecated google-generativeai dependency to eliminate import warnings, by Mark McDonald.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/main/7"
+    },
+    {
+      "id": "syn-cursor-3-0-8",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "removed",
+      "change_text": "Removed cloud agents from the Editor.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/8"
+    },
+    {
+      "id": "syn-cursor-3-4-9",
+      "product": "cursor",
+      "version": "3-4",
+      "released_at": "2026-05-13",
+      "kind_hint": "removed",
+      "change_text": "Removed noisy in-app terminal notifications and improved shortcut behavior.",
+      "source_url": "https://cursor.com/changelog/3-4",
+      "change_id": "cursor/3-4/9"
+    },
+    {
+      "id": "syn-aider-0.48.1-5",
+      "product": "aider",
+      "version": "0.48.1",
+      "released_at": null,
+      "kind_hint": "removed",
+      "change_text": "Removed obsolete 16k token limit on commit diffs, use per-model limits.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.48.1/5"
+    },
+    {
+      "id": "syn-cursor-2-5-15",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "removed",
+      "change_text": "Removed Default Mode setting so each new agent conversation begins fresh.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/15"
+    },
+    {
+      "id": "syn-aider-0.80.1-2",
+      "product": "aider",
+      "version": "0.80.1",
+      "released_at": null,
+      "kind_hint": "removed",
+      "change_text": "Removed redundant dependency check during OpenRouter OAuth flow, by Claudia Pellegrino.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.80.1/2"
+    },
+    {
+      "id": "syn-aider-0.19.1-1",
+      "product": "aider",
+      "version": "0.19.1",
+      "released_at": null,
+      "kind_hint": "removed",
+      "change_text": "Removed stray debug output.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.19.1/1"
+    },
+    {
+      "id": "syn-cursor-2-5-14",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "removed",
+      "change_text": "Removed the Dotfile Protection setting to remove unexpected approval prompts when the agent tried to edit dotfiles.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/14"
+    },
+    {
+      "id": "syn-cursor-2-5-16",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "removed",
+      "change_text": "Removed Auto-Accept on Commit setting so pending diffs are automatically accepted when you commit.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/16"
+    },
+    {
+      "id": "syn-cursor-2-5-9",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "renamed",
+      "change_text": "Renamed \"Duplicate Chat\" to \"Fork Chat\" in the three-dot menu of a chat message.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/9"
+    },
+    {
+      "id": "syn-cursor-3-0-6",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "added",
+      "change_text": "Added a new command \\`/best-of-n\\` that runs the same task in parallel across multiple models, each in its own isolated worktree, then compares outcomes.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/6"
+    },
+    {
+      "id": "syn-aider-0.85.2-1",
+      "product": "aider",
+      "version": "0.85.2",
+      "released_at": null,
+      "kind_hint": "added",
+      "change_text": "Added support for Grok-4 via `xai/grok-4` and `openrouter/x-ai/grok-4` model names.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.85.2/1"
+    },
+    {
+      "id": "syn-cursor-04-08-26-2",
+      "product": "cursor",
+      "version": "04-08-26",
+      "released_at": "2026-04-08",
+      "kind_hint": "added",
+      "change_text": "Added a \"Fix All\" action to apply multiple Bugbot fixes in one operation.",
+      "source_url": "https://cursor.com/changelog/04-08-26",
+      "change_id": "cursor/04-08-26/2"
+    },
+    {
+      "id": "syn-cursor-3-0-5",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "added",
+      "change_text": "Added a new command \\`/worktree\\` that creates a separate git worktree so changes happen in isolation.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/5"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-18",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "added",
+      "change_text": "Added Emacs-style navigation: \\*\\*\\`Ctrl+N\\`/\\`Ctrl+P\\`\\*\\* for up/down and \\*\\*\\`Ctrl+G\\`\\*\\* for cancel/dismiss, alongside the existing arrow keys and \\`Esc\\`.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/18"
+    },
+    {
+      "id": "syn-cursor-2-5-18",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "added",
+      "change_text": "Added a Close button to the agent chat pane.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/18"
+    },
+    {
+      "id": "syn-aider-0.48.1-1",
+      "product": "aider",
+      "version": "0.48.1",
+      "released_at": null,
+      "kind_hint": "added",
+      "change_text": "Added `openai/gpt-4o-2024-08-06`.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.48.1/1"
+    },
+    {
+      "id": "syn-aider-0.74.3-3",
+      "product": "aider",
+      "version": "0.74.3",
+      "released_at": null,
+      "kind_hint": "added",
+      "change_text": "Added openrouter/o3-mini-high model configuration.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.74.3/3"
+    },
+    {
+      "id": "syn-aider-0.43.4-1",
+      "product": "aider",
+      "version": "0.43.4",
+      "released_at": null,
+      "kind_hint": "added",
+      "change_text": "Added scipy back to main requirements.txt.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.43.4/1"
+    },
+    {
+      "id": "syn-cursor-3-0-21",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "added",
+      "change_text": "Added a \"scroll to bottom\" button in the agent panel that appears when content overflows.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/21"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v0.14.0-2",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v0.14.0",
+      "released_at": "2026-01-23",
+      "kind_hint": "added",
+      "change_text": "added hyper-mcp to the list of built with rmcp ([#621](https://github.com/modelcontextprotocol/rust-sdk/pull/621))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v0.14.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v0.14.0/2"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.14.0-4",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.14.0",
+      "released_at": "2026-01-23",
+      "kind_hint": "added",
+      "change_text": "added hyper-mcp to the list of built with rmcp ([#621](https://github.com/modelcontextprotocol/rust-sdk/pull/621))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.14.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.14.0/4"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-21-github-copilot-for-eclipse-is-open-source-4",
+      "product": "github-copilot",
+      "version": "2026-05-21-github-copilot-for-eclipse-is-open-source",
+      "released_at": "2026-05-21",
+      "kind_hint": "changed",
+      "change_text": "✨ What's new (#%e2%9c%a8-whats-new)",
+      "source_url": "https://github.blog/changelog/2026-05-21-github-copilot-for-eclipse-is-open-source",
+      "change_id": "github-copilot/2026-05-21-github-copilot-for-eclipse-is-open-source/4"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_117-34",
+      "product": "vscode-copilot-chat",
+      "version": "v1_117",
+      "released_at": "2026-09-15",
+      "kind_hint": "changed",
+      "change_text": "@IllusionMH (Andrii Dieiev) (https://github.com/IllusionMH)",
+      "source_url": "https://code.visualstudio.com/updates/v1_117",
+      "change_id": "vscode-copilot-chat/v1_117/34"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_111-34",
+      "product": "vscode-copilot-chat",
+      "version": "v1_111",
+      "released_at": "2026-03-15",
+      "kind_hint": "changed",
+      "change_text": "@Rohan5commit (Rohan Santhosh) (https://github.com/Rohan5commit): docs: fix duplicated wording in proposed API comment PR #298522 (https://github.com/microsoft/vscode/pull/298522)",
+      "source_url": "https://code.visualstudio.com/updates/v1_111",
+      "change_id": "vscode-copilot-chat/v1_111/34"
+    },
+    {
+      "id": "syn-windsurf-2026-05-16-bug-fixes-and-improvements-4",
+      "product": "windsurf",
+      "version": "2026-05-16-bug-fixes-and-improvements",
+      "released_at": "2026-05-16",
+      "kind_hint": "changed",
+      "change_text": "Repaired path resolution for the Devin local agent on WSL",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-05-16-bug-fixes-and-improvements/4"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_116-68",
+      "product": "vscode-copilot-chat",
+      "version": "v1_116",
+      "released_at": "2026-08-15",
+      "kind_hint": "changed",
+      "change_text": "Integrated browser (#_integrated-browser)",
+      "source_url": "https://code.visualstudio.com/updates/v1_116",
+      "change_id": "vscode-copilot-chat/v1_116/68"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_113-47",
+      "product": "vscode-copilot-chat",
+      "version": "v1_113",
+      "released_at": "2026-05-15",
+      "kind_hint": "changed",
+      "change_text": "Agent experience (#_agent-experience)",
+      "source_url": "https://code.visualstudio.com/updates/v1_113",
+      "change_id": "vscode-copilot-chat/v1_113/47"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_120-52",
+      "product": "vscode-copilot-chat",
+      "version": "v1_120",
+      "released_at": "2026-12-15",
+      "kind_hint": "changed",
+      "change_text": "@EhabY (Ehab Younes) (https://github.com/EhabY): Detect dead connections via keepalive timeout PR #310131 (https://github.com/microsoft/vscode/pull/310131)",
+      "source_url": "https://code.visualstudio.com/updates/v1_120",
+      "change_id": "vscode-copilot-chat/v1_120/52"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api-1",
+      "product": "github-copilot",
+      "version": "2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api",
+      "released_at": "2026-05-08",
+      "kind_hint": "changed",
+      "change_text": "What's new (#whats-new)",
+      "source_url": "https://github.blog/changelog/2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api",
+      "change_id": "github-copilot/2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api/1"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_109-140",
+      "product": "vscode-copilot-chat",
+      "version": "v1_109",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "@ChaseKnowlden (https://github.com/ChaseKnowlden): Hover on keyboard modifier should trigger instantly PR #276582 (https://github.com/microsoft/vscode/pull/276582)",
+      "source_url": "https://code.visualstudio.com/updates/v1_109",
+      "change_id": "vscode-copilot-chat/v1_109/140"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent-1",
+      "product": "github-copilot",
+      "version": "2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent",
+      "released_at": "2026-05-08",
+      "kind_hint": "changed",
+      "change_text": "**Configure secrets and variables at the organization level** for the first time, and share them across any or all repositories in your organization.",
+      "source_url": "https://github.blog/changelog/2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent",
+      "change_id": "github-copilot/2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent/1"
+    },
+    {
+      "id": "syn-claude-api-2026-04-16-1",
+      "product": "claude-api",
+      "version": "2026-04-16",
+      "released_at": "2026-04-16",
+      "kind_hint": "breaking",
+      "change_text": "We've launched [Claude Opus 4.7](https://www.anthropic.com/news/claude-opus-4-7), our most capable generally available model for complex reasoning and agentic coding, at the same $5 / $25 per MTok pricing as Opus 4.6. See [What's new in Claude Opus 4.7](/docs/en/about-claude/models/whats-new-claude-4-7) for capability improvements, new features, and the updated tokenizer. Opus 4.7 includes API breaking changes versus Opus 4.6; see [Migrating to Claude Opus 4.7](/docs/en/about-claude/models/migration-guide#migrating-to-claude-opus-4-7) before upgrading.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#april-16-2026",
+      "change_id": "claude-api/2026-04-16/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.73-25",
+      "product": "claude-code",
+      "version": "2.1.73",
+      "released_at": "2026-03-11",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated `/output-style` command — use `/config` instead. Output style is now fixed at session start for better prompt caching",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-73",
+      "change_id": "claude-code/2.1.73/25"
+    },
+    {
+      "id": "syn-claude-code-2.1.83-57",
+      "product": "claude-code",
+      "version": "2.1.83",
+      "released_at": "2026-03-25",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated `TaskOutput` tool in favor of using `Read` on the background task's output file path",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-83",
+      "change_id": "claude-code/2.1.83/57"
+    },
+    {
+      "id": "syn-claude-code-2.1.2-20",
+      "product": "claude-code",
+      "version": "2.1.2",
+      "released_at": "2026-01-09",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated Windows managed settings path `C:\\ProgramData\\ClaudeCode\\managed-settings.json` - administrators should migrate to `C:\\Program Files\\ClaudeCode\\managed-settings.json`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-2",
+      "change_id": "claude-code/2.1.2/20"
+    },
+    {
+      "id": "syn-claude-code-action-v1.0.49-1",
+      "product": "claude-code-action",
+      "version": "v1.0.49",
+      "released_at": "2026-02-12",
+      "kind_hint": "deprecated",
+      "change_text": "fix: replace deprecated :* with modern * wildcard in git permissions by @Dave-London in https://github.com/anthropics/claude-code-action/pull/929",
+      "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.49",
+      "change_id": "claude-code-action/v1.0.49/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-go-1.20.0-8",
+      "product": "anthropic-sdk-go",
+      "version": "1.20.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "changed",
+      "change_text": "**mcp:** correct code tool API endpoint ([6c8a083](https://github.com/anthropics/anthropic-sdk-go/commit/6c8a0831e6f084d316179a9288c4fa1c5420ea59))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.20.0",
+      "change_id": "anthropic-sdk-go/1.20.0/8"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_111-33",
+      "product": "vscode-copilot-chat",
+      "version": "v1_111",
+      "released_at": "2026-03-15",
+      "kind_hint": "changed",
+      "change_text": "@RajeshKumar11 (https://github.com/RajeshKumar11): MCP Gateway: avoid blocking list calls on startup PR #298040 (https://github.com/microsoft/vscode/pull/298040)",
+      "source_url": "https://code.visualstudio.com/updates/v1_111",
+      "change_id": "vscode-copilot-chat/v1_111/33"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.51-14",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.51",
+      "released_at": "2026-03-27",
+      "kind_hint": "changed",
+      "change_text": "**Process cleanup**: Added `SIGKILL` fallback when `SIGTERM` handler blocks in `close()` (#729)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.51",
+      "change_id": "claude-agent-sdk-python/0.1.51/14"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.82.0-2",
+      "product": "anthropic-sdk-python",
+      "version": "0.82.0",
+      "released_at": "2026-02-18",
+      "kind_hint": "changed",
+      "change_text": "add backward-compat aliases for removed nested UserLocation classes ([#1409](https://github.com/anthropics/anthropic-sdk-python/issues/1409)) ([56db1e3](https://github.com/anthropics/anthropic-sdk-python/commit/56db1e3db6108e1c0f4e9363a5f23b54976dc877))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.82.0",
+      "change_id": "anthropic-sdk-python/0.82.0/2"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/client@2.0.0-alpha.1-10",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/client@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "changed",
+      "change_text": "[#1824](https://github.com/modelcontextprotocol/typescript-sdk/pull/1824) [`fcde488`](https://github.com/modelcontextprotocol/typescript-sdk/commit/fcde4882276cb0a7d199e47f00120fe13f7f5d47) Thanks [@felixweinberger](https://github.com/felixweinberger)! - Drop `zod` from `peerDependencies` (kept as direct dependency)",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/client%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/client@2.0.0-alpha.1/10"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-v0.15.0-8",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-v0.15.0",
+      "released_at": "2026-02-10",
+      "kind_hint": "changed",
+      "change_text": "*(tasks)* expose `execution.taskSupport` on tools ([#635](https://github.com/modelcontextprotocol/rust-sdk/pull/635))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.15.0",
+      "change_id": "mcp-rust-sdk/rmcp-v0.15.0/8"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-06-github-copilot-in-visual-studio-code-april-releases-15",
+      "product": "github-copilot",
+      "version": "2026-05-06-github-copilot-in-visual-studio-code-april-releases",
+      "released_at": "2026-05-06",
+      "kind_hint": "changed",
+      "change_text": "**Agents can access any open terminal**: Agents can read from and write to existing foreground terminals, including running REPLs and interactive scripts.",
+      "source_url": "https://github.blog/changelog/2026-05-06-github-copilot-in-visual-studio-code-april-releases",
+      "change_id": "github-copilot/2026-05-06-github-copilot-in-visual-studio-code-april-releases/15"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_120-14",
+      "product": "vscode-copilot-chat",
+      "version": "v1_120",
+      "released_at": "2026-12-15",
+      "kind_hint": "changed",
+      "change_text": "January 2026 (/updates/v1_109)",
+      "source_url": "https://code.visualstudio.com/updates/v1_120",
+      "change_id": "vscode-copilot-chat/v1_120/14"
+    },
+    {
+      "id": "syn-anthropic-sdk-java-2.31.0-1",
+      "product": "anthropic-sdk-java",
+      "version": "2.31.0",
+      "released_at": "2026-05-11",
+      "kind_hint": "changed",
+      "change_text": "**client:** improve logging ([bbd371e](https://github.com/anthropics/anthropic-sdk-java/commit/bbd371ef81059aca81f2ec6b62ae279e80b5ab3d))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-java/releases/tag/v2.31.0",
+      "change_id": "anthropic-sdk-java/2.31.0/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.31.0-1",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.31.0",
+      "released_at": "2026-04-08",
+      "kind_hint": "changed",
+      "change_text": "**api:** add support for Claude Managed Agents ([29ea039](https://github.com/anthropics/anthropic-sdk-ruby/commit/29ea03965f33fb0ed07472f7f061c70357f2c8f5))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.31.0",
+      "change_id": "anthropic-sdk-ruby/1.31.0/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.50-4",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.50",
+      "released_at": "2026-03-20",
+      "kind_hint": "added",
+      "change_text": "Added daily PyPI storage quota monitoring (#705)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.50",
+      "change_id": "claude-agent-sdk-python/0.1.50/4"
+    },
+    {
+      "id": "syn-claude-code-2.1.126-16",
+      "product": "claude-code",
+      "version": "2.1.126",
+      "released_at": "2026-05-01",
+      "kind_hint": "fixed",
+      "change_text": "Fixed API retry countdown sticking at \"0s\" instead of counting down between attempts",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-126",
+      "change_id": "claude-code/2.1.126/16"
+    },
+    {
+      "id": "syn-cursor-cli-feb-18-2026-14",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "changed",
+      "change_text": "Markdown tables now wrap text within cells, use box-drawing borders, and correctly handle escaped pipes.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/14"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.65-8",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.65",
+      "released_at": "2026-04-23",
+      "kind_hint": "added",
+      "change_text": "Added bounded retry on session mirror append and UUID idempotency documentation (#857)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.65",
+      "change_id": "claude-agent-sdk-python/0.1.65/8"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_116-45",
+      "product": "vscode-copilot-chat",
+      "version": "v1_116",
+      "released_at": "2026-08-15",
+      "kind_hint": "changed",
+      "change_text": "The title bar icon ( workbench.browser.showInTitleBar Open in VS Code Open in VS Code Insiders )",
+      "source_url": "https://code.visualstudio.com/updates/v1_116",
+      "change_id": "vscode-copilot-chat/v1_116/45"
+    },
+    {
+      "id": "syn-claude-code-2.1.72-26",
+      "product": "claude-code",
+      "version": "2.1.72",
+      "released_at": "2026-03-10",
+      "kind_hint": "fixed",
+      "change_text": "Fixed backgrounded Ctrl+B queries losing their transcript or corrupting the new conversation after `/clear`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-72",
+      "change_id": "claude-code/2.1.72/26"
+    },
+    {
+      "id": "syn-claude-code-2.1.47-56",
+      "product": "claude-code",
+      "version": "2.1.47",
+      "released_at": "2026-02-18",
+      "kind_hint": "fixed",
+      "change_text": "Fixed shell commands permanently failing after a command deletes its own working directory (anthropics/claude-code#26136)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-47",
+      "change_id": "claude-code/2.1.47/56"
+    },
+    {
+      "id": "syn-anthropic-sdk-csharp-Foundry-0.4.1-3",
+      "product": "anthropic-sdk-csharp",
+      "version": "Foundry-0.4.1",
+      "released_at": "2026-01-29",
+      "kind_hint": "changed",
+      "change_text": "**internal:** version bump ([4e6f6dd](https://github.com/anthropics/anthropic-sdk-csharp/commit/4e6f6ddd0cfff4d301f7adf608256480e5d3703c))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-csharp/releases/tag/Foundry-v0.4.1",
+      "change_id": "anthropic-sdk-csharp/Foundry-0.4.1/3"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_110-61",
+      "product": "vscode-copilot-chat",
+      "version": "v1_110",
+      "released_at": "2026-02-15",
+      "kind_hint": "changed",
+      "change_text": "Enabling experimental features like YOLO mode and custom thinking phrases",
+      "source_url": "https://code.visualstudio.com/updates/v1_110",
+      "change_id": "vscode-copilot-chat/v1_110/61"
+    },
+    {
+      "id": "syn-anthropic-sdk-go-1.34.0-1",
+      "product": "anthropic-sdk-go",
+      "version": "1.34.0",
+      "released_at": "2026-04-09",
+      "kind_hint": "changed",
+      "change_text": "**api:** Add beta advisor tool ([3a6ddba](https://github.com/anthropics/anthropic-sdk-go/commit/3a6ddba23f7763d502c0bdd0842f0f90bb662c7e))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.34.0",
+      "change_id": "anthropic-sdk-go/1.34.0/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.84-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.84",
+      "released_at": "2026-03-26",
+      "kind_hint": "added",
+      "change_text": "Added `taskBudget` option for API-side token budget awareness, allowing the model to pace tool use within a token limit",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.84",
+      "change_id": "claude-agent-sdk-typescript/0.2.84/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.33-5",
+      "product": "claude-code",
+      "version": "2.1.33",
+      "released_at": "2026-02-06",
+      "kind_hint": "added",
+      "change_text": "Added `memory` frontmatter field support for agents, enabling persistent memory with `user`, `project`, or `local` scope",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-33",
+      "change_id": "claude-code/2.1.33/5"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_112-52",
+      "product": "vscode-copilot-chat",
+      "version": "v1_112",
+      "released_at": "2026-04-15",
+      "kind_hint": "changed",
+      "change_text": "@24anisha (Anisha Agarwal) (https://github.com/24anisha): Add conversation\\_id to search subagent telemetry PR #4326 (https://github.com/microsoft/vscode-copilot-chat/pull/4326)",
+      "source_url": "https://code.visualstudio.com/updates/v1_112",
+      "change_id": "vscode-copilot-chat/v1_112/52"
+    },
+    {
+      "id": "syn-claude-code-2.1.47-35",
+      "product": "claude-code",
+      "version": "2.1.47",
+      "released_at": "2026-02-18",
+      "kind_hint": "fixed",
+      "change_text": "Fixed image pasting not working on WSL2 systems where Windows copies images as BMP format (anthropics/claude-code#25935)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-47",
+      "change_id": "claude-code/2.1.47/35"
+    },
+    {
+      "id": "syn-claude-code-2.1.122-8",
+      "product": "claude-code",
+      "version": "2.1.122",
+      "released_at": "2026-04-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `/model` not showing the Effort option for Bedrock application inference profile ARNs, and those ARNs not receiving `output_config.effort`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-122",
+      "change_id": "claude-code/2.1.122/8"
+    },
+    {
+      "id": "syn-claude-code-2.1.149-21",
+      "product": "claude-code",
+      "version": "2.1.149",
+      "released_at": "2026-05-22",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `/insights` crashing when cached session-meta files are missing optional fields",
+      "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.149",
+      "change_id": "claude-code/2.1.149/21"
+    },
+    {
+      "id": "syn-claude-code-2.1.110-25",
+      "product": "claude-code",
+      "version": "2.1.110",
+      "released_at": "2026-04-15",
+      "kind_hint": "changed",
+      "change_text": "Hardened \"Open in editor\" actions against command injection from untrusted filenames",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-110",
+      "change_id": "claude-code/2.1.110/25"
+    },
+    {
+      "id": "syn-anthropic-sdk-go-1.27.0-16",
+      "product": "anthropic-sdk-go",
+      "version": "1.27.0",
+      "released_at": "2026-03-16",
+      "kind_hint": "changed",
+      "change_text": "**tests:** unskip tests that are now supported in steady ([b0ca374](https://github.com/anthropics/anthropic-sdk-go/commit/b0ca37403486c65ae171d2b330ff82c938fe9b58))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.27.0",
+      "change_id": "anthropic-sdk-go/1.27.0/16"
+    },
+    {
+      "id": "syn-anthropic-sdk-typescript-0.72.0-9",
+      "product": "anthropic-sdk-typescript",
+      "version": "0.72.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "changed",
+      "change_text": "**ci:** Add Claude Code GitHub Workflow ([#612](https://github.com/anthropics/anthropic-sdk-typescript/issues/612)) ([28a9a00](https://github.com/anthropics/anthropic-sdk-typescript/commit/28a9a00d902ae87b9dcd9942a3571dc09976eb5b))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/sdk-v0.72.0",
+      "change_id": "anthropic-sdk-typescript/0.72.0/9"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-20-semantic-issue-search-in-copilot-chat-1",
+      "product": "github-copilot",
+      "version": "2026-05-20-semantic-issue-search-in-copilot-chat",
+      "released_at": "2026-05-20",
+      "kind_hint": "changed",
+      "change_text": "What's new (#whats-new)",
+      "source_url": "https://github.blog/changelog/2026-05-20-semantic-issue-search-in-copilot-chat",
+      "change_id": "github-copilot/2026-05-20-semantic-issue-search-in-copilot-chat/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-typescript-0.73.0-5",
+      "product": "anthropic-sdk-typescript",
+      "version": "0.73.0",
+      "released_at": "2026-02-05",
+      "kind_hint": "changed",
+      "change_text": "**client:** do not parse responses with empty content-length ([2be2df9](https://github.com/anthropics/anthropic-sdk-typescript/commit/2be2df928d1564286cddc9765fd9959f9649d314))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/sdk-v0.73.0",
+      "change_id": "anthropic-sdk-typescript/0.73.0/5"
+    },
+    {
+      "id": "syn-claude-code-2.1.9-2",
+      "product": "claude-code",
+      "version": "2.1.9",
+      "released_at": "2026-01-16",
+      "kind_hint": "added",
+      "change_text": "Added `plansDirectory` setting to customize where plan files are stored",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-9",
+      "change_id": "claude-code/2.1.9/2"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v1.7.0-1",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v1.7.0",
+      "released_at": "2026-05-13",
+      "kind_hint": "changed",
+      "change_text": "add task-based stdio examples ([#839](https://github.com/modelcontextprotocol/rust-sdk/pull/839))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v1.7.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v1.7.0/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-typescript-0.91.0-4",
+      "product": "anthropic-sdk-typescript",
+      "version": "0.91.0",
+      "released_at": "2026-04-23",
+      "kind_hint": "changed",
+      "change_text": "**api:** restore missing features ([1a5b47b](https://github.com/anthropics/anthropic-sdk-typescript/commit/1a5b47b6895ee2c47af8adea1f403b76dd3ca62f))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/sdk-v0.91.0",
+      "change_id": "anthropic-sdk-typescript/0.91.0/4"
+    },
+    {
+      "id": "syn-claude-code-2.1.0-62",
+      "product": "claude-code",
+      "version": "2.1.0",
+      "released_at": "2026-01-07",
+      "kind_hint": "fixed",
+      "change_text": "Fixed duplicate Bash commands appearing in permission request option labels",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-0",
+      "change_id": "claude-code/2.1.0/62"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_119-13",
+      "product": "vscode-copilot-chat",
+      "version": "v1_119",
+      "released_at": "2026-11-15",
+      "kind_hint": "changed",
+      "change_text": "February 2026 (/updates/v1_110)",
+      "source_url": "https://code.visualstudio.com/updates/v1_119",
+      "change_id": "vscode-copilot-chat/v1_119/13"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_109-161",
+      "product": "vscode-copilot-chat",
+      "version": "v1_109",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "@renan-r-santos (Renan Santos) (https://github.com/renan-r-santos): Fix activation icon state when using `shellStartup` PR #837 (https://github.com/microsoft/vscode-python-environments/pull/837)",
+      "source_url": "https://code.visualstudio.com/updates/v1_109",
+      "change_id": "vscode-copilot-chat/v1_109/161"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.89-10",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.89",
+      "released_at": "2026-04-01",
+      "kind_hint": "fixed",
+      "change_text": "Fixed MCP servers getting permanently stuck in a failed state after a connection race — they now retry on the next message",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.89",
+      "change_id": "claude-agent-sdk-typescript/0.2.89/10"
+    },
+    {
+      "id": "syn-anthropic-sdk-csharp-Anthropic-12.4.0-4",
+      "product": "anthropic-sdk-csharp",
+      "version": "Anthropic-12.4.0",
+      "released_at": "2026-02-05",
+      "kind_hint": "changed",
+      "change_text": "update beta service to use output_config.format ([#110](https://github.com/anthropics/anthropic-sdk-csharp/issues/110)) ([5d1eb0a](https://github.com/anthropics/anthropic-sdk-csharp/commit/5d1eb0a84492af9fd4be666c6b8c34b03982699d))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-csharp/releases/tag/Anthropic-v12.4.0",
+      "change_id": "anthropic-sdk-csharp/Anthropic-12.4.0/4"
+    },
+    {
+      "id": "syn-anthropic-sdk-typescript-0.87.0-1",
+      "product": "anthropic-sdk-typescript",
+      "version": "0.87.0",
+      "released_at": "2026-04-09",
+      "kind_hint": "changed",
+      "change_text": "**api:** Add beta advisor tool ([1e99a8d](https://github.com/anthropics/anthropic-sdk-typescript/commit/1e99a8db387b8dbc2ce5cd43e3c4e4ca440aa01b))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/sdk-v0.87.0",
+      "change_id": "anthropic-sdk-typescript/0.87.0/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.83-63",
+      "product": "claude-code",
+      "version": "2.1.83",
+      "released_at": "2026-03-25",
+      "kind_hint": "changed",
+      "change_text": "Memory: `MEMORY.md` index now truncates at 25KB as well as 200 lines",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-83",
+      "change_id": "claude-code/2.1.83/63"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_109-37",
+      "product": "vscode-copilot-chat",
+      "version": "v1_109",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "**Steer with Message**: signals the current request to yield after finishing the active tool execution, then processes your new message immediately. Use this to redirect the agent when it's heading in the wrong direction.",
+      "source_url": "https://code.visualstudio.com/updates/v1_109",
+      "change_id": "vscode-copilot-chat/v1_109/37"
+    },
+    {
+      "id": "syn-claude-api-2026-05-19-4",
+      "product": "claude-api",
+      "version": "2026-05-19",
+      "released_at": "2026-05-19",
+      "kind_hint": "changed",
+      "change_text": "With Claude Managed Agents, large outputs from `agent_toolset` and MCP tools exceeding 100K tokens are now automatically spilled to a file in the sandbox. The model receives a truncated preview with the file path and can read the full content from there.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-19-2026",
+      "change_id": "claude-api/2026-05-19/4"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_114-53",
+      "product": "vscode-copilot-chat",
+      "version": "v1_114",
+      "released_at": "2026-06-15",
+      "kind_hint": "changed",
+      "change_text": "Languages (#_languages)",
+      "source_url": "https://code.visualstudio.com/updates/v1_114",
+      "change_id": "vscode-copilot-chat/v1_114/53"
+    },
+    {
+      "id": "syn-claude-api-2026-05-06-1",
+      "product": "claude-api",
+      "version": "2026-05-06",
+      "released_at": "2026-05-06",
+      "kind_hint": "changed",
+      "change_text": "[Multiagent sessions](/docs/en/managed-agents/multi-agent) and [Outcomes](/docs/en/managed-agents/define-outcomes) are now in public beta under the standard `managed-agents-2026-04-01` beta header.",
+      "source_url": "https://platform.claude.com/docs/en/release-notes/overview#may-6-2026",
+      "change_id": "claude-api/2026-05-06/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.0-23",
+      "product": "claude-code",
+      "version": "2.1.0",
+      "released_at": "2026-01-07",
+      "kind_hint": "added",
+      "change_text": "Added support for MCP `list_changed` notifications, allowing MCP servers to dynamically update their available tools, prompts, and resources without requiring reconnection",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-0",
+      "change_id": "claude-code/2.1.0/23"
+    },
+    {
+      "id": "syn-continue-dev-@continuedev/fetch@1.8.0-42",
+      "product": "continue-dev",
+      "version": "@continuedev/fetch@1.8.0",
+      "released_at": "2026-01-22",
+      "kind_hint": "changed",
+      "change_text": "**openai-adapters:** Fix multi-turn tools test API initialization timing ([75044d4](https://github.com/continuedev/continue/commit/75044d4cdc498fe7ca1a1f656d4e1ef6f24b1209))",
+      "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/fetch%401.8.0",
+      "change_id": "continue-dev/@continuedev/fetch@1.8.0/42"
+    },
+    {
+      "id": "syn-cursor-05-07-26-3",
+      "product": "cursor",
+      "version": "05-07-26",
+      "released_at": "2026-05-07",
+      "kind_hint": "changed",
+      "change_text": "The Changes tab makes it easier to navigate larger PRs with a file tree and changes picker.",
+      "source_url": "https://cursor.com/changelog/05-07-26",
+      "change_id": "cursor/05-07-26/3"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_109-125",
+      "product": "vscode-copilot-chat",
+      "version": "v1_109",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "**Persistent data storage** with configurable scope (global, workspace, or in-memory / ephemeral)",
+      "source_url": "https://code.visualstudio.com/updates/v1_109",
+      "change_id": "vscode-copilot-chat/v1_109/125"
+    },
+    {
+      "id": "syn-claude-code-2.1.76-9",
+      "product": "claude-code",
+      "version": "2.1.76",
+      "released_at": "2026-03-14",
+      "kind_hint": "fixed",
+      "change_text": "Fixed slash commands showing \"Unknown skill\"",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-76",
+      "change_id": "claude-code/2.1.76/9"
+    },
+    {
+      "id": "syn-anthropic-sdk-ruby-1.23.0-3",
+      "product": "anthropic-sdk-ruby",
+      "version": "1.23.0",
+      "released_at": "2026-02-19",
+      "kind_hint": "changed",
+      "change_text": "update mock server docs ([56f16bd](https://github.com/anthropics/anthropic-sdk-ruby/commit/56f16bd36802f804fb6a62735c330ebc22a11fe0))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-ruby/releases/tag/v1.23.0",
+      "change_id": "anthropic-sdk-ruby/1.23.0/3"
+    },
+    {
+      "id": "syn-claude-code-2.1.122-10",
+      "product": "claude-code",
+      "version": "2.1.122",
+      "released_at": "2026-04-28",
+      "kind_hint": "fixed",
+      "change_text": "Fixed Vertex AI `count_tokens` endpoint returning 400 errors for users behind proxy gateways",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-122",
+      "change_id": "claude-code/2.1.122/10"
+    },
+    {
+      "id": "syn-aider-0.79.2-6",
+      "product": "aider",
+      "version": "0.79.2",
+      "released_at": null,
+      "kind_hint": "changed",
+      "change_text": "Aider wrote 93% of the code in this release.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.79.2/6"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_118-58",
+      "product": "vscode-copilot-chat",
+      "version": "v1_118",
+      "released_at": "2026-10-15",
+      "kind_hint": "changed",
+      "change_text": "Accessibility (#_accessibility)",
+      "source_url": "https://code.visualstudio.com/updates/v1_118",
+      "change_id": "vscode-copilot-chat/v1_118/58"
+    },
+    {
+      "id": "syn-claude-code-2.1.83-34",
+      "product": "claude-code",
+      "version": "2.1.83",
+      "released_at": "2026-03-25",
+      "kind_hint": "fixed",
+      "change_text": "Fixed `Ctrl+B` interfering with readline backward-char at an idle prompt — it now only fires when a foreground task can be backgrounded",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-83",
+      "change_id": "claude-code/2.1.83/34"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.44-1",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.44",
+      "released_at": "2026-02-26",
+      "kind_hint": "changed",
+      "change_text": "Updated bundled Claude CLI to version 2.1.59",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.44",
+      "change_id": "claude-agent-sdk-python/0.1.44/1"
+    },
+    {
+      "id": "syn-claude-agent-sdk-typescript-0.2.47-1",
+      "product": "claude-agent-sdk-typescript",
+      "version": "0.2.47",
+      "released_at": "2026-02-18",
+      "kind_hint": "changed",
+      "change_text": "Updated to parity with Claude Code v2.1.47",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.47",
+      "change_id": "claude-agent-sdk-typescript/0.2.47/1"
+    }
+  ]
+}

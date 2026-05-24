@@ -1,0 +1,33 @@
+{
+  "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-25",
+  "schema_version": "1",
+  "input": {
+    "product": "github-copilot",
+    "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+    "released_at": "2026-05-13",
+    "kind_hint": "improved",
+    "change_text": "Improved UI responsiveness and reduced occasional freezes.",
+    "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/25"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "UI responsiveness and freeze reduction in Copilot for JetBrains",
+    "action_text": "Upgrade `github-copilot` for JetBrains if you have been hitting UI freezes; upstream notes do not specify which subsystem improved. Canonical vague-release-note — no targeted adjustment derivable without more detail.",
+    "deadline": null,
+    "tags": ["jetbrains", "release-notes-vague", "stability"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

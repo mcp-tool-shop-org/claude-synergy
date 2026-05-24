@@ -1,0 +1,33 @@
+{
+  "id": "syn-continue-dev--continuedev-fetch-1.8.0-2",
+  "schema_version": "1",
+  "input": {
+    "product": "continue-dev",
+    "version": "@continuedev/fetch@1.8.0",
+    "released_at": "2026-01-22",
+    "kind_hint": "changed",
+    "change_text": "add GH_TOKEN to continue-agents workflow ([dd93919](https://github.com/continuedev/continue/commit/dd939190701be55917d4d224f012017e8ea17be9)), closes [#9493](https://github.com/continuedev/continue/issues/9493)",
+    "source_url": "https://github.com/continuedev/continue/releases/tag/%40continuedev/fetch%401.8.0",
+    "change_id": "continue-dev/@continuedev/fetch@1.8.0/2"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "GH_TOKEN added to continue-agents workflow",
+    "action_text": "Read the linked commit `dd93919` if you fork or depend on the `continue-agents` CI workflow — `GH_TOKEN` was added there. Upstream notes don't specify a consumer-side action; internal CI plumbing only.",
+    "deadline": null,
+    "tags": ["ci", "github-actions", "gh-token", "internal"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

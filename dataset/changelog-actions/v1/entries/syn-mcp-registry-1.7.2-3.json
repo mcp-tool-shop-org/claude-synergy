@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-registry-1.7.2-3",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-registry",
+    "version": "1.7.2",
+    "released_at": "2026-04-27",
+    "kind_hint": "changed",
+    "change_text": "fix(list): use row-constructor cursor + restore per-phase publish timings + enable pg_stat_statements by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1215",
+    "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.2",
+    "change_id": "mcp-registry/1.7.2/3"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "mcp-registry list pagination uses row-constructor cursor + observability restored",
+    "action_text": "Upgrade `mcp-registry` to 1.7.2+ if list-endpoint pagination behaved oddly under load. Pagination now uses a row-constructor cursor (correct under concurrent inserts), per-phase publish timings are restored, and `pg_stat_statements` is enabled for slow-query introspection.",
+    "deadline": null,
+    "tags": ["mcp-registry", "pagination", "observability"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

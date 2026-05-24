@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-rust-sdk-rmcp-v1.0.0-alpha-2",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-rust-sdk",
+    "version": "rmcp-v1.0.0-alpha",
+    "released_at": "2026-03-03",
+    "kind_hint": "breaking",
+    "change_text": "*(auth)* [**breaking**] support returning extra fields from token exchange ([#700](https://github.com/modelcontextprotocol/rust-sdk/pull/700))",
+    "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v1.0.0-alpha",
+    "change_id": "mcp-rust-sdk/rmcp-v1.0.0-alpha/2"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "mcp-rust-sdk token-exchange return type now carries extra fields",
+    "action_text": "Update auth-flow call sites in `mcp-rust-sdk` rmcp-v1.0.0-alpha+ to handle the widened token-exchange return type. PR #700 lets servers surface extra fields alongside the access token; existing destructuring patterns will fail to compile until you accept the new shape.",
+    "deadline": null,
+    "tags": ["mcp", "rust-sdk", "auth", "token-exchange"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.18-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.18",
+    "released_at": "2026-01-23",
+    "kind_hint": "added",
+    "change_text": "Added customizable keyboard shortcuts. Configure keybindings per context, create chord sequences, and personalize your workflow. Run `/keybindings` to get started. Learn more at https://code.claude.com/docs/en/keybindings",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-18",
+    "change_id": "claude-code/2.1.18/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Customizable keyboard shortcuts via /keybindings",
+    "action_text": "Run `/keybindings` in Claude Code 2.1.18+ to customize keyboard shortcuts per context and define chord sequences. See `code.claude.com/docs/en/keybindings` for the JSON shape; defaults are unchanged for users who skip the configuration.",
+    "deadline": null,
+    "tags": ["claude-code", "keybindings", "slash-command"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

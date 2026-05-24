@@ -1,0 +1,256 @@
+{
+  "batch_index": 10,
+  "count": 25,
+  "candidates": [
+    {
+      "id": "syn-cursor-cli-feb-18-2026-18",
+      "product": "cursor",
+      "version": "cli-feb-18-2026",
+      "released_at": "2026-02-18",
+      "kind_hint": "added",
+      "change_text": "Added Emacs-style navigation: \\*\\*\\`Ctrl+N\\`/\\`Ctrl+P\\`\\*\\* for up/down and \\*\\*\\`Ctrl+G\\`\\*\\* for cancel/dismiss, alongside the existing arrow keys and \\`Esc\\`.",
+      "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+      "change_id": "cursor/cli-feb-18-2026/18"
+    },
+    {
+      "id": "syn-cursor-2-5-18",
+      "product": "cursor",
+      "version": "2-5",
+      "released_at": "2026-02-17",
+      "kind_hint": "added",
+      "change_text": "Added a Close button to the agent chat pane.",
+      "source_url": "https://cursor.com/changelog/2-5",
+      "change_id": "cursor/2-5/18"
+    },
+    {
+      "id": "syn-aider-0.48.1-1",
+      "product": "aider",
+      "version": "0.48.1",
+      "released_at": null,
+      "kind_hint": "added",
+      "change_text": "Added `openai/gpt-4o-2024-08-06`.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.48.1/1"
+    },
+    {
+      "id": "syn-aider-0.74.3-3",
+      "product": "aider",
+      "version": "0.74.3",
+      "released_at": null,
+      "kind_hint": "added",
+      "change_text": "Added openrouter/o3-mini-high model configuration.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.74.3/3"
+    },
+    {
+      "id": "syn-aider-0.43.4-1",
+      "product": "aider",
+      "version": "0.43.4",
+      "released_at": null,
+      "kind_hint": "added",
+      "change_text": "Added scipy back to main requirements.txt.",
+      "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+      "change_id": "aider/0.43.4/1"
+    },
+    {
+      "id": "syn-cursor-3-0-21",
+      "product": "cursor",
+      "version": "3-0",
+      "released_at": "2026-04-02",
+      "kind_hint": "added",
+      "change_text": "Added a \"scroll to bottom\" button in the agent panel that appears when content overflows.",
+      "source_url": "https://cursor.com/changelog/3-0",
+      "change_id": "cursor/3-0/21"
+    },
+    {
+      "id": "syn-mcp-rust-sdk-rmcp-macros-v0.14.0-2",
+      "product": "mcp-rust-sdk",
+      "version": "rmcp-macros-v0.14.0",
+      "released_at": "2026-01-23",
+      "kind_hint": "added",
+      "change_text": "added hyper-mcp to the list of built with rmcp ([#621](https://github.com/modelcontextprotocol/rust-sdk/pull/621))",
+      "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-macros-v0.14.0",
+      "change_id": "mcp-rust-sdk/rmcp-macros-v0.14.0/2"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-21-github-copilot-for-eclipse-is-open-source-4",
+      "product": "github-copilot",
+      "version": "2026-05-21-github-copilot-for-eclipse-is-open-source",
+      "released_at": "2026-05-21",
+      "kind_hint": "changed",
+      "change_text": "✨ What's new (#%e2%9c%a8-whats-new)",
+      "source_url": "https://github.blog/changelog/2026-05-21-github-copilot-for-eclipse-is-open-source",
+      "change_id": "github-copilot/2026-05-21-github-copilot-for-eclipse-is-open-source/4"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_117-34",
+      "product": "vscode-copilot-chat",
+      "version": "v1_117",
+      "released_at": "2026-09-15",
+      "kind_hint": "changed",
+      "change_text": "@IllusionMH (Andrii Dieiev) (https://github.com/IllusionMH)",
+      "source_url": "https://code.visualstudio.com/updates/v1_117",
+      "change_id": "vscode-copilot-chat/v1_117/34"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_111-34",
+      "product": "vscode-copilot-chat",
+      "version": "v1_111",
+      "released_at": "2026-03-15",
+      "kind_hint": "changed",
+      "change_text": "@Rohan5commit (Rohan Santhosh) (https://github.com/Rohan5commit): docs: fix duplicated wording in proposed API comment PR #298522 (https://github.com/microsoft/vscode/pull/298522)",
+      "source_url": "https://code.visualstudio.com/updates/v1_111",
+      "change_id": "vscode-copilot-chat/v1_111/34"
+    },
+    {
+      "id": "syn-windsurf-2026-05-16-bug-fixes-and-improvements-4",
+      "product": "windsurf",
+      "version": "2026-05-16-bug-fixes-and-improvements",
+      "released_at": "2026-05-16",
+      "kind_hint": "changed",
+      "change_text": "Repaired path resolution for the Devin local agent on WSL",
+      "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+      "change_id": "windsurf/2026-05-16-bug-fixes-and-improvements/4"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_116-68",
+      "product": "vscode-copilot-chat",
+      "version": "v1_116",
+      "released_at": "2026-08-15",
+      "kind_hint": "changed",
+      "change_text": "Integrated browser (#_integrated-browser)",
+      "source_url": "https://code.visualstudio.com/updates/v1_116",
+      "change_id": "vscode-copilot-chat/v1_116/68"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_113-47",
+      "product": "vscode-copilot-chat",
+      "version": "v1_113",
+      "released_at": "2026-05-15",
+      "kind_hint": "changed",
+      "change_text": "Agent experience (#_agent-experience)",
+      "source_url": "https://code.visualstudio.com/updates/v1_113",
+      "change_id": "vscode-copilot-chat/v1_113/47"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_120-52",
+      "product": "vscode-copilot-chat",
+      "version": "v1_120",
+      "released_at": "2026-12-15",
+      "kind_hint": "changed",
+      "change_text": "@EhabY (Ehab Younes) (https://github.com/EhabY): Detect dead connections via keepalive timeout PR #310131 (https://github.com/microsoft/vscode/pull/310131)",
+      "source_url": "https://code.visualstudio.com/updates/v1_120",
+      "change_id": "vscode-copilot-chat/v1_120/52"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api-1",
+      "product": "github-copilot",
+      "version": "2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api",
+      "released_at": "2026-05-08",
+      "kind_hint": "changed",
+      "change_text": "What's new (#whats-new)",
+      "source_url": "https://github.blog/changelog/2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api",
+      "change_id": "github-copilot/2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api/1"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_109-140",
+      "product": "vscode-copilot-chat",
+      "version": "v1_109",
+      "released_at": "2026-01-15",
+      "kind_hint": "changed",
+      "change_text": "@ChaseKnowlden (https://github.com/ChaseKnowlden): Hover on keyboard modifier should trigger instantly PR #276582 (https://github.com/microsoft/vscode/pull/276582)",
+      "source_url": "https://code.visualstudio.com/updates/v1_109",
+      "change_id": "vscode-copilot-chat/v1_109/140"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent-1",
+      "product": "github-copilot",
+      "version": "2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent",
+      "released_at": "2026-05-08",
+      "kind_hint": "changed",
+      "change_text": "**Configure secrets and variables at the organization level** for the first time, and share them across any or all repositories in your organization.",
+      "source_url": "https://github.blog/changelog/2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent",
+      "change_id": "github-copilot/2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent/1"
+    },
+    {
+      "id": "syn-claude-code-2.1.83-57",
+      "product": "claude-code",
+      "version": "2.1.83",
+      "released_at": "2026-03-25",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated `TaskOutput` tool in favor of using `Read` on the background task's output file path",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-83",
+      "change_id": "claude-code/2.1.83/57"
+    },
+    {
+      "id": "syn-claude-code-2.1.2-20",
+      "product": "claude-code",
+      "version": "2.1.2",
+      "released_at": "2026-01-09",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated Windows managed settings path `C:\\ProgramData\\ClaudeCode\\managed-settings.json` - administrators should migrate to `C:\\Program Files\\ClaudeCode\\managed-settings.json`",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-2",
+      "change_id": "claude-code/2.1.2/20"
+    },
+    {
+      "id": "syn-claude-code-action-v1.0.49-1",
+      "product": "claude-code-action",
+      "version": "v1.0.49",
+      "released_at": "2026-02-12",
+      "kind_hint": "deprecated",
+      "change_text": "fix: replace deprecated :* with modern * wildcard in git permissions by @Dave-London in https://github.com/anthropics/claude-code-action/pull/929",
+      "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.49",
+      "change_id": "claude-code-action/v1.0.49/1"
+    },
+    {
+      "id": "syn-anthropic-sdk-go-1.20.0-8",
+      "product": "anthropic-sdk-go",
+      "version": "1.20.0",
+      "released_at": "2026-01-29",
+      "kind_hint": "changed",
+      "change_text": "**mcp:** correct code tool API endpoint ([6c8a083](https://github.com/anthropics/anthropic-sdk-go/commit/6c8a0831e6f084d316179a9288c4fa1c5420ea59))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.20.0",
+      "change_id": "anthropic-sdk-go/1.20.0/8"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_111-33",
+      "product": "vscode-copilot-chat",
+      "version": "v1_111",
+      "released_at": "2026-03-15",
+      "kind_hint": "changed",
+      "change_text": "@RajeshKumar11 (https://github.com/RajeshKumar11): MCP Gateway: avoid blocking list calls on startup PR #298040 (https://github.com/microsoft/vscode/pull/298040)",
+      "source_url": "https://code.visualstudio.com/updates/v1_111",
+      "change_id": "vscode-copilot-chat/v1_111/33"
+    },
+    {
+      "id": "syn-claude-agent-sdk-python-0.1.51-14",
+      "product": "claude-agent-sdk-python",
+      "version": "0.1.51",
+      "released_at": "2026-03-27",
+      "kind_hint": "changed",
+      "change_text": "**Process cleanup**: Added `SIGKILL` fallback when `SIGTERM` handler blocks in `close()` (#729)",
+      "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.51",
+      "change_id": "claude-agent-sdk-python/0.1.51/14"
+    },
+    {
+      "id": "syn-anthropic-sdk-python-0.82.0-2",
+      "product": "anthropic-sdk-python",
+      "version": "0.82.0",
+      "released_at": "2026-02-18",
+      "kind_hint": "changed",
+      "change_text": "add backward-compat aliases for removed nested UserLocation classes ([#1409](https://github.com/anthropics/anthropic-sdk-python/issues/1409)) ([56db1e3](https://github.com/anthropics/anthropic-sdk-python/commit/56db1e3db6108e1c0f4e9363a5f23b54976dc877))",
+      "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.82.0",
+      "change_id": "anthropic-sdk-python/0.82.0/2"
+    },
+    {
+      "id": "syn-mcp-typescript-sdk-@modelcontextprotocol/client@2.0.0-alpha.1-10",
+      "product": "mcp-typescript-sdk",
+      "version": "@modelcontextprotocol/client@2.0.0-alpha.1",
+      "released_at": "2026-04-01",
+      "kind_hint": "changed",
+      "change_text": "[#1824](https://github.com/modelcontextprotocol/typescript-sdk/pull/1824) [`fcde488`](https://github.com/modelcontextprotocol/typescript-sdk/commit/fcde4882276cb0a7d199e47f00120fe13f7f5d47) Thanks [@felixweinberger](https://github.com/felixweinberger)! - Drop `zod` from `peerDependencies` (kept as direct dependency)",
+      "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/client%402.0.0-alpha.1",
+      "change_id": "mcp-typescript-sdk/@modelcontextprotocol/client@2.0.0-alpha.1/10"
+    }
+  ]
+}

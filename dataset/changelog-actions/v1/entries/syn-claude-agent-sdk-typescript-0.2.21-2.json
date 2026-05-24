@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.21-2",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.21",
+    "released_at": "2026-01-28",
+    "kind_hint": "added",
+    "change_text": "Added `reconnectMcpServer()` and `toggleMcpServer()` methods for managing MCP server connections",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.21",
+    "change_id": "claude-agent-sdk-typescript/0.2.21/2"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "reconnectMcpServer() and toggleMcpServer() methods",
+    "action_text": "Upgrade to `claude-agent-sdk-typescript` 0.2.21+ to call `reconnectMcpServer(name)` after transient transport drops and `toggleMcpServer(name)` to enable or disable a server mid-session. Replaces restarting the whole `Query` to recover one bad MCP connection.",
+    "deadline": null,
+    "tags": ["agent-sdk", "mcp", "connection-management"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

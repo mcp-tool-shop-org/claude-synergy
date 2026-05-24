@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-python-0.1.51-14",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-python",
+    "version": "0.1.51",
+    "released_at": "2026-03-27",
+    "kind_hint": "changed",
+    "change_text": "**Process cleanup**: Added `SIGKILL` fallback when `SIGTERM` handler blocks in `close()` (#729)",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.51",
+    "change_id": "claude-agent-sdk-python/0.1.51/14"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "SIGKILL fallback when SIGTERM blocks in close()",
+    "action_text": "Upgrade `claude-agent-sdk-python` to 0.1.51+ if you have seen `close()` hang on shutdown. The SDK now escalates to `SIGKILL` when the subprocess `SIGTERM` handler blocks; no caller-side change required.",
+    "deadline": null,
+    "tags": ["claude-agent-sdk-python", "process", "shutdown"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

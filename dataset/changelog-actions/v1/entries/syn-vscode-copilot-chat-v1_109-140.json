@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_109-140",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_109",
+    "released_at": "2026-01-15",
+    "kind_hint": "changed",
+    "change_text": "@ChaseKnowlden (https://github.com/ChaseKnowlden): Hover on keyboard modifier should trigger instantly PR #276582 (https://github.com/microsoft/vscode/pull/276582)",
+    "source_url": "https://code.visualstudio.com/updates/v1_109",
+    "change_id": "vscode-copilot-chat/v1_109/140"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Hover-on-modifier-key fires instantly (PR #276582)",
+    "action_text": "Upgrade VS Code to v1_109+ to get instant hover when pressing a keyboard modifier. Previously there was a delay; no config change required.",
+    "deadline": null,
+    "tags": ["vscode", "hover", "keybinding"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

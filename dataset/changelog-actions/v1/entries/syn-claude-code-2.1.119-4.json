@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.119-4",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.119",
+    "released_at": "2026-04-23",
+    "kind_hint": "changed",
+    "change_text": "`--from-pr` now accepts GitLab merge-request, Bitbucket pull-request, and GitHub Enterprise PR URLs",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-119",
+    "change_id": "claude-code/2.1.119/4"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "--from-pr accepts GitLab, Bitbucket, and GitHub Enterprise URLs",
+    "action_text": "Pass GitLab merge-request, Bitbucket pull-request, or GitHub Enterprise PR URLs to `--from-pr`. Previously GitHub.com-only; non-GitHub teams can now bootstrap sessions from their host's PR URL without manual checkout.",
+    "deadline": null,
+    "tags": ["cli-flag", "from-pr", "gitlab", "bitbucket"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

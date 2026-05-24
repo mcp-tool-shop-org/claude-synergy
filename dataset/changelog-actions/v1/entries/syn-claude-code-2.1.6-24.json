@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.6-24",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.6",
+    "released_at": "2026-01-13",
+    "kind_hint": "removed",
+    "change_text": "Removed ability to @-mention MCP servers to enable/disable - use `/mcp enable <name>` instead",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-6",
+    "change_id": "claude-code/2.1.6/24"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "low",
+    "subject": "@-mention MCP enable/disable removed; use `/mcp enable <name>`",
+    "action_text": "Replace `@server` enable/disable patterns with `/mcp enable <name>` and `/mcp disable <name>`. The @-mention path is gone in 2.1.6; the slash command is the named replacement and accepts the same server identifiers.",
+    "deadline": null,
+    "tags": ["claude-code", "mcp", "slash-command", "removal"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

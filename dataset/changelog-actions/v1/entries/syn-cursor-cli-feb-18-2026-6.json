@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-cli-feb-18-2026-6",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "cli-feb-18-2026",
+    "released_at": "2026-02-18",
+    "kind_hint": "changed",
+    "change_text": "CLI now stores conversation transcripts that the agent can use as context.",
+    "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+    "change_id": "cursor/cli-feb-18-2026/6"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "medium",
+    "subject": "cursor CLI persists conversation transcripts for agent context",
+    "action_text": "Audit your `cursor` CLI usage if conversations contain secrets, prompts, or proprietary code — transcripts now persist for agent context across sessions. Check the local transcript store and exclude sensitive workspaces if needed.",
+    "deadline": null,
+    "tags": ["cli", "transcripts", "context", "privacy"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

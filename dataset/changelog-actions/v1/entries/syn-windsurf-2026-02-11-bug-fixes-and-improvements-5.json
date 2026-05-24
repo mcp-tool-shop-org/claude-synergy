@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-02-11-bug-fixes-and-improvements-5",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-02-11-bug-fixes-and-improvements",
+    "released_at": "2026-02-11",
+    "kind_hint": "improved",
+    "change_text": "Improved RTL language rendering in todo lists",
+    "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+    "change_id": "windsurf/2026-02-11-bug-fixes-and-improvements/5"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "RTL language rendering in todo lists",
+    "action_text": "Update `windsurf` to the 2026-02-11 build to pick up corrected right-to-left language rendering in todo lists. Affects Arabic, Hebrew, and other RTL scripts displayed in the todo panel; no config change required.",
+    "deadline": null,
+    "tags": ["windsurf", "i18n", "rtl"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

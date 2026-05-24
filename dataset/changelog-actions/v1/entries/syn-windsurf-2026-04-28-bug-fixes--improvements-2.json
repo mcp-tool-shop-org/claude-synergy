@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-04-28-bug-fixes--improvements-2",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-04-28-bug-fixes--improvements",
+    "released_at": "2026-04-28",
+    "kind_hint": "fixed",
+    "change_text": "Fixed an authentication issue that could prevent Devin Cloud sessions from starting",
+    "source_url": "https://windsurf.com/changelog#bug-fixes--improvements",
+    "change_id": "windsurf/2026-04-28-bug-fixes--improvements/2"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Devin Cloud session start-up authentication fix",
+    "action_text": "Update Windsurf if `Devin Cloud` sessions have failed to start for you. Pre-fix an authentication path could block the session from launching; no client-side config change is required after upgrading.",
+    "deadline": null,
+    "tags": ["devin-cloud", "authentication", "session-start"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

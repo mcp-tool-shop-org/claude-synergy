@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.97-24",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.97",
+    "released_at": "2026-04-08",
+    "kind_hint": "breaking",
+    "change_text": "Fixed slash command picker breaking when a plugin's frontmatter `name` is a YAML boolean keyword",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+    "change_id": "claude-code/2.1.97/24"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Slash command picker no longer breaks on YAML-boolean plugin `name` frontmatter",
+    "action_text": "Upgrade Claude Code to 2.1.97 if any plugin frontmatter `name` is a YAML boolean keyword (`yes`, `no`, `on`, `off`, `true`, `false`). Pre-fix, the slash-command picker would break entirely. Also worth quoting such names in plugin frontmatter as a belt-and-suspenders fix.",
+    "deadline": null,
+    "tags": ["plugins", "slash-commands", "yaml"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

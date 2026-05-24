@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-rust-sdk-rmcp-v0.17.0-10",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-rust-sdk",
+    "version": "rmcp-v0.17.0",
+    "released_at": "2026-02-27",
+    "kind_hint": "changed",
+    "change_text": "*(schema)* remove AddNullable from draft2020_12 settings ([#664](https://github.com/modelcontextprotocol/rust-sdk/pull/664))",
+    "source_url": "https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v0.17.0",
+    "change_id": "mcp-rust-sdk/rmcp-v0.17.0/10"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "rmcp draft2020_12 schema settings no longer apply AddNullable",
+    "action_text": "Upgrade `rmcp` to 0.17.0+ to emit draft-2020-12 schemas without the spurious `AddNullable` transform. Consumers validating generated schemas against strict draft-2020-12 will see fewer nullable-union artifacts; downstream clients that depended on the old shape may need a regen.",
+    "deadline": null,
+    "tags": ["rmcp", "json-schema", "draft-2020-12"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

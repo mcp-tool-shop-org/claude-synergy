@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.83-57",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.83",
+    "released_at": "2026-03-25",
+    "kind_hint": "deprecated",
+    "change_text": "Deprecated `TaskOutput` tool in favor of using `Read` on the background task's output file path",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-83",
+    "change_id": "claude-code/2.1.83/57"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "TaskOutput tool deprecated; use Read on the task's output file",
+    "action_text": "Replace `TaskOutput` tool calls with `Read` against the background task's output file path. `TaskOutput` is still accepted in 2.1.83 but is marked deprecated; no removal deadline announced upstream.",
+    "deadline": null,
+    "tags": ["claude-code", "tool", "deprecation"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

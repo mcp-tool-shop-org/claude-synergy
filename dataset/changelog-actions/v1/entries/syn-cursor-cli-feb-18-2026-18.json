@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-cli-feb-18-2026-18",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "cli-feb-18-2026",
+    "released_at": "2026-02-18",
+    "kind_hint": "added",
+    "change_text": "Added Emacs-style navigation: \\*\\*\\`Ctrl+N\\`/\\`Ctrl+P\\`\\*\\* for up/down and \\*\\*\\`Ctrl+G\\`\\*\\* for cancel/dismiss, alongside the existing arrow keys and \\`Esc\\`.",
+    "source_url": "https://cursor.com/changelog/cli-feb-18-2026",
+    "change_id": "cursor/cli-feb-18-2026/18"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Emacs-style navigation keys in Cursor CLI",
+    "action_text": "Use `Ctrl+N`/`Ctrl+P` for up/down and `Ctrl+G` for cancel in Cursor CLI prompts. Existing arrow keys and `Esc` still work; nothing breaks for users who don't adopt the Emacs bindings.",
+    "deadline": null,
+    "tags": ["cursor", "cli", "keybinding"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

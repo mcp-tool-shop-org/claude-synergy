@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-csharp-Anthropic-12.15.0-2",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-csharp",
+    "version": "Anthropic-12.15.0",
+    "released_at": "2026-04-14",
+    "kind_hint": "deprecated",
+    "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([711457c](https://github.com/anthropics/anthropic-sdk-csharp/commit/711457cd6af3454ea860ce6b9e2b5594f3e5b5a2))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-csharp/releases/tag/Anthropic-v12.15.0",
+    "change_id": "anthropic-sdk-csharp/Anthropic-12.15.0/2"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "high",
+    "subject": "Sonnet 4 and Opus 4 marked deprecated in anthropic-sdk-csharp",
+    "action_text": "Migrate C# SDK callers from `claude-sonnet-4-20250514` and `claude-opus-4-20250514` to `claude-sonnet-4-6` and `claude-opus-4-7`. Upstream retires both models on the Claude API 2026-06-15; calls to the retired IDs will fail after that date.",
+    "deadline": "2026-06-15",
+    "tags": ["model-retirement", "claude-sonnet-4", "claude-opus-4", "csharp-sdk"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

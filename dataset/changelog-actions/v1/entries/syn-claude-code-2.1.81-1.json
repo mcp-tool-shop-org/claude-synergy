@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.81-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.81",
+    "released_at": "2026-03-20",
+    "kind_hint": "added",
+    "change_text": "Added `--bare` flag for scripted `-p` calls — skips hooks, LSP, plugin sync, and skill directory walks; requires `ANTHROPIC_API_KEY` or an `apiKeyHelper` via `--settings` (OAuth and keychain auth disabled); auto-memory fully disabled",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-81",
+    "change_id": "claude-code/2.1.81/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "--bare flag for low-overhead scripted -p calls",
+    "action_text": "Pass `--bare` to scripted `claude -p` calls in 2.1.81+ to skip hooks, LSP, plugin sync, skill directory walks, and auto-memory. Requires `ANTHROPIC_API_KEY` env var or an `apiKeyHelper` via `--settings`; OAuth and keychain auth are disabled in this mode.",
+    "deadline": null,
+    "tags": ["claude-code", "cli-flag", "scripting", "performance"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

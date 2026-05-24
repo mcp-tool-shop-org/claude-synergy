@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.31-11",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.31",
+    "released_at": "2026-02-04",
+    "kind_hint": "removed",
+    "change_text": "Removed misleading Anthropic API pricing from model selector for third-party provider (Bedrock, Vertex, Foundry) users",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-31",
+    "change_id": "claude-code/2.1.31/11"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Model selector no longer shows Anthropic pricing for Bedrock/Vertex/Foundry users",
+    "action_text": "Upgrade to claude-code 2.1.31+ to drop the misleading Anthropic API pricing from the model selector when configured against Bedrock, Vertex, or Foundry. Third-party-provider users had been seeing rates that did not apply to their actual billing path.",
+    "deadline": null,
+    "tags": ["claude-code", "model-selector", "third-party-providers", "billing"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

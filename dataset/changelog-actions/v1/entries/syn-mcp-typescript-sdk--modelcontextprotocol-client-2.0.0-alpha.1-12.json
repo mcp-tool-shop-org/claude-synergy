@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-typescript-sdk--modelcontextprotocol-client-2.0.0-alpha.1-12",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-typescript-sdk",
+    "version": "@modelcontextprotocol/client@2.0.0-alpha.1",
+    "released_at": "2026-04-01",
+    "kind_hint": "changed",
+    "change_text": "[#1632](https://github.com/modelcontextprotocol/typescript-sdk/pull/1632) [`d99f3ee`](https://github.com/modelcontextprotocol/typescript-sdk/commit/d99f3ee5274bb17bb0eb02c85381200feb4b43e6) Thanks [@matantsach](https://github.com/matantsach)! - Continue OAuth metadata discovery on 502 (Bad Gateway) responses, matching the existing behavior for 4xx. This fixes MCP servers behind reverse proxies that return 502 for path-aware metadata URLs. Other 5xx errors still throw to avoid retrying against overloaded servers.",
+    "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/releases/tag/%40modelcontextprotocol/client%402.0.0-alpha.1",
+    "change_id": "mcp-typescript-sdk/@modelcontextprotocol/client@2.0.0-alpha.1/12"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "@modelcontextprotocol/client OAuth metadata discovery now tolerates 502",
+    "action_text": "Upgrade `@modelcontextprotocol/client` to 2.0.0-alpha.1+ if your MCP server runs behind a reverse proxy that returns 502 for path-aware OAuth metadata URLs. Discovery now continues on 502 like it already did on 4xx; other 5xx responses still throw to avoid hammering overloaded backends.",
+    "deadline": null,
+    "tags": ["oauth", "metadata-discovery", "reverse-proxy"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

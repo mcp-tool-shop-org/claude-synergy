@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.45-12",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.45",
+    "released_at": "2026-02-17",
+    "kind_hint": "improved",
+    "change_text": "Improved startup performance by removing eager loading of session history for stats caching",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-45",
+    "change_id": "claude-code/2.1.45/12"
+  },
+  "output": {
+    "kind": "performance",
+    "severity": "low",
+    "subject": "Startup no longer eagerly loads session history for stats caching",
+    "action_text": "Upgrade Claude Code to 2.1.45+ to skip the eager session-history load that ran at startup to warm the stats cache. Cold-start latency drops for users with many sessions; behavior is otherwise unchanged.",
+    "deadline": null,
+    "tags": ["startup", "performance", "session-history"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

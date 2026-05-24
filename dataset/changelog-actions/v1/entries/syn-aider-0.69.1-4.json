@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.69.1-4",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.69.1",
+    "released_at": null,
+    "kind_hint": "improved",
+    "change_text": "Improved environment variable setup messages on Windows.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.69.1/4"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "aider env-var setup messages clearer on Windows (unspecified)",
+    "action_text": "Upgrade `aider` to 0.69.1+ on Windows if env-var setup messages confused you previously; upstream notes don't name the specific message text or variables affected. Cosmetic Windows-only string polish.",
+    "deadline": null,
+    "tags": ["aider", "windows", "env-vars", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

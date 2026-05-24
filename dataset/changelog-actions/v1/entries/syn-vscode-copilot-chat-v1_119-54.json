@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_119-54",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_119",
+    "released_at": "2026-11-15",
+    "kind_hint": "deprecated",
+    "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+    "source_url": "https://code.visualstudio.com/updates/v1_119",
+    "change_id": "vscode-copilot-chat/v1_119/54"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Deprecated features and settings section (unspecified)",
+    "action_text": "Read the `#_deprecated-features-and-settings` section in the VS Code v1.119 release notes for the specific deprecations. Upstream corpus entry is a section anchor only — no features named in the change_text.",
+    "deadline": null,
+    "tags": ["vscode", "release-notes-anchor"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

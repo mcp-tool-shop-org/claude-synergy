@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-04-15-bug-fixes-and-improvements-2",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-04-15-bug-fixes-and-improvements",
+    "released_at": "2026-04-15",
+    "kind_hint": "fixed",
+    "change_text": "Fixed bug with spawning Terminal sessions on Windows",
+    "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+    "change_id": "windsurf/2026-04-15-bug-fixes-and-improvements/2"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Windsurf Terminal session spawn fix on Windows",
+    "action_text": "Update Windsurf on Windows if `Terminal` sessions have failed to spawn. Pre-fix the spawn could fail on Windows specifically; no workaround config is required after upgrading.",
+    "deadline": null,
+    "tags": ["windows", "terminal", "spawn"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

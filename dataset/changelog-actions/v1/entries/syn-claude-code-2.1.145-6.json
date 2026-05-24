@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.145-6",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.145",
+    "released_at": "2026-05-19",
+    "kind_hint": "changed",
+    "change_text": "Slash command and @-mention suggestion list now supports mouse hover and click in fullscreen mode",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-145",
+    "change_id": "claude-code/2.1.145/6"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Mouse hover and click on slash/@-mention suggestions in fullscreen",
+    "action_text": "Hover and click suggestions in the slash-command and `@`-mention popups when running fullscreen. Keyboard navigation still works; mouse is additive for users on a trackpad or external mouse.",
+    "deadline": null,
+    "tags": ["ui", "fullscreen", "slash-commands", "mention"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

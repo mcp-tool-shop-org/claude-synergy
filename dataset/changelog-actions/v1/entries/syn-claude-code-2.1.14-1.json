@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.14-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.14",
+    "released_at": "2026-01-20",
+    "kind_hint": "added",
+    "change_text": "Added history-based autocomplete in bash mode (`!`) - type a partial command and press Tab to complete from your bash command history",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-14",
+    "change_id": "claude-code/2.1.14/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "history-based Tab autocomplete in bash mode (!)",
+    "action_text": "Type partial commands in bash mode (`!`) and press Tab to autocomplete from your bash history. Opt-in ergonomics; existing `!` workflows unchanged if you don't press Tab.",
+    "deadline": null,
+    "tags": ["bash-mode", "autocomplete", "tab-completion"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

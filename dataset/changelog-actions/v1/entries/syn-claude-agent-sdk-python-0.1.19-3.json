@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-python-0.1.19-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-python",
+    "version": "0.1.19",
+    "released_at": "2026-01-08",
+    "kind_hint": "fixed",
+    "change_text": "Fixed YAML syntax error in create-release-tag workflow (#429)",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.1.19",
+    "change_id": "claude-agent-sdk-python/0.1.19/3"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "YAML syntax error in create-release-tag workflow",
+    "action_text": "Skip if you only consume the published package — the fix is internal to the SDK's own `create-release-tag` GitHub Actions workflow. No runtime impact on `claude-agent-sdk-python` consumers; affects only upstream maintainers tagging releases.",
+    "deadline": null,
+    "tags": ["ci-only", "github-actions", "internal"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-python-0.82.0-2",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-python",
+    "version": "0.82.0",
+    "released_at": "2026-02-18",
+    "kind_hint": "changed",
+    "change_text": "add backward-compat aliases for removed nested UserLocation classes ([#1409](https://github.com/anthropics/anthropic-sdk-python/issues/1409)) ([56db1e3](https://github.com/anthropics/anthropic-sdk-python/commit/56db1e3db6108e1c0f4e9363a5f23b54976dc877))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.82.0",
+    "change_id": "anthropic-sdk-python/0.82.0/2"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Backward-compat aliases restored for removed nested UserLocation classes",
+    "action_text": "Upgrade `anthropic-sdk-python` to 0.82.0+ if a recent release broke imports of nested `UserLocation` classes. Aliases for the removed nested classes are reinstated; no caller-side code change required.",
+    "deadline": null,
+    "tags": ["anthropic-sdk-python", "userlocation", "compat"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

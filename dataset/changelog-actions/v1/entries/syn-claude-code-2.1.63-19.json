@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.63-19",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.63",
+    "released_at": "2026-02-28",
+    "kind_hint": "changed",
+    "change_text": "VSCode: Fixed remote sessions not appearing in conversation history",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-63",
+    "change_id": "claude-code/2.1.63/19"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "VSCode remote sessions now appear in conversation history",
+    "action_text": "Upgrade to 2.1.63+ if you use the VSCode extension over SSH or Dev Containers. Pre-fix remote sessions were silently dropped from conversation history; resumption and search were broken for that surface.",
+    "deadline": null,
+    "tags": ["vscode", "remote-ssh", "conversation-history"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

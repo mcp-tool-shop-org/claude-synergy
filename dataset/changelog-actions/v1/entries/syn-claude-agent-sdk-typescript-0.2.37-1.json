@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.37-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.37",
+    "released_at": "2026-02-07",
+    "kind_hint": "changed",
+    "change_text": "Updated to parity with Claude Code v2.1.37",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.37",
+    "change_id": "claude-agent-sdk-typescript/0.2.37/1"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "`claude-agent-sdk-typescript` brought to parity with Claude Code v2.1.37",
+    "action_text": "Upgrade `claude-agent-sdk-typescript` to 0.2.37 if you need parity with Claude Code v2.1.37 behavior. Release notes do not enumerate the specific surfaces affected — consult the Claude Code v2.1.37 changelog for the bundled CLI deltas.",
+    "deadline": null,
+    "tags": ["parity", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

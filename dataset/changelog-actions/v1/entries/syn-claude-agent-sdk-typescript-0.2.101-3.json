@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.101-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.101",
+    "released_at": "2026-04-10",
+    "kind_hint": "fixed",
+    "change_text": "Fixed `MaxListenersExceededWarning` when running 11+ concurrent `query()` calls",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.101",
+    "change_id": "claude-agent-sdk-typescript/0.2.101/3"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "MaxListenersExceededWarning on 11+ concurrent query() calls",
+    "action_text": "Upgrade to 0.2.101+ if you fan out 11 or more concurrent `query()` calls. Pre-fix Node emitted `MaxListenersExceededWarning` (often a leak indicator) for routine high-concurrency callers; functionality continued but logs were polluted and leak detectors fired.",
+    "deadline": null,
+    "tags": ["concurrency", "query", "node-warning"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

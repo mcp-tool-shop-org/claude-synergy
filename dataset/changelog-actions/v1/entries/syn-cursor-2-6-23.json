@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-6-23",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-6",
+    "released_at": "2026-03-03",
+    "kind_hint": "fixed",
+    "change_text": "Fixed team permission and access control inconsistencies across organization setups.",
+    "source_url": "https://cursor.com/changelog/2-6",
+    "change_id": "cursor/2-6/23"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "Team permission + access control inconsistencies across orgs",
+    "action_text": "Upgrade `cursor` to 2.6+ on Team/Org plans and audit team permissions after upgrade — pre-fix access control had inconsistencies across organization setups, a silent-failure class for authorization. Re-verify role assignments and access scopes.",
+    "deadline": null,
+    "tags": ["cursor", "team", "access-control", "permissions"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

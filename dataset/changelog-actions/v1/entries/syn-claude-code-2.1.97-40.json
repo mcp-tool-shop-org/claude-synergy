@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.97-40",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.97",
+    "released_at": "2026-04-08",
+    "kind_hint": "improved",
+    "change_text": "Improved footer layout: indicators (Focus, notifications) now stay on the mode-indicator row instead of wrapping below",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+    "change_id": "claude-code/2.1.97/40"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Footer indicators (Focus, notifications) stay on the mode-indicator row",
+    "action_text": "Upgrade Claude Code to 2.1.97+ to stop the footer indicators (`Focus`, notifications) from wrapping onto a row below the mode indicator. Cosmetic layout fix; behavior of the indicators themselves is unchanged.",
+    "deadline": null,
+    "tags": ["ui", "footer", "layout"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

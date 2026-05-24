@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.73-24",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.73",
+    "released_at": "2026-03-11",
+    "kind_hint": "changed",
+    "change_text": "Changed default Opus model on Bedrock, Vertex, and Microsoft Foundry to Opus 4.6 (was Opus 4.1)",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-73",
+    "change_id": "claude-code/2.1.73/24"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "Default Opus model on Bedrock/Vertex/Foundry bumped from 4.1 to 4.6",
+    "action_text": "Pin `--model claude-opus-4-1` explicitly on Bedrock, Vertex, or Microsoft Foundry if you depended on the old default. Upgrades silently swap your effective model to Opus 4.6 with different token costs and output behavior.",
+    "deadline": null,
+    "tags": ["default-model", "bedrock", "vertex", "foundry"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

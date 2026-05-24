@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.105-7",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.105",
+    "released_at": "2026-04-13",
+    "kind_hint": "improved",
+    "change_text": "Improved file write display: long single-line writes (e.g. minified JSON) are now truncated in the UI instead of paginating across many screens",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-105",
+    "change_id": "claude-code/2.1.105/7"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "File-write UI truncates long single-line writes",
+    "action_text": "Upgrade Claude Code to 2.1.105+ to stop seeing minified-JSON file writes paginate across many screens; long single-line writes now truncate in the UI. Cosmetic-only — file contents on disk are unchanged.",
+    "deadline": null,
+    "tags": ["ui", "file-write", "truncation"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

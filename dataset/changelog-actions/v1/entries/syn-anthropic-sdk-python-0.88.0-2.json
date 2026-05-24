@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-python-0.88.0-2",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-python",
+    "version": "0.88.0",
+    "released_at": "2026-04-01",
+    "kind_hint": "changed",
+    "change_text": "bedrock api key auth ([#1623](https://github.com/anthropics/anthropic-sdk-python/issues/1623)) ([a95a3fc](https://github.com/anthropics/anthropic-sdk-python/commit/a95a3fc586b8de63e3c2b386cee5e312d96bf5d8))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-python/releases/tag/v0.88.0",
+    "change_id": "anthropic-sdk-python/0.88.0/2"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Bedrock API-key auth added to anthropic-sdk-python",
+    "action_text": "Upgrade `anthropic-sdk-python` to 0.88.0+ to use API-key auth against Bedrock instead of SigV4-only. Opt-in; existing SigV4 callers are unaffected. See issue #1623 for the parameter surface.",
+    "deadline": null,
+    "tags": ["bedrock", "auth", "api-key"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch01",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

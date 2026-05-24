@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_117-34",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_117",
+    "released_at": "2026-09-15",
+    "kind_hint": "changed",
+    "change_text": "@IllusionMH (Andrii Dieiev) (https://github.com/IllusionMH)",
+    "source_url": "https://code.visualstudio.com/updates/v1_117",
+    "change_id": "vscode-copilot-chat/v1_117/34"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Contributor attribution fragment — no change content",
+    "action_text": "Read the upstream v1_117 release notes at the source URL for actual change content. The parsed `change_text` is a contributor attribution line only; no surface, behavior, or action is derivable from the entry alone.",
+    "deadline": null,
+    "tags": ["vscode", "release-notes-vague", "parser-artifact"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

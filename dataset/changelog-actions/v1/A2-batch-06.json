@@ -1,0 +1,256 @@
+{
+  "batch_index": 6,
+  "count": 25,
+  "candidates": [
+    {
+      "id": "syn-claude-code-2.1.142-24",
+      "product": "claude-code",
+      "version": "2.1.142",
+      "released_at": "2026-05-14",
+      "kind_hint": "removed",
+      "change_text": "Removed stale `/model claude-sonnet-4-20250514` suggestion from Usage Policy refusal messages",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-142",
+      "change_id": "claude-code/2.1.142/24"
+    },
+    {
+      "id": "syn-claude-code-2.1.6-24",
+      "product": "claude-code",
+      "version": "2.1.6",
+      "released_at": "2026-01-13",
+      "kind_hint": "removed",
+      "change_text": "Removed ability to @-mention MCP servers to enable/disable - use `/mcp enable <name>` instead",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-6",
+      "change_id": "claude-code/2.1.6/24"
+    },
+    {
+      "id": "syn-claude-code-2.1.92-20",
+      "product": "claude-code",
+      "version": "2.1.92",
+      "released_at": "2026-04-04",
+      "kind_hint": "removed",
+      "change_text": "Removed `/vim` command (toggle vim mode via `/config` → Editor mode)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-92",
+      "change_id": "claude-code/2.1.92/20"
+    },
+    {
+      "id": "syn-claude-code-2.1.71-28",
+      "product": "claude-code",
+      "version": "2.1.71",
+      "released_at": "2026-03-07",
+      "kind_hint": "removed",
+      "change_text": "Removed startup notification noise for unauthenticated org-registered claude.ai connectors",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-71",
+      "change_id": "claude-code/2.1.71/28"
+    },
+    {
+      "id": "syn-claude-code-2.1.31-11",
+      "product": "claude-code",
+      "version": "2.1.31",
+      "released_at": "2026-02-04",
+      "kind_hint": "removed",
+      "change_text": "Removed misleading Anthropic API pricing from model selector for third-party provider (Bedrock, Vertex, Foundry) users",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-31",
+      "change_id": "claude-code/2.1.31/11"
+    },
+    {
+      "id": "syn-claude-code-2.1.0-103",
+      "product": "claude-code",
+      "version": "2.1.0",
+      "released_at": "2026-01-07",
+      "kind_hint": "removed",
+      "change_text": "Removed underline styling from image reference links",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-0",
+      "change_id": "claude-code/2.1.0/103"
+    },
+    {
+      "id": "syn-claude-code-2.1.0-102",
+      "product": "claude-code",
+      "version": "2.1.0",
+      "released_at": "2026-01-07",
+      "kind_hint": "removed",
+      "change_text": "Removed permission prompt when entering plan mode - users can now enter plan mode without approval",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-0",
+      "change_id": "claude-code/2.1.0/102"
+    },
+    {
+      "id": "syn-claude-code-2.1.90-19",
+      "product": "claude-code",
+      "version": "2.1.90",
+      "released_at": "2026-04-01",
+      "kind_hint": "removed",
+      "change_text": "Removed `Get-DnsClientCache` and `ipconfig /displaydns` from auto-allow (DNS cache privacy)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-90",
+      "change_id": "claude-code/2.1.90/19"
+    },
+    {
+      "id": "syn-claude-code-2.1.144-5",
+      "product": "claude-code",
+      "version": "2.1.144",
+      "released_at": "2026-05-19",
+      "kind_hint": "renamed",
+      "change_text": "Renamed \"extra usage\" to \"usage credits\" across CLI copy; `/extra-usage` is now `/usage-credits` (old name still works)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-144",
+      "change_id": "claude-code/2.1.144/5"
+    },
+    {
+      "id": "syn-claude-code-2.1.77-42",
+      "product": "claude-code",
+      "version": "2.1.77",
+      "released_at": "2026-03-17",
+      "kind_hint": "renamed",
+      "change_text": "Renamed `/fork` to `/branch` (`/fork` still works as an alias)",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-77",
+      "change_id": "claude-code/2.1.77/42"
+    },
+    {
+      "id": "syn-claude-code-2.1.147-3",
+      "product": "claude-code",
+      "version": "2.1.147",
+      "released_at": "2026-05-21",
+      "kind_hint": "renamed",
+      "change_text": "Renamed `/simplify` to `/code-review`. It now reports correctness bugs at a chosen effort level (e.g., `/code-review high`); pass `--comment` to post findings as inline GitHub PR comments. The old cleanup-and-fix behavior has been removed",
+      "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-147",
+      "change_id": "claude-code/2.1.147/3"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-35",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/35"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-28",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/28"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-1",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/1"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-35",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/35"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-17",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "Added confirmation when starting a new command to cancel the active one.",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/17"
+    },
+    {
+      "id": "syn-windsurf-2026-04-27-devin-for-terminal-8",
+      "product": "windsurf",
+      "version": "2026-04-27-devin-for-terminal",
+      "released_at": "2026-04-27",
+      "kind_hint": "added",
+      "change_text": "Added support for server-driven extension deny lists",
+      "source_url": "https://windsurf.com/changelog#devin-for-terminal",
+      "change_id": "windsurf/2026-04-27-devin-for-terminal/8"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-8",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/8"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-28",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "added",
+      "change_text": "New features (#new-features)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/28"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_110-96",
+      "product": "vscode-copilot-chat",
+      "version": "v1_110",
+      "released_at": "2026-02-15",
+      "kind_hint": "added",
+      "change_text": "Added `ChatSessionItemControllerNewItemHandler` so that controllers can specify the URI used for new sessions.",
+      "source_url": "https://code.visualstudio.com/updates/v1_110",
+      "change_id": "vscode-copilot-chat/v1_110/96"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_118-64",
+      "product": "vscode-copilot-chat",
+      "version": "v1_118",
+      "released_at": "2026-10-15",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+      "source_url": "https://code.visualstudio.com/updates/v1_118",
+      "change_id": "vscode-copilot-chat/v1_118/64"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_118-34",
+      "product": "vscode-copilot-chat",
+      "version": "v1_118",
+      "released_at": "2026-10-15",
+      "kind_hint": "deprecated",
+      "change_text": "**Edit Mode** is officially deprecated as of VS Code version 1.110. Users can temporarily re-enable Edit Mode via VS Code setting chat.editMode.hidden Open in VS Code Open in VS Code Insiders This setting is managed at the organization level. Contact your administrator to change it.ORG. This setting will remain supported through version 1.125. Beginning with version 1.125, Edit Mode will be fully removed and can no longer be enabled via settings.",
+      "source_url": "https://code.visualstudio.com/updates/v1_118",
+      "change_id": "vscode-copilot-chat/v1_118/34"
+    },
+    {
+      "id": "syn-vscode-copilot-chat-v1_119-30",
+      "product": "vscode-copilot-chat",
+      "version": "v1_119",
+      "released_at": "2026-11-15",
+      "kind_hint": "deprecated",
+      "change_text": "**Edit Mode** is officially deprecated as of VS Code version 1.110. Users can temporarily re-enable Edit Mode via VS Code setting chat.editMode.hidden Open in VS Code Open in VS Code Insiders This setting is managed at the organization level. Contact your administrator to change it.ORG. This setting will remain supported through version 1.125. Beginning with version 1.125, Edit Mode will be fully removed and can no longer be enabled via settings.",
+      "source_url": "https://code.visualstudio.com/updates/v1_119",
+      "change_id": "vscode-copilot-chat/v1_119/30"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-39",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "released_at": "2026-05-13",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecation (#deprecation)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/39"
+    },
+    {
+      "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-32",
+      "product": "github-copilot",
+      "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+      "released_at": "2026-05-13",
+      "kind_hint": "deprecated",
+      "change_text": "Deprecation (#deprecation)",
+      "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+      "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/32"
+    }
+  ]
+}

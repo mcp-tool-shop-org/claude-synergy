@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-typescript-0.72.0-3",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-typescript",
+    "version": "0.72.0",
+    "released_at": "2026-01-29",
+    "kind_hint": "breaking",
+    "change_text": "**ci:** add breaking change detection workflow ([b181568](https://github.com/anthropics/anthropic-sdk-typescript/commit/b181568601537957f91f7123420d8d0f4625c2b7))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/sdk-v0.72.0",
+    "change_id": "anthropic-sdk-typescript/0.72.0/3"
+  },
+  "output": {
+    "kind": "docs",
+    "severity": "low",
+    "subject": "CI: breaking-change detection workflow added (no consumer impact)",
+    "action_text": "No action for consumers of `anthropic-sdk-typescript` — this is an internal CI workflow addition to the SDK repo, not a runtime change. Kind-hint of `breaking` is a Conventional-Commits scope artifact (`ci:`), not a user-facing break.",
+    "deadline": null,
+    "tags": ["sdk", "ci", "internal", "no-op"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

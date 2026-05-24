@@ -1,0 +1,33 @@
+{
+  "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-20",
+  "schema_version": "1",
+  "input": {
+    "product": "github-copilot",
+    "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "released_at": "2026-05-13",
+    "kind_hint": "improved",
+    "change_text": "Improved hover and pressed states for code block actions.",
+    "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides/20"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "code block action hover and pressed states",
+    "action_text": "Update Copilot for JetBrains to pick up refined hover and pressed states on code block action buttons. Purely cosmetic — interaction behavior is unchanged; no config or call-site changes needed.",
+    "deadline": null,
+    "tags": ["jetbrains", "ui", "cosmetic"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

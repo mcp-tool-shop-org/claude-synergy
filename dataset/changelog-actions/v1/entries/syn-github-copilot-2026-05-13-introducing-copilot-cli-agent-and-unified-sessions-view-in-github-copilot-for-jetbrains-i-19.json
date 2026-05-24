@@ -1,0 +1,33 @@
+{
+  "id": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-19",
+  "schema_version": "1",
+  "input": {
+    "product": "github-copilot",
+    "version": "2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i",
+    "released_at": "2026-05-13",
+    "kind_hint": "improved",
+    "change_text": "Improved auto-approval panel UI.",
+    "source_url": "https://github.blog/changelog/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides",
+    "change_id": "github-copilot/2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i/19"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "auto-approval panel UI",
+    "action_text": "Update Copilot for JetBrains to pick up the refreshed auto-approval panel UI. Behavior of approvals is unchanged; only the panel's visual layout is updated. No config changes required.",
+    "deadline": null,
+    "tags": ["jetbrains", "auto-approval", "ui"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch02",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

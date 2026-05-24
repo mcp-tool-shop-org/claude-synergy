@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-4-8",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-4",
+    "released_at": "2026-01-22",
+    "kind_hint": "improved",
+    "change_text": "Improved capabilities & coverage for hooks (https://cursor.com/docs/agent/hooks): \\`stop\\` hook; modify prompts \\`beforeSubmitPrompt\\` ; \\`PreToolUse\\` and \\`PostToolUse\\` hooks.",
+    "source_url": "https://cursor.com/changelog/2-4",
+    "change_id": "cursor/2-4/8"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Cursor adds stop, beforeSubmitPrompt, PreToolUse, PostToolUse hooks",
+    "action_text": "Wire new Cursor hooks on 2-4+ — `stop`, `beforeSubmitPrompt`, `PreToolUse`, `PostToolUse` — at https://cursor.com/docs/agent/hooks. `beforeSubmitPrompt` lets you mutate the prompt; tool-use hooks gate tool execution; `stop` fires at the end of an agent run.",
+    "deadline": null,
+    "tags": ["cursor", "hooks", "agent"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

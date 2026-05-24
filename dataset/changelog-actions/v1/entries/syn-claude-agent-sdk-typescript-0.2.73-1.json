@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.73-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.73",
+    "released_at": "2026-03-11",
+    "kind_hint": "fixed",
+    "change_text": "Fixed `options.env` being overridden by the `~/.claude/settings.json` env block when not using `user` as a `settingSources` option",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.73",
+    "change_id": "claude-agent-sdk-typescript/0.2.73/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "options.env was silently overridden by ~/.claude/settings.json env block",
+    "action_text": "Upgrade to 0.2.73+ if you pass `options.env` without including `user` in `settingSources`. Pre-fix your explicit env was silently overwritten by the user-settings env block — silent-wrong values for API keys, paths, or feature flags reached the subprocess.",
+    "deadline": null,
+    "tags": ["options-env", "settings", "silent-failure"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

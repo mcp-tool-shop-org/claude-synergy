@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-action-v1.0.28-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code-action",
+    "version": "v1.0.28",
+    "released_at": "2026-01-05",
+    "kind_hint": "changed",
+    "change_text": "fix: update broken link in cloud-providers.md by @ashwin-ant in https://github.com/anthropics/claude-code-action/pull/758",
+    "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.28",
+    "change_id": "claude-code-action/v1.0.28/1"
+  },
+  "output": {
+    "kind": "docs",
+    "severity": "low",
+    "subject": "Broken link in cloud-providers.md fixed",
+    "action_text": "Read the updated `cloud-providers.md` in `claude-code-action` v1.0.28+ if you previously hit a broken link there. Doc-only fix; action behavior is unchanged and the upgrade is not required to use the action.",
+    "deadline": null,
+    "tags": ["docs", "broken-link", "cloud-providers"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-github-copilot-2026-05-21-github-copilot-for-eclipse-is-open-source-4",
+  "schema_version": "1",
+  "input": {
+    "product": "github-copilot",
+    "version": "2026-05-21-github-copilot-for-eclipse-is-open-source",
+    "released_at": "2026-05-21",
+    "kind_hint": "changed",
+    "change_text": "✨ What's new (#%e2%9c%a8-whats-new)",
+    "source_url": "https://github.blog/changelog/2026-05-21-github-copilot-for-eclipse-is-open-source",
+    "change_id": "github-copilot/2026-05-21-github-copilot-for-eclipse-is-open-source/4"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "GitHub Copilot for Eclipse open-source — section heading only",
+    "action_text": "Read the upstream changelog post at the source URL to learn what's new in GitHub Copilot for Eclipse open-sourcing. The parsed `change_text` contains only the `What's new` section anchor; no actionable detail is derivable from the entry alone.",
+    "deadline": null,
+    "tags": ["github-copilot", "eclipse", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch10",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

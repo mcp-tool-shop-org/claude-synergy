@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-api-2026-03-30-2",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-api",
+    "version": "2026-03-30",
+    "released_at": "2026-03-30",
+    "kind_hint": "changed",
+    "change_text": "We're retiring the 1M token context window beta for Claude Sonnet 4.5 and Claude Sonnet 4 on **April 30, 2026**. After that date, the `context-1m-2025-08-07` beta header will have no effect on these models, and requests that exceed the standard 200k-token context window will return an error. To continue using 1M context windows, migrate to [Claude Sonnet 4.6](/docs/en/about-claude/models/overview#latest-models-comparison) or [Claude Opus 4.6](/docs/en/about-claude/models/overview#latest-models-comparison), which support the full 1M token context window at standard pricing with no beta header required.",
+    "source_url": "https://platform.claude.com/docs/en/release-notes/overview#march-30-2026",
+    "change_id": "claude-api/2026-03-30/2"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "high",
+    "subject": "1M context beta retired on Sonnet 4 / 4.5 (deadline 2026-04-30, already past)",
+    "action_text": "Migrate any `context-1m-2025-08-07` header callers on Sonnet 4 or 4.5 to `claude-sonnet-4-6` or `claude-opus-4-6` immediately — the header has been a no-op since 2026-04-30 and >200k-token requests now error. Sonnet 4.6 and Opus 4.6 support 1M context without a beta header.",
+    "deadline": "2026-04-30",
+    "tags": ["api", "context-window", "beta-header", "model-migration"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

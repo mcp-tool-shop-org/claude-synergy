@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.27-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.27",
+    "released_at": "2026-01-30",
+    "kind_hint": "added",
+    "change_text": "Added tool call failures and denials to debug logs",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-27",
+    "change_id": "claude-code/2.1.27/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "tool call failures + denials now in debug logs",
+    "action_text": "Inspect `claude --debug` output to see tool call failures and denials that were previously silent. Useful when diagnosing why an agent skipped a tool or got blocked by permissions.",
+    "deadline": null,
+    "tags": ["debug-logs", "tool-calls", "observability"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

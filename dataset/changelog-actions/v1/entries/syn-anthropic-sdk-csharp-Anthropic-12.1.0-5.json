@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-csharp-Anthropic-12.1.0-5",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-csharp",
+    "version": "Anthropic-12.1.0",
+    "released_at": "2026-01-07",
+    "kind_hint": "fixed",
+    "change_text": "fix lint error ([d3bef74](https://github.com/anthropics/anthropic-sdk-csharp/commit/d3bef74a70da9faf737a80f6e9251a30c16f223e))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-csharp/releases/tag/Anthropic-v12.1.0",
+    "change_id": "anthropic-sdk-csharp/Anthropic-12.1.0/5"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Unspecified lint error fix in anthropic-sdk-csharp",
+    "action_text": "Upgrade to `anthropic-sdk-csharp` 12.1.0+ if you build with strict-analyzer warnings. Upstream notes don't specify which lint rule or which file — no runtime behavior change derivable from the entry alone.",
+    "deadline": null,
+    "tags": ["csharp", "lint", "release-notes-vague"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

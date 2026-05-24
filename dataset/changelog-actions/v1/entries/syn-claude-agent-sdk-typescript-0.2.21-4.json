@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.21-4",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.21",
+    "released_at": "2026-01-28",
+    "kind_hint": "fixed",
+    "change_text": "Fixed PermissionRequest hooks not being executed in SDK mode (e.g., VS Code extension)",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.21",
+    "change_id": "claude-agent-sdk-typescript/0.2.21/4"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "high",
+    "subject": "PermissionRequest hooks skipped in SDK mode (VS Code extension)",
+    "action_text": "Upgrade to 0.2.21+ if you register `PermissionRequest` hooks and consume the SDK (VS Code extension or other embedding). Pre-fix the hooks were silently skipped — permission decisions fell through to defaults, defeating any safety policy you intended to enforce.",
+    "deadline": null,
+    "tags": ["permission-request", "hooks", "sdk-mode", "vscode", "silent-failure"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch04",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

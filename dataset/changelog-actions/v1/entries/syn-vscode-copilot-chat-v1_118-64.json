@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_118-64",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_118",
+    "released_at": "2026-10-15",
+    "kind_hint": "deprecated",
+    "change_text": "Deprecated features and settings (#_deprecated-features-and-settings)",
+    "source_url": "https://code.visualstudio.com/updates/v1_118",
+    "change_id": "vscode-copilot-chat/v1_118/64"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "VS Code v1.118 release — `#_deprecated-features-and-settings` section anchor only",
+    "action_text": "Read the VS Code v1.118 release notes at `source_url` directly; this entry is a `#_deprecated-features-and-settings` section anchor with no item body. Specific deprecations are not in this row — open the page to see what landed.",
+    "deadline": null,
+    "tags": ["vscode-copilot-chat", "release-notes-vague", "section-anchor"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

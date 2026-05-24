@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.97-42",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.97",
+    "released_at": "2026-04-08",
+    "kind_hint": "improved",
+    "change_text": "Improved markdown blockquotes to show a continuous left bar across wrapped lines",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-97",
+    "change_id": "claude-code/2.1.97/42"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Markdown blockquotes show continuous left bar across wrapped lines",
+    "action_text": "Upgrade Claude Code to 2.1.97+ to render markdown blockquotes with a continuous left bar across wrapped lines instead of a broken bar. Cosmetic rendering fix; content is unchanged.",
+    "deadline": null,
+    "tags": ["markdown", "blockquote", "rendering"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

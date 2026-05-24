@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-02-16-bug-fixes-and-improvements-1",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-02-16-bug-fixes-and-improvements",
+    "released_at": "2026-02-16",
+    "kind_hint": "fixed",
+    "change_text": "Fix for self-updating on Windows",
+    "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+    "change_id": "windsurf/2026-02-16-bug-fixes-and-improvements/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Windsurf self-update fix on Windows",
+    "action_text": "Update Windsurf manually one time on Windows if auto-update has stalled. The self-updater itself was broken pre-fix; subsequent updates should flow through normally after this version is installed.",
+    "deadline": null,
+    "tags": ["windows", "self-update", "auto-update"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

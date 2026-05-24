@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.0-102",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.0",
+    "released_at": "2026-01-07",
+    "kind_hint": "removed",
+    "change_text": "Removed permission prompt when entering plan mode - users can now enter plan mode without approval",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-0",
+    "change_id": "claude-code/2.1.0/102"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "low",
+    "subject": "Plan-mode entry no longer prompts for permission",
+    "action_text": "Remove permission-prompt assumptions for `plan mode` entry in 2.1.0+; the approval gate is gone and users transition without intervention. Update any automation, hooks, or onboarding docs that pre-answered the prompt.",
+    "deadline": null,
+    "tags": ["claude-code", "plan-mode", "permissions", "ux"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

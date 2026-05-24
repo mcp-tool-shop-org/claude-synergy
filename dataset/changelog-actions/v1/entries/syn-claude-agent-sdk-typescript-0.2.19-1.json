@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.19-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.19",
+    "released_at": "2026-01-23",
+    "kind_hint": "added",
+    "change_text": "Added `CLAUDE_CODE_ENABLE_TASKS` env var, set to `true` to opt into the new task system",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.19",
+    "change_id": "claude-agent-sdk-typescript/0.2.19/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "CLAUDE_CODE_ENABLE_TASKS env var enables new task system",
+    "action_text": "Set `CLAUDE_CODE_ENABLE_TASKS=true` in your SDK environment to opt into the new task system. Leaving it unset preserves the prior behavior; the task system is additive and off by default in 0.2.19.",
+    "deadline": null,
+    "tags": ["env-var", "tasks", "opt-in"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch03",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

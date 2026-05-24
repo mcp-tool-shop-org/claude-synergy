@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-5-15",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-5",
+    "released_at": "2026-02-17",
+    "kind_hint": "removed",
+    "change_text": "Removed Default Mode setting so each new agent conversation begins fresh.",
+    "source_url": "https://cursor.com/changelog/2-5",
+    "change_id": "cursor/2-5/15"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "low",
+    "subject": "'Default Mode' setting removed in Cursor 2.5",
+    "action_text": "Remove `Default Mode` from `cursor` workflow assumptions in 2.5+ — the setting is gone and each new agent conversation now begins fresh. Set mode explicitly per conversation if you relied on the prior default.",
+    "deadline": null,
+    "tags": ["cursor", "removal", "agent-mode"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch09",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

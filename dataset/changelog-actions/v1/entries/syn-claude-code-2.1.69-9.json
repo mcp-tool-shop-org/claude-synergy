@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.69-9",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.69",
+    "released_at": "2026-03-05",
+    "kind_hint": "added",
+    "change_text": "Added `includeGitInstructions` setting (and `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS` env var) to remove built-in commit and PR workflow instructions from Claude's system prompt",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-69",
+    "change_id": "claude-code/2.1.69/9"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "includeGitInstructions setting to drop built-in git/PR system prompt",
+    "action_text": "Set `includeGitInstructions: false` in settings.json (or `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS=1`) to strip the built-in commit and PR workflow guidance from Claude's system prompt. Useful when you maintain your own git instructions in CLAUDE.md; default behavior unchanged.",
+    "deadline": null,
+    "tags": ["claude-code", "settings", "env-var", "system-prompt"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch07",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.144-5",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.144",
+    "released_at": "2026-05-19",
+    "kind_hint": "renamed",
+    "change_text": "Renamed \"extra usage\" to \"usage credits\" across CLI copy; `/extra-usage` is now `/usage-credits` (old name still works)",
+    "source_url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#version-2-1-144",
+    "change_id": "claude-code/2.1.144/5"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "low",
+    "subject": "`/extra-usage` renamed to `/usage-credits` (alias retained)",
+    "action_text": "Replace `/extra-usage` with `/usage-credits` in hooks, docs, and muscle memory. The old slash command still works as an alias in 2.1.144, but the canonical name has changed across CLI copy and will be the one users see in help text.",
+    "deadline": null,
+    "tags": ["claude-code", "slash-command", "rename", "billing-copy"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch06",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

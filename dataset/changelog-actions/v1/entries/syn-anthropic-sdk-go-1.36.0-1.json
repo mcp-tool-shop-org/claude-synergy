@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-go-1.36.0-1",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-go",
+    "version": "1.36.0",
+    "released_at": "2026-04-14",
+    "kind_hint": "deprecated",
+    "change_text": "**api:** mark Sonnet and Opus 4 as deprecated ([fc49d21](https://github.com/anthropics/anthropic-sdk-go/commit/fc49d213a3de80dd37836ef3ede4199943a81b12))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.36.0",
+    "change_id": "anthropic-sdk-go/1.36.0/1"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "high",
+    "subject": "Sonnet 4 and Opus 4 marked deprecated in anthropic-sdk-go",
+    "action_text": "Migrate Go SDK callers from `claude-sonnet-4-20250514` and `claude-opus-4-20250514` to `claude-sonnet-4-6` and `claude-opus-4-7`. Upstream retires both models on the Claude API 2026-06-15; calls to the retired IDs will fail after that date.",
+    "deadline": "2026-06-15",
+    "tags": ["model-retirement", "claude-sonnet-4", "claude-opus-4", "go-sdk"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch05",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

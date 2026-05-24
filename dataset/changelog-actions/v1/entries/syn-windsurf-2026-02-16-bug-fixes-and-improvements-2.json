@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-02-16-bug-fixes-and-improvements-2",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-02-16-bug-fixes-and-improvements",
+    "released_at": "2026-02-16",
+    "kind_hint": "fixed",
+    "change_text": "Fix for macOS UI flickering",
+    "source_url": "https://windsurf.com/changelog#bug-fixes-and-improvements",
+    "change_id": "windsurf/2026-02-16-bug-fixes-and-improvements/2"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "macOS UI flickering fix in Windsurf",
+    "action_text": "Update Windsurf on macOS if the UI has been flickering. Cosmetic-only fix; no config change required and no behavioral impact beyond visual stability.",
+    "deadline": null,
+    "tags": ["macos", "ui", "flickering", "cosmetic"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-subagent-batch08",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}
