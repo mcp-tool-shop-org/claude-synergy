@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Números atualizados (versão 1.2.0):** 44 produtos / 1.171 arquivos de lançamento / 6.573 alterações / 1.260 entidades / 12 sinergias / 517 testes / 13 ferramentas MCP / 17 comandos de linha de comando. (O corpus foi atualizado via `sync_now` em 24 de maio de 2026.)
+**Números atualizados (versão 1.2.1):** 44 produtos / 1.171 arquivos de lançamento / 6.573 alterações / 1.260 entidades / 12 sinergias / 519 testes / 13 ferramentas MCP / 17 comandos de linha de comando. (O corpus foi atualizado via `sync_now` em 24 de maio de 2026.)
 
 ---
 
@@ -91,6 +91,7 @@ claude-synergy/
 | **4d — Playwright + registro MCP + configuração YAML** | ✅ implementado | Windsurf via Playwright; Smithery + registro oficial MCP como catálogos da etapa 4; produtos consolidados em `products.yaml`. |
 | **5 — Navegação com janelas (v1.1) + incorporação da OpenAI** | ✅ implementado | `hk diff` / `hk breaking`, limites de data em todos os comandos de navegação, 3 novas ferramentas MCP (total de 11), provedor de incorporação da OpenAI, dimensão de incorporação configurável, sincronização automática do `claude-code`, analisador genérico `keep-a-changelog`. |
 | **6 — v1.2 sync-from-MCP** | ✅ implementado | `sync_status` (frescor por produto, detecção de "obsoleto") e `sync_now` (busca sob demanda → ingestão → incorporação com visualização "dry_run" + bloqueio de concorrência em processo). Elimina a lacuna onde um agente poderia consultar o corpus, mas não atualizá-lo. **Corrige também:** um erro em que a exclusão de marcadores, ao usar `INSERT OR REPLACE INTO products`, causava uma exclusão em cascata na chave estrangeira `markers`, reiniciando silenciosamente o cursor "since" de cada produto a cada ingestão (regressão §8.20). |
+| **6.1 — Centralização do marcador de recuperação (versão 1.2.1)** | ✅ implementado | Centralizei a função `writeMarker` em `fetchOne` para que cada recuperação bem-sucedida atualize o marcador. Estratégias que retornavam 0 itens datados dentro do período especificado (principalmente o "changelog" bruto do `aider`) nunca escreviam um marcador e, portanto, baixavam o arquivo `HISTORY.md` a cada sincronização. Renomeei a estratégia `webfetch` não implementada para `manual` para as APIs `claude-api` e `anthropic-apps`. Agora, o `sync_status` exibe os produtos configurados como "manual" em vez de "nunca" e os exclui do processo `stale_only` (regressão §8.21). |
 
 Roteiro para a versão 0.8+: acompanhado em [URGENT_FINDINGS.md](URGENT_FINDINGS.md) e nas issues.
 
@@ -294,7 +295,7 @@ Estratégias de busca: `gh-releases | rss | raw-changelog | html-scrape | catalo
 O conjunto de testes Vitest cobre os níveis de unidade / integração / regressão / teste rápido. **[test-spec-3.md](test-spec-3.md) é a documentação atual** a partir da versão v0.7.0; [test-spec.md](test-spec.md) (v1) e [test-spec-2.md](test-spec-2.md) (v2) permanecem no repositório como registro histórico da linhagem do design.
 
 ```bash
-pnpm test               # unit + integration + regression (~36s, 517 tests)
+pnpm test               # unit + integration + regression (~36s, 519 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)

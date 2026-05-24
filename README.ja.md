@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**現在の数値 (v1.2.0時点):** 44製品 / 1,171リリースファイル / 6,573変更 / 1,260エンティティ / 12の相乗効果 / 517テスト / 13のMCPツール / 17のCLIコマンド。 (コーパスは2026年5月24日に`sync_now`で更新されました。)
+**現在の数値 (v1.2.1時点):** 44製品 / 1,171リリースファイル / 6,573変更 / 1,260エンティティ / 12の相乗効果 / 519テスト / 13のMCPツール / 17のCLIコマンド。 (2026年5月24日に`sync_now`でコーパスを更新しました。)
 
 ---
 
@@ -90,7 +90,8 @@ claude-synergy/
 | **4c — turndown HTML→Markdownインジェスト** | ✅ リリース済み | HTMLの本文（Copilot/VS Code/Cursor）が、FTS5とエンティティ抽出のための、行ごとのリストを生成 |
 | **4d — Playwright + MCPレジストリ + YAML設定** | ✅ リリース済み | WindsurfはPlaywright経由; Smitheryと公式MCPレジストリをTier-4カタログとして使用; 製品は`products.yaml`に統合 |
 | **5 — v1.1：ウィンドウ表示機能 + OpenAIの埋め込み機能** | ✅ リリース済み | `hk diff` / `hk breaking`：すべての閲覧コマンドで日付範囲を指定可能。3つの新しいMCPツール（合計11個）、OpenAIの埋め込み機能、設定可能な埋め込み次元、`claude-code`の自動同期、汎用的な`keep-a-changelog`パーサー。 |
-| **6 — v1.2 MCPからの同期** | ✅ リリース済み | `sync_status`（製品ごとの鮮度、古くなったものの検出）と`sync_now`（オンデマンドでの取得→取り込み→埋め込み。`dry_run`によるプレビュー機能付き。取り込み処理中の同時実行を制限）。コーパスを問い合わせることはできるが、更新できないという問題を解決します。**また、以下の問題を修正:** `INSERT OR REPLACE INTO products`によって`markers`の外部キーにDELETEが連鎖し、各製品の`since`カーソルが取り込みのたびにリセットされていたバグ（回帰 §8.20）。 |
+| **6 — v1.2 sync-from-MCP** | ✅ リリース済み | `sync_status`（製品ごとの鮮度、"never"または"stale"の状態検出）と`sync_now`（オンデマンドでの取得→取り込み→埋め込み。`dry_run`プレビューと、処理中の同時実行ロック機能付き）。 これにより、コーパスを問い合わせできるものの、更新できないという問題を解消します。 **また、以下の問題を修正:** `INSERT OR REPLACE INTO products`によって`markers`の外部キーにDELETEが連鎖し、すべての製品の`since`カーソルが、取り込みのたびにリセットされていたバグ（回帰 §8.20）。 |
+| **6.1 — v1.2.1 fetcher-markerの中央管理** | ✅ リリース済み | `fetchOne`内で`writeMarker`を中央管理化し、すべての正常な取得でマーカーを更新するようにしました。 以前は、一定期間内に0件のアイテムを返した戦略（特に`aider`のraw-changelog）は、マーカーを書き込まず、`HISTORY.md`を毎回再取得していました。 実装されていない`webfetch`戦略を、`claude-api`および`anthropic-apps`向けに`manual`に改名しました。 `sync_status`では、現在、手動で設定された製品を"never"ではなく"manual"として表示し、`stale_only`から除外するようにしました（回帰 §8.21）。 |
 
 v0.8以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)およびissueで追跡中。
 
@@ -254,10 +255,10 @@ GitHub Copilotの`.vscode/mcp.json`ファイルでは、`mcpServers`ではなく
 | `get_changes_since` | **新規。** 製品とバージョンごとにグループ化された、時間範囲内の変更点。入力：`since`（必須）、`until?`、`product?`、`kind?`、`limit?`。 |
 | `search_breaking_changes` | **新規。** 検索語句不要の、変更点のフラットリスト。入力：`product?`、`since?`、`until?`、`limit?`。 |
 | `compare_versions` | **新規。** 単一の製品の2つのバージョン間のすべての変更点。入力：`product`、`from_version`、`to_version`。 |
-| `sync_status` | **v1.2.** 製品ごとの同期鮮度：最終取得日時、取得からの経過時間、取り込んだリリース数。入力パラメータ：`product?`, `stale_only?`, `stale_hours?`。`latest_releases`を使用する前に、コーパスが最新の状態かどうかを確認するために使用してください。 |
-| `sync_now` | **v1.2.** オンデマンドでの更新（`hk sync`と同様）。入力パラメータ：`product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`。別の`sync_now`が実行中の場合、`InvalidParams`エラーで拒否されます。Gitへのコミットは行いません。 |
+| `sync_status` | **v1.2.** 製品ごとの同期の鮮度：最終取得時刻、取得からの経過時間、取り込まれたリリース数。 入力：`product?`、`stale_only?`、`stale_hours?`。 `latest_releases`を信頼する前に、コーパスが最新の状態かどうかを確認するために使用してください。 |
+| `sync_now` | **v1.2.** オンデマンドでの更新（`hk sync`と同様）。 入力：`product?`、`dry_run?`、`include_ingest?`、`include_embed?`、`timeout_ms?`。 別の`sync_now`が実行中の場合、`InvalidParams`エラーで拒否されます。 Gitへのコミットは行いません。 |
 
-v1.1のツールは、`hk diff` / `hk breaking`および、以前はスクリプトが必要だったバージョン比較のワークフローを模倣しています。v1.2の同期ツールは、セッションがコーパスを問い合わせることはできるが、更新できないという問題を解決します。`sync_status`は鮮度を報告し、`sync_now`はパイプラインを実行します。完全な入力スキーマについては、[マニュアル → MCPサーバー](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/)を参照してください。
+v1.1のツールは、`hk diff` / `hk breaking`および、以前はスクリプトが必要だったバージョン比較のワークフローを模倣しています。 v1.2の同期ツールは、セッションがコーパスを問い合わせできるものの、更新できないという問題を解消します。 `sync_status`は鮮度を報告し、`sync_now`はパイプラインを実行します。 完全な入力スキーマについては、[マニュアル → MCPサーバー](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/)を参照してください。
 
 ---
 
@@ -294,7 +295,7 @@ v1.1のツールは、`hk diff` / `hk breaking`および、以前はスクリプ
 Vitestスイートは、ユニットテスト、統合テスト、回帰テスト、および初期動作確認（smoke）の各レベルをカバーします。**[test-spec-3.md](test-spec-3.md)が現在の仕様**です（v0.7.0時点）。[test-spec.md](test-spec.md)（v1）および[test-spec-2.md](test-spec-2.md)（v2）は、設計の経緯を示すための履歴として、リポジトリに残っています。
 
 ```bash
-pnpm test               # unit + integration + regression (~36s, 517 tests)
+pnpm test               # unit + integration + regression (~36s, 519 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -305,7 +306,7 @@ pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 | ディレクトリ | 内容 |
 |-----|----------------|
 | `test/unit/` | モジュールごと — 抽出、取り込み、クエリ（`until` / 閲覧 / `since` / 比較を含む）、データベース（次元設定v3移行を含む）、埋め込み、ハイブリッド、取り込み + すべてのプロバイダー（Ollama / Voyage / **OpenAI**）+ RSS/変更ログの取り込み（**keep-a-changelog**パーサーを含む）/HTML + MCPレジストリの取り込み + Playwrightの取り込み + 製品設定 + 連携の取り込み/クエリ |
-| `test/integration/` | エンドツーエンド：パイプライン、同期、MCPサーバー（stdio JSON-RPC、13のツールを含む。`sync_status` / `sync_now`など）、CLI（`hk diff`、`hk breaking`など）。 |
+| `test/integration/` | エンドツーエンド：パイプライン、同期、MCPサーバー（stdio JSON-RPC、13のツール（`sync_status` / `sync_now`を含む）、CLI（`hk diff`、`hk breaking`を含む）) |
 | `test/regression/` | §8.1–§8.19 — それぞれが、開発中に修正された実際のバグに対する対策。（§8.19：ghReleasesの早期終了ページネーションは、指定範囲内のアイテムを保持します） |
 | `test/smoke/` | 実際の`products/`ディレクトリ（1,143個のファイル）に対するフルコーパスのテスト。 |
 | `test/fixtures/` | 3つのダミー製品と、モックHTTPレスポンス（RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / 公式MCPレジストリ）。 |

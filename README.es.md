@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Datos actualizados (a partir de la versión 1.2.0):** 44 productos / 1.171 archivos de lanzamiento / 6.573 cambios / 1.260 entidades / 12 sinergias / 517 pruebas / 13 herramientas MCP / 17 comandos de línea de comandos. (La base de datos se actualizó mediante `sync_now` el 24 de mayo de 2026).
+**Datos actualizados (a partir de la versión 1.2.1):** 44 productos / 1.171 archivos de lanzamiento / 6.573 cambios / 1.260 entidades / 12 sinergias / 519 pruebas / 13 herramientas MCP / 17 comandos de línea de comandos. (La base de datos se actualizó mediante `sync_now` el 24 de mayo de 2026).
 
 ---
 
@@ -91,6 +91,7 @@ claude-synergy/
 | **4d — Playwright + registro de MCP + configuración YAML** | ✅ implementado | Windsurf a través de Playwright; Smithery + registro oficial de MCP como catálogos de la etapa 4; productos consolidados en `products.yaml`. |
 | **5 — Navegación con ventanas en la versión 1.1 + integración de OpenAI** | ✅ implementado | `hk diff` / `hk breaking`, límites de fecha para todos los comandos de navegación, 3 nuevas herramientas MCP (un total de 11), proveedor de incrustación de OpenAI, dimensión de incrustación configurable, sincronización automática de `claude-code`, analizador genérico `keep-a-changelog`. |
 | **6 — Sincronización desde MCP en la versión 1.2** | ✅ implementado | `sync_status` (frescura por producto, detección de "obsoleto") y `sync_now` (obtención bajo demanda → ingestión → incrustación con vista previa de `dry_run` + bloqueo de concurrencia en el proceso). Elimina la brecha donde un agente podía consultar la base de datos pero no actualizarla. **También corrige:** el error de "limpieza de marcadores" donde `INSERT OR REPLACE INTO products` desencadenaba un DELETE en la clave externa `markers`, restableciendo silenciosamente el cursor `since` de cada producto en cada ingestión (regresión §8.20). |
+| **6.1 — Centralización de marcadores en la versión 1.2.1** | ✅ implementado | Se centralizó la función `writeMarker` en `fetchOne` para que cada extracción exitosa actualice el marcador. Las estrategias que devolvían 0 elementos con fecha dentro del período especificado (especialmente el registro de cambios "raw" de `aider`) nunca escribían un marcador y volvían a descargar `HISTORY.md` en cada sincronización. Se renombró la estrategia `webfetch` no implementada a `manual` para `claude-api` y `anthropic-apps`; ahora, `sync_status` muestra los productos configurados manualmente como "manual" en lugar de "nunca" y los excluye de `stale_only` (regresión §8.21). |
 
 Hoja de ruta para la versión 0.8+: se encuentra en [URGENT_FINDINGS.md](URGENT_FINDINGS.md) y en los problemas.
 
@@ -294,7 +295,7 @@ Estrategias de recuperación: `gh-releases | rss | raw-changelog | html-scrape |
 El conjunto de pruebas Vitest cubre los niveles de unidad / integración / regresión / pruebas básicas. **[test-spec-3.md](test-spec-3.md) es la autoridad actual** a partir de la versión v0.7.0; [test-spec.md](test-spec.md) (v1) y [test-spec-2.md](test-spec-2.md) (v2) permanecen en el repositorio como registro histórico de la línea de diseño.
 
 ```bash
-pnpm test               # unit + integration + regression (~36s, 517 tests)
+pnpm test               # unit + integration + regression (~36s, 519 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)

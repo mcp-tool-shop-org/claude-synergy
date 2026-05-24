@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v1.2.0):** 44 products / 1,171 release files / 6,573 changes / 1,260 entities / 12 synergies / 517 tests / 13 MCP tools / 17 CLI commands. (Corpus refreshed via `sync_now` on 2026-05-24.)
+**Live numbers (as of v1.2.1):** 44 products / 1,171 release files / 6,573 changes / 1,260 entities / 12 synergies / 519 tests / 13 MCP tools / 17 CLI commands. (Corpus refreshed via `sync_now` on 2026-05-24.)
 
 ---
 
@@ -91,6 +91,7 @@ claude-synergy/
 | **4d — Playwright + MCP registry + YAML config** | ✅ shipped | Windsurf via Playwright; Smithery + official MCP Registry as Tier-4 catalogs; products consolidated into `products.yaml` |
 | **5 — v1.1 windowed browsing + OpenAI embed** | ✅ shipped | `hk diff` / `hk breaking`, date bounds across all browsing commands, 3 new MCP tools (11 total), OpenAI embedding provider, configurable embedding dimension, `claude-code` auto-sync, generic `keep-a-changelog` parser |
 | **6 — v1.2 sync-from-MCP** | ✅ shipped | `sync_status` (per-product freshness, never/stale detection) and `sync_now` (on-demand fetch → ingest → embed with `dry_run` preview + in-process concurrency lock). Closes the seam where a calling agent could query the corpus but not refresh it. **Also fixes:** marker-wipe bug where `INSERT OR REPLACE INTO products` cascaded a DELETE on the `markers` FK, silently resetting every product's `since` cursor on each ingest (regression §8.20). |
+| **6.1 — v1.2.1 fetcher-marker centralization** | ✅ shipped | Centralized `writeMarker` in `fetchOne` so every successful fetch updates the marker — pre-fix, strategies that returned 0 in-window dated items (most notably `aider` raw-changelog) never wrote a marker and re-pulled `HISTORY.md` on every sync. Renamed unimplemented `webfetch` strategy to `manual` for `claude-api` + `anthropic-apps`; `sync_status` now renders manual products as "manual" instead of "never" and excludes them from `stale_only` (regression §8.21). |
 
 Roadmap beyond v1.2: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
 
@@ -294,7 +295,7 @@ Full index in [synergies/INDEX.md](synergies/INDEX.md).
 Vitest suite covers unit / integration / regression / smoke tiers. **[test-spec-3.md](test-spec-3.md) is the current authority** as of v0.7.0; [test-spec.md](test-spec.md) (v1) and [test-spec-2.md](test-spec-2.md) (v2) remain in the repo as historical record of the design lineage.
 
 ```bash
-pnpm test               # unit + integration + regression (~36s, 517 tests)
+pnpm test               # unit + integration + regression (~36s, 519 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)

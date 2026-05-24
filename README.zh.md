@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**实时数据 (截至 v1.2.0 版本):** 44 个产品 / 1,171 个发布文件 / 6,573 个变更 / 1,260 个实体 / 12 个协同功能 / 517 个测试 / 13 个 MCP 工具 / 17 个 CLI 命令。 (语料库已于 2026-05-24 通过 `sync_now` 命令刷新。)
+**实时数据（截至 v1.2.1 版本）：** 44 个产品 / 1,171 个发布文件 / 6,573 个变更 / 1,260 个实体 / 12 个协同关系 / 519 个测试 / 13 个 MCP 工具 / 17 个 CLI 命令。（语料库已于 2026-05-24 通过 `sync_now` 命令刷新。）
 
 ---
 
@@ -91,6 +91,7 @@ claude-synergy/
 | 4d — playwright + MCP 注册 + YAML 配置文件。 | ✅ 已发货。 | 使用 Playwright 进行网页抓取；Smithery + 官方 MCP 注册信息作为第四级目录；产品信息已整合到 `products.yaml` 文件中。 |
 | **5 — v1.1 版本：窗口浏览 + OpenAI 嵌入** | ✅ 已发货。 | `hk diff` / `hk breaking`，所有浏览命令都支持日期范围；3 个新的 MCP 工具 (总共 11 个)；OpenAI 嵌入提供程序；可配置的嵌入维度；`claude-code` 自动同步；通用的 `keep-a-changelog` 解析器。 |
 | **6 — v1.2 版本：从 MCP 同步** | ✅ 已发货。 | `sync_status` (报告每个产品的更新状态，检测是否过时) 和 `sync_now` (按需获取 → 导入 → 嵌入，并提供 `dry_run` 预览 + 进程内并发锁定)。 解决了调用方可以查询语料库，但无法刷新的问题。 **此外，还修复了：** 标记清除错误，即 `INSERT OR REPLACE INTO products` 会级联删除 `markers` 上的外键，从而在每次导入时静默地重置每个产品的 `since` 游标 (回归 §8.20)。 |
+| **6.1 — v1.2.1：Fetcher 标记集中化** | ✅ 已发货。 | 将 `writeMarker` 函数集中到 `fetchOne` 函数中，以便每次成功的获取都更新标记。之前，一些策略（特别是 `aider` 原始变更日志）返回 0 个在窗口期内的条目，因此从未写入标记，并且每次同步都会重新拉取 `HISTORY.md` 文件。已将未实现的 `webfetch` 策略重命名为 `manual`，适用于 `claude-api` 和 `anthropic-apps`。现在，`sync_status` 会将手动配置的产品显示为 "manual"，而不是 "never"，并且将其排除在 `stale_only` 列表中（回归问题 §8.21）。 |
 
 v0.8 及后续版本的开发计划，请参考 [URGENT_FINDINGS.md](URGENT_FINDINGS.md) 文件以及相关问题列表。
 
@@ -294,7 +295,7 @@ v1.1 版本的工具模仿了 `hk diff` / `hk breaking` 命令，以及以前需
 Vitest 测试套件覆盖单元测试、集成测试、回归测试和初步测试。 **[test-spec-3.md](test-spec-3.md) 是当前版本 (v0.7.0) 的权威文档**；[test-spec.md](test-spec.md) (v1) 和 [test-spec-2.md](test-spec-2.md) (v2) 仍然保存在代码库中，作为设计演进的历史记录。
 
 ```bash
-pnpm test               # unit + integration + regression (~36s, 517 tests)
+pnpm test               # unit + integration + regression (~36s, 519 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)

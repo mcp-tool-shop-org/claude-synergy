@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Dati aggiornati (alla versione v1.2.0):** 44 prodotti / 1.171 file di rilascio / 6.573 modifiche / 1.260 entità / 12 sinergie / 517 test / 13 strumenti MCP / 17 comandi CLI. (Il database è stato aggiornato tramite `sync_now` il 24 maggio 2026.)
+**Dati aggiornati (alla versione 1.2.1):** 44 prodotti / 1.171 file di rilascio / 6.573 modifiche / 1.260 entità / 12 sinergie / 519 test / 13 strumenti MCP / 17 comandi CLI. (Il database è stato aggiornato tramite `sync_now` il 24 maggio 2026.)
 
 ---
 
@@ -91,6 +91,7 @@ claude-synergy/
 | **4d — Playwright + registro MCP + configurazione YAML** | ✅ implementato | Windsurf tramite Playwright; Smithery + registro ufficiale MCP come cataloghi del livello 4; prodotti consolidati in `products.yaml`. |
 | **5 — v1.1: navigazione con finestre + integrazione OpenAI** | ✅ implementato | `hk diff` / `hk breaking`, limiti di data per tutti i comandi di navigazione, 3 nuovi strumenti MCP (totale di 11), provider di embedding OpenAI, dimensione dell'embedding configurabile, sincronizzazione automatica di `claude-code`, parser generico `keep-a-changelog`. |
 | **6 — v1.2: sincronizzazione da MCP** | ✅ implementato | `sync_status` (freschezza per prodotto, rilevamento di dati obsoleti) e `sync_now` (recupero su richiesta → ingestione → embedding con anteprima `dry_run` + blocco di concorrenza in-process). Risolve il problema in cui un'applicazione poteva interrogare il database ma non aggiornarlo. **Corregge anche:** un bug che causava la cancellazione di tutti i marker quando `INSERT OR REPLACE INTO products` propagava una cancellazione sulla chiave esterna `markers`, reimpostando silenziosamente il cursore `since` di ogni prodotto ad ogni ingestione (regressione §8.20). |
+| **6.1 — Centralizzazione del marcatore nel modulo fetcher (versione 1.2.1)** | ✅ implementato | La funzione `writeMarker` è stata centralizzata in `fetchOne` in modo che ogni operazione di recupero riuscita aggiorni il marcatore. Le strategie che restituivano 0 elementi datati all'interno della finestra temporale (in particolare, il registro delle modifiche "raw" di `aider`) non scrivevano mai un marcatore e scaricavano ripetutamente il file `HISTORY.md` ad ogni sincronizzazione. La strategia `webfetch` non implementata è stata rinominata in `manual` per `claude-api` e `anthropic-apps`; `sync_status` ora visualizza i prodotti configurati manualmente come "manual" invece di "mai" e li esclude da `stale_only` (regressione §8.21). |
 
 Roadmap per la versione 0.8+: disponibile in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) e nella sezione issues.
 
@@ -294,7 +295,7 @@ Indice completo in [synergies/INDEX.md](synergies/INDEX.md).
 La suite di test Vitest copre i livelli di unità, integrazione, regressione e test preliminari. **[test-spec-3.md](test-spec-3.md) è la documentazione di riferimento corrente** a partire dalla versione 0.7.0; [test-spec.md](test-spec.md) (versione 1) e [test-spec-2.md](test-spec-2.md) (versione 2) rimangono nel repository come documentazione storica della progettazione.
 
 ```bash
-pnpm test               # unit + integration + regression (~36s, 517 tests)
+pnpm test               # unit + integration + regression (~36s, 519 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
