@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Números atuais (versão v1.1.0):** 44 produtos / 1.186 arquivos de lançamento / 6.042 alterações / 1.225 entidades / 12 sinergias / 508 testes / 11 ferramentas MCP / 17 comandos de linha de comando.
+**Números atualizados (versão 1.2.0):** 44 produtos / 1.171 arquivos de lançamento / 6.573 alterações / 1.260 entidades / 12 sinergias / 517 testes / 13 ferramentas MCP / 17 comandos de linha de comando. (O corpus foi atualizado via `sync_now` em 24 de maio de 2026.)
 
 ---
 
@@ -90,6 +90,7 @@ claude-synergy/
 | **4c — ingestão de HTML para Markdown (turndown)** | ✅ implementado | Corpos de HTML (Copilot/VS Code/Cursor) agora geram linhas individuais para o FTS5 e extração de entidades. |
 | **4d — Playwright + registro MCP + configuração YAML** | ✅ implementado | Windsurf via Playwright; Smithery + registro oficial MCP como catálogos da etapa 4; produtos consolidados em `products.yaml`. |
 | **5 — Navegação com janelas (v1.1) + incorporação da OpenAI** | ✅ implementado | `hk diff` / `hk breaking`, limites de data em todos os comandos de navegação, 3 novas ferramentas MCP (total de 11), provedor de incorporação da OpenAI, dimensão de incorporação configurável, sincronização automática do `claude-code`, analisador genérico `keep-a-changelog`. |
+| **6 — v1.2 sync-from-MCP** | ✅ implementado | `sync_status` (frescor por produto, detecção de "obsoleto") e `sync_now` (busca sob demanda → ingestão → incorporação com visualização "dry_run" + bloqueio de concorrência em processo). Elimina a lacuna onde um agente poderia consultar o corpus, mas não atualizá-lo. **Corrige também:** um erro em que a exclusão de marcadores, ao usar `INSERT OR REPLACE INTO products`, causava uma exclusão em cascata na chave estrangeira `markers`, reiniciando silenciosamente o cursor "since" de cada produto a cada ingestão (regressão §8.20). |
 
 Roteiro para a versão 0.8+: acompanhado em [URGENT_FINDINGS.md](URGENT_FINDINGS.md) e nas issues.
 
@@ -253,8 +254,10 @@ Ferramentas disponíveis:
 | `get_changes_since` | **Novo.** Alterações em uma janela de tempo, agrupadas por produto+versão. Entradas: `since` (obrigatório), `until?`, `product?`, `kind?`, `limit?`. |
 | `search_breaking_changes` | **Novo.** Lista simples de alterações significativas — não é necessário um termo de pesquisa. Entradas: `product?`, `since?`, `until?`, `limit?`. |
 | `compare_versions` | **Novo.** Todas as alterações entre duas versões de um produto. Entradas: `product`, `from_version`, `to_version`. |
+| `sync_status` | **v1.2.** Frescor da sincronização por produto: última data de busca, horas desde a última busca, número de lançamentos ingeridos. Entradas: `product?`, `stale_only?`, `stale_hours?`. Use ANTES de confiar em `latest_releases` para saber se o corpus está desatualizado. |
+| `sync_now` | **v1.2.** Atualização sob demanda (espelha `hk sync`). Entradas: `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Rejeita com `InvalidParams` se outro `sync_now` já estiver em execução. NÃO faz commit no Git. |
 
-As três novas ferramentas espelham `hk diff` / `hk breaking` e o fluxo de trabalho de comparação de versões que anteriormente exigia scripts. Consulte [manual → servidor MCP](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) para obter os esquemas de entrada completos.
+As ferramentas da versão 1.1 espelham `hk diff` / `hk breaking` e o fluxo de trabalho de comparação de versões que anteriormente exigia scripts. As ferramentas de sincronização da versão 1.2 eliminam a lacuna onde uma sessão poderia consultar o corpus, mas não atualizá-lo: `sync_status` informa sobre a obsolescência, `sync_now` executa o pipeline. Consulte [manual → servidor MCP](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) para os esquemas de entrada completos.
 
 ---
 
@@ -291,7 +294,7 @@ Estratégias de busca: `gh-releases | rss | raw-changelog | html-scrape | catalo
 O conjunto de testes Vitest cobre os níveis de unidade / integração / regressão / teste rápido. **[test-spec-3.md](test-spec-3.md) é a documentação atual** a partir da versão v0.7.0; [test-spec.md](test-spec.md) (v1) e [test-spec-2.md](test-spec-2.md) (v2) permanecem no repositório como registro histórico da linhagem do design.
 
 ```bash
-pnpm test               # unit + integration + regression (~18s, 508 tests)
+pnpm test               # unit + integration + regression (~36s, 517 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -302,7 +305,7 @@ Estrutura:
 | Diretório | O que ele cobre |
 |-----|----------------|
 | `test/unit/` | por módulo — extração, ingestão, consulta (incl. `until` / navegação / desde / comparação), banco de dados (incl. migração da configuração de dimensão v3), incorporação, híbrido, busca + todos os provedores (Ollama / Voyage / **OpenAI**) + busca-rss/changelog (incl. analisador **keep-a-changelog**)/html + busca-mcp-registry + busca-playwright + configuração de produtos + ingestão/consulta de sinergia. |
-| `test/integration/` | de ponta a ponta — pipeline, sincronização, servidor MCP (JSON-RPC stdio, 11 ferramentas), CLI (incl. `hk diff`, `hk breaking`). |
+| `test/integration/` | fim a fim — pipeline, sincronização, servidor MCP (JSON-RPC padrão, 13 ferramentas, incluindo `sync_status` / `sync_now`), linha de comando (incluindo `hk diff`, `hk breaking`). |
 | `test/regression/` | §8.1–§8.19 — cada um protege contra um bug real corrigido durante o desenvolvimento (§8.19: ghReleases preserva os itens dentro da janela durante a paginação inicial). |
 | `test/smoke/` | Teste completo com um conjunto de dados simulado, representando os arquivos reais do diretório `products/` (1.143 arquivos). |
 | `test/fixtures/` | 3 produtos simulados + respostas HTTP simuladas (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Registro oficial do MCP). |

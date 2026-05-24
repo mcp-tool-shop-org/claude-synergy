@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Chiffres en direct (version v1.1.0) :** 44 produits / 1 186 fichiers de publication / 6 042 modifications / 1 225 entités / 12 synergies / 508 tests / 11 outils MCP / 17 commandes CLI.
+**Chiffres en direct (version 1.2.0) :** 44 produits / 1 171 fichiers de publication / 6 573 modifications / 1 260 entités / 12 synergies / 517 tests / 13 outils MCP / 17 commandes CLI. (Le corpus a été mis à jour via `sync_now` le 24 mai 2026.)
 
 ---
 
@@ -90,6 +90,7 @@ claude-synergy/
 | **4c — ingestion HTML→Markdown avec turndown** | ✅ réalisé | Les corps HTML (Copilot/VS Code/Cursor) génèrent désormais des lignes individuelles pour FTS5 + l'extraction d'entités. |
 | **4d — Playwright + registre MCP + configuration YAML** | ✅ réalisé | Windsurf via Playwright ; Smithery + registre MCP officiel comme catalogues de l'étape 4 ; les produits sont regroupés dans `products.yaml`. |
 | **5 — Navigation avec fenêtrage v1.1 + intégration OpenAI** | ✅ réalisé | `hk diff` / `hk breaking`, limites de date pour toutes les commandes de navigation, 3 nouveaux outils MCP (total de 11), fournisseur d'intégration OpenAI, dimension d'intégration configurable, synchronisation automatique de `claude-code`, analyseur générique `keep-a-changelog`. |
+| **6 — v1.2 synchronisation à partir de MCP** | ✅ réalisé | `sync_status` (fraîcheur par produit, détection de données obsolètes) et `sync_now` (récupération à la demande → ingestion → intégration avec aperçu `dry_run` + verrouillage de concurrence en cours). Comble le fossé où un agent pouvait interroger le corpus mais pas le mettre à jour. **Corrige également :** un bug lié à la suppression des marqueurs où `INSERT OR REPLACE INTO products` déclenchait une suppression en cascade sur la clé étrangère `markers`, remettant silencieusement à zéro le curseur `since` de chaque produit à chaque ingestion (régression §8.20). |
 
 Feuille de route pour la version 0.8+ : consultable dans [URGENT_FINDINGS.md](URGENT_FINDINGS.md) et les problèmes.
 
@@ -253,8 +254,10 @@ Outils exposés :
 | `get_changes_since` | **Nouveau.** Modifications dans une fenêtre de temps, regroupées par produit + version. Entrées : `since` (obligatoire), `until?`, `product?`, `kind?`, `limit?`. |
 | `search_breaking_changes` | **Nouveau.** Liste plate des modifications importantes — aucun terme de recherche n'est nécessaire. Entrées : `product?`, `since?`, `until?`, `limit?`. |
 | `compare_versions` | **Nouveau.** Toutes les modifications entre deux versions d'un même produit. Entrées : `product`, `from_version`, `to_version`. |
+| `sync_status` | **v1.2.** Fraîcheur de la synchronisation par produit : horodatage de la dernière récupération, heures écoulées depuis la récupération, nombre de publications ingérées. Paramètres : `product?`, `stale_only?`, `stale_hours?`. Utilisez ceci AVANT de faire confiance à `latest_releases` pour savoir si le corpus est obsolète. |
+| `sync_now` | **v1.2.** Actualisation à la demande (reproduit `hk sync`). Paramètres : `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Renvoie une erreur `InvalidParams` si une autre opération `sync_now` est déjà en cours. NE COMMET PAS les modifications dans Git. |
 
-Les trois nouveaux outils reprennent `hk diff` / `hk breaking` et le flux de travail de comparaison de versions qui nécessitait auparavant un script. Consultez [manuel → serveur MCP](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) pour les schémas d'entrée complets.
+Les outils de la version 1.1 reproduisent `hk diff` / `hk breaking` et le flux de travail de comparaison de versions qui nécessitait auparavant des scripts. Les outils de synchronisation de la version 1.2 comblent le fossé où une session pouvait interroger le corpus mais pas le mettre à jour : `sync_status` signale l'obsolescence, `sync_now` exécute le pipeline. Consultez [le guide → serveur MCP](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) pour les schémas de paramètres complets.
 
 ---
 
@@ -291,7 +294,7 @@ Index complet dans [synergies/INDEX.md](synergies/INDEX.md).
 La suite Vitest couvre les niveaux unitaires, d'intégration, de régression et de test de base. **[test-spec-3.md](test-spec-3.md) est la référence actuelle** à partir de la version v0.7.0 ; [test-spec.md](test-spec.md) (v1) et [test-spec-2.md](test-spec-2.md) (v2) restent dans le dépôt comme enregistrement historique de l'évolution de la conception.
 
 ```bash
-pnpm test               # unit + integration + regression (~18s, 508 tests)
+pnpm test               # unit + integration + regression (~36s, 517 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -302,7 +305,7 @@ Structure :
 | Dossier | Ce qu'il couvre |
 |-----|----------------|
 | `test/unit/` | par module — extraction, ingestion, requête (incl. `until` / navigation / depuis / comparaison), base de données (incl. migration de configuration de dimension v3), intégration, hybride, récupération + tous les fournisseurs (Ollama / Voyage / **OpenAI**) + récupération-RSS/changelog (incl. analyseur **keep-a-changelog**) / HTML + récupération-registre-MCP + récupération-playwright + configuration-produits + ingestion/requête de synergies. |
-| `test/integration/` | de bout en bout — pipeline, synchronisation, serveur MCP (JSON-RPC stdio, 11 outils), CLI (incl. `hk diff`, `hk breaking`). |
+| `test/integration/` | de bout en bout : pipeline, synchronisation, serveur MCP (JSON-RPC standard, 13 outils dont `sync_status` / `sync_now`), CLI (dont `hk diff`, `hk breaking`). |
 | `test/regression/` | §8.1–§8.19 — chacun protège contre un bug réel corrigé pendant le développement (§8.19 : la pagination précoce de ghReleases préserve les éléments dans la fenêtre). |
 | `test/smoke/` | Test complet sur l'ensemble des fichiers (1 143 fichiers) simulant les produits réels. |
 | `test/fixtures/` | 3 produits factices + réponses HTTP simulées (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Registre MCP officiel). |

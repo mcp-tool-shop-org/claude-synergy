@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v1.1.0):** 44 products / 1,186 release files / 6,042 changes / 1,225 entities / 12 synergies / 508 tests / 11 MCP tools / 17 CLI commands.
+**Live numbers (as of v1.2.0):** 44 products / 1,171 release files / 6,573 changes / 1,260 entities / 12 synergies / 517 tests / 13 MCP tools / 17 CLI commands. (Corpus refreshed via `sync_now` on 2026-05-24.)
 
 ---
 
@@ -84,14 +84,15 @@ claude-synergy/
 | **1 — bootstrap (markdown corpus)** | ✅ shipped | Study-swarm seeded 706 release files Jan→May 2026; extended to 1,186 by Tier 4d |
 | **2a — SQLite + FTS5 + CLI** | ✅ shipped | `hk` CLI; 15 subcommands; sub-300ms ingest |
 | **2b — sqlite-vec + Contextual Retrieval** | ✅ shipped | Provider-pluggable (none/structured/ollama/claude-haiku context × ollama/voyage embed × none/ollama-judge/voyage/cohere rerank) |
-| **3 — sync + MCP server** | ✅ shipped | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` exposes 11 tools over stdio (8 at original Tier-3 ship, 3 added in v1.1) |
+| **3 — sync + MCP server** | ✅ shipped | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` exposes 13 tools over stdio (8 at original Tier-3 ship, 3 added in v1.1, 2 added in v1.2) |
 | **4a — extend beyond Anthropic** | ✅ shipped | +15 MCP SDKs, Cursor (RSS), Aider (HISTORY.md), Continue.dev, Cody Enterprise (RSS filtered) |
 | **4b — HTML-scrape fetcher** | ✅ shipped | GitHub Copilot + VS Code Chat (Windsurf needs Playwright — v0.7) |
 | **4c — turndown HTML→markdown ingest** | ✅ shipped | HTML bodies (Copilot/VS Code/Cursor) now produce per-bullet rows for FTS5 + entity extraction |
 | **4d — Playwright + MCP registry + YAML config** | ✅ shipped | Windsurf via Playwright; Smithery + official MCP Registry as Tier-4 catalogs; products consolidated into `products.yaml` |
 | **5 — v1.1 windowed browsing + OpenAI embed** | ✅ shipped | `hk diff` / `hk breaking`, date bounds across all browsing commands, 3 new MCP tools (11 total), OpenAI embedding provider, configurable embedding dimension, `claude-code` auto-sync, generic `keep-a-changelog` parser |
+| **6 — v1.2 sync-from-MCP** | ✅ shipped | `sync_status` (per-product freshness, never/stale detection) and `sync_now` (on-demand fetch → ingest → embed with `dry_run` preview + in-process concurrency lock). Closes the seam where a calling agent could query the corpus but not refresh it. **Also fixes:** marker-wipe bug where `INSERT OR REPLACE INTO products` cascaded a DELETE on the `markers` FK, silently resetting every product's `since` cursor on each ingest (regression §8.20). |
 
-Roadmap beyond v1.1: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
+Roadmap beyond v1.2: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
 
 ---
 
@@ -221,7 +222,7 @@ No search term needed — `hk breaking` is the answer to "did anything load-bear
 
 ## MCP server — give your agents access to this corpus
 
-`claude-synergy-mcp` exposes 11 tools over stdio. Wire into Claude Code (or any MCP host) via `~/.claude/.mcp.json` or your project's `.mcp.json`:
+`claude-synergy-mcp` exposes 13 tools over stdio. Wire into Claude Code (or any MCP host) via `~/.claude/.mcp.json` or your project's `.mcp.json`:
 
 ```json
 {
@@ -252,9 +253,11 @@ Tools exposed:
 | `read_synergy` | Full text of one synergy file |
 | `get_changes_since` | **New.** Changes in a time window, grouped by product+version. Inputs: `since` (required), `until?`, `product?`, `kind?`, `limit?`. |
 | `search_breaking_changes` | **New.** Flat list of breaking changes — no search term needed. Inputs: `product?`, `since?`, `until?`, `limit?`. |
-| `compare_versions` | **New.** All changes between two versions of one product. Inputs: `product`, `from_version`, `to_version`. |
+| `compare_versions` | **v1.1.** All changes between two versions of one product. Inputs: `product`, `from_version`, `to_version`. |
+| `sync_status` | **v1.2.** Per-product sync freshness — last fetch timestamp, hours since fetch, ingested release count. Inputs: `product?`, `stale_only?`, `stale_hours?`. Use BEFORE trusting `latest_releases` to know if the corpus is stale. |
+| `sync_now` | **v1.2.** On-demand refresh (mirrors `hk sync`). Inputs: `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Rejects with `InvalidParams` if another `sync_now` is already in flight. Does NOT commit to git. |
 
-The three new tools mirror `hk diff` / `hk breaking` and the version-comparison workflow that previously required scripting. See [handbook → MCP server](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) for full input schemas.
+The v1.1 tools mirror `hk diff` / `hk breaking` and the version-comparison workflow that previously required scripting. The v1.2 sync tools close the seam where a session could query the corpus but not refresh it — `sync_status` reports staleness, `sync_now` runs the pipeline. See [handbook → MCP server](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) for full input schemas.
 
 ---
 
@@ -291,7 +294,7 @@ Full index in [synergies/INDEX.md](synergies/INDEX.md).
 Vitest suite covers unit / integration / regression / smoke tiers. **[test-spec-3.md](test-spec-3.md) is the current authority** as of v0.7.0; [test-spec.md](test-spec.md) (v1) and [test-spec-2.md](test-spec-2.md) (v2) remain in the repo as historical record of the design lineage.
 
 ```bash
-pnpm test               # unit + integration + regression (~18s, 508 tests)
+pnpm test               # unit + integration + regression (~36s, 517 tests)
 pnpm test:watch         # interactive
 pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
@@ -302,7 +305,7 @@ Layout:
 | Dir | What it covers |
 |-----|----------------|
 | `test/unit/` | per-module — extract, ingest, query (incl. `until` / browse / since / compare), db (incl. dim-config v3 migration), embed, hybrid, fetch + every provider (Ollama / Voyage / **OpenAI**) + fetch-rss/changelog (incl. **keep-a-changelog** parser)/html + fetch-mcp-registry + fetch-playwright + products-config + synergy ingest/query |
-| `test/integration/` | end-to-end — pipeline, sync, MCP server (stdio JSON-RPC, 11 tools), CLI (incl. `hk diff`, `hk breaking`) |
+| `test/integration/` | end-to-end — pipeline, sync, MCP server (stdio JSON-RPC, 13 tools incl. `sync_status` / `sync_now`), CLI (incl. `hk diff`, `hk breaking`) |
 | `test/regression/` | §8.1–§8.19 — each protects against a real bug fixed during development (§8.19: ghReleases early-exit pagination preserves in-window items) |
 | `test/smoke/` | opt-in full-corpus against real `products/` (1,143 files) |
 | `test/fixtures/` | 3 fake products + mock HTTP responses (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Official MCP Registry) |
