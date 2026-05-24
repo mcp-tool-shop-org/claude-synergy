@@ -906,14 +906,20 @@ function handleSyncStatus(args: { product?: string; staleOnly?: boolean; staleHo
       : '(no products in DB — run `hk ingest` first)';
   }
   const lines = [
-    'Product                              Strategy        Last fetch  Hours  Ingested  Latest release',
-    '───────────────────────────────────  ──────────────  ──────────  ─────  ────────  ──────────────',
+    'Product                              Strategy        Last fetch   Hours  Ingested  Latest release',
+    '───────────────────────────────────  ──────────────  ──────────  ──────  ────────  ──────────────',
   ];
   for (const r of rows) {
+    // `manual` strategy products are seeded by hand and have no fetcher
+    // dispatch — render them as "manual" instead of "never" so callers can
+    // tell "needs implementation" apart from "stale gh-releases" (v1.2.1).
+    const isManual = r.fetch_strategy === 'manual';
     const product = (r.product ?? '').padEnd(36);
     const strategy = (r.fetch_strategy ?? '—').padEnd(14);
-    const lastFetch = r.last_fetch_attempt ? r.last_fetch_attempt.split('T')[0] : 'never     ';
-    const hours = formatHours(r.hours_since_fetch).padStart(5);
+    const lastFetch = r.last_fetch_attempt
+      ? r.last_fetch_attempt.split('T')[0]
+      : (isManual ? 'manual    ' : 'never     ');
+    const hours = (isManual && r.hours_since_fetch == null ? 'manual' : formatHours(r.hours_since_fetch)).padStart(6);
     const ingested = String(r.releases_ingested).padStart(8);
     const latest = r.last_release_at ? r.last_release_at.split('T')[0] : '—';
     lines.push(`${product} ${strategy} ${lastFetch}  ${hours}  ${ingested}  ${latest}`);

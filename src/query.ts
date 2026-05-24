@@ -227,7 +227,14 @@ export function getSyncStatus(
   const rows = db.prepare(sql).all(params) as SyncStatusRow[];
   if (opts.staleOnly) {
     const cutoff = opts.staleHours ?? 24;
-    return rows.filter((r) => r.hours_since_fetch === null || r.hours_since_fetch > cutoff);
+    // Manual-strategy products have no automated fetcher (sync_now can't
+    // refresh them), so excluding them from the "what's stale" view keeps
+    // the result focused on actionable items.
+    return rows.filter(
+      (r) =>
+        r.fetch_strategy !== 'manual' &&
+        (r.hours_since_fetch === null || r.hours_since_fetch > cutoff),
+    );
   }
   return rows;
 }

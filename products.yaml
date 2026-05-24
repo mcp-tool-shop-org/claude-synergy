@@ -77,19 +77,24 @@ products:
       type: gh-releases
       repo: anthropics/claude-code
 
-  # ── Tier 3 / HTML feeds ──────────────────────────────────────────────────
+  # ── Tier 3 / manual-seed (no automated fetcher yet) ──────────────────────
+  # Renamed from `webfetch` to `manual` in v1.2.1 — the original label suggested
+  # an automated WebFetch-based fetcher that was never implemented. These two
+  # corpora are still seeded by hand (the initial study-swarm pulled them via
+  # WebFetch one-shot, but `sync_now` does not refresh them). `sync_status`
+  # renders the strategy as "manual" instead of "never" so callers can
+  # distinguish "needs implementation" from "stale gh-releases."
   - name: claude-api
     display_name: Claude API / Platform
     tier: 3
     source_url: https://platform.claude.com/docs/en/release-notes/overview
-    fetch_strategy: webfetch
-    # WebFetch-based; corpus seeded by initial swarm.
+    fetch_strategy: manual
 
   - name: anthropic-apps
     display_name: Anthropic Apps (Design / Cowork / Chat / Mobile)
     tier: 3
     source_url: https://support.claude.com/en/articles/12138966-release-notes
-    fetch_strategy: webfetch
+    fetch_strategy: manual
 
   # ── Tier 1 / GitHub Releases — Anthropic SDKs ────────────────────────────
   - name: claude-agent-sdk-python

@@ -1,7 +1,7 @@
 # mcp-registry-official — MCP server catalog
 
 **Source:** official-mcp-registry
-**Entries:** 1902
+**Entries:** 1901
 **Fetched:** 2026-05-24
 
 | Name | Description | Popularity | Created | Homepage |
@@ -1292,7 +1292,7 @@
 | Connext MCP | Integrate Connext AI into agentic workflows, enabling Connext product-aware assistance. | — | 2026-05-08 | [link](https://chatbot.rti.com/mcp) |
 | com.ruddia/being-mcp-server | Personality Runtime for AI agents — persistent memory, personality, and relationships via MCP | — | 2026-04-17 | — |
 | com.runmemento/memento | Local-first, LLM-agnostic memory layer for AI assistants. | — | 2026-05-17 | — |
-| QuizBase | MCP server for trivia: 1.4M+ questions (EN+PL), 24 categories, 11 tools + 4 prompts, OAuth 2.1. | — | 2026-05-19 | [link](https://quizbase.runriva.com/mcp) |
+| QuizBase | MCP server for trivia: 1.4M+ questions (EN+PL), 24 categories, 12 tools + 4 prompts, OAuth 2.1. | — | 2026-05-24 | [link](https://quizbase.runriva.com/mcp) |
 | SaaS Browser | Search 400k+ SaaS and software companies by category, technology, country, pricing, and more. | — | 2026-02-17 | [link](https://saasbrowser.com/mcp) |
 | Google Analytics (unofficial) | Connect Google Analytics to ChatGPT. Query GA4 data in plain English and get instant insights. | — | 2026-02-07 | [link](https://api.safe-mcp.com/mcp) |
 | Sats4AI - Bitcoin-Powered AI Tools | Permissionless communication supercharger. 40+ Lightning-paid tools for humans and AI agents. | — | 2026-04-19 | [link](https://sats4ai.com/api/mcp) |
@@ -1907,4 +1907,3 @@
 | WooCommerce MCP Server | 101 tools for WooCommerce store management with field filtering and guided prompts. | — | 2026-03-12 | — |
 | io.github.AmoghReddy45/kiwiclaw-mcp-server | Search vetted OpenClaw skills and browse the ClawBoard forum via 14 MCP tools. | — | 2026-03-04 | — |
 | io.github.Anandb71/arbor | The Graph-Native Intelligence Layer for Code. | — | 2026-01-07 | — |
-| io.github.Anarkitty1/semantic-frame | Token-efficient semantic compression for numerical data. 95%+ token reduction. | — | 2025-12-12 | — |

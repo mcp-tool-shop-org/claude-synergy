@@ -284,26 +284,37 @@ async function fetchOne(
   // against a malformed products.yaml entry or hardcoded fallback typo.
   assertProductShape(target.product);
 
-  const since = sinceOverride ?? readMarker(db, target.product) ?? '2026-01-01';
+  const existingMarker = readMarker(db, target.product);
+  const since = sinceOverride ?? existingMarker ?? '2026-01-01';
   const outDir = resolve(productsRoot, target.product, 'releases');
   mkdirSync(outDir, { recursive: true });
 
+  let stats: FetchStats;
   try {
     switch (target.strategy) {
       case 'gh-releases':
-        return await fetchGhReleases(db, outDir, target, since);
+        stats = await fetchGhReleases(db, outDir, target, since);
+        break;
       case 'rss':
-        return await fetchRss(db, outDir, target, since, signal);
+        stats = await fetchRss(db, outDir, target, since, signal);
+        break;
       case 'raw-changelog':
-        return await fetchRawChangelog(db, outDir, target, since, signal);
+        stats = await fetchRawChangelog(db, outDir, target, since, signal);
+        break;
       case 'html-scrape':
-        return await fetchHtmlScrape(db, outDir, target, since, signal);
+        stats = await fetchHtmlScrape(db, outDir, target, since, signal);
+        break;
       case 'catalog':
-        return await fetchCatalogStrategy(db, productsRoot, target, since, signal);
+        stats = await fetchCatalogStrategy(db, productsRoot, target, since, signal);
+        break;
       case 'playwright':
-        return await fetchPlaywrightStrategy(db, outDir, target, since);
+        stats = await fetchPlaywrightStrategy(db, outDir, target, since);
+        break;
     }
   } catch (e: any) {
+    // Strategy threw before returning. Do NOT touch the marker — preserve
+    // the previous last-known-good so the next attempt re-fetches the same
+    // window. Surface the error in stats.errors instead.
     return {
       product: target.product,
       fetched: 0,
@@ -312,6 +323,18 @@ async function fetchOne(
       errors: [`fetch failed: ${e.message}`],
     };
   }
+
+  // Centralized marker write — fires on EVERY successful fetch, including
+  // ones that returned 0 dated items. Pre-v1.2.1 each strategy was responsible
+  // for calling writeMarker, but did so only when it computed a non-null
+  // `latest`. Strategies like raw-changelog/aider that return mostly undated
+  // items therefore never updated the marker, and sync_status reported
+  // "never" forever. Centralizing here also guarantees `updated_at` is
+  // refreshed on every poll so callers can distinguish "stale corpus" from
+  // "stale fetch attempt." Regression: test/regression/bugs.test.ts §8.21.
+  const markerVersion = stats.latest ?? existingMarker ?? since;
+  writeMarker(db, target.product, markerVersion, target.strategy);
+  return stats;
 }
 
 // ─── Strategy: gh-releases ───────────────────────────────────────────────────
@@ -354,8 +377,7 @@ async function fetchGhReleases(
     }
   }
 
-  if (latest) writeMarker(db, target.product, latest, target.strategy);
-
+  // Marker write is centralized in fetchOne (v1.2.1) — strategies just return stats.
   return { product: target.product, fetched, newSince: since, latest, errors };
 }
 
@@ -547,8 +569,7 @@ async function fetchRss(
     }
   }
 
-  if (latest) writeMarker(db, target.product, latest, target.strategy);
-
+  // Marker write is centralized in fetchOne (v1.2.1).
   return { product: target.product, fetched, newSince: since, latest, errors };
 }
 
@@ -613,8 +634,11 @@ async function fetchRawChangelog(
     }
   }
 
-  if (latest) writeMarker(db, target.product, latest, target.strategy);
-
+  // Marker write is centralized in fetchOne (v1.2.1) — critical for raw-changelog
+  // parsers like aider-history whose items frequently have releasedAt=null (the
+  // GH-API date map only catches versions whose tag matches exactly), so this
+  // path historically never wrote a marker and re-pulled the entire HISTORY.md
+  // on every sync.
   return { product: target.product, fetched, newSince: since, latest, errors };
 }
 
@@ -667,8 +691,7 @@ async function fetchHtmlScrape(
     }
   }
 
-  if (latest) writeMarker(db, target.product, latest, target.strategy);
-
+  // Marker write is centralized in fetchOne (v1.2.1).
   return { product: target.product, fetched, newSince: since, latest, errors };
 }
 
@@ -721,8 +744,7 @@ async function fetchPlaywrightStrategy(
     }
   }
 
-  if (latest) writeMarker(db, target.product, latest, target.strategy);
-
+  // Marker write is centralized in fetchOne (v1.2.1).
   return { product: target.product, fetched, newSince: since, latest, errors };
 }
 
@@ -741,10 +763,9 @@ async function fetchCatalogStrategy(
   const productDir = resolve(productsRoot, target.product);
   writeCatalog(productDir, target.product, entries);
 
-  // Catalog snapshots: marker is the date of this sync, not a release timestamp
+  // Catalog snapshots: marker is the date of this sync, not a release timestamp.
+  // fetchOne (v1.2.1) writes the marker using stats.latest, so we set it here.
   const nowIso = new Date().toISOString();
-  writeMarker(db, target.product, nowIso, target.strategy);
-
   return {
     product: target.product,
     fetched: entries.length,

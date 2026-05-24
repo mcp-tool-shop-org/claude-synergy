@@ -797,6 +797,101 @@ describe('§8.13 Ingest deletes prior changes for replaced version (FTS5 sync)',
   });
 });
 
+// ─── 8.21 Marker writes on empty fetch (v1.2.1 aider regression) ──────────
+// Pre-v1.2.1 each strategy was responsible for calling writeMarker, and only
+// did so when it computed a non-null `latest`. Raw-changelog parsers like
+// aider-history return items whose releasedAt the GH-API date map cannot
+// always resolve (older versions, "main branch"), and items dated before
+// sinceIso are filtered out before reaching the strategy. The realistic
+// case is: a successful fetch returns 0 in-window dated items → `latest`
+// stays null → marker never written → sync_status reports "never" forever
+// and every sync re-pulls the full HISTORY.md.
+//
+// v1.2.1 centralizes the marker write in fetchOne so EVERY successful fetch
+// updates the marker — using `stats.latest`, the existing marker, or the
+// `since` fallback in that order. The released_at column stays unchanged
+// when there's no new data, but updated_at refreshes on every poll.
+describe('§8.21 Marker writes on empty fetch (centralized in fetchOne, v1.2.1)', () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('successful gh-releases fetch with zero in-window releases still writes a marker', async () => {
+    // Mock the gh CLI to return an empty array on every page so the fetcher
+    // returns latest=null, fetched=0, errors=[]. This mirrors the real
+    // raw-changelog case where every item is filtered out by sinceIso.
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(() => '[]'),
+      execSync: vi.fn(() => '[]'),
+    }));
+    const { fetchAll } = await import('../../src/fetch.js');
+
+    const productsRoot = mkdtempSync(join(tmpdir(), 'fetch-empty-'));
+    try {
+      const stats = await fetchAll(temp.db, productsRoot, {
+        product: 'claude-agent-sdk-python',
+      });
+      expect(stats[0].fetched).toBe(0);
+      expect(stats[0].latest).toBeNull();
+      expect(stats[0].errors).toEqual([]);
+
+      // The marker must exist with version falling back to `since` (the v0.5
+      // fallback of '2026-01-01' when no prior marker exists), and updated_at
+      // set to roughly now.
+      const marker = temp.db
+        .prepare(
+          `SELECT version, updated_at FROM markers
+           WHERE product = ? AND name = 'last_fetched_release_at'`
+        )
+        .get('claude-agent-sdk-python') as { version: string; updated_at: string } | undefined;
+      expect(marker, 'marker should be written even on zero-release fetch').toBeDefined();
+      expect(marker!.updated_at).toMatch(/^2\d{3}-\d{2}-\d{2}T/);
+    } finally {
+      rmSync(productsRoot, { recursive: true, force: true });
+    }
+  });
+
+  it('subsequent empty fetch preserves prior version, refreshes updated_at', async () => {
+    // Seed an existing marker as if from a prior successful fetch.
+    temp.db
+      .prepare(
+        `INSERT OR IGNORE INTO products (name, display_name, source_tier, source_url, fetch_strategy, notes)
+         VALUES ('claude-agent-sdk-python', 'Claude Agent SDK (Python)', 1, '', 'gh-releases', NULL)`
+      )
+      .run();
+    const oldUpdatedAt = '2026-05-01T00:00:00.000Z';
+    temp.db
+      .prepare(
+        `INSERT INTO markers (product, name, version, updated_at)
+         VALUES (?, 'last_fetched_release_at', ?, ?)`
+      )
+      .run('claude-agent-sdk-python', '2026-04-15T12:00:00Z', oldUpdatedAt);
+
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(() => '[]'),
+      execSync: vi.fn(() => '[]'),
+    }));
+    const { fetchAll } = await import('../../src/fetch.js');
+
+    const productsRoot = mkdtempSync(join(tmpdir(), 'fetch-empty-2-'));
+    try {
+      await fetchAll(temp.db, productsRoot, { product: 'claude-agent-sdk-python' });
+      const marker = temp.db
+        .prepare(
+          `SELECT version, updated_at FROM markers
+           WHERE product = 'claude-agent-sdk-python' AND name = 'last_fetched_release_at'`
+        )
+        .get() as { version: string; updated_at: string };
+      // Version preserved (no new release to advance to)
+      expect(marker.version).toBe('2026-04-15T12:00:00Z');
+      // updated_at refreshed — strictly greater than the seeded oldUpdatedAt
+      expect(marker.updated_at > oldUpdatedAt).toBe(true);
+    } finally {
+      rmSync(productsRoot, { recursive: true, force: true });
+    }
+  });
+});
+
 // ─── 8.20 Markers survive ingest (v1.2 sync_status regression) ────────────
 // Before v1.2 the products-row upsert used INSERT OR REPLACE, which is a
 // DELETE+INSERT. The markers.product FK is ON DELETE CASCADE, so every
