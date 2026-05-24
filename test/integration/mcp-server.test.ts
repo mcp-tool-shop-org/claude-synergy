@@ -40,7 +40,7 @@ afterEach(() => {
 
 describe('MCP server integration', () => {
   it(
-    'completes initialize handshake and lists the expected tool set (Wave 1: 11 tools)',
+    'completes initialize handshake and lists the expected tool set (Wave 2: 13 tools)',
     async () => {
       await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
         const init = await client.initialize();
@@ -52,7 +52,8 @@ describe('MCP server integration', () => {
 
         const tools = await client.listTools();
         const names = tools.map((t) => t.name).sort();
-        // Wave 1 adds: get_changes_since, search_breaking_changes, compare_versions
+        // Wave 1 added: get_changes_since, search_breaking_changes, compare_versions
+        // Wave 2 added: sync_status, sync_now
         expect(names).toEqual([
           'compare_versions',
           'get_changes_since',
@@ -64,6 +65,8 @@ describe('MCP server integration', () => {
           'read_synergy',
           'search',
           'search_breaking_changes',
+          'sync_now',
+          'sync_status',
           'top_entities',
         ]);
         for (const t of tools) {
@@ -390,6 +393,139 @@ describe('MCP server integration', () => {
           // Either "(no synergies)" or just no listing of test-synergy
           expect(text.length).toBeGreaterThan(0);
           expect(text).not.toContain('test-synergy');
+        });
+      },
+      25_000
+    );
+  });
+
+  // ── Wave 2 sync tools ─────────────────────────────────────────────────
+  describe('sync tools (Wave 2)', () => {
+    it(
+      'sync_status returns one row per seeded product with no marker (hours_since_fetch=never)',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('sync_status', {});
+          const text = res.content[0]?.text ?? '';
+          // Seeded fixture products were ingested but never had a marker written,
+          // so they appear with "never" in the hours column.
+          expect(text).toContain('test-cli');
+          expect(text).toContain('never');
+          // Header row is always present
+          expect(text).toMatch(/Product\s+Strategy\s+Last fetch/);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'sync_status with product filter scopes to one row',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('sync_status', { product: 'test-cli' });
+          const text = res.content[0]?.text ?? '';
+          expect(text).toContain('test-cli');
+          // Other seeded products must not appear
+          expect(text).not.toContain('test-sdk');
+          expect(text).toContain('1 product');
+        });
+      },
+      25_000
+    );
+
+    it(
+      'sync_status with stale_only=true returns all marker-less products (treated as stale)',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('sync_status', { stale_only: true, stale_hours: 1 });
+          const text = res.content[0]?.text ?? '';
+          // All seeded products lack markers — should all show as stale
+          expect(text).toContain('test-cli');
+          expect(text).toContain('never');
+        });
+      },
+      25_000
+    );
+
+    it(
+      'sync_status with non-existent product returns the empty-list message',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('sync_status', { product: 'no-such-product' });
+          const text = res.content[0]?.text ?? '';
+          expect(text).toMatch(/\(no products/);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'sync_now dry_run enumerates real fetch targets without writes',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('sync_now', { dry_run: true });
+          const text = res.content[0]?.text ?? '';
+          // Dry-run header
+          expect(text).toContain('dry_run');
+          // claude-code is in the canonical fetch target list
+          expect(text).toContain('claude-code');
+          // Strategy column should appear (gh-releases is most common)
+          expect(text).toContain('gh-releases');
+        });
+      },
+      25_000
+    );
+
+    it(
+      'sync_now dry_run with product filter scopes to that product',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          const res = await client.callTool('sync_now', { dry_run: true, product: 'claude-code' });
+          const text = res.content[0]?.text ?? '';
+          expect(text).toContain('claude-code');
+          // Other targets should not appear
+          expect(text).not.toContain('aider');
+          expect(text).toContain('would fetch 1 product');
+        });
+      },
+      25_000
+    );
+
+    it(
+      'sync_now dry_run with unknown product rejects with InvalidParams',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          await expect(
+            client.callTool('sync_now', { dry_run: true, product: 'no-such-product' })
+          ).rejects.toThrow(/unknown product/i);
+        });
+      },
+      25_000
+    );
+
+    it(
+      'sync_now rejects non-boolean dry_run',
+      async () => {
+        await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+          await client.initialize();
+          await client.notifyInitialized();
+          await expect(
+            client.callTool('sync_now', { dry_run: 'yes' as unknown as boolean })
+          ).rejects.toThrow(/dry_run.*boolean/i);
         });
       },
       25_000

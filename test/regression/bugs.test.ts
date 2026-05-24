@@ -796,3 +796,46 @@ describe('§8.13 Ingest deletes prior changes for replaced version (FTS5 sync)',
     }
   });
 });
+
+// ─── 8.20 Markers survive ingest (v1.2 sync_status regression) ────────────
+// Before v1.2 the products-row upsert used INSERT OR REPLACE, which is a
+// DELETE+INSERT. The markers.product FK is ON DELETE CASCADE, so every
+// ingest silently wiped every marker. That made sync_status report "never"
+// for any product whose row was rewritten — undermining the whole point of
+// the sync_status tool. Fix: switch to ON CONFLICT(name) DO UPDATE so the
+// row is refreshed in place and the FK CASCADE does not fire.
+describe('§8.20 Markers survive ingest (products upsert preserves FK rows)', () => {
+  it('marker written before ingest is still present after ingest', () => {
+    // Seed corpus first so a product row exists to update
+    seedSampleProducts(temp.db);
+    expect(
+      (temp.db.prepare(`SELECT COUNT(*) AS n FROM products`).get() as { n: number }).n
+    ).toBeGreaterThan(0);
+
+    // Write a marker for one of the seeded products
+    temp.db
+      .prepare(
+        `INSERT INTO markers (product, name, version, updated_at)
+         VALUES (?, 'last_fetched_release_at', ?, ?)
+         ON CONFLICT(product, name) DO UPDATE SET version = excluded.version, updated_at = excluded.updated_at`
+      )
+      .run('test-cli', '2026-05-24T00:00:00Z', new Date().toISOString());
+
+    const before = temp.db
+      .prepare(
+        `SELECT version FROM markers WHERE product = 'test-cli' AND name = 'last_fetched_release_at'`
+      )
+      .get() as { version: string } | undefined;
+    expect(before?.version).toBe('2026-05-24T00:00:00Z');
+
+    // Re-ingest — pre-fix, this CASCADE-DELETEs every marker
+    ingestAll(temp.db, FIXTURE_PRODUCTS_ROOT);
+
+    const after = temp.db
+      .prepare(
+        `SELECT version FROM markers WHERE product = 'test-cli' AND name = 'last_fetched_release_at'`
+      )
+      .get() as { version: string } | undefined;
+    expect(after?.version).toBe('2026-05-24T00:00:00Z');
+  });
+});

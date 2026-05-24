@@ -41,8 +41,10 @@ import {
   compareVersions,
   listSynergies,
   getSynergy,
+  getSyncStatus,
   type ChangesSinceResult,
   type QueryResult,
+  type SyncStatusRow,
 } from './query.js';
 import { hybridSearch } from './hybrid.js';
 
@@ -63,6 +65,13 @@ const DB_PATH =
 const SYNERGIES_DIR =
   process.env.CLAUDE_SYNERGY_SYNERGIES_DIR ??
   resolveSynergiesDir();
+
+// Where sync_now writes new release files. Defaults to <db-parent>/../products so
+// the usual layout (data/claude-synergy.db + products/<slug>/releases/*.md) works
+// without configuration. Override via env for tests or non-standard layouts.
+const PRODUCTS_ROOT =
+  process.env.CLAUDE_SYNERGY_PRODUCTS_ROOT ??
+  join(dirname(DB_PATH), '..', 'products');
 
 function resolveSynergiesDir(): string {
   // Try repo-root/synergies relative to DB, then cwd
@@ -237,6 +246,34 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         required: ['product', 'from_version', 'to_version'],
       },
     },
+    {
+      name: 'sync_status',
+      description:
+        'Per-product sync freshness. Returns one row per product with last-fetched timestamp, hours since last fetch, and ingested release count. Use BEFORE trusting latest_releases / search results to know if the corpus is stale, and BEFORE calling sync_now to know what needs refreshing.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          product: { type: 'string', description: 'Limit to one product' },
+          stale_only: { type: 'boolean', description: 'Only return products older than stale_hours (or never fetched)', default: false },
+          stale_hours: { type: 'number', description: 'Threshold for stale_only (default 24)', default: 24 },
+        },
+      },
+    },
+    {
+      name: 'sync_now',
+      description:
+        'Refresh the corpus by running fetch → ingest → embed (mirrors `hk sync`). Pass dry_run=true to enumerate what would be fetched without writes. By default runs the full pipeline so new releases are immediately queryable via search/lookup_entity. Concurrency: rejected with InvalidParams if another sync_now is already in flight. Does NOT commit to git — caller decides.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          product: { type: 'string', description: 'Limit to one product' },
+          dry_run: { type: 'boolean', description: 'Enumerate targets and report what would be fetched, no writes', default: false },
+          include_ingest: { type: 'boolean', description: 'Run ingest step after fetch (default true)', default: true },
+          include_embed: { type: 'boolean', description: 'Run embed step after ingest (requires Ollama; default true)', default: true },
+          timeout_ms: { type: 'number', description: 'Hard timeout for the entire sync (default 300000 = 5 min, max 600000)', default: 300000 },
+        },
+      },
+    },
   ],
 }));
 
@@ -298,6 +335,15 @@ function optInt(
       ErrorCode.InvalidParams,
       `${tool}: ${field} must be an integer in [${min}, ${max}]`
     );
+  }
+  return v;
+}
+
+function optBool(rec: Record<string, unknown>, field: string, tool: string): boolean | undefined {
+  const v = rec[field];
+  if (v === undefined || v === null) return undefined;
+  if (typeof v !== 'boolean') {
+    throw new McpError(ErrorCode.InvalidParams, `${tool}: ${field} must be a boolean`);
   }
   return v;
 }
@@ -493,6 +539,32 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             },
           ],
         };
+      }
+      case 'sync_status': {
+        const r = asRecord(args ?? {}, 'sync_status');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: handleSyncStatus({
+                product: optString(r, 'product', 'sync_status'),
+                staleOnly: optBool(r, 'stale_only', 'sync_status'),
+                staleHours: optInt(r, 'stale_hours', 'sync_status', 1, 100_000),
+              }),
+            },
+          ],
+        };
+      }
+      case 'sync_now': {
+        const r = asRecord(args ?? {}, 'sync_now');
+        const text = await handleSyncNow({
+          product: optString(r, 'product', 'sync_now'),
+          dryRun: optBool(r, 'dry_run', 'sync_now'),
+          includeIngest: optBool(r, 'include_ingest', 'sync_now'),
+          includeEmbed: optBool(r, 'include_embed', 'sync_now'),
+          timeoutMs: optInt(r, 'timeout_ms', 'sync_now', 1_000, 600_000),
+        });
+        return { content: [{ type: 'text', text }] };
       }
       default:
         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
@@ -807,6 +879,154 @@ function handleSearchBreakingChanges(args: { product?: string; since?: string; u
   }
   lines.push(`${results.length} breaking change${results.length === 1 ? '' : 's'}`);
   return lines.join('\n');
+}
+
+// ── Sync handlers ──────────────────────────────────────────────────────────
+// sync_status is pure SQL → fast, no I/O beyond DB.
+// sync_now mutates: writes release files to PRODUCTS_ROOT, ingests into DB,
+// optionally generates embeddings. Guarded by an in-process lock so two
+// concurrent MCP calls cannot race on the same SQLite WAL.
+
+function formatHours(h: number | null): string {
+  if (h == null) return 'never';
+  if (h < 1) return `${Math.round(h * 60)}m`;
+  if (h < 48) return `${h.toFixed(1)}h`;
+  return `${Math.round(h / 24)}d`;
+}
+
+function handleSyncStatus(args: { product?: string; staleOnly?: boolean; staleHours?: number }): string {
+  const rows: SyncStatusRow[] = getSyncStatus(db, {
+    product: args.product,
+    staleOnly: args.staleOnly,
+    staleHours: args.staleHours,
+  });
+  if (rows.length === 0) {
+    return args.staleOnly
+      ? `(no stale products — threshold ${args.staleHours ?? 24}h)`
+      : '(no products in DB — run `hk ingest` first)';
+  }
+  const lines = [
+    'Product                              Strategy        Last fetch  Hours  Ingested  Latest release',
+    '───────────────────────────────────  ──────────────  ──────────  ─────  ────────  ──────────────',
+  ];
+  for (const r of rows) {
+    const product = (r.product ?? '').padEnd(36);
+    const strategy = (r.fetch_strategy ?? '—').padEnd(14);
+    const lastFetch = r.last_fetch_attempt ? r.last_fetch_attempt.split('T')[0] : 'never     ';
+    const hours = formatHours(r.hours_since_fetch).padStart(5);
+    const ingested = String(r.releases_ingested).padStart(8);
+    const latest = r.last_release_at ? r.last_release_at.split('T')[0] : '—';
+    lines.push(`${product} ${strategy} ${lastFetch}  ${hours}  ${ingested}  ${latest}`);
+  }
+  lines.push('');
+  lines.push(`${rows.length} product${rows.length === 1 ? '' : 's'}`);
+  return lines.join('\n');
+}
+
+// Module-level lock — second concurrent sync_now call rejects rather than
+// races on the SQLite WAL. Reset in finally{} so a thrown error doesn't
+// leave the lock stuck.
+let syncInProgress = false;
+
+interface SyncNowArgs {
+  product?: string;
+  dryRun?: boolean;
+  includeIngest?: boolean;
+  includeEmbed?: boolean;
+  timeoutMs?: number;
+}
+
+async function handleSyncNow(args: SyncNowArgs): Promise<string> {
+  if (syncInProgress) {
+    throw new McpError(
+      ErrorCode.InvalidParams,
+      'sync_now: another sync is already in progress — retry after it completes (or call sync_status to see progress)',
+    );
+  }
+
+  const dryRun = args.dryRun ?? false;
+  const includeIngest = args.includeIngest ?? true;
+  const includeEmbed = args.includeEmbed ?? true;
+  const timeoutMs = args.timeoutMs ?? 300_000;
+
+  // Lazy-load fetch/ingest/embed so the MCP startup stays light for sessions
+  // that never call sync_now.
+  const { fetchAll, listFetchTargets } = await import('./fetch.js');
+
+  // dry_run: just enumerate targets + their current markers, no writes.
+  if (dryRun) {
+    const targets = args.product
+      ? listFetchTargets().filter((t) => t.product === args.product)
+      : listFetchTargets();
+    if (targets.length === 0) {
+      throw new McpError(ErrorCode.InvalidParams, `sync_now: unknown product: ${args.product}`);
+    }
+    const lines = [`(dry_run — would fetch ${targets.length} product${targets.length === 1 ? '' : 's'})`, ''];
+    for (const t of targets) {
+      const marker = db
+        .prepare(`SELECT version FROM markers WHERE product = ? AND name = 'last_fetched_release_at'`)
+        .get(t.product) as { version: string } | undefined;
+      const since = marker?.version ?? '2026-01-01 (no marker)';
+      lines.push(`  ${t.product.padEnd(36)} ${t.strategy.padEnd(14)} since ${since}`);
+    }
+    return lines.join('\n');
+  }
+
+  syncInProgress = true;
+  const t0 = Date.now();
+  try {
+    // === fetch ===
+    const fetchStats = await fetchAll(db, PRODUCTS_ROOT, {
+      product: args.product,
+      timeoutMs,
+    });
+    const fetched = fetchStats.summary;
+
+    // === ingest ===
+    let ingestSummary = '';
+    if (includeIngest) {
+      const { ingestAll } = await import('./ingest.js');
+      const ingestStats = ingestAll(db, PRODUCTS_ROOT);
+      ingestSummary = `ingested: +${ingestStats.releasesAdded} releases, +${ingestStats.changesAdded} changes, +${ingestStats.entitiesAdded} entities`;
+    }
+
+    // === embed === (best-effort — Ollama may be unreachable)
+    let embedSummary = '';
+    let embedError = '';
+    if (includeEmbed) {
+      try {
+        const { embedAll } = await import('./embed.js');
+        const embedStats = await embedAll(db, {
+          contextProviderName: 'structured',
+          embeddingProviderName: 'ollama',
+        });
+        embedSummary = `embedded: +${embedStats.chunksCreated} chunks via ${embedStats.contextProvider} + ${embedStats.embeddingProvider}`;
+      } catch (e: any) {
+        embedError = `embed skipped: ${e.message ?? String(e)}`;
+      }
+    }
+
+    const elapsedMs = Date.now() - t0;
+    const lines = [
+      `sync_now complete in ${(elapsedMs / 1000).toFixed(1)}s`,
+      '',
+      `fetched: ${fetched.succeeded}/${fetched.total} products ok, ${fetched.failed} failed, ${fetched.skipped} skipped, +${fetched.newChanges} new releases`,
+    ];
+    if (fetched.errors.length > 0) {
+      lines.push('');
+      lines.push('fetch errors:');
+      for (const e of fetched.errors.slice(0, 10)) {
+        lines.push(`  ${e.product}: ${e.error}`);
+      }
+      if (fetched.errors.length > 10) lines.push(`  … ${fetched.errors.length - 10} more`);
+    }
+    if (ingestSummary) lines.push(ingestSummary);
+    if (embedSummary) lines.push(embedSummary);
+    if (embedError) lines.push(embedError);
+    return lines.join('\n');
+  } finally {
+    syncInProgress = false;
+  }
 }
 
 function handleCompareVersions(args: { product: string; from_version: string; to_version: string }): string {

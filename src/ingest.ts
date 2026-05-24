@@ -183,9 +183,21 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
     }
   });
 
+  // UPSERT instead of INSERT OR REPLACE — the latter is a DELETE+INSERT and
+  // cascades through the markers.product FK (ON DELETE CASCADE), wiping every
+  // marker on every ingest. That made sync_status report "never" for any
+  // product whose row was rewritten during the fetch→ingest pipeline. ON
+  // CONFLICT DO UPDATE refreshes the same row in place, leaving FKs intact.
+  // Regression: test/regression/bugs.test.ts §8.20.
   const insertProduct = db.prepare(`
-    INSERT OR REPLACE INTO products (name, display_name, source_tier, source_url, fetch_strategy, notes)
+    INSERT INTO products (name, display_name, source_tier, source_url, fetch_strategy, notes)
     VALUES (@name, @display_name, @source_tier, @source_url, @fetch_strategy, @notes)
+    ON CONFLICT(name) DO UPDATE SET
+      display_name   = excluded.display_name,
+      source_tier    = excluded.source_tier,
+      source_url     = excluded.source_url,
+      fetch_strategy = excluded.fetch_strategy,
+      notes          = excluded.notes
   `);
 
   const insertRelease = db.prepare(`

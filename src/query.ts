@@ -175,6 +175,63 @@ export function listProducts(
   return db.prepare(sql).all() as any;
 }
 
+export interface SyncStatusRow {
+  product: string;
+  fetch_strategy: string | null;
+  last_release_at: string | null;       // marker.version — ISO timestamp of newest fetched release
+  last_fetch_attempt: string | null;    // marker.updated_at — when the marker was last written
+  hours_since_fetch: number | null;     // null if never fetched
+  releases_ingested: number;            // distinct versions in releases table for this product
+}
+
+/**
+ * Per-product sync freshness. Joins markers + products + releases so a caller
+ * can answer "which products are stale, and which haven't ingested anything yet?"
+ * with one query.
+ *
+ * Used by the sync_status MCP tool and (eventually) the CLI's `hk status`.
+ */
+export function getSyncStatus(
+  db: Database.Database,
+  opts: { product?: string; staleHours?: number; staleOnly?: boolean } = {}
+): SyncStatusRow[] {
+  const filters: string[] = [];
+  const params: Record<string, any> = {};
+  if (opts.product) {
+    filters.push('p.name = @product');
+    params.product = opts.product;
+  }
+  const where = filters.length > 0 ? `WHERE ${filters.join(' AND ')}` : '';
+  // LEFT JOIN markers — products with no marker yet still appear (hours_since_fetch = NULL).
+  // Hours computation uses julianday() so SQLite handles ISO timestamps uniformly.
+  const sql = `
+    SELECT p.name                       AS product,
+           p.fetch_strategy             AS fetch_strategy,
+           m.version                    AS last_release_at,
+           m.updated_at                 AS last_fetch_attempt,
+           CASE WHEN m.updated_at IS NULL THEN NULL
+                ELSE ROUND((julianday('now') - julianday(m.updated_at)) * 24.0, 1)
+           END                          AS hours_since_fetch,
+           (SELECT COUNT(DISTINCT r.version)
+            FROM releases r
+            WHERE r.product = p.name)   AS releases_ingested
+    FROM products p
+    LEFT JOIN markers m
+      ON m.product = p.name
+     AND m.name = 'last_fetched_release_at'
+    ${where}
+    ORDER BY (hours_since_fetch IS NULL) DESC,
+             hours_since_fetch DESC,
+             p.name ASC
+  `;
+  const rows = db.prepare(sql).all(params) as SyncStatusRow[];
+  if (opts.staleOnly) {
+    const cutoff = opts.staleHours ?? 24;
+    return rows.filter((r) => r.hours_since_fetch === null || r.hours_since_fetch > cutoff);
+  }
+  return rows;
+}
+
 export function entityFrequency(
   db: Database.Database,
   type: string,

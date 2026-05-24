@@ -170,7 +170,7 @@ describe('ingest — bullet parsing', () => {
 });
 
 describe('ingest — idempotency', () => {
-  it('running ingest twice produces the same row counts', () => {
+  it('running ingest twice produces the same row counts (second run is fully skipped)', () => {
     const stats1 = seedSampleProducts(temp.db);
     const releases1 = (temp.db.prepare(`SELECT COUNT(*) AS c FROM releases`).get() as { c: number }).c;
     const changes1 = (temp.db.prepare(`SELECT COUNT(*) AS c FROM changes`).get() as { c: number }).c;
@@ -179,9 +179,16 @@ describe('ingest — idempotency', () => {
     const releases2 = (temp.db.prepare(`SELECT COUNT(*) AS c FROM releases`).get() as { c: number }).c;
     const changes2 = (temp.db.prepare(`SELECT COUNT(*) AS c FROM changes`).get() as { c: number }).c;
 
+    // Table row counts must be stable across ingests
     expect(releases2).toBe(releases1);
     expect(changes2).toBe(changes1);
-    expect(stats2.releasesAdded).toBe(stats1.releasesAdded);
+    // Second run: notes_hash matches → every release is skipped, not re-added.
+    // Pre-v1.2 this expected releasesAdded === releasesAdded (both 9) because the
+    // products UPSERT used INSERT OR REPLACE, whose CASCADE DELETE on the releases
+    // FK silently wiped them before the dedup hash check could fire. v1.2 fixes
+    // the cascade (regression §8.20); idempotency now means "skipped".
+    expect(stats2.releasesAdded).toBe(0);
+    expect(stats2.skipped).toBe(stats1.releasesAdded);
   });
 
   it('modifying a file then re-ingesting replaces that release\'s changes (delete + reinsert)', () => {
