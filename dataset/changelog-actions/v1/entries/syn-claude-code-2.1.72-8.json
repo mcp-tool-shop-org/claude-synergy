@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.72-8",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.72",
+    "released_at": "2026-03-10",
+    "kind_hint": "changed",
+    "change_text": "Simplified effort levels to low/medium/high (removed max) with new symbols (○ ◐ ●) and a brief notification instead of a persistent icon. Use `/effort auto` to reset to default",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.72",
+    "change_id": "claude-code/2.1.72/8"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "low",
+    "subject": "/effort max removed; levels are now low|medium|high",
+    "action_text": "Switch `/effort max` calls to `/effort high` (closest behavioral match). The persistent effort icon is replaced by a brief notification with new symbols ○ ◐ ●; `/effort auto` resets to default.",
+    "deadline": null,
+    "tags": ["slash-command", "effort", "ui-change"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

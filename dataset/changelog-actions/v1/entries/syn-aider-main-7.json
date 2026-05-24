@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-main-7",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "main",
+    "released_at": null,
+    "kind_hint": "removed",
+    "change_text": "Removed deprecated google-generativeai dependency to eliminate import warnings, by Mark McDonald.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/main/7"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "google-generativeai dependency removed (was deprecated)",
+    "action_text": "Upgrade aider's main branch to drop the deprecated google-generativeai dependency and eliminate startup import warnings. No functional change.",
+    "deadline": null,
+    "tags": ["aider", "dependency-cleanup"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

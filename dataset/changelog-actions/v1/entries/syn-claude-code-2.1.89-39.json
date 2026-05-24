@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.89-39",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.89",
+    "released_at": "2026-04-01",
+    "kind_hint": "improved",
+    "change_text": "Improved `@`-mention typeahead to rank source files above MCP resources with similar names",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.89",
+    "change_id": "claude-code/2.1.89/39"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "@-mention typeahead ranks source files above MCP resources",
+    "action_text": "Type `@` in Claude Code 2.1.89+ — source files now rank above MCP resources with similar names in the typeahead. Reduces accidental MCP selection when a file and an MCP resource share a prefix.",
+    "deadline": null,
+    "tags": ["typeahead", "at-mention", "ux-ranking"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

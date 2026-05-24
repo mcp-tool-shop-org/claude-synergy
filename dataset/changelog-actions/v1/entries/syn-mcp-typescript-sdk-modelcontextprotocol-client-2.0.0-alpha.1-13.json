@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-typescript-sdk-modelcontextprotocol-client-2.0.0-alpha.1-13",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-typescript-sdk",
+    "version": "@modelcontextprotocol/client@2.0.0-alpha.1",
+    "released_at": "2026-04-01",
+    "kind_hint": "changed",
+    "change_text": "Always set `windowsHide` when spawning stdio server processes on Windows, not just in Electron environments. Prevents unwanted console windows in (#1772, 5276439)",
+    "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/pull/1772",
+    "change_id": "mcp-typescript-sdk/@modelcontextprotocol/client@2.0.0-alpha.1/13"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "windowsHide always set when spawning stdio MCP servers on Windows",
+    "action_text": "Upgrade `@modelcontextprotocol/client` to 2.0.0-alpha.1+ on Windows to suppress unwanted console-window flashes when stdio MCP servers spawn. Previously only suppressed in Electron environments; now suppressed for every host.",
+    "deadline": null,
+    "tags": ["windows", "stdio", "console-flash"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

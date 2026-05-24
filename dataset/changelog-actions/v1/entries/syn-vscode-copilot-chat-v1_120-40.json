@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_120-40",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_120",
+    "released_at": "2026-12-15",
+    "kind_hint": "changed",
+    "change_text": "`resolveCustomEditorSideBySideDiff(documents, webviewPanels, token)`: render the diff using two webviews, one for each side, with VS Code coordinating layout and scroll sync.",
+    "source_url": "https://code.visualstudio.com/updates/v1_120",
+    "change_id": "vscode-copilot-chat/v1_120/40"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "resolveCustomEditorSideBySideDiff now returns two webviews",
+    "action_text": "Update extensions implementing `resolveCustomEditorSideBySideDiff` to provide two webviews (one per diff side) instead of one. VS Code now coordinates layout and scroll sync between the two panels.",
+    "deadline": null,
+    "tags": ["vscode", "api", "extension-author"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

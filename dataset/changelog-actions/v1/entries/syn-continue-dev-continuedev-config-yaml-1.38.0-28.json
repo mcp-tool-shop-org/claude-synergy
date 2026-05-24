@@ -1,0 +1,33 @@
+{
+  "id": "syn-continue-dev-continuedev-config-yaml-1.38.0-28",
+  "schema_version": "1",
+  "input": {
+    "product": "continue-dev",
+    "version": "@continuedev/config-yaml@1.38.0",
+    "released_at": "2026-01-13",
+    "kind_hint": "changed",
+    "change_text": "**openai-adapters:** Add defensive type checks for stream.usage Promise ([7d3fa6d](https://github.com/continuedev/continue/commit/7d3fa6daa97519df87c70b32fbbe1f46e6fa3bc7))",
+    "source_url": "https://github.com/continuedev/continue/releases/tag/@continuedev/config-yaml@1.38.0",
+    "change_id": "continue-dev/@continuedev/config-yaml@1.38.0/28"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "openai-adapters: defensive type checks on stream.usage Promise",
+    "action_text": "Upgrade `@continuedev/openai-adapters` 1.38.0+ if you were hitting type-coercion errors when `stream.usage` resolved to an unexpected shape. Defensive; no API change.",
+    "deadline": null,
+    "tags": ["openai-adapters", "type-safety", "streaming"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

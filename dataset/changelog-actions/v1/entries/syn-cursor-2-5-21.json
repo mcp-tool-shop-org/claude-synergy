@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-5-21",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-5",
+    "released_at": "2026-02-17",
+    "kind_hint": "fixed",
+    "change_text": "Fixed keybinding behavior for Cmd+Opt Left/Right for tab navigation.",
+    "source_url": "https://cursor.com/changelog#2-5",
+    "change_id": "cursor/2-5/21"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "Cmd+Opt Left/Right tab navigation fixed",
+    "action_text": "Upgrade Cursor 2.5+ if `Cmd+Opt Left/Right` tab navigation was misbehaving. UX-grade fix; no API or config change.",
+    "deadline": null,
+    "tags": ["cursor", "keybinding", "tab-nav"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

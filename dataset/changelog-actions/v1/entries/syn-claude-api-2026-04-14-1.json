@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-api-2026-04-14-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-api",
+    "version": "2026-04-14",
+    "released_at": "2026-04-14",
+    "kind_hint": "deprecated",
+    "change_text": "We announced the deprecation of the Claude Sonnet 4 model (`claude-sonnet-4-20250514`) and the Claude Opus 4 model (`claude-opus-4-20250514`), with retirement on the Claude API scheduled for June 15, 2026. We recommend migrating to [Claude Sonnet 4.6](/docs/en/about-claude/models/overview#latest-mod",
+    "source_url": "https://platform.claude.com/docs/en/release-notes/overview",
+    "change_id": "claude-api/2026-04-14/1"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "high",
+    "subject": "Claude Sonnet 4 + Opus 4 retiring on the API 2026-06-15",
+    "action_text": "Migrate `claude-sonnet-4-20250514` callers to `claude-sonnet-4-6` and `claude-opus-4-20250514` callers to `claude-opus-4-7`. Retirement is 2026-06-15; calls to the retired IDs will start failing on that date.",
+    "deadline": "2026-06-15",
+    "tags": ["model-retirement", "claude-sonnet-4", "claude-opus-4"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

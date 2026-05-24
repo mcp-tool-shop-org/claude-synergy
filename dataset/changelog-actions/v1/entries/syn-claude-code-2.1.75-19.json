@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.75-19",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.75",
+    "released_at": "2026-03-13",
+    "kind_hint": "breaking",
+    "change_text": "Breaking change: Removed deprecated Windows managed settings fallback at `C:\\ProgramData\\ClaudeCode\\managed-settings.json` — use `C:\\Program Files\\ClaudeCode\\managed-settings.json`",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.75",
+    "change_id": "claude-code/2.1.75/19"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "Windows managed-settings.json fallback path removed",
+    "action_text": "Move `C:\\ProgramData\\ClaudeCode\\managed-settings.json` to `C:\\Program Files\\ClaudeCode\\managed-settings.json` on every Windows host BEFORE upgrading Claude Code to 2.1.75+. The old fallback path is no longer read; enterprise deployments using the deprecated location will silently lose managed settings.",
+    "deadline": null,
+    "tags": ["windows", "managed-settings", "enterprise-deploy"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

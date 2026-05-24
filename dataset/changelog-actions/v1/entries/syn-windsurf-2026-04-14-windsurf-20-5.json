@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-04-14-windsurf-20-5",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-04-14-windsurf-20",
+    "released_at": "2026-04-14",
+    "kind_hint": "added",
+    "change_text": "New Kanban-style view showing all local and cloud agent sessions, organized by status",
+    "source_url": "https://windsurf.com/changelog#2026-04-14-windsurf-20",
+    "change_id": "windsurf/2026-04-14-windsurf-20/5"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Kanban view for local + cloud agent sessions",
+    "action_text": "Open Windsurf's new Kanban view to see all local and cloud agent sessions grouped by status. Opt-in UI; no migration needed.",
+    "deadline": null,
+    "tags": ["windsurf", "ui-feature", "agent-sessions"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

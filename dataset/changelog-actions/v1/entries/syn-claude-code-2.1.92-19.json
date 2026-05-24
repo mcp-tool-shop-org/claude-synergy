@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.92-19",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.92",
+    "released_at": "2026-04-04",
+    "kind_hint": "removed",
+    "change_text": "Removed `/tag` command",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.92",
+    "change_id": "claude-code/2.1.92/19"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "medium",
+    "subject": "/tag slash command removed",
+    "action_text": "Remove `/tag` from hooks, scripts, and chained commands — it no longer exists in 2.1.92+. No replacement is named; grep Claude Code docs for the recommended pattern.",
+    "deadline": null,
+    "tags": ["slash-command", "removal"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

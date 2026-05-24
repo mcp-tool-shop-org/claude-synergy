@@ -1,0 +1,33 @@
+{
+  "id": "syn-windsurf-2026-01-13-bug-fixes-and-improvements-2",
+  "schema_version": "1",
+  "input": {
+    "product": "windsurf",
+    "version": "2026-01-13-bug-fixes-and-improvements",
+    "released_at": "2026-01-13",
+    "kind_hint": "improved",
+    "change_text": "Improved stability and reliability",
+    "source_url": "https://windsurf.com/changelog#2026-01-13-bug-fixes-and-improvements",
+    "change_id": "windsurf/2026-01-13-bug-fixes-and-improvements/2"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Stability and reliability improvements (unspecified)",
+    "action_text": "Upgrade Windsurf if you've been hitting stability issues; upstream notes don't specify which subsystems improved. Canonical vague-release-note — no targeted adjustment derivable without more detail.",
+    "deadline": null,
+    "tags": ["release-notes-vague", "stability"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

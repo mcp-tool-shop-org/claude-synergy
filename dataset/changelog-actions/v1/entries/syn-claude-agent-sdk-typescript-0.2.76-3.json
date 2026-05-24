@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.76-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.76",
+    "released_at": "2026-03-14",
+    "kind_hint": "added",
+    "change_text": "Added `planFilePath` field to `ExitPlanMode` tool input for hooks and SDK consumers",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.76",
+    "change_id": "claude-agent-sdk-typescript/0.2.76/3"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "ExitPlanMode tool input gains planFilePath field",
+    "action_text": "Read `planFilePath` from `ExitPlanMode` tool input in hooks and SDK consumers — claude-agent-sdk-typescript 0.2.76+ surfaces the file path the plan was written to. Opt-in; existing handlers continue to work.",
+    "deadline": null,
+    "tags": ["api", "exit-plan-mode", "hooks"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

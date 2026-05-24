@@ -1,0 +1,33 @@
+{
+  "id": "syn-aider-0.40.1-1",
+  "schema_version": "1",
+  "input": {
+    "product": "aider",
+    "version": "0.40.1",
+    "released_at": null,
+    "kind_hint": "improved",
+    "change_text": "Improved context awareness of repomap.",
+    "source_url": "https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md",
+    "change_id": "aider/0.40.1/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "repomap context awareness improved",
+    "action_text": "Upgrade aider 0.40.1+ for improved repomap context awareness. Source entry doesn't specify which scenarios changed; no API or config update needed.",
+    "deadline": null,
+    "tags": ["aider", "repomap"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

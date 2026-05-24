@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.73-25",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.73",
+    "released_at": "2026-03-11",
+    "kind_hint": "deprecated",
+    "change_text": "Deprecated `/output-style` command — use `/config` instead. Output style is now fixed at session start for better prompt caching",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.73",
+    "change_id": "claude-code/2.1.73/25"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "low",
+    "subject": "/output-style deprecated; use /config",
+    "action_text": "Replace `/output-style` invocations with `/config`. Output style is fixed at session start now (for prompt-cache reuse); mid-session `/output-style` would have been a no-op anyway.",
+    "deadline": null,
+    "tags": ["slash-command", "prompt-caching"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

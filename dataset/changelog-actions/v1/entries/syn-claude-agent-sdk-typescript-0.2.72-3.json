@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.72-3",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.72",
+    "released_at": "2026-03-10",
+    "kind_hint": "fixed",
+    "change_text": "Fixed `toggleMcpServer` and `reconnectMcpServer` failing with \"Server not found\" for servers passed via `query({mcpServers})`",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.72",
+    "change_id": "claude-agent-sdk-typescript/0.2.72/3"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "toggleMcpServer + reconnectMcpServer now work for inline mcpServers",
+    "action_text": "Upgrade to claude-agent-sdk-typescript 0.2.72+ to call `toggleMcpServer` and `reconnectMcpServer` on servers passed via `query({mcpServers})`. Pre-fix calls failed with 'Server not found'.",
+    "deadline": null,
+    "tags": ["api", "mcp"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

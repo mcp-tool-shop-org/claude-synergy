@@ -1,0 +1,33 @@
+{
+  "id": "syn-vscode-copilot-chat-v1_114-33",
+  "schema_version": "1",
+  "input": {
+    "product": "vscode-copilot-chat",
+    "version": "v1_114",
+    "released_at": "2026-06-15",
+    "kind_hint": "deprecated",
+    "change_text": "**Edit Mode** is officially deprecated as of VS Code version 1.110. Users can temporarily re-enable Edit Mode via VS Code setting chat.editMode.hidden",
+    "source_url": "https://code.visualstudio.com/updates/v1_114",
+    "change_id": "vscode-copilot-chat/v1_114/33"
+  },
+  "output": {
+    "kind": "deprecation",
+    "severity": "medium",
+    "subject": "VS Code Copilot Chat Edit Mode deprecated as of 1.110",
+    "action_text": "Migrate VS Code Copilot Chat workflows off Edit Mode (deprecated as of 1.110). Re-enable temporarily via the `chat.editMode.hidden` setting; no removal date is given.",
+    "deadline": null,
+    "tags": ["vscode", "edit-mode", "ui-feature"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

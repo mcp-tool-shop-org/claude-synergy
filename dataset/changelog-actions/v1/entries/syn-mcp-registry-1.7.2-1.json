@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-registry-1.7.2-1",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-registry",
+    "version": "1.7.2",
+    "released_at": "2026-04-27",
+    "kind_hint": "changed",
+    "change_text": "fix(deploy): manage Cloud Resource Manager API enablement in Pulumi by @rdimitrov in https://github.com/modelcontextprotocol/registry/pull/1213",
+    "source_url": "https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.2",
+    "change_id": "mcp-registry/1.7.2/1"
+  },
+  "output": {
+    "kind": "unknown",
+    "severity": "low",
+    "subject": "Pulumi-managed Cloud Resource Manager API enablement (internal deploy fix)",
+    "action_text": "No consumer-facing change. mcp-registry's internal Pulumi deployment now manages Cloud Resource Manager API enablement; relevant only to operators of the registry infra.",
+    "deadline": null,
+    "tags": ["infra", "pulumi", "registry-internal"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.2-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.2",
+    "released_at": "2026-01-09",
+    "kind_hint": "added",
+    "change_text": "Added source path metadata to images dragged onto the terminal, helping Claude understand where images originated",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.2",
+    "change_id": "claude-code/2.1.2/1"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Drag-dropped images now carry source-path metadata",
+    "action_text": "Drag images directly onto the Claude Code terminal in 2.1.2+ — Claude now reads the source-file path metadata so it can reference where the image originated. No config change.",
+    "deadline": null,
+    "tags": ["image-drop", "terminal", "metadata"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

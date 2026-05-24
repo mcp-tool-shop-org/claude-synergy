@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-2-5-9",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "2-5",
+    "released_at": "2026-02-17",
+    "kind_hint": "renamed",
+    "change_text": "Renamed \"Duplicate Chat\" to \"Fork Chat\" in the three-dot menu of a chat message.",
+    "source_url": "https://cursor.com/changelog#2-5",
+    "change_id": "cursor/2-5/9"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "low",
+    "subject": "'Duplicate Chat' menu item renamed to 'Fork Chat'",
+    "action_text": "Look for 'Fork Chat' in the chat-message three-dot menu — it was previously labeled 'Duplicate Chat'. Functionality unchanged; UI label only.",
+    "deadline": null,
+    "tags": ["cursor", "ui-rename"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

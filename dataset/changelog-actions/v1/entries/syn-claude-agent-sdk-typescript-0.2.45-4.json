@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.45-4",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.45",
+    "released_at": "2026-02-17",
+    "kind_hint": "improved",
+    "change_text": "Improved memory usage for shell commands that produce large output — RSS no longer grows unboundedly with command output size",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.45",
+    "change_id": "claude-agent-sdk-typescript/0.2.45/4"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "medium",
+    "subject": "Shell-tool RSS now bounded for high-output commands",
+    "action_text": "Upgrade to claude-agent-sdk-typescript 0.2.45+ if shell commands with multi-MB stdout OOM'd or grew RSS unboundedly. No API change; fix is transparent.",
+    "deadline": null,
+    "tags": ["memory", "shell-tool", "oom"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

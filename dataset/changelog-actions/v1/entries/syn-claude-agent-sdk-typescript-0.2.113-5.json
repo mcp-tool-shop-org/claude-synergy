@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.113-5",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.113",
+    "released_at": "2026-04-17",
+    "kind_hint": "breaking",
+    "change_text": "**Breaking**: `options.env` once again replaces `process.env` for the CLI subprocess instead of overlaying it. To add or override individual variables, pass `env: { ...process.env, MY_VAR: \"x\" }`",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.113",
+    "change_id": "claude-agent-sdk-typescript/0.2.113/5"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "high",
+    "subject": "options.env replaces (not overlays) process.env for the CLI subprocess",
+    "action_text": "Audit every `options.env` passed to `query()`. Spread `process.env` first: `env: { ...process.env, MY_VAR: 'x' }`. Subprocess will lose inherited env (PATH, ANTHROPIC_API_KEY, HOME) if you don't — silent failure mode.",
+    "deadline": null,
+    "tags": ["api", "env", "subprocess"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

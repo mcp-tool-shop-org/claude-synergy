@@ -1,0 +1,33 @@
+{
+  "id": "syn-cursor-04-08-26-2",
+  "schema_version": "1",
+  "input": {
+    "product": "cursor",
+    "version": "04-08-26",
+    "released_at": "2026-04-08",
+    "kind_hint": "added",
+    "change_text": "Added a \"Fix All\" action to apply multiple Bugbot fixes in one operation.",
+    "source_url": "https://cursor.com/changelog#04-08-26",
+    "change_id": "cursor/04-08-26/2"
+  },
+  "output": {
+    "kind": "feature",
+    "severity": "low",
+    "subject": "Bugbot 'Fix All' action",
+    "action_text": "Click `Fix All` in Cursor's Bugbot UI to apply every pending Bugbot fix in one operation. New opt-in action; existing per-fix flow continues to work.",
+    "deadline": null,
+    "tags": ["cursor", "bugbot", "bulk-action"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

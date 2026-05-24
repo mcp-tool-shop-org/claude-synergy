@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-ruby-sdk-0.16.0-1",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-ruby-sdk",
+    "version": "0.16.0",
+    "released_at": "2026-05-14",
+    "kind_hint": "fixed",
+    "change_text": "Fix missing `output_schema` argument in `define_tool` API (#301)",
+    "source_url": "https://github.com/modelcontextprotocol/ruby-sdk/releases/tag/v0.16.0",
+    "change_id": "mcp-ruby-sdk/0.16.0/1"
+  },
+  "output": {
+    "kind": "fix",
+    "severity": "low",
+    "subject": "define_tool now accepts output_schema",
+    "action_text": "Upgrade to mcp-ruby-sdk 0.16.0+ to pass `output_schema` to `define_tool`. Pre-fix callers passing the argument had no error but also no effect.",
+    "deadline": null,
+    "tags": ["api", "tool-definition"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

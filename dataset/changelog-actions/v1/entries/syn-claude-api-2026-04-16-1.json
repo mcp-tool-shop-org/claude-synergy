@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-api-2026-04-16-1",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-api",
+    "version": "2026-04-16",
+    "released_at": "2026-04-16",
+    "kind_hint": "breaking",
+    "change_text": "We've launched [Claude Opus 4.7](https://www.anthropic.com/news/claude-opus-4-7), our most capable generally available model for complex reasoning and agentic coding, at the same $5 / $25 per MTok pricing as Opus 4.6. See [What's new in Claude Opus 4.7](/docs/en/about-claude/models/whats-new-claude-4-7) for capability improvements, new features, and the updated tokenizer. Opus 4.7 includes API bre",
+    "source_url": "https://platform.claude.com/docs/en/release-notes/overview",
+    "change_id": "claude-api/2026-04-16/1"
+  },
+  "output": {
+    "kind": "breaking",
+    "severity": "high",
+    "subject": "Claude Opus 4.7 launched; includes API breaking changes + updated tokenizer",
+    "action_text": "Read the Opus 4.7 launch notes BEFORE switching model IDs to `claude-opus-4-7` — the release includes API breaking changes and an updated tokenizer. Same $5/$25 per MTok pricing as Opus 4.6; check `whats-new-claude-4-7` docs for the full break list.",
+    "deadline": null,
+    "tags": ["model-launch", "claude-opus-4-7", "tokenizer-change"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}
