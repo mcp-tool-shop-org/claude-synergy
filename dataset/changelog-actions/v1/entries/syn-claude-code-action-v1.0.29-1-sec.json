@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-action-v1.0.29-1-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code-action",
+    "version": "v1.0.29",
+    "released_at": "2026-03-20",
+    "kind_hint": "changed",
+    "change_text": "[Security] Fix HIGH vulnerability: CVE-2025-66414 by @orbisai0security in https://github.com/anthropics/claude-code-action/pull/792",
+    "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.29",
+    "change_id": "claude-code-action/v1.0.29/1"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "CVE-2025-66414 (HIGH) patched in claude-code-action",
+    "action_text": "Upgrade `claude-code-action` to v1.0.29+ to patch CVE-2025-66414 (HIGH severity). Pin the action version in every workflow that uses it (`uses: anthropics/claude-code-action@v1.0.29` or later) and read PR #792 + the CVE advisory for affected paths.",
+    "deadline": null,
+    "tags": ["cve", "cve-2025-66414", "github-action"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-action-v1.0.90-2-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code-action",
+    "version": "v1.0.90",
+    "released_at": "2026-05-08",
+    "kind_hint": "changed",
+    "change_text": "security: reject PATH_TO_CLAUDE_CODE_EXECUTABLE with control characters by @qozle in https://github.com/anthropics/claude-code-action/pull/1185",
+    "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.90",
+    "change_id": "claude-code-action/v1.0.90/2"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "medium",
+    "subject": "PATH_TO_CLAUDE_CODE_EXECUTABLE rejects control characters",
+    "action_text": "Upgrade `claude-code-action` to v1.0.90+ — `PATH_TO_CLAUDE_CODE_EXECUTABLE` input values containing control characters are now rejected. Defense-in-depth against shell-meta injection via the workflow input; no known exploit but the input was previously unsanitized.",
+    "deadline": null,
+    "tags": ["input-validation", "shell-injection", "defense-in-depth"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.113-14-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.113",
+    "released_at": "2026-04-17",
+    "kind_hint": "changed",
+    "change_text": "Security: on macOS, `/private/{etc,var,tmp,home}` paths are now treated as dangerous removal targets under `Bash(rm:*)` allow rules",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.113",
+    "change_id": "claude-code/2.1.113/14"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "macOS /private symlink paths now dangerous under Bash(rm:*) rules",
+    "action_text": "Upgrade macOS `claude-code` hosts to 2.1.113+ to treat `/private/{etc,var,tmp,home}` as dangerous removal targets under `Bash(rm:*)` allow rules. Pre-fix, macOS-specific symlink layout let `rm /private/etc/X` evade rules expecting the canonical `/etc/X` path.",
+    "deadline": null,
+    "tags": ["sandbox-bypass", "macos", "symlink-evasion", "destructive-rm"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

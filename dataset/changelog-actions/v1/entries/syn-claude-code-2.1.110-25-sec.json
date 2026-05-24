@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.110-25-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.110",
+    "released_at": "2026-04-14",
+    "kind_hint": "changed",
+    "change_text": "Hardened \"Open in editor\" actions against command injection from untrusted filenames",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.110",
+    "change_id": "claude-code/2.1.110/25"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "Command injection via untrusted filenames in `Open in editor` actions",
+    "action_text": "Upgrade to `claude-code` 2.1.110+ to harden the `Open in editor` action against command injection from untrusted filenames. Pre-fix, crafted filenames could execute shell commands when opened — relevant when reviewing PRs or untrusted repos.",
+    "deadline": null,
+    "tags": ["command-injection", "open-in-editor", "untrusted-input"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-go-1.42.0-9-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-go",
+    "version": "1.42.0",
+    "released_at": "2026-05-11",
+    "kind_hint": "changed",
+    "change_text": "redact api-key headers in debug logs ([46a074f](https://github.com/anthropics/anthropic-sdk-go/commit/46a074f588c30c2a88e6f46093be606b37dd3fef))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-go/releases/tag/v1.42.0",
+    "change_id": "anthropic-sdk-go/1.42.0/9"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "anthropic-sdk-go redacts x-api-key from debug logs",
+    "action_text": "Upgrade `anthropic-sdk-go` to 1.42.0+ to redact `x-api-key` headers from debug log output. Pre-fix, enabling debug logging wrote API keys to logs in plaintext. Audit prior debug logs for leaked keys and rotate exposed credentials.",
+    "deadline": null,
+    "tags": ["credential-leak", "debug-logging", "api-key", "go"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

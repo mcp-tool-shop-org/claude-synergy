@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.2-7-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.2",
+    "released_at": "2026-01-09",
+    "kind_hint": "fixed",
+    "change_text": "Fixed a command injection vulnerability in bash command processing where malformed input could execute arbitrary commands",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.2",
+    "change_id": "claude-code/2.1.2/7"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "Bash command processing command injection (arbitrary command execution)",
+    "action_text": "Upgrade to `claude-code` 2.1.2+ to patch a command injection vulnerability in bash command processing. Pre-fix, malformed input passed through the bash tool could execute arbitrary commands outside the requested operation.",
+    "deadline": null,
+    "tags": ["command-injection", "bash-tool", "rce-class"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

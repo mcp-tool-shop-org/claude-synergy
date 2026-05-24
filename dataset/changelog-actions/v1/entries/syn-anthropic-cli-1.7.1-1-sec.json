@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-cli-1.7.1-1-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-cli",
+    "version": "1.7.1",
+    "released_at": "2026-05-11",
+    "kind_hint": "changed",
+    "change_text": "redact api-key headers in debug logs ([b479ed1](https://github.com/anthropics/anthropic-cli/commit/b479ed15a5b6780d0f58618941f4900ae270c5f7))",
+    "source_url": "https://github.com/anthropics/anthropic-cli/releases/tag/v1.7.1",
+    "change_id": "anthropic-cli/1.7.1/1"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "anthropic-cli redacts x-api-key from debug logs",
+    "action_text": "Upgrade `anthropic-cli` to 1.7.1+ to redact `x-api-key` headers from debug log output. Part of the coordinated cross-SDK debug-log redaction (2026-05-07–11) — audit prior debug logs for leaked keys and rotate exposed credentials.",
+    "deadline": null,
+    "tags": ["credential-leak", "debug-logging", "api-key", "cli"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.126-11-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.126",
+    "released_at": "2026-05-01",
+    "kind_hint": "changed",
+    "change_text": "**Security:** Fixed `allowManagedDomainsOnly` / `allowManagedReadPathsOnly` being ignored when a higher-priority managed-settings source lacked a `sandbox` block",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.126",
+    "change_id": "claude-code/2.1.126/11"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "allowManagedDomainsOnly / allowManagedReadPathsOnly bypassed via settings stacking",
+    "action_text": "Upgrade enterprise `claude-code` deployments to 2.1.126+ to enforce `allowManagedDomainsOnly` and `allowManagedReadPathsOnly` even when a higher-priority managed-settings source lacks a `sandbox` block. Pre-fix, IT policy was bypassable via partial settings stacking.",
+    "deadline": null,
+    "tags": ["managed-settings", "policy-bypass", "enterprise"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

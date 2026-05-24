@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.113-16-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.113",
+    "released_at": "2026-04-17",
+    "kind_hint": "changed",
+    "change_text": "Security: `Bash(find:*)` allow rules no longer auto-approve `find -exec`/`-delete`",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.113",
+    "change_id": "claude-code/2.1.113/16"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "Bash(find:*) allow rules no longer auto-approve `find -exec` / `find -delete`",
+    "action_text": "Upgrade to `claude-code` 2.1.113+ to require explicit approval for `find -exec` and `find -delete` even under `Bash(find:*)` allow rules. Pre-fix, `find . -exec rm {} \\;` ran without prompting under any `Bash(find:*)` allow — turning `find` into an arbitrary-execution bypass.",
+    "deadline": null,
+    "tags": ["sandbox-bypass", "find-exec", "destructive-rm"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

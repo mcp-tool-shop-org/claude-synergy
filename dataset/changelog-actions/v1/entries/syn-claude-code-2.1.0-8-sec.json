@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.0-8-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.0",
+    "released_at": "2026-01-07",
+    "kind_hint": "fixed",
+    "change_text": "Fixed security issue where sensitive data (OAuth tokens, API keys, passwords) could be exposed in debug logs",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.0",
+    "change_id": "claude-code/2.1.0/8"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "OAuth tokens, API keys, passwords exposed in debug logs",
+    "action_text": "Upgrade to `claude-code` 2.1.0+ to stop OAuth tokens, API keys, and passwords from appearing in debug log output. Audit any pre-fix debug log files for leaked credentials before discarding and rotate exposed keys.",
+    "deadline": null,
+    "tags": ["credential-leak", "debug-logging", "oauth"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

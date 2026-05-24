@@ -1,0 +1,33 @@
+{
+  "id": "syn-external-ghsa-f65r-h4g3-3h9h-backpropagate",
+  "schema_version": "1",
+  "input": {
+    "product": "backpropagate",
+    "version": "1.2.0",
+    "released_at": "2026-05-23",
+    "kind_hint": "security",
+    "change_text": "GHSA-f65r-h4g3-3h9h (CRITICAL): backprop ui --auth and backprop ui --share do not enforce authentication. In backpropagate >= 1.1.0, the optional Reflex web UI (`backprop ui`) exposes a training control plane (dataset upload, model load, training start/stop, GGUF export, HuggingFace push). The CLI accepts `--auth user:pass` and `--share` flags documented as security controls, but the Reflex backend never reads `BACKPROPAGATE_UI_AUTH` — no auth middleware is registered. Any client reaching the bound port has full UI access. Affected: pip backpropagate >= 1.1.0, < 1.2.0; npm @mcptoolshop/backpropagate >= 1.1.0, < 1.2.0. CWE-358, CWE-862, CWE-1295.",
+    "source_url": "https://github.com/mcp-tool-shop-org/backpropagate/security/advisories/GHSA-f65r-h4g3-3h9h",
+    "change_id": "external-ghsa/GHSA-f65r-h4g3-3h9h/1"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "GHSA-f65r-h4g3-3h9h (CRITICAL): backpropagate UI auth bypass — `--auth` flag was inert",
+    "action_text": "Upgrade `backpropagate` to 1.2.0+ (pip OR `@mcptoolshop/backpropagate@1.2.0` npm) to patch GHSA-f65r-h4g3-3h9h (CRITICAL). Pre-fix, `backprop ui --auth user:pass` printed `Auth: enabled` but the Reflex backend never read the credential — any client reaching the port had full UI access (dataset read, training control, HF push). Audit hosts that ran `--share` for exposed training data and rotate HF tokens used in those sessions.",
+    "deadline": null,
+    "tags": ["ghsa", "ghsa-f65r-h4g3-3h9h", "auth-bypass", "critical", "external-advisory"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

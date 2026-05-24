@@ -1,0 +1,33 @@
+{
+  "id": "syn-mcp-typescript-sdk-modelcontextprotocol-server-2.0.0-alpha.1-5-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "mcp-typescript-sdk",
+    "version": "@modelcontextprotocol/server@2.0.0-alpha.1",
+    "released_at": "2026-04-01",
+    "kind_hint": "changed",
+    "change_text": "Fix ReDoS vulnerability in UriTemplate regex patterns (CVE-2026-0621)",
+    "source_url": "https://github.com/modelcontextprotocol/typescript-sdk/pull/1363",
+    "change_id": "mcp-typescript-sdk/@modelcontextprotocol/server@2.0.0-alpha.1/5"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "medium",
+    "subject": "CVE-2026-0621: ReDoS in @modelcontextprotocol/server UriTemplate regex",
+    "action_text": "Upgrade `@modelcontextprotocol/server` to 2.0.0-alpha.1+ to patch CVE-2026-0621 (ReDoS in `UriTemplate` regex patterns). Pre-fix, an attacker-controlled URI matched against a vulnerable template could pin a CPU thread — DoS class, no RCE.",
+    "deadline": null,
+    "tags": ["cve", "cve-2026-0621", "redos", "denial-of-service"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

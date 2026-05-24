@@ -1,0 +1,33 @@
+{
+  "id": "syn-anthropic-sdk-java-2.31.0-4-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "anthropic-sdk-java",
+    "version": "2.31.0",
+    "released_at": "2026-05-11",
+    "kind_hint": "changed",
+    "change_text": "redact api-key headers in debug logs ([3bca768](https://github.com/anthropics/anthropic-sdk-java/commit/3bca768637738a646ab1f06d44306ae23391fdd6))",
+    "source_url": "https://github.com/anthropics/anthropic-sdk-java/releases/tag/v2.31.0",
+    "change_id": "anthropic-sdk-java/2.31.0/4"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "anthropic-sdk-java redacts x-api-key from debug logs",
+    "action_text": "Upgrade `anthropic-sdk-java` to 2.31.0+ to redact `x-api-key` headers from debug log output. Pre-fix, debug logging in production wrote API keys to log files in plaintext. Audit prior debug logs for leaked keys and rotate exposed credentials.",
+    "deadline": null,
+    "tags": ["credential-leak", "debug-logging", "api-key", "java"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

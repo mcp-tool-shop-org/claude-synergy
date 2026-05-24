@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-action-v1.0.72-1-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code-action",
+    "version": "v1.0.72",
+    "released_at": "2026-04-23",
+    "kind_hint": "changed",
+    "change_text": "Harden tag mode tool permissions against prompt injection by @km-anthropic in https://github.com/anthropics/claude-code-action/pull/1002",
+    "source_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.72",
+    "change_id": "claude-code-action/v1.0.72/1"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "Tag-mode tool permissions hardened against prompt injection",
+    "action_text": "Upgrade `claude-code-action` to v1.0.72+ in workflows that use tag-trigger mode on PRs from external contributors. Pre-fix, untrusted PR content could expand the action's tool surface via prompt injection — see PR #1002 for the hardened permission model.",
+    "deadline": null,
+    "tags": ["prompt-injection", "tag-mode", "github-action", "untrusted-input"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

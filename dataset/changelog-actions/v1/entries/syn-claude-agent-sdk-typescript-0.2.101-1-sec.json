@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-agent-sdk-typescript-0.2.101-1-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-agent-sdk-typescript",
+    "version": "0.2.101",
+    "released_at": "2026-04-08",
+    "kind_hint": "changed",
+    "change_text": "Security: bumped `@anthropic-ai/sdk` to `^0.81.0` and `@modelcontextprotocol/sdk` to `^1.29.0` to resolve GHSA-5474-4w2j-mq4c and transitive hono advisories",
+    "source_url": "https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.2.101",
+    "change_id": "claude-agent-sdk-typescript/0.2.101/1"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "GHSA-5474-4w2j-mq4c + transitive hono advisories resolved via dependency bumps",
+    "action_text": "Upgrade `claude-agent-sdk-typescript` to 0.2.101+ to pick up `@anthropic-ai/sdk@^0.81.0` and `@modelcontextprotocol/sdk@^1.29.0`, resolving GHSA-5474-4w2j-mq4c plus transitive `hono` advisories. Re-run `npm audit` after upgrade to confirm.",
+    "deadline": null,
+    "tags": ["ghsa", "ghsa-5474-4w2j-mq4c", "dependency-bump", "transitive"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

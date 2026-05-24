@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.119-15-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.119",
+    "released_at": "2026-04-23",
+    "kind_hint": "changed",
+    "change_text": "Security: `blockedMarketplaces` now correctly enforces `hostPattern` and `pathPattern` entries",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.119",
+    "change_id": "claude-code/2.1.119/15"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "medium",
+    "subject": "blockedMarketplaces hostPattern / pathPattern entries now enforced",
+    "action_text": "Upgrade `claude-code` to 2.1.119+ to enforce `blockedMarketplaces` `hostPattern` and `pathPattern` entries. Pre-fix, pattern entries were silently ignored — blocked plugin marketplaces remained installable through pattern-matched URLs.",
+    "deadline": null,
+    "tags": ["managed-settings", "marketplace", "policy-enforcement"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

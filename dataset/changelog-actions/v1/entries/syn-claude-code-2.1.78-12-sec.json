@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.78-12-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.78",
+    "released_at": "2026-03-15",
+    "kind_hint": "changed",
+    "change_text": "**Security:** Fixed silent sandbox disable when `sandbox.enabled: true` is set but dependencies are missing — now shows a visible startup warning",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.78",
+    "change_id": "claude-code/2.1.78/12"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "Sandbox silently disabled when dependencies missing (now warns at startup)",
+    "action_text": "Upgrade to `claude-code` 2.1.78+ to surface a visible startup warning when `sandbox.enabled: true` is configured but sandbox dependencies are missing. Pre-fix, the sandbox silently disabled — users believed they were sandboxed when they were not.",
+    "deadline": null,
+    "tags": ["sandbox", "silent-failure", "security-control-bypass"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "syn-claude-code-2.1.113-15-sec",
+  "schema_version": "1",
+  "input": {
+    "product": "claude-code",
+    "version": "2.1.113",
+    "released_at": "2026-04-17",
+    "kind_hint": "changed",
+    "change_text": "Security: Bash deny rules now match commands wrapped in `env`/`sudo`/`watch`/`ionice`/`setsid` and similar exec wrappers",
+    "source_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.113",
+    "change_id": "claude-code/2.1.113/15"
+  },
+  "output": {
+    "kind": "security",
+    "severity": "high",
+    "subject": "Bash deny rules now match commands wrapped in env / sudo / watch / ionice / setsid",
+    "action_text": "Upgrade to `claude-code` 2.1.113+ to make Bash deny rules match commands wrapped in `env`, `sudo`, `watch`, `ionice`, `setsid`, and similar exec wrappers. Pre-fix, a denied command ran when prefixed by any common exec wrapper — e.g. `Bash(curl:*)` deny was bypassed by `env curl ...`.",
+    "deadline": null,
+    "tags": ["sandbox-bypass", "deny-rules", "exec-wrapper"]
+  },
+  "provenance": {
+    "labeler": "opus-4.7-this-session-a25",
+    "labeled_at": "2026-05-24",
+    "reviewer": null,
+    "reviewed_at": null,
+    "review_action": "pending"
+  },
+  "quality": {
+    "faithfulness": "ok",
+    "schema_valid": true,
+    "human_grade": null
+  }
+}
