@@ -41,6 +41,14 @@ const DB_PATH = join(REPO_ROOT, 'data', 'claude-synergy.db');
 // these segments skip the corpus-DB lookup but must carry a real source_url.
 const EXTERNAL_NAMESPACES = new Set(['external-ghsa', 'external-cve']);
 
+// Closed enums — entries with out-of-enum kind/severity are rejected at the
+// citation step rather than silently bucketing into a phantom class.
+// Source of truth: SCHEMA.md + schema.v1.json.
+const VALID_KINDS = new Set([
+  'breaking', 'deprecation', 'security', 'feature', 'fix', 'performance', 'docs', 'unknown',
+]);
+const VALID_SEVERITIES = new Set(['low', 'medium', 'high']);
+
 // ── Args ─────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const arg = (name, def) => {
@@ -50,10 +58,18 @@ const arg = (name, def) => {
 
 const INCLUDE_PENDING = args.includes('--include-pending');
 const HOLDOUT_FRACTION = parseFloat(arg('holdout', '0.2'));
-const SEED = parseInt(arg('seed', '2026052403'), 10);
+const SEED_RAW = arg('seed', '2026052403');
+const SEED = parseInt(SEED_RAW, 10);
 
 if (!(HOLDOUT_FRACTION > 0 && HOLDOUT_FRACTION < 1)) {
   console.error(`--holdout must be in (0, 1); got ${HOLDOUT_FRACTION}`);
+  process.exit(2);
+}
+
+// Same NaN-trap as --holdout. mulberry32(NaN) silently degrades to seed=0 and
+// the manifest's reproducibility claim becomes a lie.
+if (!Number.isFinite(SEED) || !Number.isInteger(SEED)) {
+  console.error(`--seed must be an integer; got ${JSON.stringify(SEED_RAW)}`);
   process.exit(2);
 }
 
@@ -85,7 +101,11 @@ if (!existsSync(ENTRIES_DIR)) {
   process.exit(2);
 }
 
-const files = readdirSync(ENTRIES_DIR).filter((f) => f.endsWith('.json'));
+// readdirSync order is FS-dependent (NTFS = alphabetical, ext4 = hash-order).
+// .sort() guarantees byte-identical splits across machines so the manifest's
+// build_seed is a real reproducibility primitive, not just "reproducible on
+// the same filesystem."
+const files = readdirSync(ENTRIES_DIR).filter((f) => f.endsWith('.json')).sort();
 const entries = files.map((f) => ({
   filename: f,
   data: JSON.parse(readFileSync(join(ENTRIES_DIR, f), 'utf-8')),
@@ -107,6 +127,26 @@ const validated = [];
 const rejected = [];
 
 for (const { filename, data } of entries) {
+  // Enum validation FIRST — out-of-enum kind/severity should never reach the
+  // split phase. Pre-fix, a typo like "kind":"feaure" silently created a
+  // phantom class and skewed the stratified split with no error.
+  const kind = data.output?.kind;
+  if (!VALID_KINDS.has(kind)) {
+    rejected.push({
+      filename,
+      reason: `output.kind not in 8-enum: ${JSON.stringify(kind)} (allowed: ${[...VALID_KINDS].join(', ')})`,
+    });
+    continue;
+  }
+  const severity = data.output?.severity;
+  if (!VALID_SEVERITIES.has(severity)) {
+    rejected.push({
+      filename,
+      reason: `output.severity not in 3-enum: ${JSON.stringify(severity)} (allowed: low, medium, high)`,
+    });
+    continue;
+  }
+
   const ci = data.input.change_id ?? '';
   const namespace = ci.split('/')[0];
 
@@ -159,7 +199,8 @@ if (eligible.length === 0) {
 // ── Stratified 80/20 split by kind ───────────────────────────────────────────
 const byKind = {};
 for (const e of eligible) {
-  const k = e.data.output?.kind ?? 'unknown';
+  // .output.kind is guaranteed in-enum at this point (validated above).
+  const k = e.data.output.kind;
   (byKind[k] = byKind[k] || []).push(e);
 }
 
@@ -178,6 +219,15 @@ for (const [kind, kindEntries] of Object.entries(byKind)) {
     training: training.length,
     holdout: holdout.length,
   };
+  // For n=1 classes (Math.max floor → 1 holdout, 0 train) the model never
+  // sees the class during training. Warn loudly; v1 doesn't trip this
+  // (smallest class is performance=6), but future v2+ samples might.
+  if (training.length === 0) {
+    console.warn(
+      `  ⚠  kind="${kind}" has 0 train entries (n=${kindEntries.length}, ${holdout.length} holdout). ` +
+        `Model will never see this class during training. Augment this class before fine-tuning.`,
+    );
+  }
   trainingEntries.push(...training);
   holdoutEntries.push(...holdout);
 }
