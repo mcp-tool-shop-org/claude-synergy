@@ -16,7 +16,7 @@
     "subject": "Compaction API beta for Opus 4.6 (server-side context summarization)",
     "action_text": "Call the new `compaction API` beta on Opus 4.6 to offload context summarization to the server for long conversations. Beta surface — review the compaction docs for stability caveats before relying on it in production.",
     "deadline": null,
-    "tags": ["api", "compaction", "opus-4.6", "beta"]
+    "tags": ["api", "compaction", "opus-4-6", "beta"]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",

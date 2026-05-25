@@ -14,7 +14,7 @@
     "kind": "docs",
     "severity": "low",
     "subject": "hyper-mcp added to the 'built with rmcp' README list",
-    "action_text": "No consumer action. The rmcp README's 'built with' list now includes `hyper-mcp` as an example project. Informational only.",
+    "action_text": "Skip — the `rmcp` README's 'built with' list now includes `hyper-mcp` as an example project. Informational only; no consumer action.",
     "deadline": null,
     "tags": ["docs", "readme-update"]
   },

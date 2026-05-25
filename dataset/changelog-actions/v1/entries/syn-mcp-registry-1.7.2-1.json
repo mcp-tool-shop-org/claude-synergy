@@ -14,7 +14,7 @@
     "kind": "unknown",
     "severity": "low",
     "subject": "Pulumi-managed Cloud Resource Manager API enablement (internal deploy fix)",
-    "action_text": "No consumer-facing change. mcp-registry's internal Pulumi deployment now manages Cloud Resource Manager API enablement; relevant only to operators of the registry infra.",
+    "action_text": "Skip — no consumer-facing change. `mcp-registry`'s internal Pulumi deployment now manages Cloud Resource Manager API enablement; relevant only to operators of the registry infra.",
     "deadline": null,
     "tags": ["infra", "pulumi", "registry-internal"]
   },

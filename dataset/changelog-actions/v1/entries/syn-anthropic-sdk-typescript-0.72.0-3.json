@@ -14,7 +14,7 @@
     "kind": "docs",
     "severity": "low",
     "subject": "CI: breaking-change detection workflow added (no consumer impact)",
-    "action_text": "No action for consumers of `anthropic-sdk-typescript` — this is an internal CI workflow addition to the SDK repo, not a runtime change. Kind-hint of `breaking` is a Conventional-Commits scope artifact (`ci:`), not a user-facing break.",
+    "action_text": "Skip — `anthropic-sdk-typescript` consumers see no runtime change. The kind hint of `breaking` is a Conventional-Commits `ci:` scope artifact (an internal breaking-change-detection workflow was added to the SDK repo), not a user-facing API break.",
     "deadline": null,
     "tags": ["sdk", "ci", "internal", "no-op"]
   },
