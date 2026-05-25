@@ -165,13 +165,25 @@ function computeStats(matrix, total) {
 const round3 = (x) => Math.round(x * 1000) / 1000;
 
 // ── Severity diagnostics (reported, not gating) ──────────────────────────────
+//
+// Normalizes case + whitespace on both sides before comparing — format=json
+// doesn't enforce enum membership, so a model could emit "Low" or "low " and
+// silently miss against "low". Same defense applied to kind comparisons via
+// VALID_KINDS_SET.has() upstream (out-of-enum gets rejected as an error,
+// not silently miscompared).
+function normLow(s) {
+  return (typeof s === 'string' ? s : '').toLowerCase().trim();
+}
+
 function severityAgreement(verdicts, key1, key2) {
   let match = 0;
   let total = 0;
   for (const v of verdicts) {
-    if (v[key1] && v[key2]) {
+    const a = normLow(v[key1]);
+    const b = normLow(v[key2]);
+    if (a && b) {
       total++;
-      if (v[key1] === v[key2]) match++;
+      if (a === b) match++;
     }
   }
   return total ? round3(match / total) : null;
@@ -266,8 +278,34 @@ async function run1() {
 }
 
 // ── Run 2: qwen3 vs cs-actions ───────────────────────────────────────────────
+//
+// Serial inference (not Promise.all) per entry. Ollama defaults to
+// OLLAMA_MAX_LOADED_MODELS=1 on Windows; concurrent calls to two different
+// models force unload+reload thrashing, blowing per-entry time from ~1.4s
+// to 5-30s. Serial pays ~2x wall-clock but is robust regardless of MAX_LOADED
+// setting. Both models are pre-warmed at run start to amortize initial load.
 async function run2(modelName) {
   console.error(`\n=== Run 2: ${JUDGE_MODEL} vs ${modelName} (release pass criterion) ===`);
+  const maxLoaded = process.env.OLLAMA_MAX_LOADED_MODELS;
+  if (maxLoaded === '1' || (maxLoaded === undefined && process.platform === 'win32')) {
+    console.error(`  Note: OLLAMA_MAX_LOADED_MODELS=${maxLoaded ?? '(unset, Windows default = 1)'}.`);
+    console.error(`  Using serial inference (~2x wall-clock vs parallel). To enable concurrent calls,`);
+    console.error(`  set OLLAMA_MAX_LOADED_MODELS=2 before invoking — both models (qwen3:8b + ${modelName})`);
+    console.error(`  are ~5GB quantized, comfortable for 16GB VRAM.`);
+  }
+
+  // Pre-warm both models with a tiny inference so the first real entry isn't
+  // paying a cold-load. Each model becomes resident; serial calls below
+  // then alternate without unload/reload thrashing (assuming MAX_LOADED >= 2,
+  // or paying the swap cost predictably if =1).
+  console.error('  Pre-warming both models...');
+  try {
+    await infer(JUDGE_MODEL, 'Product: x\nVersion: 1\nReleased: 2026-01-01\nKind hint: added\nChange: warmup\nSource: x');
+    await infer(modelName, 'Product: x\nVersion: 1\nReleased: 2026-01-01\nKind hint: added\nChange: warmup\nSource: x');
+  } catch (e) {
+    console.error(`  Pre-warm failed (will continue, but timing may include cold-load): ${e.message}`);
+  }
+
   const t0 = Date.now();
   const qwen3Matrix = emptyMatrix();
   const csMatrix = emptyMatrix();
@@ -277,10 +315,9 @@ async function run2(modelName) {
   for (let i = 0; i < holdout.length; i++) {
     const entry = holdout[i];
     try {
-      const [qwen3Pred, csPred] = await Promise.all([
-        infer(JUDGE_MODEL, entry.user_prompt),
-        infer(modelName, entry.user_prompt),
-      ]);
+      // Serial, not Promise.all — see comment at function top
+      const qwen3Pred = await infer(JUDGE_MODEL, entry.user_prompt);
+      const csPred = await infer(modelName, entry.user_prompt);
       if (qwen3Pred.__parse_error || csPred.__parse_error) {
         errors.push({ line: entry.line, error: 'parse_error', qwen3: qwen3Pred, cs: csPred });
         continue;
@@ -319,11 +356,21 @@ async function run2(modelName) {
   const qwen3VsCs = verdicts.length ? round3(verdicts.filter((v) => v.qwen3_matches_cs).length / verdicts.length) : 0;
   const releasePass = qwen3VsCs >= qwen3VsGt;
 
+  // Severity rollups — diagnostic only, not gating per EVAL.md
+  const qwen3VsGtSeverity = severityAgreement(verdicts, 'qwen3_severity', 'ground_truth_severity');
+  const csVsGtSeverity = severityAgreement(verdicts, 'cs_severity', 'ground_truth_severity');
+  const qwen3VsCsSeverity = severityAgreement(verdicts, 'qwen3_severity', 'cs_severity');
+
   console.error('\n--- Run 2 summary ---');
   console.error(`  qwen3-vs-GT kind agreement:             ${(100 * qwen3VsGt).toFixed(1)}%`);
   console.error(`  cs-actions-vs-GT kind agreement:        ${(100 * csVsGt).toFixed(1)}%  (diagnostic)`);
   console.error(`  qwen3-vs-cs-actions kind agreement:     ${(100 * qwen3VsCs).toFixed(1)}%`);
   console.error(`  Release pass (qwen3-vs-cs ≥ qwen3-vs-GT): ${releasePass ? 'PASS ✓' : 'FAIL ✗'}`);
+  console.error('');
+  console.error(`  Severity diagnostics (not gating):`);
+  console.error(`    qwen3-vs-GT severity:                 ${qwen3VsGtSeverity !== null ? (100 * qwen3VsGtSeverity).toFixed(1) + '%' : 'n/a'}`);
+  console.error(`    cs-actions-vs-GT severity:            ${csVsGtSeverity !== null ? (100 * csVsGtSeverity).toFixed(1) + '%' : 'n/a'}`);
+  console.error(`    qwen3-vs-cs-actions severity:         ${qwen3VsCsSeverity !== null ? (100 * qwen3VsCsSeverity).toFixed(1) + '%' : 'n/a'}`);
   console.error(`  Errors: ${errors.length} | Elapsed: ${((Date.now() - t0) / 1000).toFixed(0)}s`);
 
   return {
@@ -342,6 +389,9 @@ async function run2(modelName) {
     qwen3_per_class: qwen3Stats.per_class,
     cs_actions_per_class: csStats.per_class,
     cs_actions_thin_class_diagnostics: csStats.thin_class_diagnostics,
+    qwen3_vs_ground_truth_severity_agreement: qwen3VsGtSeverity,
+    cs_actions_vs_ground_truth_severity_agreement: csVsGtSeverity,
+    qwen3_vs_cs_actions_severity_agreement: qwen3VsCsSeverity,
     verdicts,
     errors,
   };

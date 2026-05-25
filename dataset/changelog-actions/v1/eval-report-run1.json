@@ -1,5 +1,5 @@
 {
-  "ran_at": "2026-05-25T15:21:42.243Z",
+  "ran_at": "2026-05-25T15:30:32.261Z",
   "holdout_path": "E:\\AI\\claude-synergy\\dataset\\changelog-actions\\v1\\holdout.jsonl",
   "holdout_size_loaded": 59,
   "holdout_size_full": 59,
@@ -8,7 +8,7 @@
     "description": "qwen3:8b vs ground truth on holdout (zero-shot floor)",
     "model": "qwen3:8b",
     "holdout_size": 59,
-    "elapsed_seconds": 78.505,
+    "elapsed_seconds": 78.344,
     "overall_kind_agreement": 0.78,
     "macro_f1_well_populated": 0.801,
     "severity_diagnostic_agreement": 0.542,
