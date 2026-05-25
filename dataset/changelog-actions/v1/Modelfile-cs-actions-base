@@ -1,0 +1,110 @@
+# Modelfile for cs-actions-base — Stage A of the v1 deployment.
+#
+# Imports the manually-converted GGUF (q8_0) as an Ollama base. The downstream
+# Modelfile.cs-actions-v1 then layers deployment configuration (temperature,
+# num_predict, system prompt) on top.
+#
+# Two-stage layering keeps the heavy "what weights" decision separate from
+# the lightweight "how to serve" decision — Modelfile.cs-actions-v1 can be
+# edited without re-quantizing 8 GB.
+#
+# Build sequence (full pipeline):
+#   1. PYTHONUTF8=1 python scripts/manual-merge.py
+#      → output/merged-hf/ (~15 GB bf16 safetensors merged LoRA into base)
+#   2. cd /e/AI/llama.cpp-src && python convert_hf_to_gguf.py \
+#         /e/AI/claude-synergy/output/merged-hf \
+#         --outfile /e/AI/claude-synergy/output/cs-actions-base.q8_0.gguf \
+#         --outtype q8_0
+#      → output/cs-actions-base.q8_0.gguf (~8 GB q8_0 quantized)
+#   3. ollama create cs-actions-base \
+#         -f dataset/changelog-actions/v1/Modelfile-cs-actions-base
+#      → registers as "cs-actions-base" in Ollama
+#   4. ollama create cs-actions:v1 \
+#         -f dataset/changelog-actions/v1/Modelfile.cs-actions-v1
+#      → layers temperature/system_prompt/num_predict on top
+#
+# Why this 4-step chain instead of `backprop export --ollama` or
+# `ollama create --experimental --quantize`:
+#
+#   - backprop 1.4.0 GGUF export hits an UnboundLocalError on active_adapters
+#     when loading from a bnb-4bit checkpoint (active_adapters bug).
+#   - ollama 0.24.0 `--experimental` safetensors import selects an MLX runner
+#     on Windows that doesn't support Qwen2ForCausalLM, leaving the model
+#     registered but unrunnable ("mlx runner failed").
+#   - The standard GGUF path through ollama (FROM ./*.gguf) routes to
+#     llama.cpp's runner that works on Windows + CUDA.
+#
+# Quantization is q8_0 instead of q4_K_M because the convert script supports
+# q8_0 directly but q4_K_M requires the separate llama-quantize binary
+# (not bundled with llama.cpp's Python tools). q8_0 is ~8 GB vs q4_K_M's
+# ~4.5 GB, both viable for inference on this rig's 16 GB VRAM.
+#
+# The merged-hf/ + *.gguf files at the FROM path are .gitignored (see
+# top-level .gitignore — under the `output/` rule). Reproducible from
+# scripts/manual-merge.py + the cached base model + this convert command.
+#
+# IMPORTANT: `ollama create` in 0.24.0 mis-parses `./relative` FROM paths
+# as model-name references ("invalid model name" error). Use an ABSOLUTE
+# path. The path below is the local-rig path; adjust to your local repo
+# clone before `ollama create`. See `scripts/build-modelfile-base.mjs` for
+# a CWD-portable generator (TODO post-v1).
+#
+# TEMPLATE block is the Qwen2.5-Instruct chat template, copied verbatim
+# from `ollama show qwen2.5:7b --template`. Required because Ollama 0.24.0
+# does NOT auto-read `tokenizer.chat_template` from a GGUF imported via
+# `FROM ./*.gguf` — it defaults to bare `{{ .Prompt }}` which strips the
+# <|im_start|>/<|im_end|> role markers the fine-tuned model expects.
+# Without this TEMPLATE the model echoes inputs as garbage JSON.
+
+FROM E:/AI/claude-synergy/output/cs-actions-base.q8_0.gguf
+
+TEMPLATE """{{- if .Messages }}
+{{- if or .System .Tools }}<|im_start|>system
+{{- if .System }}
+{{ .System }}
+{{- end }}
+{{- if .Tools }}
+
+# Tools
+
+You may call one or more functions to assist with the user query.
+
+You are provided with function signatures within <tools></tools> XML tags:
+<tools>
+{{- range .Tools }}
+{"type": "function", "function": {{ .Function }}}
+{{- end }}
+</tools>
+
+For each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:
+<tool_call>
+{"name": <function-name>, "arguments": <args-json-object>}
+</tool_call>
+{{- end }}<|im_end|>
+{{ end }}
+{{- range $i, $_ := .Messages }}
+{{- $last := eq (len (slice $.Messages $i)) 1 -}}
+{{- if eq .Role "user" }}<|im_start|>user
+{{ .Content }}<|im_end|>
+{{ else if eq .Role "assistant" }}<|im_start|>assistant
+{{ if .Content }}{{ .Content }}
+{{- else if .ToolCalls }}<tool_call>
+{{ range .ToolCalls }}{"name": "{{ .Function.Name }}", "arguments": {{ .Function.Arguments }}}
+{{ end }}</tool_call>
+{{- end }}{{ if not $last }}<|im_end|>
+{{ end }}
+{{- else if eq .Role "tool" }}<|im_start|>user
+<tool_response>
+{{ .Content }}
+</tool_response><|im_end|>
+{{ end }}
+{{- if and (ne .Role "assistant") $last }}<|im_start|>assistant
+{{ end }}
+{{- end }}
+{{- else }}
+{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{ if .Prompt }}<|im_start|>user
+{{ .Prompt }}<|im_end|>
+{{ end }}<|im_start|>assistant
+{{ end }}{{ .Response }}{{ if .Response }}<|im_end|>{{ end }}"""

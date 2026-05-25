@@ -12,7 +12,7 @@ The dataset is the artifact. The fine-tuned model is downstream of it. Re-tune t
 
 | Dataset | Status | Purpose | Schema |
 |---|---|---|---|
-| [`changelog-actions/v1`](./changelog-actions/) | **301 entries on disk, all `review_action: pending`** (A1 hand-curated 30 + A2 parallel-subagent 250 + A2.5 security-oversample 21). Pending A3 spot-check + freeze. | Train a small model that converts one changelog entry → one structured action item | [v1 schema](./changelog-actions/SCHEMA.md) · [style spec](./changelog-actions/STYLE.md) |
+| [`changelog-actions/v1`](./changelog-actions/) | **301 entries on disk, all `review_action: pending`** (A1 hand-curated 30 + A2 parallel-subagent 250 + A2.5 security-oversample 21). Pending A3 spot-check + freeze. | Train a small model that converts one changelog entry → one structured action item | [v1 schema](./changelog-actions/SCHEMA.md) · [style spec](./changelog-actions/STYLE.md) · [training](./changelog-actions/v1/TRAINING.md) · [eval](./changelog-actions/v1/EVAL.md) |
 
 ### v1 distribution (snapshot)
 

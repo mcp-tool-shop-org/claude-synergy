@@ -13,3 +13,13 @@ site/.astro/
 site/dist/
 site/node_modules/
 .polyglot-cache.json
+
+# B1 training output — LoRA adapter weights + GGUF export.
+# Reproducible from scripts/run-b1-training.py + dataset/changelog-actions/v1/training.jsonl
+# + the manifest's build_seed. Multi-GB artifacts; archive via `backprop export
+# --push-to-hub` to HuggingFace, not git.
+output/
+
+# Study-swarm research artifacts (research dispatches, agent transcripts).
+# Local-only by convention; not part of the shipped surface.
+.swarm/

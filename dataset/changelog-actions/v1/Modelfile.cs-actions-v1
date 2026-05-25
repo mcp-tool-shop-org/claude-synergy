@@ -8,6 +8,11 @@
 #        ollama create cs-actions:v1 -f Modelfile.cs-actions-v1
 #
 # Clean separation: backprop owns weights, this file owns deployment config.
+#
+# Full training reproducibility (venv setup, Windows PYTHONUTF8=1 caveat,
+# pipeline wall-clock budget, when to re-train vs cut v2) is documented in
+# TRAINING.md alongside this file. EVAL.md (also alongside) covers what
+# runs after this Modelfile produces cs-actions:v1.
 
 FROM cs-actions-base
 
