@@ -121,7 +121,9 @@ function validateEntry(filename, data, releaseExistsStmt) {
     err(filename, 'source_url', `not a valid http(s) URL: ${JSON.stringify(inp.source_url)}`);
   }
   // change_id namespace: corpus product slug OR external-{ghsa,cve}
-  const changeIdNamespace = (inp.change_id ?? '').split('/')[0];
+  const changeIdParts = (inp.change_id ?? '').split('/');
+  const changeIdNamespace = changeIdParts[0];
+  const changeIdOrdinal = changeIdParts[changeIdParts.length - 1];
   if (changeIdNamespace.startsWith('external-')) {
     if (!EXTERNAL_NAMESPACES.has(changeIdNamespace)) {
       err(
@@ -135,6 +137,16 @@ function validateEntry(filename, data, releaseExistsStmt) {
       filename,
       'change_id.namespace',
       `change_id namespace ${JSON.stringify(changeIdNamespace)} matches neither product slug nor external-{ghsa,cve}`,
+    );
+  }
+  // Ordinal: last segment must be a positive integer. Symmetric with the
+  // namespace check above and matches the schema.v1.json regex (`.../[0-9]+$`).
+  // Pre-fix, `aider/0.19.1/notanumber` slipped through.
+  if (changeIdParts.length >= 2 && !/^[0-9]+$/.test(changeIdOrdinal ?? '')) {
+    err(
+      filename,
+      'change_id.ordinal',
+      `change_id ordinal must be a positive integer; got ${JSON.stringify(changeIdOrdinal)}`,
     );
   }
 
@@ -252,8 +264,7 @@ if (existsSync(DB_PATH)) {
 
 // ── Per-entry pass ───────────────────────────────────────────────────────────
 const idSeen = new Map(); // id → filename
-const changeIdSeen = new Map(); // change_id → filename
-const tupleSeen = new Map(); // (product, version, ordinal) → filename
+const tupleSeen = new Map(); // (product, version, ordinal) tuple = change_id → filename
 
 for (const filename of files) {
   const path = join(ENTRIES_DIR, filename);
@@ -273,25 +284,23 @@ for (const filename of files) {
     idSeen.set(meta.id, filename);
   }
 
-  // Cross-entry: duplicate change_id (warning — cross-SDK identical fixes are intentional)
-  if (meta.change_id && changeIdSeen.has(meta.change_id)) {
-    err(
-      filename,
-      'duplicate.change_id',
-      `change_id '${meta.change_id}' also in ${changeIdSeen.get(meta.change_id)}`,
-      'warning',
-    );
-  } else if (meta.change_id) {
-    changeIdSeen.set(meta.change_id, filename);
-  }
-
   // Cross-entry: duplicate (product, version, ordinal) tuple
+  // change_id IS the tuple — A2.9 dropped the redundant duplicate.change_id
+  // warning that previously fired on the same condition at lower severity.
+  // The user's earlier rationale (cross-SDK coordinated disclosures) doesn't
+  // pan out — the 4 SDK debug-log entries have distinct change_ids because
+  // they have distinct products. A real "coordinated disclosure" check would
+  // compare change_text or subject across entries, which is a different rule
+  // worth designing for v2 if it becomes useful.
   if (meta.change_id) {
-    const tuple = meta.change_id; // change_id IS the (product, version, ordinal) tuple already
-    if (tupleSeen.has(tuple)) {
-      err(filename, 'duplicate.tuple', `(product, version, ordinal) tuple '${tuple}' also in ${tupleSeen.get(tuple)}`);
+    if (tupleSeen.has(meta.change_id)) {
+      err(
+        filename,
+        'duplicate.tuple',
+        `(product, version, ordinal) tuple '${meta.change_id}' also in ${tupleSeen.get(meta.change_id)}`,
+      );
     } else {
-      tupleSeen.set(tuple, filename);
+      tupleSeen.set(meta.change_id, filename);
     }
   }
 }
