@@ -27,8 +27,16 @@ PARAMETER temperature 0.0
 # past this is the model degenerating into repetition, not legitimate JSON.
 PARAMETER num_predict 320
 
+# repeat_penalty 1.0 — Disabled (Ollama default is 1.1). Structured JSON
+# output has legitimate token repetition (`"`, `,`, ` `, `{`, `}`) that a
+# nonzero penalty would distort even under greedy sampling, biasing the
+# logits toward fewer/different separators. Explicit 1.0 = off.
 PARAMETER repeat_penalty 1.0
-PARAMETER top_p 1.0
+
+# top_p / top_k intentionally omitted — inert at temperature 0.0 (greedy
+# sampling ignores nucleus / top-k filtering). Adding them as identity
+# values would only be visual noise; the deterministic-greedy contract
+# lives in `temperature 0.0` alone.
 
 # ─── System prompt ───────────────────────────────────────────────────────────
 #
