@@ -1,0 +1,69 @@
+{
+  "built_at": "2026-05-25T13:49:28.270Z",
+  "build_seed": 2026052403,
+  "build_args": {
+    "include_pending": true,
+    "holdout_fraction": 0.2
+  },
+  "totals": {
+    "entries_on_disk": 301,
+    "citation_resolved": 301,
+    "citation_rejected": 0,
+    "eligible_after_review_filter": 301,
+    "training_size": 241,
+    "holdout_size": 60
+  },
+  "citation_kinds": {
+    "corpus": 300,
+    "external": 1
+  },
+  "included_review_states": [
+    "approved",
+    "edited",
+    "pending"
+  ],
+  "rejected_filenames": [],
+  "split_by_kind": {
+    "fix": {
+      "total": 97,
+      "training": 78,
+      "holdout": 19
+    },
+    "feature": {
+      "total": 69,
+      "training": 55,
+      "holdout": 14
+    },
+    "unknown": {
+      "total": 38,
+      "training": 30,
+      "holdout": 8
+    },
+    "performance": {
+      "total": 6,
+      "training": 5,
+      "holdout": 1
+    },
+    "security": {
+      "total": 21,
+      "training": 17,
+      "holdout": 4
+    },
+    "deprecation": {
+      "total": 26,
+      "training": 21,
+      "holdout": 5
+    },
+    "docs": {
+      "total": 14,
+      "training": 11,
+      "holdout": 3
+    },
+    "breaking": {
+      "total": 30,
+      "training": 24,
+      "holdout": 6
+    }
+  },
+  "system_prompt": "You synthesize one changelog entry into one structured action item. Output strict JSON with fields: kind (one of: breaking | deprecation | security | feature | fix | performance | docs | unknown), severity (one of: low | medium | high), subject, action_text (verb-first imperative, 1-3 sentences, names the affected surface in backticks, max 500 chars), deadline (YYYY-MM-DD if upstream-named, else null), tags. Use kind='unknown' when you cannot classify confidently. Never invent deadlines."
+}

@@ -50,7 +50,10 @@ Two schemas: one for curation (rich, in `entries/`), one for training (JSONL, de
 - **`output.kind = "unknown"` is first-class** and rewarded over fabricated certainty. Pair with low `human_grade` and route to human review when scaling.
 - **`output.severity` is orthogonal to `output.kind`.** A `performance` regression can be high severity; a `security` advisory can be low.
 - **`output.deadline` only set when upstream named one.** Never inferred from text; never fabricated. If upstream said "retiring 2026-06-15," use that. Otherwise null.
-- **`input.change_id` must exist in the source corpus.** The dataset build script validates this; entries with broken citations fail the build.
+- **`input.change_id` must resolve to a real citation.** The dataset build script validates this in one of two paths:
+  - **Corpus-bound** (default): `(input.product, input.version)` must match a row in the `releases` table of `data/claude-synergy.db`. The DB stores the canonical (product, version) → release-file mapping, including the resolution for multi-package monorepos (`anthropic-sdk-typescript@0.72.0` → `sdk-0.72.0.md`, etc.) and scoped npm packages (`continue-dev@'@continuedev/config-yaml@1.38.0'` → `continuedev-config-yaml-1.38.0.md`). Naive `<product>/releases/<version>.md` lookup is NOT sufficient — go through the DB.
+  - **External-namespace exception**: change_ids beginning with `external-ghsa/` or `external-cve/` skip the corpus lookup. Those entries instead require `input.source_url` to be a valid http(s) URL pointing to the published advisory. This exists so high-signal external advisories (e.g. `backpropagate` GHSA-f65r-h4g3-3h9h — the author's own ecosystem) can train the model on the auth-bypass / inert-security-flag pattern even when the affected product isn't in claude-synergy's 37-tracked-products set.
+  - Adding a new external namespace requires updating `EXTERNAL_NAMESPACES` in `scripts/build-dataset.mjs`.
 - **`provenance.review_action = "approved"` is required for an entry to land in `training.jsonl`.** `"rejected"` entries stay in `entries/` as negative-space documentation but are excluded from training.
 
 ### Kind decision rules (mechanical — apply in order)
