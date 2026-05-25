@@ -16,14 +16,19 @@
     "subject": "GH_TOKEN added to continue-agents workflow",
     "action_text": "Read the linked commit `dd93919` if you fork or depend on the `continue-agents` CI workflow — `GH_TOKEN` was added there. Upstream notes don't specify a consumer-side action; internal CI plumbing only.",
     "deadline": null,
-    "tags": ["ci", "github-actions", "gh-token", "internal"]
+    "tags": [
+      "ci",
+      "github-actions",
+      "gh-token",
+      "internal"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "Shell-tool RSS now bounded for high-output commands",
     "action_text": "Upgrade to claude-agent-sdk-typescript 0.2.45+ if shell commands with multi-MB stdout OOM'd or grew RSS unboundedly. No API change; fix is transparent.",
     "deadline": null,
-    "tags": ["memory", "shell-tool", "oom"]
+    "tags": [
+      "memory",
+      "shell-tool",
+      "oom"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

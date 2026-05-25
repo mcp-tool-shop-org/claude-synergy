@@ -16,14 +16,19 @@
     "subject": "MCP tool search auto mode now default when MCP descriptions exceed 10% context",
     "action_text": "Add `MCPSearch` to `disallowedTools` in settings to keep MCP tools loaded upfront. Default behavior now defers MCP tools past the 10% context threshold and surfaces them via the `MCPSearch` tool — workflows that assumed all MCP tools were always visible to the model may regress.",
     "deadline": null,
-    "tags": ["mcp", "mcpsearch", "default-change", "context-window"]
+    "tags": [
+      "mcp",
+      "mcpsearch",
+      "default-change",
+      "context-window"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

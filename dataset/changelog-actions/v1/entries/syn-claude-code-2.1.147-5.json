@@ -16,14 +16,18 @@
     "subject": "Auto-updater retries transient failures and reports error categories + OS codes",
     "action_text": "Upgrade Claude Code to 2.1.147+ to get an auto-updater that retries transient network failures, reports specific error categories and OS error codes on failure, and shows the current version when an update fails. Behavior change only on failure paths — successful updates are unchanged.",
     "deadline": null,
-    "tags": ["auto-updater", "error-messages", "retry"]
+    "tags": [
+      "auto-updater",
+      "error-messages",
+      "retry"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

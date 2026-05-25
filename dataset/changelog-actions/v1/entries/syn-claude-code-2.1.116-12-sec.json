@@ -16,14 +16,18 @@
     "subject": "Sandbox auto-allow bypassed dangerous-path check for `rm` against /, $HOME",
     "action_text": "Upgrade to `claude-code` 2.1.116+ to re-enable the dangerous-path safety check for `rm`/`rmdir` against `/`, `$HOME`, and other critical system directories under sandbox auto-allow. Pre-fix, agents in auto-allow mode could destroy host directories via sandboxed bash.",
     "deadline": null,
-    "tags": ["sandbox-bypass", "data-loss", "destructive-rm"]
+    "tags": [
+      "sandbox-bypass",
+      "data-loss",
+      "destructive-rm"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

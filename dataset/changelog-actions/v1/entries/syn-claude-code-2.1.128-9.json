@@ -16,14 +16,18 @@
     "subject": "SDK hosts get localSettings suggestion for Bash 'Always allow'",
     "action_text": "Upgrade Claude Code to 2.1.128+ if your SDK host shows Bash permission prompts. 'Always allow' now writes to `.claude/settings.local.json` via the new persistent `localSettings` suggestion, so the grant survives across sessions instead of resetting.",
     "deadline": null,
-    "tags": ["sdk", "permissions", "settings-local"]
+    "tags": [
+      "sdk",
+      "permissions",
+      "settings-local"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

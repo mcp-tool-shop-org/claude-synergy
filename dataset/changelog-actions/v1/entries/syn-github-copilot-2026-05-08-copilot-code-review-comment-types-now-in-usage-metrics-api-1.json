@@ -16,14 +16,18 @@
     "subject": "Copilot code-review comment types in Usage Metrics API — heading only",
     "action_text": "Read the upstream changelog at the source URL for the `What's new` content on Copilot code-review comment types in the Usage Metrics API. The parsed `change_text` is the heading anchor only; the title implies a metrics-API additive change.",
     "deadline": null,
-    "tags": ["github-copilot", "usage-metrics", "release-notes-vague"]
+    "tags": [
+      "github-copilot",
+      "usage-metrics",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

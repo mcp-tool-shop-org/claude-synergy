@@ -16,14 +16,18 @@
     "subject": "YAML syntax error in create-release-tag workflow",
     "action_text": "Skip if you only consume the published package — the fix is internal to the SDK's own `create-release-tag` GitHub Actions workflow. No runtime impact on `claude-agent-sdk-python` consumers; affects only upstream maintainers tagging releases.",
     "deadline": null,
-    "tags": ["ci-only", "github-actions", "internal"]
+    "tags": [
+      "ci-only",
+      "github-actions",
+      "internal"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

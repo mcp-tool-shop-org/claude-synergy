@@ -16,14 +16,18 @@
     "subject": "Hover-on-modifier-key fires instantly (PR #276582)",
     "action_text": "Upgrade VS Code to v1_109+ to get instant hover when pressing a keyboard modifier. Previously there was a delay; no config change required.",
     "deadline": null,
-    "tags": ["vscode", "hover", "keybinding"]
+    "tags": [
+      "vscode",
+      "hover",
+      "keybinding"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

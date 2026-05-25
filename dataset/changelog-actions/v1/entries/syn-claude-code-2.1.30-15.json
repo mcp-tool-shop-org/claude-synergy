@@ -16,14 +16,18 @@
     "subject": "--resume memory usage cut 68% via stat-based loading",
     "action_text": "Upgrade Claude Code to 2.1.30+ if you maintain many resumable sessions and have been hitting `--resume` memory pressure. The full session index is replaced with stat-based loading + progressive enrichment, cutting RSS ~68% on heavy-session users. No flag required.",
     "deadline": null,
-    "tags": ["resume", "memory", "performance"]
+    "tags": [
+      "resume",
+      "memory",
+      "performance"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

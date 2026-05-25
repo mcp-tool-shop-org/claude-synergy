@@ -16,14 +16,18 @@
     "subject": "spinnerVerbs setting to customize spinner labels",
     "action_text": "Add `spinnerVerbs` to settings.json with an array of strings to override the default spinner labels in Claude Code 2.1.23+. Pure cosmetic — defaults remain for users who skip the setting.",
     "deadline": null,
-    "tags": ["claude-code", "settings", "cosmetic"]
+    "tags": [
+      "claude-code",
+      "settings",
+      "cosmetic"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

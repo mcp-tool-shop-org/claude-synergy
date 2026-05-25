@@ -16,14 +16,18 @@
     "subject": "Cursor dashboard/account UI clarity pass (unspecified)",
     "action_text": "Open the Cursor dashboard on 2-6+ to see refreshed overview, analytics, and collections views. Upstream notes don't name removed fields or moved controls — a sweep through the UI is the only way to confirm nothing you relied on shifted.",
     "deadline": null,
-    "tags": ["cursor", "ui", "dashboard"]
+    "tags": [
+      "cursor",
+      "ui",
+      "dashboard"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

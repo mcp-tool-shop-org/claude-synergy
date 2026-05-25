@@ -16,14 +16,18 @@
     "subject": "Cursor adds stop, beforeSubmitPrompt, PreToolUse, PostToolUse hooks",
     "action_text": "Wire new Cursor hooks on 2-4+ — `stop`, `beforeSubmitPrompt`, `PreToolUse`, `PostToolUse` — at https://cursor.com/docs/agent/hooks. `beforeSubmitPrompt` lets you mutate the prompt; tool-use hooks gate tool execution; `stop` fires at the end of an agent run.",
     "deadline": null,
-    "tags": ["cursor", "hooks", "agent"]
+    "tags": [
+      "cursor",
+      "hooks",
+      "agent"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

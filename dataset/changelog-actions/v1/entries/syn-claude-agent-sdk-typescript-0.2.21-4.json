@@ -16,14 +16,20 @@
     "subject": "PermissionRequest hooks skipped in SDK mode (VS Code extension)",
     "action_text": "Upgrade to 0.2.21+ if you register `PermissionRequest` hooks and consume the SDK (VS Code extension or other embedding). Pre-fix the hooks were silently skipped — permission decisions fell through to defaults, defeating any safety policy you intended to enforce.",
     "deadline": null,
-    "tags": ["permission-request", "hooks", "sdk-mode", "vscode", "silent-failure"]
+    "tags": [
+      "permission-request",
+      "hooks",
+      "sdk-mode",
+      "vscode",
+      "silent-failure"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

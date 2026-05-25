@@ -16,14 +16,18 @@
     "subject": "reloadPlugins() SDK method",
     "action_text": "Upgrade to `claude-agent-sdk-typescript` 0.2.85+ to call `reloadPlugins()` and pick up refreshed commands, agents, and MCP server status without tearing down the `Query`. Use after editing plugin manifests on disk so the running session sees the new surfaces.",
     "deadline": null,
-    "tags": ["agent-sdk", "plugins", "hot-reload"]
+    "tags": [
+      "agent-sdk",
+      "plugins",
+      "hot-reload"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch02",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,20 @@
     "subject": "GHSA-f65r-h4g3-3h9h (CRITICAL): backpropagate UI auth bypass — `--auth` flag was inert",
     "action_text": "Upgrade `backpropagate` to 1.2.0+ (pip OR `@mcptoolshop/backpropagate@1.2.0` npm) to patch GHSA-f65r-h4g3-3h9h (CRITICAL). Pre-fix, `backprop ui --auth user:pass` printed `Auth: enabled` but the Reflex backend never read the credential — any client reaching the port had full UI access (dataset read, training control, HF push). Audit hosts that ran `--share` for exposed training data and rotate HF tokens used in those sessions.",
     "deadline": null,
-    "tags": ["ghsa", "ghsa-f65r-h4g3-3h9h", "auth-bypass", "critical", "external-advisory"]
+    "tags": [
+      "ghsa",
+      "ghsa-f65r-h4g3-3h9h",
+      "auth-bypass",
+      "critical",
+      "external-advisory"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

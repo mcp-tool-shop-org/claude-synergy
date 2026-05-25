@@ -16,14 +16,18 @@
     "subject": "/effort max removed; levels are now low|medium|high",
     "action_text": "Switch `/effort max` calls to `/effort high` (closest behavioral match). The persistent effort icon is replaced by a brief notification with new symbols ○ ◐ ●; `/effort auto` resets to default.",
     "deadline": null,
-    "tags": ["slash-command", "effort", "ui-change"]
+    "tags": [
+      "slash-command",
+      "effort",
+      "ui-change"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

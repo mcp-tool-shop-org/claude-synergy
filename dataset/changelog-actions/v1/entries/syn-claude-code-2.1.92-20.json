@@ -16,14 +16,19 @@
     "subject": "`/vim` slash command removed; toggle via `/config` → Editor mode",
     "action_text": "Replace `/vim` invocations with `/config` and toggle Editor mode in the settings panel. The slash command is gone in 2.1.92; update muscle memory, hooks, and any wrapper scripts that piped `/vim` into the CLI.",
     "deadline": null,
-    "tags": ["claude-code", "slash-command", "vim-mode", "removal"]
+    "tags": [
+      "claude-code",
+      "slash-command",
+      "vim-mode",
+      "removal"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

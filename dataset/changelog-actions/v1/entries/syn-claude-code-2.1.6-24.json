@@ -16,14 +16,19 @@
     "subject": "@-mention MCP enable/disable removed; use `/mcp enable <name>`",
     "action_text": "Replace `@server` enable/disable patterns with `/mcp enable <name>` and `/mcp disable <name>`. The @-mention path is gone in 2.1.6; the slash command is the named replacement and accepts the same server identifiers.",
     "deadline": null,
-    "tags": ["claude-code", "mcp", "slash-command", "removal"]
+    "tags": [
+      "claude-code",
+      "mcp",
+      "slash-command",
+      "removal"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

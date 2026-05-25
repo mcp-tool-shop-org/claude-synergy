@@ -16,14 +16,17 @@
     "subject": "Deprecation section in GitHub Copilot 2026-05-13 changelog (unspecified)",
     "action_text": "Read the `#deprecation` section of the GitHub Copilot 2026-05-13 changelog for specifics. Upstream corpus entry is a bare section anchor — no feature or surface named in the change_text.",
     "deadline": null,
-    "tags": ["github-copilot", "release-notes-anchor"]
+    "tags": [
+      "github-copilot",
+      "release-notes-anchor"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

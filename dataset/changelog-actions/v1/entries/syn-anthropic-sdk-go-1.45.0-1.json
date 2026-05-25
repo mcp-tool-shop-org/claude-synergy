@@ -16,14 +16,18 @@
     "subject": "thinking-token-count beta exposes estimated tokens in streaming thinking deltas",
     "action_text": "Opt into the `thinking-token-count` beta in `anthropic-sdk-go` 1.45.0+ to read estimated token counts from thinking block deltas during streaming. Useful for live cost tracking on extended-thinking requests; existing streams are unaffected.",
     "deadline": null,
-    "tags": ["beta", "thinking", "streaming"]
+    "tags": [
+      "beta",
+      "thinking",
+      "streaming"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

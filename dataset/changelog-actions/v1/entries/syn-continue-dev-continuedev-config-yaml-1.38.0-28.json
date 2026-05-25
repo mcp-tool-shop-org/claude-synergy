@@ -16,14 +16,18 @@
     "subject": "openai-adapters: defensive type checks on stream.usage Promise",
     "action_text": "Upgrade `@continuedev/openai-adapters` 1.38.0+ if you were hitting type-coercion errors when `stream.usage` resolved to an unexpected shape. Defensive; no API change.",
     "deadline": null,
-    "tags": ["openai-adapters", "type-safety", "streaming"]
+    "tags": [
+      "openai-adapters",
+      "type-safety",
+      "streaming"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

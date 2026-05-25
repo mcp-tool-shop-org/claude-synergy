@@ -16,14 +16,18 @@
     "subject": "aider model listing now includes aider-provided models in fuzzy match",
     "action_text": "Use fuzzy `--model` matching on `aider` 0.79.1+ to discover aider-bundled models (e.g. `aider-mini`) alongside the litellm catalog. Pre-fix, only litellm-registered models were suggested when typing a partial name.",
     "deadline": null,
-    "tags": ["aider", "model-selection", "fuzzy-match"]
+    "tags": [
+      "aider",
+      "model-selection",
+      "fuzzy-match"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "Claude Opus 4.7 launched; includes API breaking changes + updated tokenizer",
     "action_text": "Read the Opus 4.7 launch notes BEFORE switching model IDs to `claude-opus-4-7` — the release includes API breaking changes and an updated tokenizer. Same $5/$25 per MTok pricing as Opus 4.6; check `whats-new-claude-4-7` docs for the full break list.",
     "deadline": null,
-    "tags": ["model-launch", "claude-opus-4-7", "tokenizer-change"]
+    "tags": [
+      "model-launch",
+      "claude-opus-4-7",
+      "tokenizer-change"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

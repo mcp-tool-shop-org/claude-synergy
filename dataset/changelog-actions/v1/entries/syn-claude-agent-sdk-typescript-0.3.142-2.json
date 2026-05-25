@@ -16,14 +16,20 @@
     "subject": "MCP servers connect non-blocking by default; init may report pending",
     "action_text": "Audit MCP server consumers in 0.3.142+ — sessions now start before slow servers finish connecting, and `init` reports `status: \"pending\"`. Set `MCP_CONNECTION_NONBLOCKING=0` to restore the up-to-5s blocking wait, or mark must-have servers `alwaysLoad: true` to require them in turn 1. Silent-failure risk if turn-1 logic assumes all servers are ready.",
     "deadline": null,
-    "tags": ["sdk", "mcp", "env-var", "non-blocking", "silent-failure"]
+    "tags": [
+      "sdk",
+      "mcp",
+      "env-var",
+      "non-blocking",
+      "silent-failure"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

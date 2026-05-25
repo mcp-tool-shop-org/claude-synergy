@@ -16,14 +16,18 @@
     "subject": "resolveCustomEditorSideBySideDiff now returns two webviews",
     "action_text": "Update extensions implementing `resolveCustomEditorSideBySideDiff` to provide two webviews (one per diff side) instead of one. VS Code now coordinates layout and scroll sync between the two panels.",
     "deadline": null,
-    "tags": ["vscode", "api", "extension-author"]
+    "tags": [
+      "vscode",
+      "api",
+      "extension-author"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

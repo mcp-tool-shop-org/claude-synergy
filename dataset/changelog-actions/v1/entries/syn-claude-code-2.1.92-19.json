@@ -16,14 +16,17 @@
     "subject": "/tag slash command removed",
     "action_text": "Remove `/tag` from hooks, scripts, and chained commands — it no longer exists in 2.1.92+. No replacement is named; grep Claude Code docs for the recommended pattern.",
     "deadline": null,
-    "tags": ["slash-command", "removal"]
+    "tags": [
+      "slash-command",
+      "removal"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

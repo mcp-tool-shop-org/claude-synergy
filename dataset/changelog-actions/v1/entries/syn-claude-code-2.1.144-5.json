@@ -16,14 +16,19 @@
     "subject": "`/extra-usage` renamed to `/usage-credits` (alias retained)",
     "action_text": "Replace `/extra-usage` with `/usage-credits` in hooks, docs, and muscle memory. The old slash command still works as an alias in 2.1.144, but the canonical name has changed across CLI copy and will be the one users see in help text.",
     "deadline": null,
-    "tags": ["claude-code", "slash-command", "rename", "billing-copy"]
+    "tags": [
+      "claude-code",
+      "slash-command",
+      "rename",
+      "billing-copy"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

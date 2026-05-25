@@ -16,14 +16,18 @@
     "subject": "Customizable keyboard shortcuts via /keybindings",
     "action_text": "Run `/keybindings` in Claude Code 2.1.18+ to customize keyboard shortcuts per context and define chord sequences. See `code.claude.com/docs/en/keybindings` for the JSON shape; defaults are unchanged for users who skip the configuration.",
     "deadline": null,
-    "tags": ["claude-code", "keybindings", "slash-command"]
+    "tags": [
+      "claude-code",
+      "keybindings",
+      "slash-command"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

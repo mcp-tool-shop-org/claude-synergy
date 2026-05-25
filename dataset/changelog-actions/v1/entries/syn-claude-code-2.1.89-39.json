@@ -16,14 +16,18 @@
     "subject": "@-mention typeahead ranks source files above MCP resources",
     "action_text": "Type `@` in Claude Code 2.1.89+ — source files now rank above MCP resources with similar names in the typeahead. Reduces accidental MCP selection when a file and an MCP resource share a prefix.",
     "deadline": null,
-    "tags": ["typeahead", "at-mention", "ux-ranking"]
+    "tags": [
+      "typeahead",
+      "at-mention",
+      "ux-ranking"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "GitHub Copilot 2026-05-13 release — section anchor only, no item body",
     "action_text": "Read the 2026-05-13 GitHub Copilot changelog at `source_url` directly; this entry is a `#new-features` section anchor with no item body. Repeat parser artifact — no actionable advice in this row.",
     "deadline": null,
-    "tags": ["github-copilot", "release-notes-vague", "section-anchor"]
+    "tags": [
+      "github-copilot",
+      "release-notes-vague",
+      "section-anchor"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

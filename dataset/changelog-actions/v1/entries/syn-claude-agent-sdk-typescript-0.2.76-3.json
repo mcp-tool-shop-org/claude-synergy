@@ -16,14 +16,18 @@
     "subject": "ExitPlanMode tool input gains planFilePath field",
     "action_text": "Read `planFilePath` from `ExitPlanMode` tool input in hooks and SDK consumers — claude-agent-sdk-typescript 0.2.76+ surfaces the file path the plan was written to. Opt-in; existing handlers continue to work.",
     "deadline": null,
-    "tags": ["api", "exit-plan-mode", "hooks"]
+    "tags": [
+      "api",
+      "exit-plan-mode",
+      "hooks"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

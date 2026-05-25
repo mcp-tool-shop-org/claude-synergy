@@ -16,14 +16,17 @@
     "subject": "`swe-check` model availability fix in Windsurf",
     "action_text": "Update Windsurf if the `swe-check` model has been intermittently unavailable for your account. Pre-fix some users could not reach the model at all; upstream notes don't specify the trigger.",
     "deadline": null,
-    "tags": ["swe-check", "model-availability"]
+    "tags": [
+      "swe-check",
+      "model-availability"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

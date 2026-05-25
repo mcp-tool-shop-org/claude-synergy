@@ -16,14 +16,17 @@
     "subject": "toggleMcpServer + reconnectMcpServer now work for inline mcpServers",
     "action_text": "Upgrade to claude-agent-sdk-typescript 0.2.72+ to call `toggleMcpServer` and `reconnectMcpServer` on servers passed via `query({mcpServers})`. Pre-fix calls failed with 'Server not found'.",
     "deadline": null,
-    "tags": ["api", "mcp"]
+    "tags": [
+      "api",
+      "mcp"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "Stray debug output removed from aider",
     "action_text": "Upgrade `aider` to 0.19.1+ to silence stray debug output in normal runs. Cosmetic; if you scraped logs expecting that output to be present, adjust your parser.",
     "deadline": null,
-    "tags": ["aider", "logging", "cleanup"]
+    "tags": [
+      "aider",
+      "logging",
+      "cleanup"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

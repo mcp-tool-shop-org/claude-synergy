@@ -16,14 +16,18 @@
     "subject": "Devin local agent path resolution restored on WSL",
     "action_text": "Upgrade Windsurf to the 2026-05-16 build if running the `Devin local agent` under WSL. Path resolution was failing and has been repaired; no config change required on the user side.",
     "deadline": null,
-    "tags": ["windsurf", "wsl", "devin"]
+    "tags": [
+      "windsurf",
+      "wsl",
+      "devin"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

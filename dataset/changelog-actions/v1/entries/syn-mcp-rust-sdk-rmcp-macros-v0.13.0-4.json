@@ -16,14 +16,17 @@
     "subject": "rmcp-macros clarity and formatting changes (unspecified)",
     "action_text": "Upgrade `rmcp-macros` to 0.13.0+ if upstream changes affect you; release note says only 'clarity and formatting' without naming a surface. Canonical vague-release-note — no targeted adjustment derivable.",
     "deadline": null,
-    "tags": ["rmcp-macros", "release-notes-vague"]
+    "tags": [
+      "rmcp-macros",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

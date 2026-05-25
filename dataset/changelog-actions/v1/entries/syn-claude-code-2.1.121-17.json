@@ -16,14 +16,19 @@
     "subject": "mcp_authenticate now accepts redirectUri for custom schemes",
     "action_text": "Pass `redirectUri` to `mcp_authenticate` when building a custom-scheme OAuth callback or a claude.ai connector. Lets desktop apps complete OAuth via `myapp://callback` style URIs instead of localhost-only flows.",
     "deadline": null,
-    "tags": ["sdk", "mcp-authenticate", "oauth", "connectors"]
+    "tags": [
+      "sdk",
+      "mcp-authenticate",
+      "oauth",
+      "connectors"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

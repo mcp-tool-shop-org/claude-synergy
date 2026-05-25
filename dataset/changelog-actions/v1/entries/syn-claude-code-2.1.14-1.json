@@ -16,14 +16,18 @@
     "subject": "history-based Tab autocomplete in bash mode (!)",
     "action_text": "Type partial commands in bash mode (`!`) and press Tab to autocomplete from your bash history. Opt-in ergonomics; existing `!` workflows unchanged if you don't press Tab.",
     "deadline": null,
-    "tags": ["bash-mode", "autocomplete", "tab-completion"]
+    "tags": [
+      "bash-mode",
+      "autocomplete",
+      "tab-completion"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

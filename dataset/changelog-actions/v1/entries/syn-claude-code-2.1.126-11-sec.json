@@ -16,14 +16,18 @@
     "subject": "allowManagedDomainsOnly / allowManagedReadPathsOnly bypassed via settings stacking",
     "action_text": "Upgrade enterprise `claude-code` deployments to 2.1.126+ to enforce `allowManagedDomainsOnly` and `allowManagedReadPathsOnly` even when a higher-priority managed-settings source lacks a `sandbox` block. Pre-fix, IT policy was bypassable via partial settings stacking.",
     "deadline": null,
-    "tags": ["managed-settings", "policy-bypass", "enterprise"]
+    "tags": [
+      "managed-settings",
+      "policy-bypass",
+      "enterprise"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

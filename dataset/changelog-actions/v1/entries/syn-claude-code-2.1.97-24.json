@@ -16,14 +16,18 @@
     "subject": "Slash command picker no longer breaks on YAML-boolean plugin `name` frontmatter",
     "action_text": "Upgrade Claude Code to 2.1.97 if any plugin frontmatter `name` is a YAML boolean keyword (`yes`, `no`, `on`, `off`, `true`, `false`). Pre-fix, the slash-command picker would break entirely. Also worth quoting such names in plugin frontmatter as a belt-and-suspenders fix.",
     "deadline": null,
-    "tags": ["plugins", "slash-commands", "yaml"]
+    "tags": [
+      "plugins",
+      "slash-commands",
+      "yaml"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "aider adds `gemini-2.5-flash-preview-04-17` model support",
     "action_text": "Upgrade `aider` to 0.82.3+ to use `gemini-2.5-flash-preview-04-17` as a model option. Opt-in; existing model selections continue to work unchanged.",
     "deadline": null,
-    "tags": ["model-support", "gemini", "gemini-2-5-flash"]
+    "tags": [
+      "model-support",
+      "gemini",
+      "gemini-2-5-flash"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

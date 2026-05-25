@@ -16,14 +16,19 @@
     "subject": "/setup-vertex + /setup-bedrock honor CLAUDE_CONFIG_DIR, seed pins, offer 1M context",
     "action_text": "Upgrade Claude Code to 2.1.111+ to get `/setup-vertex` and `/setup-bedrock` that print the resolved `settings.json` path when `CLAUDE_CONFIG_DIR` is set, prefill model candidates from existing pins on re-run, and surface a 'with 1M context' option for supported models.",
     "deadline": null,
-    "tags": ["slash-commands", "vertex", "bedrock", "1m-context"]
+    "tags": [
+      "slash-commands",
+      "vertex",
+      "bedrock",
+      "1m-context"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

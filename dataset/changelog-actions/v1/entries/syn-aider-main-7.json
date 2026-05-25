@@ -16,14 +16,17 @@
     "subject": "google-generativeai dependency removed (was deprecated)",
     "action_text": "Upgrade aider's main branch to drop the deprecated google-generativeai dependency and eliminate startup import warnings. No functional change.",
     "deadline": null,
-    "tags": ["aider", "dependency-cleanup"]
+    "tags": [
+      "aider",
+      "dependency-cleanup"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

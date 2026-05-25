@@ -16,14 +16,19 @@
     "subject": "--from-pr accepts GitLab, Bitbucket, and GitHub Enterprise URLs",
     "action_text": "Pass GitLab merge-request, Bitbucket pull-request, or GitHub Enterprise PR URLs to `--from-pr`. Previously GitHub.com-only; non-GitHub teams can now bootstrap sessions from their host's PR URL without manual checkout.",
     "deadline": null,
-    "tags": ["cli-flag", "from-pr", "gitlab", "bitbucket"]
+    "tags": [
+      "cli-flag",
+      "from-pr",
+      "gitlab",
+      "bitbucket"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

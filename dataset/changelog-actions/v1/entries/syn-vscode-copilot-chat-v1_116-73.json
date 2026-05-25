@@ -16,14 +16,17 @@
     "subject": "Deprecated features and settings section (unspecified)",
     "action_text": "Read the `#_deprecated-features-and-settings` section in the VS Code v1.116 release notes to see which settings affect your workflow. Upstream entry is a section anchor only — no specific features named in the corpus.",
     "deadline": null,
-    "tags": ["vscode", "release-notes-anchor"]
+    "tags": [
+      "vscode",
+      "release-notes-anchor"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

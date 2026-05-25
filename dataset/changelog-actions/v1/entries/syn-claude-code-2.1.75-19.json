@@ -16,14 +16,18 @@
     "subject": "Windows managed-settings.json fallback path removed",
     "action_text": "Move `C:\\ProgramData\\ClaudeCode\\managed-settings.json` to `C:\\Program Files\\ClaudeCode\\managed-settings.json` on every Windows host BEFORE upgrading Claude Code to 2.1.75+. The old fallback path is no longer read; enterprise deployments using the deprecated location will silently lose managed settings.",
     "deadline": null,
-    "tags": ["windows", "managed-settings", "enterprise-deploy"]
+    "tags": [
+      "windows",
+      "managed-settings",
+      "enterprise-deploy"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

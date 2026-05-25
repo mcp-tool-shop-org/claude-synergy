@@ -16,14 +16,19 @@
     "subject": "abort-restore preserves user text when no checkpoint exists",
     "action_text": "Update `cursor` CLI to get clean abort-restore when no checkpoint exists — state rolls back and user text is preserved. Pre-fix aborts without a checkpoint could drop in-progress user input.",
     "deadline": null,
-    "tags": ["cli", "abort-restore", "checkpoint", "data-preservation"]
+    "tags": [
+      "cli",
+      "abort-restore",
+      "checkpoint",
+      "data-preservation"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

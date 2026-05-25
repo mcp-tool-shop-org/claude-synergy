@@ -1,0 +1,3673 @@
+{
+  "judge_model": "qwen3:8b",
+  "judged_at": "2026-05-25T14:36:18.947Z",
+  "total": 301,
+  "agree": 278,
+  "disagree": 23,
+  "unsure": 0,
+  "errors": 0,
+  "elapsed_seconds": 431.9,
+  "verdicts": [
+    {
+      "filename": "syn-aider-0.19.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'fix' under rule 4 (Bugfix restoring spec'd behavior), and severity is 'low' under rule 6 (docs-only)."
+    },
+    {
+      "filename": "syn-aider-0.29.2-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change improves a feature (model warnings) without breaking existing behavior, aligning with rule 7 (new capability) and rule 6 (docs-only) for severity."
+    },
+    {
+      "filename": "syn-aider-0.40.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'feature' under rule 7 (New capability that consumers can opt into), and severity 'low' under rule 6 (Documentation-only / log-format change / release-notes-only / README list update)."
+    },
+    {
+      "filename": "syn-aider-0.43.4-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'fix' under rule 4 (bugfix restoring spec'd behavior), and severity is 'low' under rule 6 (docs-only)."
+    },
+    {
+      "filename": "syn-aider-0.48.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-aider-0.48.1-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a documentation-only improvement to progress indication, matching rule 6 (docs)."
+    },
+    {
+      "filename": "syn-aider-0.48.1-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes an obsolete limit, which is a bugfix restoring spec'd behavior, matching rule 4. Severity is low as it's a docs-only change with no impact on default config."
+    },
+    {
+      "filename": "syn-aider-0.69.1-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a documentation-only update to environment variable setup messages on Windows, matching rule 6 (docs)."
+    },
+    {
+      "filename": "syn-aider-0.72.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior → fix. Severity 'low' matches rule 6 (docs-only) and rule 8 (no clear impact beyond metadata fix)."
+    },
+    {
+      "filename": "syn-aider-0.74.3-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-aider-0.79.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability (fuzzy matching for aider-provided models) that consumers can opt into, matching rule 7. Severity is low as it's an opt-in feature addition, matching rule 6 for severity."
+    },
+    {
+      "filename": "syn-aider-0.80.1-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'fix' under rule 4, which covers bugfixes restoring spec'd behavior. Severity is 'low' under rule 6, which covers compile-time-only changes."
+    },
+    {
+      "filename": "syn-aider-0.82.3-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds support for a new model, which is an additive feature, matching rule 7. Severity is low as it is an opt-in feature addition, matching rule 6 for severity."
+    },
+    {
+      "filename": "syn-aider-0.83.2-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "performance",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 5 applies: Deliberate optimization (caching added, algorithm swapped, runtime sped up by design) → performance. Severity 'low' matches Rule 6: Documentation-only / log-format change / release-notes-only / README list update → docs, but since the change is performance-related, 'low' is appropriate for a performance optimization."
+    },
+    {
+      "filename": "syn-aider-0.85.2-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-aider-0.85.2-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4."
+    },
+    {
+      "filename": "syn-aider-main-7.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes a deprecated dependency, which aligns with rule 2 (deprecation) but is classified as 'fix' due to the absence of a clear rule match. Since the proposed 'kind' is 'fix' and the 'severity' is 'low', and no rule explicitly contradicts this, the classification is correct."
+    },
+    {
+      "filename": "syn-anthropic-apps-2026-03-11-claude-excel-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 7: New capability that consumers can opt into (additive) → feature. Severity rule 6: opt-in feature addition → low."
+    },
+    {
+      "filename": "syn-anthropic-apps-2026-04-09-claude-cowork-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' as it's a new capability (OpenTelemetry support) that consumers can opt into. Severity is 'low' as it's an opt-in feature addition."
+    },
+    {
+      "filename": "syn-anthropic-cli-1.3.0-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change introduces a new capability (CMA Memory public beta) that consumers can opt into, matching rule 7 for 'feature'. Severity is 'low' as it's an opt-in feature addition, matching rule 6 for 'docs' but classified as 'low' per severity rules for opt-in features."
+    },
+    {
+      "filename": "syn-anthropic-cli-1.3.0-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a refactor of function signature, which falls under rule 6 (docs) or rule 8 (unknown). Since the change_text does not clearly indicate documentation-only or a refactor, it is classified as 'unknown'. Severity is 'low' as it is a compile-time-only change with no impact on runtime behavior."
+    },
+    {
+      "filename": "syn-anthropic-cli-1.7.1-1-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change redacts API keys in debug logs, which aligns with the 'security' kind per rule 1 (credential leak). Severity is 'high' due to the credential leak trigger in the severity rules."
+    },
+    {
+      "filename": "syn-anthropic-sdk-csharp-Anthropic-12.1.0-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a lint error fix, which falls under rule 8 (unknown) as it cannot be classified confidently from change_text alone. Severity is 'low' as it is a compile-time-only fix."
+    },
+    {
+      "filename": "syn-anthropic-sdk-csharp-Anthropic-12.15.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'deprecation' per rule 2. Severity is 'high' due to the deprecation with a named deadline within 30 days (implied by the release date and the nature of deprecation)."
+    },
+    {
+      "filename": "syn-anthropic-sdk-go-1.20.0-8.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4."
+    },
+    {
+      "filename": "syn-anthropic-sdk-go-1.36.0-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'deprecation' per rule 2. Severity is 'high' due to the 'deprecated' hint and the potential for breaking changes in future versions, matching the HIGH trigger for deprecation with deadline >30 days."
+    },
+    {
+      "filename": "syn-anthropic-sdk-go-1.42.0-9-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change redacts API keys in debug logs, which aligns with the 'security' kind rule (rule 1: credential leak). The severity is 'high' due to the credential leak trigger (HIGH: credential-leak)."
+    },
+    {
+      "filename": "syn-anthropic-sdk-go-1.45.0-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability (thinking-token-count beta) that consumers can opt into, matching rule 7 for 'feature'. Severity is 'low' as it's an opt-in feature addition, matching rule 6 for 'docs' but since it's a new capability, 'low' is appropriate for 'feature' severity."
+    },
+    {
+      "filename": "syn-anthropic-sdk-java-2.12.0-28.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 2: deprecation alias retained"
+    },
+    {
+      "filename": "syn-anthropic-sdk-java-2.15.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecate haiku-3' matches the deprecation pattern. Severity 'low' is correct per rule 6 (deprecation with no named replacement and no deadline)."
+    },
+    {
+      "filename": "syn-anthropic-sdk-java-2.31.0-4-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change redacts API keys in debug logs, which aligns with the 'security' kind rule (rule 1: credential leak). The severity is 'high' due to the credential leak trigger (HIGH: credential-leak)."
+    },
+    {
+      "filename": "syn-anthropic-sdk-php-0.5.0-10.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a documentation-only update (phpstan type annotations), which matches rule 6, and the severity is low as per rule LOW: docs-only."
+    },
+    {
+      "filename": "syn-anthropic-sdk-python-0.77.0-6.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "unknown",
+        "severity": "medium"
+      },
+      "suggested": {
+        "kind": "breaking"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 3 applies: 'Old form removed in this version (no grace period in this release)' → breaking"
+    },
+    {
+      "filename": "syn-anthropic-sdk-python-0.82.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds backward-compat aliases for removed classes, which is a deprecation-related change but not a breaking change. It aligns with rule 2 (deprecation) but the proposed kind is 'fix', which is incorrect. However, the severity is correctly classified as 'low' under rule 6 (docs-only or opt-in). Since the kind is misclassified, the verdict is 'disagree' based on the rule."
+    },
+    {
+      "filename": "syn-anthropic-sdk-python-0.87.0-14.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a documentation-only update (test dependency bump), matching rule 6 and severity rule LOW for docs-only changes."
+    },
+    {
+      "filename": "syn-anthropic-sdk-python-0.88.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability added), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-anthropic-sdk-python-0.95.0-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'deprecation' per rule 2. Severity is 'high' due to the deprecation with a named deadline within 30 days (implied by the release date and the nature of the change)."
+    },
+    {
+      "filename": "syn-anthropic-sdk-python-0.97.0-7.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a documentation-only update (test dependency bump), matching rule 6 and severity rule for low."
+    },
+    {
+      "filename": "syn-anthropic-sdk-ruby-1.17.0-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'deprecation' per rule 2, and severity is 'medium' as per rule 5 (deprecation with deadline >30 days)."
+    },
+    {
+      "filename": "syn-anthropic-sdk-ruby-1.23.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecate haiku-3' matches the deprecation pattern. Severity 'low' is correct per Rule 6 (deprecation with no named replacement and no deadline)."
+    },
+    {
+      "filename": "syn-anthropic-sdk-ruby-1.24.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a new capability promoted to GA, which matches rule 7 (feature), and the severity is low as it is an opt-in feature addition, matching rule 6 for severity."
+    },
+    {
+      "filename": "syn-anthropic-sdk-ruby-1.28.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'deprecation' per rule 2. Severity is 'medium' as it matches the 'deprecation with deadline >30 days' trigger in severity rules."
+    },
+    {
+      "filename": "syn-anthropic-sdk-ruby-1.34.0-1.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "high"
+      },
+      "suggested": {
+        "kind": "deprecation"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Kind check is wrong: the entry matches rule 2 (deprecation) but was classified as 'deprecation' (correct), but severity is incorrectly marked as 'high'. The severity should be 'medium' as it is a deprecation with no deadline mentioned, and no runtime crash or data loss involved."
+    },
+    {
+      "filename": "syn-anthropic-sdk-typescript-0.72.0-3.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "unknown"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "The change text mentions a breaking change detection workflow, which implies a breaking change, but the upstream hint says 'breaking', and the change text does not clearly indicate consumer impact. Rule 8 applies as the change_text is too vague to confidently classify as 'docs' or 'unknown'."
+    },
+    {
+      "filename": "syn-anthropic-sdk-typescript-0.95.1-1-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change redacts API keys in debug logs, which aligns with the 'security' kind rule (CVE-class / credential leak). The severity is 'high' due to the credential leak trigger."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.19-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior → fix. Severity 'low' matches 'compile-time-only' trigger (Rule 6)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.36-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change introduces a new configuration type and deprecates an old field, matching rule 2 (deprecation) and severity rule for deprecation with deadline >30 days (medium)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.49-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only change)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.51-14.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (SIGKILL fallback when SIGTERM blocks in close())"
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.52-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability additive), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.52-7.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bundled CLI version update, which is a documentation-only change with no functional impact, matching rule 6 for 'docs' and severity 'low' for 'docs-only'."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.52-8.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Change text describes a documentation-only update to example tests and error handling, matching rule 6 (docs) and low severity per rule 6 (docs-only)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.65-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text does not trigger any specific rule for 'kind', and the severity is 'low' as it is a documentation-only change with no impact on runtime behavior."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.70-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (fixing silent CallToolResult loss), and severity HIGH due to silent-failure mode and data-loss (model receiving validation-error blob instead of actual tool output)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-python-0.1.70-2.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {
+        "kind": "fix"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring correct behavior by resolving a runtime error, matching rule 4 (Bugfix restoring spec'd behavior). The proposed kind 'fix' is correct, but the severity was classified as 'high' without justification. The error is not a silent-failure, data-loss, credential-leak, or scope-escape, so severity should not be 'high'."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.101-1-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'security' per rule 1 (CVE-class / GHSA-eligible). Severity is 'high' per HIGH trigger (credential-leak)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.101-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (temp directory leak fixed), and severity is HIGH due to credential-leak trigger."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.101-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (fixing a warning related to concurrent calls). Severity 'medium' matches the MEDIUM trigger for 'perf-or-memory regression' (warning is a performance-related issue)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.110-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.113-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'breaking' per rule 3, as the old form is removed with no grace period. Severity is 'high' per rule HIGH due to breaking in default-config user's runtime."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.136-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 2: 'Deprecation alias retained' → deprecation; severity is 'medium' as per rule 6 (deprecation with deadline >30 days)"
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.15-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability additive), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.19-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into). Severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.21-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.21-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability additive), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.21-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (PermissionRequest hooks not being executed is a regression that is being fixed). Severity HIGH due to silent-failure mode (hooks not being executed is a failure mode that could impact functionality)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.30-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds new options for debug logging, which is an additive feature with no impact on existing behavior, matching rule 7 for 'feature' and rule 6 for 'low' severity."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.37-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text does not mention security, deprecation, breaking changes, or any specific issue, so 'unknown' is the correct kind. The severity is 'low' as it's a parity update with no clear impact on runtime or behavior."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.45-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (RSS no longer grows unboundedly). Severity is 'medium' due to perf-or-memory regression trigger."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.69-5.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {
+        "kind": "breaking"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 3 applies: 'Old form removed in this version (no grace period in this release)' — the change reverts a breaking change, but the upstream labeled it as breaking, which aligns with the actual impact."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.69-7.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "performance",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'performance' under rule 5 (deliberate optimization), and severity 'medium' under rule LOW (opt-in feature addition) — no rule violations detected."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.72-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.73-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {
+        "severity": "medium"
+      },
+      "kind_check": "ok",
+      "severity_check": "wrong",
+      "rationale": "Severity is wrong: the change is a bugfix restoring spec'd behavior, not a silent-failure mode, data-loss, or credential-leak. It falls under MEDIUM as it's a bugfix with no in-version named replacement."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.74-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (skills with `user-invocable: false` should not be included in `supportedCommands()`). Severity is 'medium' as it's a bugfix restoring spec'd behavior but not a critical failure."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.76-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.83-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.85-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.86-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.89-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' as it's a new capability that consumers can opt into. Severity is 'low' as it's an opt-in feature addition."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.2.94-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.3.142-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'breaking' per rule 3 (Old form removed in this version with no grace period). Severity is 'high' per rule HIGH (breaking in default-config user)."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.3.142-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'breaking' per rule 3, as the old form is removed with no grace period. Severity is 'high' per rule HIGH, as it involves a breaking change with potential runtime impact on default-config users."
+    },
+    {
+      "filename": "syn-claude-agent-sdk-typescript-0.3.142-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 3: Old form removed in this version (no grace period in this release) → breaking. Severity is HIGH due to silent-failure mode (replacing `TodoWrite` with new tools without snapshot list replacement, which may break existing logic)."
+    },
+    {
+      "filename": "syn-claude-api-2026-02-05-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'manual thinking' is deprecated, so kind is 'deprecation'. Severity 'medium' matches the deprecation with no named replacement and no deadline specified."
+    },
+    {
+      "filename": "syn-claude-api-2026-02-05-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' as it's a new capability added (rule 7). Severity is 'low' as it's an opt-in feature addition (rule 6)."
+    },
+    {
+      "filename": "syn-claude-api-2026-02-17-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into). Severity is 'low' per rule 6 (docs-only / opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-api-2026-02-19-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'deprecation' is explicitly mentioned in the change text. Severity 'high' is triggered by 'credential-leak' and 'scope-escape' (retirement crossing documented boundary)."
+    },
+    {
+      "filename": "syn-claude-api-2026-03-30-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'deprecation' per rule 2 (deprecation alias retained), and severity is 'high' due to the deadline within 30 days (April 30, 2026) triggering the HIGH severity rule."
+    },
+    {
+      "filename": "syn-claude-api-2026-04-14-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 2 (deprecation) and severity HIGH trigger (deprecation with deadline >30 days)"
+    },
+    {
+      "filename": "syn-claude-api-2026-04-16-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'breaking' per rule 3 as the change text indicates a breaking change with no grace period. Severity is 'high' per rule HIGH as it involves API breaking changes and potential scope-escape or data-loss risks."
+    },
+    {
+      "filename": "syn-claude-api-2026-05-06-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' as it's a new capability that consumers can opt into. Severity is 'low' as it's an opt-in feature addition."
+    },
+    {
+      "filename": "syn-claude-api-2026-05-06-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds new filtering and sorting capabilities, which is an additive feature, matching rule 7. Severity is low as it is an opt-in feature addition, matching rule 6."
+    },
+    {
+      "filename": "syn-claude-api-2026-05-11-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only / opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.0-102.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'breaking' under rule 3 because the old form is removed in this version with no grace period. Severity is 'low' under rule 6 for a breaking change that is opt-in and non-default."
+    },
+    {
+      "filename": "syn-claude-code-2.1.0-103.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a documentation-only / log-format change / release-notes-only / README list update, which matches rule 6, and severity is low as per rule LOW: docs-only."
+    },
+    {
+      "filename": "syn-claude-code-2.1.0-8-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1 for security kind and HIGH severity trigger for credential-leak"
+    },
+    {
+      "filename": "syn-claude-code-2.1.101-15.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'fix' under rule 4, which covers bugfixes restoring spec'd behavior. Severity is 'medium' under rule MEDIUM, as it's a bugfix with no in-version named replacement."
+    },
+    {
+      "filename": "syn-claude-code-2.1.101-16-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a command injection vulnerability, which matches rule 1 (CVE-class / known exploit) and triggers the HIGH severity rule for credential-leak."
+    },
+    {
+      "filename": "syn-claude-code-2.1.105-13.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 7: New capability that consumers can opt into (additive) → feature. Severity rule 6: opt-in feature addition → low."
+    },
+    {
+      "filename": "syn-claude-code-2.1.105-17.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {
+        "kind": "breaking"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 3: Old form removed in this version (no grace period in this release) → breaking"
+    },
+    {
+      "filename": "syn-claude-code-2.1.105-7.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.108-7.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change improves user experience by clarifying error messages, which aligns with rule 7 (new capability that consumers can opt into) and severity rule LOW (docs-only)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.110-25-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1 for security (CVE-class/credential leak/known exploit) and severity HIGH trigger (silent-failure mode / data-loss / credential-leak)"
+    },
+    {
+      "filename": "syn-claude-code-2.1.111-13.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change introduces new capabilities (showing actual path, seeding pins, offering 1M context) that are additive and opt-in, matching rule 7 for 'feature'. Severity is 'low' as it's an opt-in feature addition, matching rule 6 for 'docs' but the 'feature' kind takes precedence, and the severity is correctly classified as low."
+    },
+    {
+      "filename": "syn-claude-code-2.1.111-25.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (LSP diagnostics correctly ordered after edits), severity is medium due to visible-failure mode and no in-version named replacement."
+    },
+    {
+      "filename": "syn-claude-code-2.1.113-14-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1: CVE-class / GHSA-eligible / explicit 'Security:' prefix → security. Severity is HIGH due to credential-leak trigger."
+    },
+    {
+      "filename": "syn-claude-code-2.1.113-15-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1 (CVE-class / Security: prefix) for kind, and severity is HIGH due to credential-leak trigger."
+    },
+    {
+      "filename": "syn-claude-code-2.1.113-16-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1 (CVE-class / Security: prefix) for kind, and triggers HIGH severity due to credential-leak and security-related change."
+    },
+    {
+      "filename": "syn-claude-code-2.1.113-19.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "fix"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (markdown tables breaking with inline code spans containing `|` is a regression, now fixed)"
+    },
+    {
+      "filename": "syn-claude-code-2.1.113-33.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 4: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-claude-code-2.1.116-12-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1 (security) and severity trigger 'credential-leak' (indirectly related to dangerous-path check bypass)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.117-27.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {
+        "kind": "breaking"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 3: Old form removed in this version (no grace period in this release) → breaking. The change text implies the 'Manage Plugins' panel was broken in prior versions and is now fixed, which aligns with a breaking change."
+    },
+    {
+      "filename": "syn-claude-code-2.1.119-15-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1 for 'security' due to the 'Security:' prefix and enforcement of security-related patterns."
+    },
+    {
+      "filename": "syn-claude-code-2.1.119-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.120-14.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (telemetry suppression was not functioning as intended). Severity HIGH due to potential silent-failure mode and credential-leak risk (telemetry data may include sensitive info)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.120-19.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 4: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-claude-code-2.1.121-17.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.126-11-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1 (security) due to the 'Security:' prefix and the fix addresses a bypass of security settings, triggering HIGH severity for credential-leak and silent-failure mode."
+    },
+    {
+      "filename": "syn-claude-code-2.1.126-12.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {
+        "kind": "fix"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring expected behavior (session not breaking on oversized image paste), matching rule 4 → 'fix'. The proposed 'kind: fix' is correct, but the severity was incorrectly classified as 'high'."
+    },
+    {
+      "filename": "syn-claude-code-2.1.128-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability (persistent `localSettings` suggestion) that consumers can opt into, matching rule 7 for 'feature'. Severity is 'medium' as it's a new feature with no in-version named replacement, matching rule 6 for 'medium'."
+    },
+    {
+      "filename": "syn-claude-code-2.1.139-42.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {
+        "kind": "fix"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (argument substitution breaking due to regex metacharacters is a regression, now fixed)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.14-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability (autocomplete) that consumers can opt into, matching rule 7 for 'feature'. Severity is 'low' as it's an opt-in feature addition, matching rule 6 for 'docs' but severity is correctly classified as 'low' under rule 6."
+    },
+    {
+      "filename": "syn-claude-code-2.1.140-6.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'fix' under rule 4, which covers bugfixes restoring spec'd behavior. Severity is 'medium' under rule MEDIUM, as it's a visible-failure mode with no in-version named replacement."
+    },
+    {
+      "filename": "syn-claude-code-2.1.140-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (fixing redundant wakeups). Severity is low per rule 6 (docs-only or opt-in feature addition is not applicable here, but the change is compile-time-only or docs-only in nature)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.142-24.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a documentation-only update, matching rule 6, and severity is low as per rule LOW: docs-only."
+    },
+    {
+      "filename": "syn-claude-code-2.1.144-20.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {
+        "kind": "fix"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring correct behavior (preventing MCP images with unsupported MIME types from breaking the conversation), which matches rule 4 → 'fix'. The proposed 'kind: fix' is correct, but the severity was classified as 'high' which is not justified by the change text. The issue does not involve silent-failure, data-loss, credential-leak, or runtime-crash for default-config users, so severity should not be 'high'."
+    },
+    {
+      "filename": "syn-claude-code-2.1.144-5.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "docs"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "The change is a documentation-only rename with an alias retained, matching rule 6 (docs), not deprecation (rule 2)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.145-6.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability (mouse hover and click support) that is opt-in and additive, matching rule 7 for 'feature'. Severity is 'low' as it is an opt-in feature addition, matching rule 6 for 'docs' but classified as 'low' per severity rules for opt-in features."
+    },
+    {
+      "filename": "syn-claude-code-2.1.146-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The rename of `/simplify` to `/code-review` is an additive change with a named replacement, matching rule 7 (feature) and severity rule LOW (rename with named replacement)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.147-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes the old form (`/simplify`) without a grace period, matching rule 3 (breaking). Severity is medium as it's a breaking change in non-default config (requires opt-in for new behavior) and has no named replacement in this version."
+    },
+    {
+      "filename": "syn-claude-code-2.1.147-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change introduces a new capability (improved auto-updater) that consumers can opt into, matching rule 7 for 'feature'. Severity is 'low' as it is an opt-in feature addition, matching rule 6 for 'docs' but classified as 'low' per severity rules for opt-in features."
+    },
+    {
+      "filename": "syn-claude-code-2.1.18-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into). Severity is 'low' per rule 6 (docs-only / opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.2-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds new metadata to images, which is an additive capability consumers can opt into, matching rule 7. Severity is low as it's an opt-in feature addition, matching rule 6."
+    },
+    {
+      "filename": "syn-claude-code-2.1.2-20.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'deprecation' per rule 2. Severity is 'medium' as it matches the 'deprecation with deadline >30 days' trigger in severity rules."
+    },
+    {
+      "filename": "syn-claude-code-2.1.2-7-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a command injection vulnerability, which matches rule 1 for 'security' kind. The severity is 'high' due to the credential-leak trigger in the HIGH severity rules."
+    },
+    {
+      "filename": "syn-claude-code-2.1.20-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.23-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new customizable setting (`spinnerVerbs`) which is an additive feature with no impact on existing behavior, matching rule 7 (feature) and LOW severity per rule 6 (docs-only)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.27-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability additive), severity is 'low' per rule 6 (docs-only change)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.27-7.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4. The severity is high due to the failure mode being a silent-failure mode, matching the HIGH trigger."
+    },
+    {
+      "filename": "syn-claude-code-2.1.30-15.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "performance",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a deliberate optimization (caching added, algorithm swapped, runtime sped up by design) → performance (rule 5). Severity is medium due to perf-or-memory regression (rule 2)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.31-11.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4: Bugfix restoring spec'd behavior (removing misleading info) → fix; Low severity per rule 6 (docs-only change)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.45-12.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "performance",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a deliberate optimization (algorithm swapped, runtime sped up by design) → performance (rule 5), and severity is low as it's a performance optimization with no failure mode or data loss (rule 6)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.47-24.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {
+        "kind": "fix"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring correct behavior, matching rule 4 (Bugfix restoring spec'd behavior) → kind should be 'fix', but the upstream hint incorrectly classified it as 'breaking'."
+    },
+    {
+      "filename": "syn-claude-code-2.1.6-24.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 3: Old form removed in this version (no grace period in this release) → breaking. Severity rule LOW: compile-time-only / rename with named replacement / cosmetic UI / docs-only / opt-in feature addition."
+    },
+    {
+      "filename": "syn-claude-code-2.1.63-19.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (remote sessions appearing in conversation history). Severity 'medium' matches trigger for visible-failure mode with no in-version replacement."
+    },
+    {
+      "filename": "syn-claude-code-2.1.68-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'breaking' per rule 3 (Old form removed in this version with no grace period). Severity is 'high' per rule HIGH (breaking in non-default-but-documented config)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.69-10.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability that consumers can opt into, matching rule 7. Severity is low as it's an opt-in feature addition, matching rule 6."
+    },
+    {
+      "filename": "syn-claude-code-2.1.69-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.7-13.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a new default behavior that may affect existing configurations, but it is not a breaking change since users can opt-out. It aligns with rule 7 (feature) but was classified as 'breaking' — however, the severity 'medium' is appropriate due to the potential impact on non-default configurations, matching rule 6 (low) and rule 2 (medium)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.7-15.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-claude-code-2.1.71-28.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (removing unnecessary warning) → fix. Severity 'low' matches rule 6 (docs-only or opt-in feature addition) as it's a non-functional change with no impact on behavior."
+    },
+    {
+      "filename": "syn-claude-code-2.1.71-9.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {
+        "kind": "fix"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring correct behavior after a regression (image processing failure leading to oversized images in context), which matches rule 4."
+    },
+    {
+      "filename": "syn-claude-code-2.1.72-8.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a non-breaking UI/UX adjustment with no functional impact on existing behavior, aligning with rule 7 (feature) or 6 (docs), but the proposed 'breaking' is incorrect. The severity 'low' is appropriate as it's a compile-time-only change with no runtime impact."
+    },
+    {
+      "filename": "syn-claude-code-2.1.73-24.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'breaking' per rule 3, as the old form is removed in this version with no grace period. Severity is 'medium' per rule MEDIUM: breaking in non-default-but-documented config."
+    },
+    {
+      "filename": "syn-claude-code-2.1.73-25.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 2: 'Deprecated /output-style command — use /config instead' is a deprecation with no grace period, so 'deprecation' is correct. Severity 'low' matches rule 6: 'rename with named replacement' and 'docs-only' are low severity."
+    },
+    {
+      "filename": "syn-claude-code-2.1.75-11.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (token estimation over-counting) and preventing premature context compaction."
+    },
+    {
+      "filename": "syn-claude-code-2.1.75-19.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 3: Old form removed in this version (no grace period in this release) → breaking. Severity is medium per rule: breaking in non-default-but-documented config."
+    },
+    {
+      "filename": "syn-claude-code-2.1.77-19.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4. Severity is 'high' due to the potential for data loss or silent-failure mode, matching the HIGH trigger."
+    },
+    {
+      "filename": "syn-claude-code-2.1.77-42.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The rename with alias retained matches rule 2 (deprecation) and severity 'low' matches the 'rename with named replacement' trigger in rule 6."
+    },
+    {
+      "filename": "syn-claude-code-2.1.78-12-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1 for security classification (explicit 'Security:' prefix). Severity is 'high' due to silent-failure mode and data-loss risk (sandbox disable leading to potential security exposure)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.81-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability (`--bare` flag) that consumers can opt into, matching rule 7 for 'feature'. Severity is 'low' as it's an opt-in feature addition, matching rule 6 for 'docs' but severity is correctly classified as 'low' under rule 6."
+    },
+    {
+      "filename": "syn-claude-code-2.1.83-57.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 2: deprecation alias retained"
+    },
+    {
+      "filename": "syn-claude-code-2.1.85-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability additive), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.89-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.89-39.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a new capability that consumers can opt into, matching rule 7 for 'feature', and the severity is 'low' as it is an opt-in feature addition, matching rule 6 for 'docs' but classified as 'low' per severity rules."
+    },
+    {
+      "filename": "syn-claude-code-2.1.90-10.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (improving readability of hover text). Severity is low per rule 6 (docs-only / cosmetic UI)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.90-19.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes old forms from auto-allow, matching rule 3 (breaking) and severity is low as it's a non-default config change with no in-version replacement."
+    },
+    {
+      "filename": "syn-claude-code-2.1.92-19.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'breaking' under rule 3, as the old form was removed in this version with no grace period. Severity is 'medium' under rule 4, as it's a breaking change in a non-default-but-documented config (assuming /tag was a documented command)."
+    },
+    {
+      "filename": "syn-claude-code-2.1.92-20.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 3 applies: 'Old form removed in this version (no grace period in this release)' → breaking. Severity 'low' matches Rule 6: 'rename with named replacement'"
+    },
+    {
+      "filename": "syn-claude-code-2.1.97-20.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (fixing hidden error messages) → severity medium due to visible-failure mode with no in-version replacement."
+    },
+    {
+      "filename": "syn-claude-code-2.1.97-24.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-claude-code-2.1.97-40.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a layout improvement with no functional impact, aligning with rule 6 (docs) or rule 7 (feature), but since it's a layout change without user-facing impact, it's classified as 'fix' with 'low' severity per rule 4 and 6."
+    },
+    {
+      "filename": "syn-claude-code-2.1.97-42.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (improving markdown rendering) → fix. Severity 'low' matches rule 6 (docs-only or opt-in feature) as it's a cosmetic markdown improvement."
+    },
+    {
+      "filename": "syn-claude-code-action-v1.0.28-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 6: Documentation-only change → docs; LOW severity per LOW rule for docs-only"
+    },
+    {
+      "filename": "syn-claude-code-action-v1.0.29-1-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1: CVE-class with explicit 'Security:' prefix and 'HIGH vulnerability' trigger for severity."
+    },
+    {
+      "filename": "syn-claude-code-action-v1.0.49-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: bugfix restoring spec'd behavior (replacing deprecated wildcard syntax with modern syntax). Severity is low per rule 6 (docs-only / opt-in feature addition)."
+    },
+    {
+      "filename": "syn-claude-code-action-v1.0.72-1-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text mentions 'harden tag mode tool permissions against prompt injection', which aligns with the 'security' kind per rule 1. The severity is 'high' due to the potential for credential leak or silent-failure mode, matching the HIGH trigger."
+    },
+    {
+      "filename": "syn-claude-code-action-v1.0.90-2-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 1: CVE-class / GHSA-eligible / explicit 'Security:' prefix → security. Severity is medium as it involves a security fix with no named deadline, aligning with MEDIUM criteria."
+    },
+    {
+      "filename": "syn-continue-dev--continuedev-config-yaml-1.38.0-21.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a bugfix restoring spec'd behavior (initializing the usage field), matching rule 4. Severity is low as it is a documentation-only change with no impact on runtime behavior."
+    },
+    {
+      "filename": "syn-continue-dev--continuedev-config-yaml-1.40.0-41.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a bugfix restoring spec'd behavior (detected shell spawning), and severity is medium due to no in-version named replacement."
+    },
+    {
+      "filename": "syn-continue-dev--continuedev-fetch-1.8.0-18.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a dependency constraint to align with core, which is a bugfix restoring spec'd behavior (rule 4), and severity is low as it's a compile-time-only change (rule 6)."
+    },
+    {
+      "filename": "syn-continue-dev--continuedev-fetch-1.8.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a documentation-only update to a workflow, which matches rule 6 (docs), but the proposed classification of 'unknown' is correct under rule 8 as the change_text alone does not clearly indicate the kind. Severity 'low' is appropriate under rule 7 (docs-only)."
+    },
+    {
+      "filename": "syn-continue-dev--continuedev-openai-adapters-1.37.0-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a bugfix restoring spec'd behavior, matching rule 4. Severity is low as it's a compile-time-only change with no runtime impact."
+    },
+    {
+      "filename": "syn-continue-dev-continuedev-config-yaml-1.38.0-28.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds defensive type checks, which is a bugfix restoring spec'd behavior, matching rule 4. Severity is low as it's a defensive check with no visible failure or performance impact."
+    },
+    {
+      "filename": "syn-cursor-04-08-26-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability ('Fix All' action) that consumers can opt into, matching rule 7 for 'feature'. Severity is 'low' as it's an opt-in feature addition, matching rule 6 for 'docs' but severity is correctly classified as 'low' under rule 6."
+    },
+    {
+      "filename": "syn-cursor-05-07-26-6.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into). Severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-cursor-2-4-24.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a bugfix restoring expected behavior (preventing accidental exits), matching rule 4. Severity is low as it's a cosmetic UI fix with no impact on functionality or performance."
+    },
+    {
+      "filename": "syn-cursor-2-4-40.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-cursor-2-4-41.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4. Severity is low as it's a bugfix with no impact on default-config users."
+    },
+    {
+      "filename": "syn-cursor-2-4-8.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change introduces new hooks (stop, beforeSubmitPrompt, PreToolUse, PostToolUse) which are additive capabilities, matching rule 7 (New capability that consumers can opt into (additive)) → kind: feature. Severity is low as it is an opt-in feature addition, matching rule 6 (docs-only / opt-in feature addition) → severity: low."
+    },
+    {
+      "filename": "syn-cursor-2-5-10.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a polishing of a permission request flow, which is a documentation-only change, matching rule 6 (docs). Severity is low as it is a cosmetic UI improvement with no functional impact."
+    },
+    {
+      "filename": "syn-cursor-2-5-14.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 3 applies: 'Old form removed in this version (no grace period in this release)' → breaking. Severity 'medium' matches trigger: 'breaking in non-default-but-documented config'."
+    },
+    {
+      "filename": "syn-cursor-2-5-15.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "breaking",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "breaking"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 3 applies: 'Old form removed in this version (no grace period in this release)' → breaking. The proposed kind is correct, but severity_check is not properly evaluated."
+    },
+    {
+      "filename": "syn-cursor-2-5-16.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 3 applies: 'Old form removed in this version (no grace period in this release)' → breaking. Severity rule for breaking in non-default-but-documented config matches 'medium'."
+    },
+    {
+      "filename": "syn-cursor-2-5-18.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-cursor-2-5-21.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4 for 'fix' kind. Severity is 'low' as it's a bugfix with no indication of high-severity triggers."
+    },
+    {
+      "filename": "syn-cursor-2-5-22.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4."
+    },
+    {
+      "filename": "syn-cursor-2-5-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a rename with a named replacement (\"Fork Chat\"), which matches rule 6 (docs) and severity rule LOW (rename with named replacement)."
+    },
+    {
+      "filename": "syn-cursor-2-6-23.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (fixing inconsistencies in access control). Severity HIGH due to potential for silent-failure mode or data-loss if permissions are misconfigured."
+    },
+    {
+      "filename": "syn-cursor-2-6-26.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes UI improvements without any security, deprecation, or breaking change indicators, so 'unknown' is correct per rule 8. Severity 'low' applies as it's a docs-only/UI change with no impact on functionality."
+    },
+    {
+      "filename": "syn-cursor-3-0-21.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 7: New capability that consumers can opt into (additive) → feature. Severity rule 6: opt-in feature addition → low."
+    },
+    {
+      "filename": "syn-cursor-3-0-30.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring expected behavior, matching rule 4 (Bugfix restoring spec'd behavior). Severity is low as it's a bugfix with no impact on security, performance, or breaking changes."
+    },
+    {
+      "filename": "syn-cursor-3-0-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 7: New capability that consumers can opt into (additive) → feature. Severity rule 6: opt-in feature addition → low."
+    },
+    {
+      "filename": "syn-cursor-3-0-6.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change adds a new capability that consumers can opt into, matching rule 7 for 'feature'. Severity is 'low' as it's an opt-in feature addition, matching rule 6 for 'docs' but severity is correctly classified as 'low' under rule 6."
+    },
+    {
+      "filename": "syn-cursor-3-0-7.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 2: 'deprecation alias retained' and severity rule for 'deprecation with deadline >30 days' (medium)."
+    },
+    {
+      "filename": "syn-cursor-3-0-8.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change 'Removed cloud agents from the Editor' matches rule 3: 'Old form removed in this version (no grace period in this release)' → breaking. Severity 'medium' matches the 'breaking in non-default-but-documented config' trigger under severity rules."
+    },
+    {
+      "filename": "syn-cursor-3-4-11.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "performance",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'performance' under rule 5 (deliberate optimization), and severity 'low' under rule LOW (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-cursor-3-4-17.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes bug fixes restoring expected behavior, matching rule 4 (fix). Severity is low as it's a bugfix with no indication of high-severity triggers like data loss or silent failure."
+    },
+    {
+      "filename": "syn-cursor-3-4-9.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a removal of noise and improvement of behavior, which aligns with a 'fix' classification under rule 4 (bugfix restoring spec'd behavior). Severity is 'low' as it is a non-breaking, cosmetic improvement with no impact on functionality or security."
+    },
+    {
+      "filename": "syn-cursor-cli-feb-18-2026-18.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into). Severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-cursor-cli-feb-18-2026-24.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 7: New capability that consumers can opt into (additive) → feature. Rule 6: Docs-only / log-format change / release-notes-only → low severity."
+    },
+    {
+      "filename": "syn-cursor-cli-feb-18-2026-33.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (state rolls back cleanly and user text is preserved). Severity 'medium' matches the trigger for 'visible-failure mode + no in-version named replacement'."
+    },
+    {
+      "filename": "syn-cursor-cli-feb-18-2026-34.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-cursor-cli-feb-18-2026-6.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into). Severity is 'medium' per rule 5 (deliberate optimization) and rule 6 (docs-only) — but since it's a new feature, 'medium' is appropriate as it's not a breaking change or security issue."
+    },
+    {
+      "filename": "syn-cursor-cli-jan-08-2026-13.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {
+        "kind": "feature"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "The change is a deliberate optimization improving user experience, matching rule 5 (performance), but the proposed kind is 'breaking' which is wrong. The change does not break existing behavior or require migration."
+    },
+    {
+      "filename": "syn-external-ghsa-f65r-h4g3-3h9h-backpropagate.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 1 applies: CVE-class / GHSA-eligible / credential leak / known exploit / explicit 'Security:' prefix → security. Severity HIGH trigger: credential-leak."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-08-copilot-code-review-comment-types-now-in-usage-metrics-api-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is vague and lacks specific details to confidently classify the kind, so 'unknown' is correct. The severity is 'low' as it is a documentation-only change with no impact on functionality."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-08-more-flexible-secrets-and-variables-for-copilot-cloud-agent-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is too vague to apply any specific rule confidently, so 'unknown' is correct, and 'low' severity is appropriate for a docs-only or opt-in feature addition."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-19.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a UI improvement, which falls under 'documentation-only' per rule 6, and the severity is 'low' as it is a cosmetic UI change."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-23.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring expected behavior, matching rule 4 (Bugfix restoring spec'd behavior). Severity is low as it's a fix with no impact on runtime or security."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-25.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes UI improvements without any security, deprecation, or breaking implications, and the proposed 'unknown' kind aligns with rule 8. Severity 'low' matches the 'docs-only' and 'cosmetic UI' trigger in rule 6."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-28.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is too vague to apply any rule confidently, so 'unknown' is correct and 'low' severity is appropriate for a docs-only or opt-in feature addition."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-32.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "deprecation"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecation (#deprecation)' directly matches the deprecation rule."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-35.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is too vague to apply any rule confidently, so 'unknown' is correct and 'low' severity is appropriate for a docs-only or opt-in feature addition."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-i-39.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "deprecation"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecation (#deprecation)' directly matches the deprecation rule."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-17.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a new capability (added confirmation) that is opt-in, matching rule 7 for 'feature' and rule 6 for 'low' severity (docs-only or opt-in)."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-18.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a styling and rendering improvement, which falls under the 'documentation-only' category (rule 6), but since it's not explicitly classified as docs-only, and no rule applies confidently, 'unknown' is correct. Severity is 'low' as it's a cosmetic UI change."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-20.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a UI improvement, which falls under rule 6 (docs) or is classified as 'fix' due to the 'improved' hint. Since the change is cosmetic and does not affect functionality, severity is 'low' as per rule 7 (docs)."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-23.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4. Severity is low as it's a fix with no impact on runtime or security."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-24.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'fix' under rule 4 (bugfix restoring spec'd behavior) and 'low' severity under rule LOW (cosmetic UI)."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-28.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is too vague to apply any specific rule confidently, so 'unknown' is correct, and 'low' severity is appropriate for a docs-only or opt-in feature addition."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-35.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is too vague to apply any rule confidently, so 'unknown' is correct and 'low' severity is appropriate for a docs-only change."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-39.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "deprecation"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecation (#deprecation)' directly matches the deprecation rule."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-13-introducing-copilot-cli-agent-and-unified-sessions-view-in-github-copilot-for-jetbrains-ides-8.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is too vague to apply any specific rule confidently, so 'unknown' is correct, and 'low' severity is appropriate for a docs-only or opt-in feature addition."
+    },
+    {
+      "filename": "syn-github-copilot-2026-05-21-github-copilot-for-eclipse-is-open-source-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is a section heading only, and there is no actionable content to classify under any of the 8 kinds. The proposed classification of 'unknown' with severity 'low' is correct under rule 8 and severity rule for docs-only."
+    },
+    {
+      "filename": "syn-mcp-registry-1.7.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a deployment update with no indication of security, deprecation, breaking changes, or documentation-only changes. It aligns with 'docs' as a low-severity change."
+    },
+    {
+      "filename": "syn-mcp-registry-1.7.1-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (availability hardening) and adding metrics (publish-phase timing) → kind: fix. Severity 'low' matches rule 6 (docs-only) and rule 8 (no clear high/medium trigger)."
+    },
+    {
+      "filename": "syn-mcp-registry-1.7.2-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4, and the severity is low as it is a docs-only change with no impact on runtime behavior."
+    },
+    {
+      "filename": "syn-mcp-registry-1.7.2-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a deployment update with no security, deprecation, or breaking implications, and is classified as 'docs' with 'low' severity, which aligns with rule 6 and rule 5 for severity."
+    },
+    {
+      "filename": "syn-mcp-registry-1.7.2-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior (\"restore per-phase publish timings\") and recovering from regression (\"fix(list)\"). This matches rule 4."
+    },
+    {
+      "filename": "syn-mcp-registry-1.7.4-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a deployment update with no functional or security impact, matching rule 6 (docs) and LOW severity per rule 6 (docs-only)."
+    },
+    {
+      "filename": "syn-mcp-registry-1.7.4-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (memory adjustment to match pgxpool size). Severity 'medium' matches the perf-or-memory regression trigger."
+    },
+    {
+      "filename": "syn-mcp-ruby-sdk-0.16.0-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-mcp-ruby-sdk-0.7.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-macros-v0.13.0-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Change text indicates documentation-only change, matching rule 6 (docs) and severity rule for low (docs-only)."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-macros-v0.14.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Change text indicates a README list update, matching rule 6 (docs), and the severity is low as per rule LOW: docs-only."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-macros-v1.1.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: deprecation alias retained → deprecation. Severity 'low' matches the rule for deprecation with no named replacement."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-macros-v1.2.0-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a code refactoring that routes through a re-exported path, which is a documentation-only or code-style change, matching rule 6 (docs) and severity LOW (docs-only)."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-macros-v1.3.0-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (clippy warnings fixed), severity is low per LOW rule for docs-only or compile-time-only changes."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-macros-v1.6.0-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 6 applies: documentation-only change, severity is low per LOW rule for docs-only changes."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-v0.13.0-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-v0.14.0-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 7: New capability that consumers can opt into (additive) → feature, but the change is a documentation-only update to the README list, so 'docs' is correct. Severity 'low' matches Rule 6: Documentation-only → low."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-v0.15.0-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "high"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior (avoiding dropping completed task results), matching rule 4. The severity is high due to the potential for silent-failure mode or data-loss if results are dropped, matching the HIGH trigger."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-v0.16.0-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text does not mention security, deprecation, breaking changes, or performance, and the kind is 'unknown' as per rule 8."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-v0.17.0-10.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (removing an outdated schema setting). Severity 'medium' matches the rule for deprecation with deadline >30 days (interpreted as non-immediate removal)."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-v1.0.0-alpha-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'breaking' per rule 3 (Old form removed in this version). Severity is 'medium' per rule MEDIUM: breaking in non-default-but-documented config."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-v1.1.1-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes adding functionality (logging/setLevel and ping before initialized notification), which aligns with rule 7 (New capability that consumers can opt into (additive)), and the severity is medium as it is a non-breaking, additive feature with no immediate impact on existing behavior."
+    },
+    {
+      "filename": "syn-mcp-rust-sdk-rmcp-v1.3.0-12.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (clippy warnings fixed). Severity is low per rule 6 (docs-only / compile-time-only)."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk--modelcontextprotocol-client-2.0.0-alpha.1-10.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes `zod` from `peerDependencies`, which is a dependency management change. Since it's not a breaking change (no grace period mentioned), not a security issue, and not a deprecation, the proposed kind 'breaking' is correct. The severity 'medium' is appropriate as it's a dependency change with no immediate impact on runtime behavior."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk--modelcontextprotocol-client-2.0.0-alpha.1-12.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'fix' under rule 4, which covers bugfixes restoring spec'd behavior. Severity is 'medium' under rule MEDIUM, as it addresses a specific issue with 5xx errors without introducing a named replacement or critical failure mode."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk--modelcontextprotocol-node-2.0.0-alpha.1-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes deprecated method signatures, matching rule 3 (Old form removed in this version) for 'breaking' kind. Severity is 'medium' as per rule 6 (deprecation with deadline >30 days)."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk--modelcontextprotocol-node-2.0.0-alpha.1-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a package manager standardization (pnpm) which is a documentation-only change, matching rule 6, and severity is low as per rule LOW: docs-only."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk--modelcontextprotocol-node-2.0.0-alpha.1-6.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes deprecated methods with no grace period, matching rule 3 for 'breaking' and severity rule for 'medium' due to breaking in non-default-but-documented config."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk--modelcontextprotocol-server-2.0.0-alpha.1-12.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes deprecated method signatures, matching rule 2 (deprecation) and severity rule for deprecation with deadline >30 days (MEDIUM)."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk--modelcontextprotocol-server-2.0.0-alpha.1-16.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change removes deprecated methods without a grace period, matching rule 3 for 'breaking' and severity rule for 'medium' due to breaking in non-default-but-documented config."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk-modelcontextprotocol-client-2.0.0-alpha.1-13.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (prevents unwanted console windows) → fix. Severity 'medium' matches 'visible-failure mode + no in-version named replacement' (prevents unwanted console windows is a visible failure with no named replacement)."
+    },
+    {
+      "filename": "syn-mcp-typescript-sdk-modelcontextprotocol-server-2.0.0-alpha.1-5-sec.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "security",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 1 applies: CVE-class with explicit 'Security:' prefix and credential leak trigger 'security' kind. Severity 'medium' matches the 'CVE' trigger under HIGH severity, but the entry is a fix for a known vulnerability, not a new exploit, so 'medium' is correct."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_108-29.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_108-30.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes an improvement to validation logic, which is a documentation-only change and falls under rule 6, leading to 'docs' kind. However, the proposed 'unknown' kind is correct under rule 8 as the change text is not sufficiently detailed to confidently classify. The severity 'low' matches rule 6 for docs-only changes."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_109-140.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a bugfix restoring spec'd behavior, matching rule 4, and the severity is low as it's a cosmetic UI improvement with no runtime impact."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_110-96.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into), severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_111-33.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "performance",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'performance' under rule 5 (deliberate optimization), and severity 'medium' under rule MEDIUM (perf-or-memory regression)."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_111-34.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "docs",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a documentation-only fix, matching rule 6, and the severity is low as per rule LOW: docs-only."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_112-34.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: deprecation alias retained (setting remains supported through 1.125), so kind is correctly classified as deprecation. Severity is medium as per rule MEDIUM: deprecation with deadline >30 days."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_113-47.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is a section heading only, which matches rule 8 (unknown) and severity rule LOW (docs-only)."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_114-33.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'deprecation' per rule 2. Severity is 'medium' as per rule MEDIUM: deprecation with deadline >30 days."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_115-43.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "deprecation"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecated features and settings' matches the deprecation kind."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_116-68.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is a section heading only, and there is no clear indication of a specific kind. The proposed classification of 'unknown' with 'low' severity aligns with the rules, as the change is documentation-only and has no impact on functionality."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_116-73.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "deprecation"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecated features and settings' matches the deprecation kind."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_117-34.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text contains only contributor attribution with no actual change content, matching rule 8 (unknown) and severity rule for low (docs-only)."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_118-34.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 2: 'deprecation alias retained' and severity rule for 'deprecation with deadline >30 days'"
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_118-64.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "deprecation"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecated features and settings' matches the deprecation kind."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_119-30.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "deprecation",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is correctly classified as 'deprecation' per rule 2. Severity is 'medium' as it matches the 'deprecation with deadline >30 days' trigger in severity rules."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_119-54.json",
+      "verdict": "disagree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {
+        "kind": "deprecation"
+      },
+      "kind_check": "wrong",
+      "severity_check": "ok",
+      "rationale": "Rule 2 applies: 'Deprecated features and settings' matches the deprecation kind."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_120-40.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "breaking",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change does not meet any of the breaking criteria (no grace period, no runtime crash, no data loss), and the proposed kind 'breaking' is not justified by the rules."
+    },
+    {
+      "filename": "syn-vscode-copilot-chat-v1_120-52.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' as it's a new capability (dead-connection detection) added via a PR, matching rule 7. Severity is 'low' as it's an opt-in feature addition, matching rule 6 for severity."
+    },
+    {
+      "filename": "syn-windsurf-2026-01-13-bug-fixes-and-improvements-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text is vague and does not clearly indicate a security, deprecation, breaking, or fix issue, so 'unknown' is correct. The severity is 'low' as it is a documentation-only or cosmetic change."
+    },
+    {
+      "filename": "syn-windsurf-2026-02-11-bug-fixes-and-improvements-3.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (fixing a false positive privilege escalation prompt). Severity 'medium' matches the trigger for 'visible-failure mode + no in-version named replacement'."
+    },
+    {
+      "filename": "syn-windsurf-2026-02-11-bug-fixes-and-improvements-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is classified as 'fix' under rule 4 (bugfix restoring spec'd behavior), and severity is 'low' under rule 6 (docs-only / opt-in feature addition)."
+    },
+    {
+      "filename": "syn-windsurf-2026-02-16-bug-fixes-and-improvements-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-windsurf-2026-02-16-bug-fixes-and-improvements-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior → fix. Severity 'low' matches 'compile-time-only' trigger (Rule 6)."
+    },
+    {
+      "filename": "syn-windsurf-2026-04-14-windsurf-20-10.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "unknown",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change is a documentation-only update to .gitignore and .codeiumignore handling, matching rule 6."
+    },
+    {
+      "filename": "syn-windsurf-2026-04-14-windsurf-20-5.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability additive), severity is 'low' per rule 6 (docs-only or opt-in feature addition)."
+    },
+    {
+      "filename": "syn-windsurf-2026-04-15-bug-fixes-and-improvements-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4 (fix). Severity is medium due to a visible-failure mode with no in-version named replacement, matching the MEDIUM severity trigger."
+    },
+    {
+      "filename": "syn-windsurf-2026-04-27-devin-for-terminal-6.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior → fix. Severity 'low' matches rule 6 (docs-only / opt-in feature addition) and is consistent with the nature of a bugfix that does not affect core functionality or introduce regression."
+    },
+    {
+      "filename": "syn-windsurf-2026-04-27-devin-for-terminal-8.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "feature",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Kind is 'feature' per rule 7 (new capability that consumers can opt into). Severity is 'low' per rule 6 (opt-in feature addition)."
+    },
+    {
+      "filename": "syn-windsurf-2026-04-28-bug-fixes--improvements-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (crash fixed). Severity is 'medium' as it's a crash that could occur in runtime, but no named deadline or build-broken flag is mentioned."
+    },
+    {
+      "filename": "syn-windsurf-2026-04-28-bug-fixes--improvements-2.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "The change text describes a bugfix restoring spec'd behavior, matching rule 4."
+    },
+    {
+      "filename": "syn-windsurf-2026-05-16-bug-fixes-and-improvements-1.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "medium"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Matches rule 4: Bugfix restoring spec'd behavior"
+    },
+    {
+      "filename": "syn-windsurf-2026-05-16-bug-fixes-and-improvements-4.json",
+      "verdict": "agree",
+      "original": {
+        "kind": "fix",
+        "severity": "low"
+      },
+      "suggested": {},
+      "kind_check": "ok",
+      "severity_check": "ok",
+      "rationale": "Rule 4 applies: Bugfix restoring spec'd behavior (path resolution for Devin local agent on WSL). Severity is low per rule 6 (docs-only or opt-in feature addition is not applicable here, but the change is not a security issue, not a breaking change, and not a performance issue)."
+    }
+  ],
+  "errors_detail": []
+}

@@ -16,14 +16,17 @@
     "subject": "'Duplicate Chat' menu item renamed to 'Fork Chat'",
     "action_text": "Look for 'Fork Chat' in the chat-message three-dot menu — it was previously labeled 'Duplicate Chat'. Functionality unchanged; UI label only.",
     "deadline": null,
-    "tags": ["cursor", "ui-rename"]
+    "tags": [
+      "cursor",
+      "ui-rename"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

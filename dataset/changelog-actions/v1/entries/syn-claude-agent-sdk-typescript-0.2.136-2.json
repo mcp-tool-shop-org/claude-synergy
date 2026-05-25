@@ -16,14 +16,18 @@
     "subject": "TodoWrite tool deprecated in favor of Task tools",
     "action_text": "Migrate `TodoWrite` callers to the new Task tools — `TaskCreate`, `TaskGet`, `TaskUpdate`, `TaskList`. Old tool still works in 0.2.136 but a future minor version will switch over; replace at your next maintenance window.",
     "deadline": null,
-    "tags": ["tool-deprecation", "todowrite", "task-tools"]
+    "tags": [
+      "tool-deprecation",
+      "todowrite",
+      "task-tools"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

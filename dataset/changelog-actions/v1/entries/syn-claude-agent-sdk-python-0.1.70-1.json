@@ -16,14 +16,18 @@
     "subject": "mcp dependency floor raised to >=1.19.0 to fix silent CallToolResult loss",
     "action_text": "Upgrade `mcp` to `>=1.19.0` (now enforced by `claude-agent-sdk-python` 0.1.70). Older `mcp` versions mishandled `CallToolResult` from in-process SDK MCP tool handlers, sending the model a validation-error blob instead of the real tool output — silent failure mode.",
     "deadline": null,
-    "tags": ["mcp", "in-process-tools", "silent-failure"]
+    "tags": [
+      "mcp",
+      "in-process-tools",
+      "silent-failure"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

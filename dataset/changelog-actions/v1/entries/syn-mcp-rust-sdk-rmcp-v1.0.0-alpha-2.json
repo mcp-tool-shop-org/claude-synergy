@@ -16,14 +16,19 @@
     "subject": "mcp-rust-sdk token-exchange return type now carries extra fields",
     "action_text": "Update auth-flow call sites in `mcp-rust-sdk` rmcp-v1.0.0-alpha+ to handle the widened token-exchange return type. PR #700 lets servers surface extra fields alongside the access token; existing destructuring patterns will fail to compile until you accept the new shape.",
     "deadline": null,
-    "tags": ["mcp", "rust-sdk", "auth", "token-exchange"]
+    "tags": [
+      "mcp",
+      "rust-sdk",
+      "auth",
+      "token-exchange"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

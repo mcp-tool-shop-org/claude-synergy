@@ -16,14 +16,17 @@
     "subject": "'Scroll to bottom' button in Cursor agent panel",
     "action_text": "Click the `scroll to bottom` button that appears in the agent panel when content overflows. Cosmetic ergonomic addition; manual scrolling still works as before.",
     "deadline": null,
-    "tags": ["cursor", "ui"]
+    "tags": [
+      "cursor",
+      "ui"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

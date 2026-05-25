@@ -16,14 +16,20 @@
     "subject": "Resume-session temp dir leak on Windows + macOS/APFS race",
     "action_text": "Upgrade to 0.2.101+ if you use resume-session on Windows or macOS/APFS. Pre-fix runs leaked temp directories silently — disk filled over long-running services, and `await using` disposal could race its own cleanup on APFS, leaving stale state behind.",
     "deadline": null,
-    "tags": ["resume-session", "windows", "macos", "apfs", "temp-leak"]
+    "tags": [
+      "resume-session",
+      "windows",
+      "macos",
+      "apfs",
+      "temp-leak"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,19 @@
     "subject": "Sonnet 4 and Opus 4 marked deprecated in anthropic-sdk-ruby",
     "action_text": "Migrate Ruby SDK callers from `claude-sonnet-4-20250514` and `claude-opus-4-20250514` to `claude-sonnet-4-6` and `claude-opus-4-7`. Upstream retires both models on the Claude API 2026-06-15; calls to the retired IDs will fail after that date.",
     "deadline": "2026-06-15",
-    "tags": ["model-retirement", "claude-sonnet-4", "claude-opus-4", "ruby-sdk"]
+    "tags": [
+      "model-retirement",
+      "claude-sonnet-4",
+      "claude-opus-4",
+      "ruby-sdk"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

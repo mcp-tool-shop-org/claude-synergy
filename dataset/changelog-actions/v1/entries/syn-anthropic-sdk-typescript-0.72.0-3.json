@@ -16,14 +16,19 @@
     "subject": "CI: breaking-change detection workflow added (no consumer impact)",
     "action_text": "Skip — `anthropic-sdk-typescript` consumers see no runtime change. The kind hint of `breaking` is a Conventional-Commits `ci:` scope artifact (an internal breaking-change-detection workflow was added to the SDK repo), not a user-facing API break.",
     "deadline": null,
-    "tags": ["sdk", "ci", "internal", "no-op"]
+    "tags": [
+      "sdk",
+      "ci",
+      "internal",
+      "no-op"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

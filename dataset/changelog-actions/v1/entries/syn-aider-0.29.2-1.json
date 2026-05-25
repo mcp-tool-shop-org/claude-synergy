@@ -16,14 +16,18 @@
     "subject": "aider model warnings clearer for unknown/unfamiliar models",
     "action_text": "Read https://aider.chat/docs/llms.html#model-warnings on `aider` 0.29.2+ to understand the refreshed unknown-model warnings. Helpful when bringing up a model identifier aider hasn't seen — guidance now points at the right config knob.",
     "deadline": null,
-    "tags": ["aider", "model-warnings", "ux"]
+    "tags": [
+      "aider",
+      "model-warnings",
+      "ux"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

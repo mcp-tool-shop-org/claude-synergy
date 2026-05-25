@@ -16,14 +16,18 @@
     "subject": "File-write UI truncates long single-line writes",
     "action_text": "Upgrade Claude Code to 2.1.105+ to stop seeing minified-JSON file writes paginate across many screens; long single-line writes now truncate in the UI. Cosmetic-only — file contents on disk are unchanged.",
     "deadline": null,
-    "tags": ["ui", "file-write", "truncation"]
+    "tags": [
+      "ui",
+      "file-write",
+      "truncation"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

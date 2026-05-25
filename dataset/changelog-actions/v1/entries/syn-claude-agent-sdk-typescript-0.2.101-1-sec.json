@@ -16,14 +16,19 @@
     "subject": "GHSA-5474-4w2j-mq4c + transitive hono advisories resolved via dependency bumps",
     "action_text": "Upgrade `claude-agent-sdk-typescript` to 0.2.101+ to pick up `@anthropic-ai/sdk@^0.81.0` and `@modelcontextprotocol/sdk@^1.29.0`, resolving GHSA-5474-4w2j-mq4c plus transitive `hono` advisories. Re-run `npm audit` after upgrade to confirm.",
     "deadline": null,
-    "tags": ["ghsa", "ghsa-5474-4w2j-mq4c", "dependency-bump", "transitive"]
+    "tags": [
+      "ghsa",
+      "ghsa-5474-4w2j-mq4c",
+      "dependency-bump",
+      "transitive"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

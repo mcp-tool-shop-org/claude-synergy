@@ -16,14 +16,19 @@
     "subject": "system:init + result events emit 'Task' (reverted from 'Agent')",
     "action_text": "Update `system:init` and `result` event consumers to expect `'Task'` as the Agent tool name in 0.2.69+ — the prior patch unintentionally emitted `'Agent'`. Plan a follow-up: the wire name migrates to `'Agent'` in the next minor release.",
     "deadline": null,
-    "tags": ["sdk", "events", "regression-recovery", "tool-name"]
+    "tags": [
+      "sdk",
+      "events",
+      "regression-recovery",
+      "tool-name"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

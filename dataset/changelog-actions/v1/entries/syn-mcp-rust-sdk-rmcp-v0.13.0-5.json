@@ -16,14 +16,18 @@
     "subject": "rmcp adds task support per SEP-1686",
     "action_text": "Upgrade `rmcp` to 0.13.0+ to use the new task surface from SEP-1686 (long-running tool invocations with status polling). Additive feature; existing tool/resource callers are unaffected. Read SEP-1686 before adopting to align with the spec'd lifecycle.",
     "deadline": null,
-    "tags": ["rmcp", "tasks", "sep-1686"]
+    "tags": [
+      "rmcp",
+      "tasks",
+      "sep-1686"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

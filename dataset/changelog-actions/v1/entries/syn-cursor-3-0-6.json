@@ -16,14 +16,19 @@
     "subject": "/best-of-n slash command runs the same task across multiple models",
     "action_text": "Try `/best-of-n` in `cursor` 3.0+ when you want to A/B a task across models — it runs the same prompt in parallel, each in an isolated worktree, then compares outcomes. Opt-in; no impact on consumers who don't invoke it.",
     "deadline": null,
-    "tags": ["cursor", "slash-command", "worktree", "best-of-n"]
+    "tags": [
+      "cursor",
+      "slash-command",
+      "worktree",
+      "best-of-n"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

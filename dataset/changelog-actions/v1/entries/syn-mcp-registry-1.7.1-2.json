@@ -16,14 +16,18 @@
     "subject": "mcp-registry availability hardening + publish-phase timing metrics",
     "action_text": "Upgrade `mcp-registry` to 1.7.1+ if you operate a registry instance — PR #1211 adds availability hardening plus per-phase publish timing metrics. Use the new timings to spot slow phases of publish without bisecting through logs.",
     "deadline": null,
-    "tags": ["mcp-registry", "availability", "observability"]
+    "tags": [
+      "mcp-registry",
+      "availability",
+      "observability"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

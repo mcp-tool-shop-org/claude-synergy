@@ -16,14 +16,18 @@
     "subject": "drag-and-drop fixed in agent-window Cascade tabs",
     "action_text": "Update Windsurf to drag files into agent-window `Cascade` tabs again. Pre-fix the drop target was non-responsive; no replacement workflow was needed beyond the fix.",
     "deadline": null,
-    "tags": ["cascade", "drag-drop", "agent-window"]
+    "tags": [
+      "cascade",
+      "drag-drop",
+      "agent-window"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

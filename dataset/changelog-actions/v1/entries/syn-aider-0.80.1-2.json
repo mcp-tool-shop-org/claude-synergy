@@ -16,14 +16,19 @@
     "subject": "Redundant dependency check removed from OpenRouter OAuth flow",
     "action_text": "Upgrade `aider` to 0.80.1+ if you authenticate with OpenRouter via OAuth — a redundant dependency check has been removed from the flow. No caller-side action required; internal cleanup only.",
     "deadline": null,
-    "tags": ["aider", "openrouter", "oauth", "internal"]
+    "tags": [
+      "aider",
+      "openrouter",
+      "oauth",
+      "internal"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

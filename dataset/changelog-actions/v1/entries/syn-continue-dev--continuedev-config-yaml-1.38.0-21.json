@@ -16,14 +16,18 @@
     "subject": "createSession/startNewSession now initialize usage field",
     "action_text": "Upgrade `@continuedev/config-yaml` to 1.38.0+ if you read the `usage` field from `createSession` or `startNewSession`. Pre-fix returns left the field uninitialized; reads against fresh sessions could silently surface stale or missing data.",
     "deadline": null,
-    "tags": ["config-yaml", "session", "usage-tracking"]
+    "tags": [
+      "config-yaml",
+      "session",
+      "usage-tracking"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

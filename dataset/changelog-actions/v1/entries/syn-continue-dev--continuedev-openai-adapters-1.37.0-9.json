@@ -16,14 +16,18 @@
     "subject": "openai-adapters no longer falls back to relative path for non-markdown files",
     "action_text": "Upgrade `@continuedev/openai-adapters` to 1.37.0+ if you pass non-markdown file paths through the adapter. Pre-fix non-markdown inputs silently fell back to a relative path resolution that could produce wrong-file reads.",
     "deadline": null,
-    "tags": ["openai-adapters", "path-resolution", "markdown"]
+    "tags": [
+      "openai-adapters",
+      "path-resolution",
+      "markdown"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "logging/setLevel now returns empty hash per spec",
     "action_text": "Upgrade to mcp-ruby-sdk 0.7.1+ to align `logging/setLevel` with the MCP specification — it now returns `{}` instead of a non-conformant payload. Strict clients that validated the response shape rejected the pre-fix response.",
     "deadline": null,
-    "tags": ["ruby", "logging", "spec-conformance"]
+    "tags": [
+      "ruby",
+      "logging",
+      "spec-conformance"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

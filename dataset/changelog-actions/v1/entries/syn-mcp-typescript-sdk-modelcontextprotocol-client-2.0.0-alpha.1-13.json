@@ -16,14 +16,18 @@
     "subject": "windowsHide always set when spawning stdio MCP servers on Windows",
     "action_text": "Upgrade `@modelcontextprotocol/client` to 2.0.0-alpha.1+ on Windows to suppress unwanted console-window flashes when stdio MCP servers spawn. Previously only suppressed in Electron environments; now suppressed for every host.",
     "deadline": null,
-    "tags": ["windows", "stdio", "console-flash"]
+    "tags": [
+      "windows",
+      "stdio",
+      "console-flash"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

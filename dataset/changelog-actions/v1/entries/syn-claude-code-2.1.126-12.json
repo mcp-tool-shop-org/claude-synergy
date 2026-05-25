@@ -16,14 +16,18 @@
     "subject": "Pasting images larger than 2000px no longer breaks the session",
     "action_text": "Upgrade Claude Code to 2.1.126 if you ever paste images. Pre-fix, any pasted image >2000px broke the session outright; the fix downscales on paste, auto-removes oversized history entries, and retries — recovers from a runtime-crash mode for the default-config user.",
     "deadline": null,
-    "tags": ["images", "session", "paste"]
+    "tags": [
+      "images",
+      "session",
+      "paste"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

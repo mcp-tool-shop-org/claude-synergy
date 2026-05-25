@@ -16,14 +16,18 @@
     "subject": "CI timeout bumped for example tests; sleep reduced in error-handling example",
     "action_text": "Skip unless you vendor the example tests. Internal CI-only tweak in `claude-agent-sdk-python` 0.1.52: example test timeout raised and the error-handling example's sleep shortened. No consumer-facing surface affected.",
     "deadline": null,
-    "tags": ["ci", "examples", "internal"]
+    "tags": [
+      "ci",
+      "examples",
+      "internal"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

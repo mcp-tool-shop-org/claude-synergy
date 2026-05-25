@@ -16,14 +16,18 @@
     "subject": "`ChatSessionItemControllerNewItemHandler` lets controllers set the new-session URI",
     "action_text": "Implement `ChatSessionItemControllerNewItemHandler` on chat-session-item controllers (VS Code v1.110+) to specify the URI used when a new session opens. Opt-in extension API; existing controllers without the handler fall back to the previous default URI selection.",
     "deadline": null,
-    "tags": ["vscode-copilot-chat", "extension-api", "chat-sessions"]
+    "tags": [
+      "vscode-copilot-chat",
+      "extension-api",
+      "chat-sessions"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

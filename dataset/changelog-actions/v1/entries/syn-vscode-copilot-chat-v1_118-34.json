@@ -16,14 +16,19 @@
     "subject": "Edit Mode deprecated; `chat.editMode.hidden` re-enable removed in VS Code 1.125",
     "action_text": "Migrate workflows off VS Code Copilot Chat Edit Mode now. The `chat.editMode.hidden` org-managed setting still re-enables it through v1.124, but v1.125 removes the feature outright and the setting will stop working. No in-product replacement is named — coordinate the migration before 1.125 lands.",
     "deadline": null,
-    "tags": ["vscode-copilot-chat", "edit-mode", "deprecation", "org-setting"]
+    "tags": [
+      "vscode-copilot-chat",
+      "edit-mode",
+      "deprecation",
+      "org-setting"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

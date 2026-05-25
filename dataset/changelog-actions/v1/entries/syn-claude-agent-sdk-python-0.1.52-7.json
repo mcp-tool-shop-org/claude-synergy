@@ -16,14 +16,18 @@
     "subject": "Bundled Claude CLI bumped to 2.1.87 inside claude-agent-sdk-python 0.1.52",
     "action_text": "Upgrade `claude-agent-sdk-python` to 0.1.52 to pick up bundled Claude CLI 2.1.87. Release notes don't enumerate the CLI deltas — read the Claude Code 2.1.87 changelog for the actual surface changes the subprocess will exhibit.",
     "deadline": null,
-    "tags": ["bundled-cli", "claude-code", "release-notes-vague"]
+    "tags": [
+      "bundled-cli",
+      "claude-code",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

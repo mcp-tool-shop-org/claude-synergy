@@ -16,14 +16,18 @@
     "subject": "MaxListenersExceededWarning on 11+ concurrent query() calls",
     "action_text": "Upgrade to 0.2.101+ if you fan out 11 or more concurrent `query()` calls. Pre-fix Node emitted `MaxListenersExceededWarning` (often a leak indicator) for routine high-concurrency callers; functionality continued but logs were polluted and leak detectors fired.",
     "deadline": null,
-    "tags": ["concurrency", "query", "node-warning"]
+    "tags": [
+      "concurrency",
+      "query",
+      "node-warning"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

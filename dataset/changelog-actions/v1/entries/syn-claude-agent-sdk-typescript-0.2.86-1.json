@@ -16,14 +16,18 @@
     "subject": "getContextUsage() control method",
     "action_text": "Upgrade to `claude-agent-sdk-typescript` 0.2.86+ to call `getContextUsage()` on the query control surface for a per-category breakdown of context window usage. Use it before deciding to compact, fork, or trim system messages — the breakdown tells you which category is dominating.",
     "deadline": null,
-    "tags": ["agent-sdk", "context-window", "introspection"]
+    "tags": [
+      "agent-sdk",
+      "context-window",
+      "introspection"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch02",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

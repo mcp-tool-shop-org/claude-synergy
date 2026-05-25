@@ -16,14 +16,18 @@
     "subject": "Claude Sonnet 4 + Opus 4 retiring on the API 2026-06-15",
     "action_text": "Migrate `claude-sonnet-4-20250514` callers to `claude-sonnet-4-6` and `claude-opus-4-20250514` callers to `claude-opus-4-7`. Retirement is 2026-06-15; calls to the retired IDs will start failing on that date.",
     "deadline": "2026-06-15",
-    "tags": ["model-retirement", "claude-sonnet-4", "claude-opus-4"]
+    "tags": [
+      "model-retirement",
+      "claude-sonnet-4",
+      "claude-opus-4"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

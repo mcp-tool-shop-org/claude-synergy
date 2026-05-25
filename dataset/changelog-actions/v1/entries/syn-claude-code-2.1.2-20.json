@@ -16,14 +16,19 @@
     "subject": "Windows managed-settings path moved from ProgramData to Program Files",
     "action_text": "Migrate `C:\\ProgramData\\ClaudeCode\\managed-settings.json` to `C:\\Program Files\\ClaudeCode\\managed-settings.json` for Windows administrators. The legacy path still resolves in 2.1.2 but is marked deprecated; no removal deadline announced upstream.",
     "deadline": null,
-    "tags": ["claude-code", "windows", "managed-settings", "deprecation"]
+    "tags": [
+      "claude-code",
+      "windows",
+      "managed-settings",
+      "deprecation"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

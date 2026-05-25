@@ -16,14 +16,18 @@
     "subject": "thinking-display-setting promoted to GA in anthropic-sdk-ruby",
     "action_text": "Drop any `thinking-display-setting` beta gating in `anthropic-sdk-ruby` 1.24.0+ — the setting is now GA. Opt-in surface only; existing callers that did not pass it continue unchanged.",
     "deadline": null,
-    "tags": ["ga", "thinking", "display"]
+    "tags": [
+      "ga",
+      "thinking",
+      "display"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "tool call failures + denials now in debug logs",
     "action_text": "Inspect `claude --debug` output to see tool call failures and denials that were previously silent. Useful when diagnosing why an agent skipped a tool or got blocked by permissions.",
     "deadline": null,
-    "tags": ["debug-logs", "tool-calls", "observability"]
+    "tags": [
+      "debug-logs",
+      "tool-calls",
+      "observability"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

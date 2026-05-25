@@ -16,14 +16,19 @@
     "subject": "DISABLE_TELEMETRY and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC ignored for API and enterprise users",
     "action_text": "Upgrade to `claude-code` 2.1.120+ to make `DISABLE_TELEMETRY` and `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` actually suppress usage metrics telemetry on API and enterprise tiers. Pre-fix the env vars set but were silently ignored — telemetry shipped anyway. Audit network logs from earlier builds if data residency matters.",
     "deadline": null,
-    "tags": ["claude-code", "telemetry", "env-var", "enterprise"]
+    "tags": [
+      "claude-code",
+      "telemetry",
+      "env-var",
+      "enterprise"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch02",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,19 @@
     "subject": "In-app terminal notification noise reduced + shortcut behavior",
     "action_text": "Upgrade `cursor` to 3.4+ to drop noisy in-app terminal notifications and pick up shortcut-behavior tweaks. Cosmetic change; no surface name removed and no user action required.",
     "deadline": null,
-    "tags": ["cursor", "terminal", "notifications", "shortcuts"]
+    "tags": [
+      "cursor",
+      "terminal",
+      "notifications",
+      "shortcuts"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

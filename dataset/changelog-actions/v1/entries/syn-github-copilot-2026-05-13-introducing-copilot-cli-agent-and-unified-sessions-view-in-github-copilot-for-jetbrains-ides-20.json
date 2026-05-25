@@ -16,14 +16,18 @@
     "subject": "code block action hover and pressed states",
     "action_text": "Update Copilot for JetBrains to pick up refined hover and pressed states on code block action buttons. Purely cosmetic — interaction behavior is unchanged; no config or call-site changes needed.",
     "deadline": null,
-    "tags": ["jetbrains", "ui", "cosmetic"]
+    "tags": [
+      "jetbrains",
+      "ui",
+      "cosmetic"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch02",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

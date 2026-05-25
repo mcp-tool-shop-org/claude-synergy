@@ -16,14 +16,18 @@
     "subject": "rmcp-macros *Param type aliases deprecated in favor of *Params",
     "action_text": "Rename `*Param` type aliases in rmcp-macros usage to `*Params` (plural). Compiler emits deprecation warnings flagging each call site; mechanical fix.",
     "deadline": null,
-    "tags": ["rust", "type-alias", "macros"]
+    "tags": [
+      "rust",
+      "type-alias",
+      "macros"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

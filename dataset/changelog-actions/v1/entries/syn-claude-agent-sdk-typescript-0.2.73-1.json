@@ -16,14 +16,18 @@
     "subject": "options.env was silently overridden by ~/.claude/settings.json env block",
     "action_text": "Upgrade to 0.2.73+ if you pass `options.env` without including `user` in `settingSources`. Pre-fix your explicit env was silently overwritten by the user-settings env block — silent-wrong values for API keys, paths, or feature flags reached the subprocess.",
     "deadline": null,
-    "tags": ["options-env", "settings", "silent-failure"]
+    "tags": [
+      "options-env",
+      "settings",
+      "silent-failure"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

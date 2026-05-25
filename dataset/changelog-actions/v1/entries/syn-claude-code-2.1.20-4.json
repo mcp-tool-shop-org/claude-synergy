@@ -16,14 +16,19 @@
     "subject": "Load CLAUDE.md from --add-dir directories (env-gated)",
     "action_text": "Set `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1` and pass `--add-dir <path>` to have Claude Code 2.1.20+ pick up `CLAUDE.md` files from extra directories. Env gate keeps the behavior opt-in; existing single-directory loading is unchanged when the flag is absent.",
     "deadline": null,
-    "tags": ["claude-code", "cli-flag", "env-var", "claude-md"]
+    "tags": [
+      "claude-code",
+      "cli-flag",
+      "env-var",
+      "claude-md"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

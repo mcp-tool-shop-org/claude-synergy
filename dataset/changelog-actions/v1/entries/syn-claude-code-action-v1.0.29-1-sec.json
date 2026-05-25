@@ -16,14 +16,18 @@
     "subject": "CVE-2025-66414 (HIGH) patched in claude-code-action",
     "action_text": "Upgrade `claude-code-action` to v1.0.29+ to patch CVE-2025-66414 (HIGH severity). Pin the action version in every workflow that uses it (`uses: anthropics/claude-code-action@v1.0.29` or later) and read PR #792 + the CVE advisory for affected paths.",
     "deadline": null,
-    "tags": ["cve", "cve-2025-66414", "github-action"]
+    "tags": [
+      "cve",
+      "cve-2025-66414",
+      "github-action"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

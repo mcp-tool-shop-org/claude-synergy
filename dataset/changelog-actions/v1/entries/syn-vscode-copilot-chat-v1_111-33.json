@@ -16,14 +16,19 @@
     "subject": "MCP Gateway no longer blocks on list calls during startup",
     "action_text": "Upgrade VS Code to v1_111+ if `MCP Gateway` startup has been slow. PR #298040 removes blocking `list` calls during startup; no user-side config change required.",
     "deadline": null,
-    "tags": ["vscode", "mcp", "startup", "performance"]
+    "tags": [
+      "vscode",
+      "mcp",
+      "startup",
+      "performance"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

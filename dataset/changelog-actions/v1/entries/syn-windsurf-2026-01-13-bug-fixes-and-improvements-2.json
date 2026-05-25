@@ -16,14 +16,17 @@
     "subject": "Stability and reliability improvements (unspecified)",
     "action_text": "Upgrade Windsurf if you've been hitting stability issues; upstream notes don't specify which subsystems improved. Canonical vague-release-note — no targeted adjustment derivable without more detail.",
     "deadline": null,
-    "tags": ["release-notes-vague", "stability"]
+    "tags": [
+      "release-notes-vague",
+      "stability"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

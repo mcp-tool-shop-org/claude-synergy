@@ -16,14 +16,20 @@
     "subject": "`Get-DnsClientCache` and `ipconfig /displaydns` no longer auto-allowed (DNS-cache privacy)",
     "action_text": "Expect a permission prompt the first time the agent runs `Get-DnsClientCache` or `ipconfig /displaydns` in 2.1.90+; both were removed from auto-allow for DNS-cache privacy. Add explicit allow rules to settings if you intentionally want these silent.",
     "deadline": null,
-    "tags": ["claude-code", "auto-allow", "dns", "privacy", "permissions"]
+    "tags": [
+      "claude-code",
+      "auto-allow",
+      "dns",
+      "privacy",
+      "permissions"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

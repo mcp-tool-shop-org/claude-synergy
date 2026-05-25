@@ -16,14 +16,18 @@
     "subject": ".gitignore and .codeiumignore handling",
     "action_text": "Update `windsurf` to the 2026-04-14 build if you rely on `.gitignore` or `.codeiumignore` to scope what the editor reads. Upstream notes do not list which surfaces changed; re-verify ignored paths are still ignored after the upgrade.",
     "deadline": null,
-    "tags": ["windsurf", "gitignore", "release-notes-vague"]
+    "tags": [
+      "windsurf",
+      "gitignore",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch02",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

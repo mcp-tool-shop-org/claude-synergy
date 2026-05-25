@@ -16,14 +16,19 @@
     "subject": "SDK query() cleans up subprocess + temp files on early break",
     "action_text": "Upgrade Claude Code SDK to 2.1.101+ if your code `break`s out of a `for await` over `query()` or uses `await using`. Pre-fix the subprocess and temp files leaked on early termination; now they are released when the iterator closes.",
     "deadline": null,
-    "tags": ["sdk", "query", "cleanup", "leak"]
+    "tags": [
+      "sdk",
+      "query",
+      "cleanup",
+      "leak"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,17 @@
     "subject": "/output-style deprecated; use /config",
     "action_text": "Replace `/output-style` invocations with `/config`. Output style is fixed at session start now (for prompt-cache reuse); mid-session `/output-style` would have been a no-op anyway.",
     "deadline": null,
-    "tags": ["slash-command", "prompt-caching"]
+    "tags": [
+      "slash-command",
+      "prompt-caching"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

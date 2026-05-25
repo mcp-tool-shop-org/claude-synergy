@@ -16,14 +16,18 @@
     "subject": "scipy restored to aider main requirements.txt",
     "action_text": "Upgrade to aider 0.43.4+ if you hit `ModuleNotFoundError: scipy` after a prior install. Scipy was inadvertently dropped from `requirements.txt` and has been restored as a direct dependency.",
     "deadline": null,
-    "tags": ["aider", "dependency", "regression"]
+    "tags": [
+      "aider",
+      "dependency",
+      "regression"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

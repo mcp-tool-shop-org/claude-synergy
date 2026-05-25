@@ -16,14 +16,19 @@
     "subject": "PermissionDenied hook for auto-mode classifier denials",
     "action_text": "Register a `PermissionDenied` hook in settings.json to intercept auto-mode classifier denials in Claude Code 2.1.89+. Return `{retry: true}` from the hook to tell the model it can retry the action; omit the field to let the denial stand. Opt-in.",
     "deadline": null,
-    "tags": ["claude-code", "hooks", "auto-mode", "permissions"]
+    "tags": [
+      "claude-code",
+      "hooks",
+      "auto-mode",
+      "permissions"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

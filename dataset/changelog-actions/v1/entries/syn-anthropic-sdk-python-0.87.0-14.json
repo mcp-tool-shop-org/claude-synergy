@@ -16,14 +16,18 @@
     "subject": "Test dependency `steady` bumped to v0.19.7",
     "action_text": "Skip unless you run the `anthropic-sdk-python` test suite yourself. Internal test-only bump of `steady` to v0.19.7; no runtime dependency change for consumers, no public-surface effect.",
     "deadline": null,
-    "tags": ["tests", "internal", "deps"]
+    "tags": [
+      "tests",
+      "internal",
+      "deps"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

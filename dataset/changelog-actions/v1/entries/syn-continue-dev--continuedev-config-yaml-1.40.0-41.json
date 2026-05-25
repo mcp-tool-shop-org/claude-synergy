@@ -16,14 +16,19 @@
     "subject": "continue CLI detects WSL and spawns appropriate shell",
     "action_text": "Upgrade `@continuedev/config-yaml` to 1.40.0+ if you run the `continue` CLI under WSL. Pre-fix it spawned the wrong shell on WSL hosts, breaking commands that assumed a Linux-style environment.",
     "deadline": null,
-    "tags": ["cli", "wsl", "shell-spawn", "windows"]
+    "tags": [
+      "cli",
+      "wsl",
+      "shell-spawn",
+      "windows"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

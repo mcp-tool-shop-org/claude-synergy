@@ -16,14 +16,18 @@
     "subject": "Claude Haiku 3 marked deprecated in anthropic-sdk-java",
     "action_text": "Audit Java SDK callers for `claude-3-haiku-20240307` and plan migration to a current Haiku model (`claude-haiku-4-5` or newer). No retirement date is named in this release; the deprecation surfaces as a compile-time hint only.",
     "deadline": null,
-    "tags": ["model-deprecation", "claude-haiku-3", "java-sdk"]
+    "tags": [
+      "model-deprecation",
+      "claude-haiku-3",
+      "java-sdk"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

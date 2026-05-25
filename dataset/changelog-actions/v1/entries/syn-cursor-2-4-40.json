@@ -16,14 +16,18 @@
     "subject": "Accept/reject diff UI missing on dotfile edits",
     "action_text": "Upgrade `cursor` to 2.4+ if you edit dotfiles via the agent — pre-fix the accept/reject diff UI sometimes did not appear, leaving changes ambiguously applied. Re-review any unreviewed dotfile edits made on earlier versions.",
     "deadline": null,
-    "tags": ["cursor", "diff-ui", "dotfiles"]
+    "tags": [
+      "cursor",
+      "diff-ui",
+      "dotfiles"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

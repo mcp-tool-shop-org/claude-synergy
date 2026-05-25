@@ -16,14 +16,18 @@
     "subject": "cursor CLI auto-detects terminal light/dark background",
     "action_text": "Update `cursor` CLI to get terminal-aware color output that adapts to dark or light backgrounds. No flag needed; detection runs automatically per session.",
     "deadline": null,
-    "tags": ["cli", "terminal", "theming"]
+    "tags": [
+      "cli",
+      "terminal",
+      "theming"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

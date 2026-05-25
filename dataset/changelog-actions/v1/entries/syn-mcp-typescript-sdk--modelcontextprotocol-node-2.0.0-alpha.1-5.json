@@ -16,14 +16,18 @@
     "subject": "@modelcontextprotocol/node repo standardized on pnpm",
     "action_text": "Use `pnpm` when contributing to `@modelcontextprotocol/node`; the repo's package-manager docs and scripts are now pnpm-only. Consumers of the published package are unaffected — this is a repository-tooling change, not an API change.",
     "deadline": null,
-    "tags": ["pnpm", "repo-tooling", "contributors"]
+    "tags": [
+      "pnpm",
+      "repo-tooling",
+      "contributors"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

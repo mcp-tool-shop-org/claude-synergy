@@ -16,14 +16,19 @@
     "subject": "Default Opus model on Bedrock/Vertex/Foundry bumped from 4.1 to 4.6",
     "action_text": "Pin `--model claude-opus-4-1` explicitly on Bedrock, Vertex, or Microsoft Foundry if you depended on the old default. Upgrades silently swap your effective model to Opus 4.6 with different token costs and output behavior.",
     "deadline": null,
-    "tags": ["default-model", "bedrock", "vertex", "foundry"]
+    "tags": [
+      "default-model",
+      "bedrock",
+      "vertex",
+      "foundry"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

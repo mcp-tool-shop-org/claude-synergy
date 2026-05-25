@@ -16,14 +16,18 @@
     "subject": "CLI input lag during rapid text changes",
     "action_text": "Upgrade `cursor` to 2.4+ if you hit input lag in the CLI under bursts of rapid text. Scope is narrow — only some cases addressed per upstream; reproduce after upgrade to confirm your case is covered.",
     "deadline": null,
-    "tags": ["cursor", "cli", "performance"]
+    "tags": [
+      "cursor",
+      "cli",
+      "performance"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

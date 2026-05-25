@@ -16,14 +16,19 @@
     "subject": "CVE-2026-0621: ReDoS in @modelcontextprotocol/server UriTemplate regex",
     "action_text": "Upgrade `@modelcontextprotocol/server` to 2.0.0-alpha.1+ to patch CVE-2026-0621 (ReDoS in `UriTemplate` regex patterns). Pre-fix, an attacker-controlled URI matched against a vulnerable template could pin a CPU thread — DoS class, no RCE.",
     "deadline": null,
-    "tags": ["cve", "cve-2026-0621", "redos", "denial-of-service"]
+    "tags": [
+      "cve",
+      "cve-2026-0621",
+      "redos",
+      "denial-of-service"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

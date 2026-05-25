@@ -16,14 +16,18 @@
     "subject": "TaskOutput tool deprecated; use Read on the task's output file",
     "action_text": "Replace `TaskOutput` tool calls with `Read` against the background task's output file path. `TaskOutput` is still accepted in 2.1.83 but is marked deprecated; no removal deadline announced upstream.",
     "deadline": null,
-    "tags": ["claude-code", "tool", "deprecation"]
+    "tags": [
+      "claude-code",
+      "tool",
+      "deprecation"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

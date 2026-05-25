@@ -16,14 +16,17 @@
     "subject": "anthropic-cli formatJSON signature refactor",
     "action_text": "Read the v1.3.0 commit `a9ac5e1` if you import `formatJSON` from the anthropic-cli codebase — the signature changed from positional args to a `ShowJSONOpts` object. Internal helper change; not part of the documented public CLI surface and likely no consumer impact.",
     "deadline": null,
-    "tags": ["anthropic-cli", "internal-refactor"]
+    "tags": [
+      "anthropic-cli",
+      "internal-refactor"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

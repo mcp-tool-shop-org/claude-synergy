@@ -16,14 +16,18 @@
     "subject": "CLAUDE_CODE_ENABLE_TASKS env var enables new task system",
     "action_text": "Set `CLAUDE_CODE_ENABLE_TASKS=true` in your SDK environment to opt into the new task system. Leaving it unset preserves the prior behavior; the task system is additive and off by default in 0.2.19.",
     "deadline": null,
-    "tags": ["env-var", "tasks", "opt-in"]
+    "tags": [
+      "env-var",
+      "tasks",
+      "opt-in"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

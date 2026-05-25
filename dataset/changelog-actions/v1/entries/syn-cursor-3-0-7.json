@@ -16,14 +16,19 @@
     "subject": "Editor's previous worktree and best-of-n selection deprecated in Cursor 3.0",
     "action_text": "Migrate any Editor workflows depending on the previous worktree picker or best-of-n result selection in Cursor 3.0. Upstream notes name no replacement and no removal deadline; treat as on a path to removal and plan an alternative now.",
     "deadline": null,
-    "tags": ["cursor", "editor", "worktree", "best-of-n"]
+    "tags": [
+      "cursor",
+      "editor",
+      "worktree",
+      "best-of-n"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

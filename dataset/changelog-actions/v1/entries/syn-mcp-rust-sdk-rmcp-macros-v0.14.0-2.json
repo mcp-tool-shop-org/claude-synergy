@@ -16,14 +16,18 @@
     "subject": "hyper-mcp added to 'built with rmcp' README list",
     "action_text": "Read the rmcp README's `built with rmcp` section to discover `hyper-mcp` if relevant. Documentation-only addition; no API or runtime behavior changes.",
     "deadline": null,
-    "tags": ["mcp", "rust", "docs"]
+    "tags": [
+      "mcp",
+      "rust",
+      "docs"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,17 @@
     "subject": "define_tool now accepts output_schema",
     "action_text": "Upgrade to mcp-ruby-sdk 0.16.0+ to pass `output_schema` to `define_tool`. Pre-fix callers passing the argument had no error but also no effect.",
     "deadline": null,
-    "tags": ["api", "tool-definition"]
+    "tags": [
+      "api",
+      "tool-definition"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "rmcp draft2020_12 schema settings no longer apply AddNullable",
     "action_text": "Upgrade `rmcp` to 0.17.0+ to emit draft-2020-12 schemas without the spurious `AddNullable` transform. Consumers validating generated schemas against strict draft-2020-12 will see fewer nullable-union artifacts; downstream clients that depended on the old shape may need a regen.",
     "deadline": null,
-    "tags": ["rmcp", "json-schema", "draft-2020-12"]
+    "tags": [
+      "rmcp",
+      "json-schema",
+      "draft-2020-12"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

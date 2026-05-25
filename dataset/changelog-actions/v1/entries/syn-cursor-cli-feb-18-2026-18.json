@@ -16,14 +16,18 @@
     "subject": "Emacs-style navigation keys in Cursor CLI",
     "action_text": "Use `Ctrl+N`/`Ctrl+P` for up/down and `Ctrl+G` for cancel in Cursor CLI prompts. Existing arrow keys and `Esc` still work; nothing breaks for users who don't adopt the Emacs bindings.",
     "deadline": null,
-    "tags": ["cursor", "cli", "keybinding"]
+    "tags": [
+      "cursor",
+      "cli",
+      "keybinding"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

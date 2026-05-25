@@ -16,14 +16,18 @@
     "subject": "Corrected MCP code-tool API endpoint in anthropic-sdk-go",
     "action_text": "Upgrade `anthropic-sdk-go` to 1.20.0+ if calling the MCP `code tool` API. Pre-fix callers hit the wrong endpoint and saw visible failures; no caller-side code change required after upgrade.",
     "deadline": null,
-    "tags": ["anthropic-sdk-go", "mcp", "endpoint"]
+    "tags": [
+      "anthropic-sdk-go",
+      "mcp",
+      "endpoint"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "auto-approval panel UI",
     "action_text": "Update Copilot for JetBrains to pick up the refreshed auto-approval panel UI. Behavior of approvals is unchanged; only the panel's visual layout is updated. No config changes required.",
     "deadline": null,
-    "tags": ["jetbrains", "auto-approval", "ui"]
+    "tags": [
+      "jetbrains",
+      "auto-approval",
+      "ui"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch02",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

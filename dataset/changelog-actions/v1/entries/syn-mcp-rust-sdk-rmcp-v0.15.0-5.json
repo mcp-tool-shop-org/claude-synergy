@@ -16,14 +16,18 @@
     "subject": "rmcp tasks no longer drop completed results during collection",
     "action_text": "Upgrade `rmcp` to 0.15.0+ if your server uses the task surface. Pre-fix the collection step could drop completed task results — silent data-loss mode, no error raised, caller saw a missing result. No workaround on 0.14 and earlier other than the upgrade.",
     "deadline": null,
-    "tags": ["rmcp", "tasks", "data-loss"]
+    "tags": [
+      "rmcp",
+      "tasks",
+      "data-loss"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

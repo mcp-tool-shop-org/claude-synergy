@@ -16,14 +16,18 @@
     "subject": "New model settings now replace old ones",
     "action_text": "Upgrade `aider` to 0.85.2+ if you reconfigure existing models via overrides — pre-fix settings silently kept the stale values. Re-apply any model override after upgrade to confirm the new values stick.",
     "deadline": null,
-    "tags": ["aider", "model-config", "silent-failure"]
+    "tags": [
+      "aider",
+      "model-config",
+      "silent-failure"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

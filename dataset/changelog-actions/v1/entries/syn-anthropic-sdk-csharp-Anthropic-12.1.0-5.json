@@ -16,14 +16,18 @@
     "subject": "Unspecified lint error fix in anthropic-sdk-csharp",
     "action_text": "Upgrade to `anthropic-sdk-csharp` 12.1.0+ if you build with strict-analyzer warnings. Upstream notes don't specify which lint rule or which file — no runtime behavior change derivable from the entry alone.",
     "deadline": null,
-    "tags": ["csharp", "lint", "release-notes-vague"]
+    "tags": [
+      "csharp",
+      "lint",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "aider repo-map progress indication improved (unspecified)",
     "action_text": "Upgrade `aider` to 0.48.1+ if repo-map processing felt opaque; upstream notes only say progress indication improved without naming the prior gap. Cosmetic UX adjustment with no behavior change.",
     "deadline": null,
-    "tags": ["aider", "ux", "repo-map"]
+    "tags": [
+      "aider",
+      "ux",
+      "repo-map"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

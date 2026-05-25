@@ -16,14 +16,19 @@
     "subject": "Tag-mode tool permissions hardened against prompt injection",
     "action_text": "Upgrade `claude-code-action` to v1.0.72+ in workflows that use tag-trigger mode on PRs from external contributors. Pre-fix, untrusted PR content could expand the action's tool surface via prompt injection — see PR #1002 for the hardened permission model.",
     "deadline": null,
-    "tags": ["prompt-injection", "tag-mode", "github-action", "untrusted-input"]
+    "tags": [
+      "prompt-injection",
+      "tag-mode",
+      "github-action",
+      "untrusted-input"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

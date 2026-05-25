@@ -11,19 +11,23 @@
     "change_id": "anthropic-sdk-python/0.77.0/6"
   },
   "output": {
-    "kind": "unknown",
+    "kind": "breaking",
     "severity": "medium",
     "subject": "Unnamed class removed in anthropic-sdk-python 0.77.0",
     "action_text": "Read `anthropic-sdk-python` PR #1333 before upgrading to 0.77.0 — release notes say a class was removed but do not name it. Diff your import sites against the release commit (81ee953) to identify the affected symbol.",
     "deadline": null,
-    "tags": ["sdk", "removal", "release-notes-vague"]
+    "tags": [
+      "sdk",
+      "removal",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "edited"
   },
   "quality": {
     "faithfulness": "ok",

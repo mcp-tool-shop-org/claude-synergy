@@ -16,14 +16,18 @@
     "subject": "rmcp-macros task_handler routes through re-exported serde_json",
     "action_text": "Upgrade `rmcp-macros` to 1.2.0+ if your crate uses `task_handler` without a direct `serde_json` dependency. The macro now resolves `serde_json` through the re-exported path, removing the need for callers to add `serde_json` to their `Cargo.toml`.",
     "deadline": null,
-    "tags": ["rmcp-macros", "serde-json", "rust"]
+    "tags": [
+      "rmcp-macros",
+      "serde-json",
+      "rust"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

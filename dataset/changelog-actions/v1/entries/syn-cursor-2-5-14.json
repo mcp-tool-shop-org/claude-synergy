@@ -16,14 +16,19 @@
     "subject": "'Dotfile Protection' setting removed in Cursor 2.5",
     "action_text": "Remove `Dotfile Protection` from `cursor` settings assumptions in 2.5+ — the toggle is gone and the agent now edits dotfiles without an approval prompt. Audit any agent workflow that relied on the prompt as a guardrail before letting it touch dotfiles.",
     "deadline": null,
-    "tags": ["cursor", "dotfiles", "removal", "guardrail"]
+    "tags": [
+      "cursor",
+      "dotfiles",
+      "removal",
+      "guardrail"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

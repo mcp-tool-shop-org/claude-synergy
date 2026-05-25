@@ -16,14 +16,20 @@
     "subject": "Grok-4 support via xai/grok-4 + openrouter/x-ai/grok-4",
     "action_text": "Pass `--model xai/grok-4` or `--model openrouter/x-ai/grok-4` to `aider` 0.85.2+ to route through Grok-4. Opt-in; existing model choices are unaffected.",
     "deadline": null,
-    "tags": ["aider", "model-support", "grok-4", "xai", "openrouter"]
+    "tags": [
+      "aider",
+      "model-support",
+      "grok-4",
+      "xai",
+      "openrouter"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,19 @@
     "subject": "`resume` works in non-git workspaces",
     "action_text": "Update `cursor` CLI to call `resume` from directories that aren't git repos. Pre-fix the command required a git workspace and failed otherwise; no `.git` initialization is needed after this version.",
     "deadline": null,
-    "tags": ["cli", "resume", "non-git", "workspace"]
+    "tags": [
+      "cli",
+      "resume",
+      "non-git",
+      "workspace"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

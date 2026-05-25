@@ -12,18 +12,22 @@
   },
   "output": {
     "kind": "fix",
-    "severity": "medium",
+    "severity": "high",
     "subject": "Leading whitespace in assistant messages preserved (ASCII art / indented diagrams)",
     "action_text": "Upgrade Claude Code to 2.1.105 if you render ASCII art, indented diagrams, or any output where leading whitespace carries meaning. Pre-fix, the renderer trimmed leading whitespace from assistant messages, mangling structure silently.",
     "deadline": null,
-    "tags": ["rendering", "whitespace", "ascii-art"]
+    "tags": [
+      "rendering",
+      "whitespace",
+      "ascii-art"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "edited"
   },
   "quality": {
     "faithfulness": "ok",

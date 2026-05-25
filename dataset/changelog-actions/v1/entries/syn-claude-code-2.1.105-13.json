@@ -16,14 +16,18 @@
     "subject": "MCP large-output truncation prompt now gives format-specific recipes",
     "action_text": "Upgrade Claude Code to 2.1.105+ to get format-aware recipes (`jq` for JSON, computed `Read` chunk sizes for text) when an MCP tool returns oversize output. No config required; prompt fires automatically when truncation triggers.",
     "deadline": null,
-    "tags": ["mcp", "truncation", "prompt"]
+    "tags": [
+      "mcp",
+      "truncation",
+      "prompt"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

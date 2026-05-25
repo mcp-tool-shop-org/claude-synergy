@@ -16,14 +16,19 @@
     "subject": "cursor CLI persists conversation transcripts for agent context",
     "action_text": "Audit your `cursor` CLI usage if conversations contain secrets, prompts, or proprietary code — transcripts now persist for agent context across sessions. Check the local transcript store and exclude sensitive workspaces if needed.",
     "deadline": null,
-    "tags": ["cli", "transcripts", "context", "privacy"]
+    "tags": [
+      "cli",
+      "transcripts",
+      "context",
+      "privacy"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

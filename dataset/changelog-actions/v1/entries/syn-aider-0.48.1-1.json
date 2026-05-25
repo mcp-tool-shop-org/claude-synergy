@@ -16,14 +16,18 @@
     "subject": "openai/gpt-4o-2024-08-06 model added to aider",
     "action_text": "Pass `--model openai/gpt-4o-2024-08-06` to aider 0.48.1+ to use the new model. Existing model selections are unaffected; this is an additive entry to the model registry.",
     "deadline": null,
-    "tags": ["aider", "model", "openai"]
+    "tags": [
+      "aider",
+      "model",
+      "openai"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

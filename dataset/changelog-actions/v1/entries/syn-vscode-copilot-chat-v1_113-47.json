@@ -16,14 +16,18 @@
     "subject": "Agent experience — section heading only",
     "action_text": "Read the upstream v1_113 release notes at the source URL for the `Agent experience` section's actual content. The parsed `change_text` is the heading anchor only; no actionable detail is derivable from the entry alone.",
     "deadline": null,
-    "tags": ["vscode", "release-notes-vague", "parser-artifact"]
+    "tags": [
+      "vscode",
+      "release-notes-vague",
+      "parser-artifact"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

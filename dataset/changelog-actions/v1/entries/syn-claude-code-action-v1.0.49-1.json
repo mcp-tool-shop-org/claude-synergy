@@ -16,14 +16,18 @@
     "subject": "Git-permission wildcard updated from :* to * in claude-code-action",
     "action_text": "Upgrade `claude-code-action` to v1.0.49+ to pick up the modern `*` wildcard for git permissions (replacing the deprecated `:*` form). Internal fix; no user-side workflow change required.",
     "deadline": null,
-    "tags": ["claude-code-action", "git", "permissions"]
+    "tags": [
+      "claude-code-action",
+      "git",
+      "permissions"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,19 @@
     "subject": "Plan-mode entry no longer prompts for permission",
     "action_text": "Remove permission-prompt assumptions for `plan mode` entry in 2.1.0+; the approval gate is gone and users transition without intervention. Update any automation, hooks, or onboarding docs that pre-answered the prompt.",
     "deadline": null,
-    "tags": ["claude-code", "plan-mode", "permissions", "ux"]
+    "tags": [
+      "claude-code",
+      "plan-mode",
+      "permissions",
+      "ux"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

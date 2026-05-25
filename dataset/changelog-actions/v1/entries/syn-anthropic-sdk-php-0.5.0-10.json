@@ -16,14 +16,18 @@
     "subject": "Tighter phpstan type annotations in anthropic-sdk-php",
     "action_text": "Upgrade to anthropic-sdk-php 0.5.0+ if you run `phpstan` at strict levels in CI. Type-only refinement; runtime behavior unchanged, but downstream consumers may surface new (correct) type errors.",
     "deadline": null,
-    "tags": ["php", "phpstan", "types"]
+    "tags": [
+      "php",
+      "phpstan",
+      "types"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

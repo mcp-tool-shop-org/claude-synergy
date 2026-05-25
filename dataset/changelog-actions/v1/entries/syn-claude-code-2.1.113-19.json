@@ -16,14 +16,18 @@
     "subject": "Markdown tables with `|` inside inline code spans no longer break",
     "action_text": "Upgrade Claude Code to 2.1.113 if assistant output includes markdown tables whose cells contain inline code spans with `|`. Pre-fix, the renderer treated the pipe as a column separator and corrupted the table layout.",
     "deadline": null,
-    "tags": ["markdown", "rendering", "tables"]
+    "tags": [
+      "markdown",
+      "rendering",
+      "tables"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

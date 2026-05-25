@@ -16,14 +16,17 @@
     "subject": "`claude-agent-sdk-typescript` brought to parity with Claude Code v2.1.37",
     "action_text": "Upgrade `claude-agent-sdk-typescript` to 0.2.37 if you need parity with Claude Code v2.1.37 behavior. Release notes do not enumerate the specific surfaces affected — consult the Claude Code v2.1.37 changelog for the bundled CLI deltas.",
     "deadline": null,
-    "tags": ["parity", "release-notes-vague"]
+    "tags": [
+      "parity",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

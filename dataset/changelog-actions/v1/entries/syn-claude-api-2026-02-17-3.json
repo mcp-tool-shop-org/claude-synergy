@@ -16,14 +16,19 @@
     "subject": "web search + programmatic tool calling GA; dynamic filtering added",
     "action_text": "Drop the beta header from `web_search` and programmatic-tool-calling requests — both are now GA. Opt into `dynamic_filtering` on web search and web fetch to cut token cost by filtering results via code execution before they enter the context window.",
     "deadline": null,
-    "tags": ["api", "web-search", "tool-use", "ga"]
+    "tags": [
+      "api",
+      "web-search",
+      "tool-use",
+      "ga"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

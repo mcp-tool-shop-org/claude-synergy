@@ -16,14 +16,20 @@
     "subject": "Trio nursery corruption on early query() cancellation with options.stderr",
     "action_text": "Upgrade `claude-agent-sdk-python` to 0.1.70+ if you call `query()` inside a trio nursery with `options.stderr` set — pre-fix early-break raised `RuntimeError: Nursery stack corrupted`. Internal fix uses `spawn_detached()`; no caller-side changes required.",
     "deadline": null,
-    "tags": ["sdk", "trio", "nursery", "stderr", "cancellation"]
+    "tags": [
+      "sdk",
+      "trio",
+      "nursery",
+      "stderr",
+      "cancellation"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

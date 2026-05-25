@@ -16,14 +16,18 @@
     "subject": "reconnectMcpServer() and toggleMcpServer() methods",
     "action_text": "Upgrade to `claude-agent-sdk-typescript` 0.2.21+ to call `reconnectMcpServer(name)` after transient transport drops and `toggleMcpServer(name)` to enable or disable a server mid-session. Replaces restarting the whole `Query` to recover one bad MCP connection.",
     "deadline": null,
-    "tags": ["agent-sdk", "mcp", "connection-management"]
+    "tags": [
+      "agent-sdk",
+      "mcp",
+      "connection-management"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch02",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

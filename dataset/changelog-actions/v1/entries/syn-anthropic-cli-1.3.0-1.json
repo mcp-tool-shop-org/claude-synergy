@@ -16,14 +16,18 @@
     "subject": "anthropic-cli surfaces CMA Memory public beta",
     "action_text": "Upgrade `anthropic-cli` to 1.3.0+ to call the `CMA Memory` public-beta endpoints from the CLI. Public beta means the API may shift before GA; gate production use behind a known-version pin until it stabilizes.",
     "deadline": null,
-    "tags": ["anthropic-cli", "cma-memory", "public-beta"]
+    "tags": [
+      "anthropic-cli",
+      "cma-memory",
+      "public-beta"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "blockedMarketplaces hostPattern / pathPattern entries now enforced",
     "action_text": "Upgrade `claude-code` to 2.1.119+ to enforce `blockedMarketplaces` `hostPattern` and `pathPattern` entries. Pre-fix, pattern entries were silently ignored — blocked plugin marketplaces remained installable through pattern-matched URLs.",
     "deadline": null,
-    "tags": ["managed-settings", "marketplace", "policy-enforcement"]
+    "tags": [
+      "managed-settings",
+      "marketplace",
+      "policy-enforcement"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

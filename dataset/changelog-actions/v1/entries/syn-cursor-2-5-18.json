@@ -16,14 +16,17 @@
     "subject": "Close button on Cursor agent chat pane",
     "action_text": "Click the new `Close` button on the agent chat pane to dismiss it directly. Cosmetic addition; existing close paths (keyboard, menu) remain functional.",
     "deadline": null,
-    "tags": ["cursor", "ui"]
+    "tags": [
+      "cursor",
+      "ui"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

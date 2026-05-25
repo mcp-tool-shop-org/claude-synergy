@@ -16,14 +16,19 @@
     "subject": "Keyboard shortcut handling in modals + vim/emacs caret leakage",
     "action_text": "Upgrade `cursor` to 3.4+ if you hit keyboard-shortcut weirdness in modals or vim/emacs caret styling bleeding into other contexts. Re-test custom keybindings after upgrade — no API surface changes named.",
     "deadline": null,
-    "tags": ["cursor", "keybindings", "vim", "emacs"]
+    "tags": [
+      "cursor",
+      "keybindings",
+      "vim",
+      "emacs"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

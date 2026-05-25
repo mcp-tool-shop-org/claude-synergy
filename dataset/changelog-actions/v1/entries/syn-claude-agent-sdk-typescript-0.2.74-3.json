@@ -16,14 +16,19 @@
     "subject": "user-invocable: false skills leaked into supportedCommands() and system:init",
     "action_text": "Upgrade to 0.2.74+ if you author skills with `user-invocable: false`. Pre-fix those skills appeared in `supportedCommands()` and the `system:init` message's `slash_commands` / `skills` lists — users saw and could invoke skills explicitly marked non-invocable.",
     "deadline": null,
-    "tags": ["skills", "user-invocable", "system-init", "supportedcommands"]
+    "tags": [
+      "skills",
+      "user-invocable",
+      "system-init",
+      "supportedcommands"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

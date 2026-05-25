@@ -16,14 +16,18 @@
     "subject": "Skill argument names with regex metacharacters no longer break substitution",
     "action_text": "Upgrade Claude Code to 2.1.139 if any skill argument name contains regex metacharacters (`.`, `*`, `+`, `?`, `[`, `(`, `\\`, etc.). Pre-fix, substitution would break — likely silently, producing wrong text in skill invocations.",
     "deadline": null,
-    "tags": ["skills", "regex", "substitution"]
+    "tags": [
+      "skills",
+      "regex",
+      "substitution"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

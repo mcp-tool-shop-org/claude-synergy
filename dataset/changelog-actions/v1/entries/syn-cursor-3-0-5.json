@@ -16,14 +16,19 @@
     "subject": "/worktree slash command creates an isolated git worktree",
     "action_text": "Run `/worktree` in `cursor` 3.0+ when you want agent changes isolated in a separate git worktree rather than mixed into your active branch. Opt-in; existing workflows are unaffected.",
     "deadline": null,
-    "tags": ["cursor", "slash-command", "worktree", "git"]
+    "tags": [
+      "cursor",
+      "slash-command",
+      "worktree",
+      "git"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

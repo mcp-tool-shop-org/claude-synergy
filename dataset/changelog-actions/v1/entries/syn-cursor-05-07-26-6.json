@@ -16,14 +16,19 @@
     "subject": "`/multitask` slash command parallelizes requests via async subagents",
     "action_text": "Use `/multitask` in the cursor editor to dispatch parallel async subagents instead of queuing requests. Opt-in; default queuing behavior unchanged for prompts that don't invoke the command.",
     "deadline": null,
-    "tags": ["slash-command", "multitask", "parallel", "subagents"]
+    "tags": [
+      "slash-command",
+      "multitask",
+      "parallel",
+      "subagents"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,19 @@
     "subject": "anthropic-cli redacts x-api-key from debug logs",
     "action_text": "Upgrade `anthropic-cli` to 1.7.1+ to redact `x-api-key` headers from debug log output. Part of the coordinated cross-SDK debug-log redaction (2026-05-07–11) — audit prior debug logs for leaked keys and rotate exposed credentials.",
     "deadline": null,
-    "tags": ["credential-leak", "debug-logging", "api-key", "cli"]
+    "tags": [
+      "credential-leak",
+      "debug-logging",
+      "api-key",
+      "cli"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

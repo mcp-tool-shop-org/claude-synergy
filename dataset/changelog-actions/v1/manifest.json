@@ -1,8 +1,8 @@
 {
-  "built_at": "2026-05-25T14:10:32.029Z",
+  "built_at": "2026-05-25T14:43:28.921Z",
   "build_seed": 2026052403,
   "build_args": {
-    "include_pending": true,
+    "include_pending": false,
     "holdout_fraction": 0.2
   },
   "totals": {
@@ -10,8 +10,8 @@
     "citation_resolved": 301,
     "citation_rejected": 0,
     "eligible_after_review_filter": 301,
-    "training_size": 241,
-    "holdout_size": 60
+    "training_size": 242,
+    "holdout_size": 59
   },
   "citation_kinds": {
     "corpus": 300,
@@ -19,8 +19,7 @@
   },
   "included_review_states": [
     "approved",
-    "edited",
-    "pending"
+    "edited"
   ],
   "rejected_filenames": [],
   "split_by_kind": {
@@ -35,9 +34,9 @@
       "holdout": 14
     },
     "unknown": {
-      "total": 38,
+      "total": 37,
       "training": 30,
-      "holdout": 8
+      "holdout": 7
     },
     "performance": {
       "total": 6,
@@ -60,8 +59,8 @@
       "holdout": 3
     },
     "breaking": {
-      "total": 30,
-      "training": 24,
+      "total": 31,
+      "training": 25,
       "holdout": 6
     }
   },

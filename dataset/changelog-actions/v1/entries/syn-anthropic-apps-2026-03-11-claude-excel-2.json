@@ -16,14 +16,19 @@
     "subject": "Claude for Excel and PowerPoint supports LLM gateway routing",
     "action_text": "Point `Claude for Excel` and `Claude for PowerPoint` at your enterprise LLM gateway if you route Claude traffic through one. Upstream entry is one-liner — see the linked release-notes page for the configuration surface; opt-in only.",
     "deadline": null,
-    "tags": ["claude-apps", "excel", "powerpoint", "llm-gateway"]
+    "tags": [
+      "claude-apps",
+      "excel",
+      "powerpoint",
+      "llm-gateway"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

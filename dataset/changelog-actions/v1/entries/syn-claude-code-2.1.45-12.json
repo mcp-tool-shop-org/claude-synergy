@@ -16,14 +16,18 @@
     "subject": "Startup no longer eagerly loads session history for stats caching",
     "action_text": "Upgrade Claude Code to 2.1.45+ to skip the eager session-history load that ran at startup to warm the stats cache. Cold-start latency drops for users with many sessions; behavior is otherwise unchanged.",
     "deadline": null,
-    "tags": ["startup", "performance", "session-history"]
+    "tags": [
+      "startup",
+      "performance",
+      "session-history"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

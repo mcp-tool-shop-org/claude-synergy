@@ -16,14 +16,18 @@
     "subject": "Cmd+Opt Left/Right tab navigation fixed",
     "action_text": "Upgrade Cursor 2.5+ if `Cmd+Opt Left/Right` tab navigation was misbehaving. UX-grade fix; no API or config change.",
     "deadline": null,
-    "tags": ["cursor", "keybinding", "tab-nav"]
+    "tags": [
+      "cursor",
+      "keybinding",
+      "tab-nav"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

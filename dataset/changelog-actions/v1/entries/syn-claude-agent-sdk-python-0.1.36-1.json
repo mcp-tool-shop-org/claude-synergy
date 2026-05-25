@@ -16,14 +16,19 @@
     "subject": "max_thinking_tokens deprecated in favor of ThinkingConfig",
     "action_text": "Replace `max_thinking_tokens` with the `thinking` field on `ClaudeAgentOptions`, using `ThinkingConfigAdaptive`, `ThinkingConfigEnabled`, or `ThinkingConfigDisabled`. The new `thinking` field already takes precedence; old field still accepted but on a removal path.",
     "deadline": null,
-    "tags": ["python", "thinking-config", "max-thinking-tokens", "options"]
+    "tags": [
+      "python",
+      "thinking-config",
+      "max-thinking-tokens",
+      "options"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

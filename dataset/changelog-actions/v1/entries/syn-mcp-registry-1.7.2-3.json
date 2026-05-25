@@ -16,14 +16,18 @@
     "subject": "mcp-registry list pagination uses row-constructor cursor + observability restored",
     "action_text": "Upgrade `mcp-registry` to 1.7.2+ if list-endpoint pagination behaved oddly under load. Pagination now uses a row-constructor cursor (correct under concurrent inserts), per-phase publish timings are restored, and `pg_stat_statements` is enabled for slow-query introspection.",
     "deadline": null,
-    "tags": ["mcp-registry", "pagination", "observability"]
+    "tags": [
+      "mcp-registry",
+      "pagination",
+      "observability"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

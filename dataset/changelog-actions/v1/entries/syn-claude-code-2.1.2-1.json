@@ -16,14 +16,18 @@
     "subject": "Drag-dropped images now carry source-path metadata",
     "action_text": "Drag images directly onto the Claude Code terminal in 2.1.2+ — Claude now reads the source-file path metadata so it can reference where the image originated. No config change.",
     "deadline": null,
-    "tags": ["image-drop", "terminal", "metadata"]
+    "tags": [
+      "image-drop",
+      "terminal",
+      "metadata"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

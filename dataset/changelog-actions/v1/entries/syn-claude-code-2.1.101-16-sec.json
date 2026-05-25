@@ -16,14 +16,18 @@
     "subject": "Command injection in POSIX `which` fallback (LSP binary detection)",
     "action_text": "Upgrade to `claude-code` 2.1.101+ to patch a command injection vulnerability in the POSIX `which` fallback used by LSP binary detection. Pre-fix, a crafted LSP binary name could execute arbitrary commands during language-server discovery.",
     "deadline": null,
-    "tags": ["command-injection", "lsp", "rce-class"]
+    "tags": [
+      "command-injection",
+      "lsp",
+      "rce-class"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

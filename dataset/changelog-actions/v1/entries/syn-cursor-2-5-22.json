@@ -16,14 +16,18 @@
     "subject": "Auto-run mode switching bug (unspecified)",
     "action_text": "Upgrade `cursor` to 2.5+ if you've hit issues switching auto-run mode; upstream notes don't specify symptoms or trigger. Re-verify your auto-run workflow after upgrade.",
     "deadline": null,
-    "tags": ["cursor", "auto-run", "release-notes-vague"]
+    "tags": [
+      "cursor",
+      "auto-run",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

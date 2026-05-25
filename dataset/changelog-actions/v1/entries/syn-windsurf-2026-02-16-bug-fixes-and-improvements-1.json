@@ -16,14 +16,18 @@
     "subject": "Windsurf self-update fix on Windows",
     "action_text": "Update Windsurf manually one time on Windows if auto-update has stalled. The self-updater itself was broken pre-fix; subsequent updates should flow through normally after this version is installed.",
     "deadline": null,
-    "tags": ["windows", "self-update", "auto-update"]
+    "tags": [
+      "windows",
+      "self-update",
+      "auto-update"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

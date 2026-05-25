@@ -16,14 +16,18 @@
     "subject": "Windows bash execution failed when user had a .bashrc file",
     "action_text": "Upgrade to 2.1.27+ on Windows if you have a `.bashrc` in your home directory. Pre-fix Bash tool calls failed outright for those users — full feature lost, no workaround beyond renaming the rc file.",
     "deadline": null,
-    "tags": ["windows", "bash", "bashrc"]
+    "tags": [
+      "windows",
+      "bash",
+      "bashrc"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

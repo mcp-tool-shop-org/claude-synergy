@@ -16,14 +16,18 @@
     "subject": "aider caches OpenRouter model metadata locally",
     "action_text": "Upgrade `aider` to 0.83.2+ if you route through OpenRouter — the SDK now caches model metadata locally instead of fetching on every invocation. Faster startup and fewer transient failures when OpenRouter's metadata endpoint hiccups.",
     "deadline": null,
-    "tags": ["aider", "openrouter", "cache"]
+    "tags": [
+      "aider",
+      "openrouter",
+      "cache"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

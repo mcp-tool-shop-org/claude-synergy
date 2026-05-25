@@ -16,14 +16,18 @@
     "subject": "Bugbot 'Fix All' action",
     "action_text": "Click `Fix All` in Cursor's Bugbot UI to apply every pending Bugbot fix in one operation. New opt-in action; existing per-fix flow continues to work.",
     "deadline": null,
-    "tags": ["cursor", "bugbot", "bulk-action"]
+    "tags": [
+      "cursor",
+      "bugbot",
+      "bulk-action"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

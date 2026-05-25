@@ -16,14 +16,18 @@
     "subject": "ClaudeSDKClient.get_context_usage() exposes context-window usage by category",
     "action_text": "Call `get_context_usage()` on `ClaudeSDKClient` in `claude-agent-sdk-python` 0.1.52+ to inspect context-window consumption broken down by category. Opt-in; useful for compaction triggers, telemetry, and budget-aware orchestration.",
     "deadline": null,
-    "tags": ["api", "context-window", "telemetry"]
+    "tags": [
+      "api",
+      "context-window",
+      "telemetry"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

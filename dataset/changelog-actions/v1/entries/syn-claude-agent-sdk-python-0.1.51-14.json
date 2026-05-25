@@ -16,14 +16,18 @@
     "subject": "SIGKILL fallback when SIGTERM blocks in close()",
     "action_text": "Upgrade `claude-agent-sdk-python` to 0.1.51+ if you have seen `close()` hang on shutdown. The SDK now escalates to `SIGKILL` when the subprocess `SIGTERM` handler blocks; no caller-side change required.",
     "deadline": null,
-    "tags": ["claude-agent-sdk-python", "process", "shutdown"]
+    "tags": [
+      "claude-agent-sdk-python",
+      "process",
+      "shutdown"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

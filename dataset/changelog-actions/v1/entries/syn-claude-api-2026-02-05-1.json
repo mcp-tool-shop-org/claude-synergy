@@ -16,14 +16,19 @@
     "subject": "Opus 4.6 launch; manual thinking deprecated; no assistant prefill",
     "action_text": "Switch Opus 4.6 callers from `thinking: {type: 'enabled', budget_tokens: ...}` to `thinking: {type: 'adaptive'}` — the manual form is deprecated on this model. Also drop assistant-message prefill from Opus 4.6 requests; the model does not support it. No upstream-named removal date.",
     "deadline": null,
-    "tags": ["api", "opus-4-6", "thinking", "assistant-prefill"]
+    "tags": [
+      "api",
+      "opus-4-6",
+      "thinking",
+      "assistant-prefill"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

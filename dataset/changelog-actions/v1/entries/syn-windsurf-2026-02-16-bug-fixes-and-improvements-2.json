@@ -16,14 +16,19 @@
     "subject": "macOS UI flickering fix in Windsurf",
     "action_text": "Update Windsurf on macOS if the UI has been flickering. Cosmetic-only fix; no config change required and no behavioral impact beyond visual stability.",
     "deadline": null,
-    "tags": ["macos", "ui", "flickering", "cosmetic"]
+    "tags": [
+      "macos",
+      "ui",
+      "flickering",
+      "cosmetic"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

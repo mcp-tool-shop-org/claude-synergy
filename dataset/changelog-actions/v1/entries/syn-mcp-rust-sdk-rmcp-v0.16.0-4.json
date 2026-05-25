@@ -16,14 +16,18 @@
     "subject": "rmcp duplicate meta serialization (intent unspecified)",
     "action_text": "Upgrade `rmcp` to 0.16.0+ if you have been seeing duplicate `meta` fields in serialized payloads; upstream notes don't specify whether this introduces, fixes, or refactors the behavior. Re-inspect wire output if your client parses `meta` strictly.",
     "deadline": null,
-    "tags": ["rmcp", "serialization", "release-notes-vague"]
+    "tags": [
+      "rmcp",
+      "serialization",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,19 @@
     "subject": "getSessionMessages() memory usage reduced for compacted-history sessions",
     "action_text": "Upgrade to 0.2.69+ if you call `getSessionMessages()` on long-running sessions with compacted history. Memory footprint is reduced; previously, loading a heavily compacted session could spike RSS enough to OOM workers on small instances.",
     "deadline": null,
-    "tags": ["memory", "performance", "session", "compaction"]
+    "tags": [
+      "memory",
+      "performance",
+      "session",
+      "compaction"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

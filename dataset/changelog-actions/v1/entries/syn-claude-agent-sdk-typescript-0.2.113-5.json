@@ -16,14 +16,18 @@
     "subject": "options.env replaces (not overlays) process.env for the CLI subprocess",
     "action_text": "Audit every `options.env` passed to `query()`. Spread `process.env` first: `env: { ...process.env, MY_VAR: 'x' }`. Subprocess will lose inherited env (PATH, ANTHROPIC_API_KEY, HOME) if you don't — silent failure mode.",
     "deadline": null,
-    "tags": ["api", "env", "subprocess"]
+    "tags": [
+      "api",
+      "env",
+      "subprocess"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "getContextUsage() now counts options.agents in the breakdown",
     "action_text": "Upgrade to 0.2.94+ if you pass agents via `options.agents` and rely on `getContextUsage()` for budgeting. Pre-fix the `agents` breakdown undercounted, silently misleading any caller that gated work on the returned numbers.",
     "deadline": null,
-    "tags": ["context-usage", "agents", "silent-undercount"]
+    "tags": [
+      "context-usage",
+      "agents",
+      "silent-undercount"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

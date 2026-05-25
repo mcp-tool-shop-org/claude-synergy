@@ -16,14 +16,18 @@
     "subject": "VSCode `Manage Plugins` panel no longer breaks with multiple large marketplaces",
     "action_text": "Upgrade Claude Code to 2.1.117 in VSCode if you configure multiple large plugin marketplaces. Pre-fix, the `Manage Plugins` panel would break and become unusable; the fix restores normal panel behavior at scale.",
     "deadline": null,
-    "tags": ["vscode", "plugins", "marketplaces"]
+    "tags": [
+      "vscode",
+      "plugins",
+      "marketplaces"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

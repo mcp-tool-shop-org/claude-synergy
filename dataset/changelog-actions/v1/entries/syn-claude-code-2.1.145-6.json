@@ -16,14 +16,19 @@
     "subject": "Mouse hover and click on slash/@-mention suggestions in fullscreen",
     "action_text": "Hover and click suggestions in the slash-command and `@`-mention popups when running fullscreen. Keyboard navigation still works; mouse is additive for users on a trackpad or external mouse.",
     "deadline": null,
-    "tags": ["ui", "fullscreen", "slash-commands", "mention"]
+    "tags": [
+      "ui",
+      "fullscreen",
+      "slash-commands",
+      "mention"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

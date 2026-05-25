@@ -16,14 +16,18 @@
     "subject": "mcp-registry prod deployment bumped to v1.7.3",
     "action_text": "Read PR #1223 in `mcp-registry` for the operator-facing record that prod was bumped to v1.7.3. No client-side action — this is the upstream-operated registry deployment log, not a library change consumers need to track.",
     "deadline": null,
-    "tags": ["mcp-registry", "deploy", "operator-log"]
+    "tags": [
+      "mcp-registry",
+      "deploy",
+      "operator-log"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

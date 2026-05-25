@@ -16,14 +16,19 @@
     "subject": "v2 session API (unstable_v2_*) removed; use query()",
     "action_text": "Replace `unstable_v2_createSession` / `unstable_v2_resumeSession` / `unstable_v2_prompt` / `SDKSession` / `SDKSessionOptions` with `query()`. Pass an `AsyncIterable<SDKUserMessage>` for multi-turn, or `options.resume` to continue. Build-broken for any caller still on the v2 surface in 0.3.142+.",
     "deadline": null,
-    "tags": ["sdk", "removal", "session-api", "query"]
+    "tags": [
+      "sdk",
+      "removal",
+      "session-api",
+      "query"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

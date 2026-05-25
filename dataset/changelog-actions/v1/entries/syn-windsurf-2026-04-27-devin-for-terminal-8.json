@@ -16,14 +16,19 @@
     "subject": "Windsurf supports server-driven extension deny lists",
     "action_text": "Configure `server-driven extension deny lists` in Windsurf (2026-04-27 release) if your org needs central control over which IDE extensions clients can load. Opt-in capability; existing per-client extension policy continues to work unchanged when the server list is absent.",
     "deadline": null,
-    "tags": ["windsurf", "extensions", "deny-list", "enterprise"]
+    "tags": [
+      "windsurf",
+      "extensions",
+      "deny-list",
+      "enterprise"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

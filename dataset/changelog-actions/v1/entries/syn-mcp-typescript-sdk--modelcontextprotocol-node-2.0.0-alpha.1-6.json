@@ -16,14 +16,18 @@
     "subject": "Deprecated `.tool`, `.prompt`, `.resource` methods removed from @modelcontextprotocol/node",
     "action_text": "Rewrite any `.tool`, `.prompt`, or `.resource` calls against `@modelcontextprotocol/node` to the current method signatures. PR #1419 removes the deprecated overloads in 2.0.0-alpha.1; pre-fix callers will hit type errors and runtime failures.",
     "deadline": null,
-    "tags": ["mcp", "api-removal", "breaking-change"]
+    "tags": [
+      "mcp",
+      "api-removal",
+      "breaking-change"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

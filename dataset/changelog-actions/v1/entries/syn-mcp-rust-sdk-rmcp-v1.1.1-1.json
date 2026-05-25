@@ -16,14 +16,18 @@
     "subject": "rmcp accepts logging/setLevel and ping before initialized notification",
     "action_text": "Upgrade `rmcp` to 1.1.1+ if clients send `logging/setLevel` or `ping` before the `initialized` notification. Pre-fix the server rejected these requests during the early handshake window; the spec permits both at any time, so callers will now succeed instead of erroring.",
     "deadline": null,
-    "tags": ["rmcp", "mcp-spec", "handshake"]
+    "tags": [
+      "rmcp",
+      "mcp-spec",
+      "handshake"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

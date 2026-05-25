@@ -16,14 +16,18 @@
     "subject": "macOS x86_64 wheel added to published matrix",
     "action_text": "Upgrade to `claude-agent-sdk-python` 0.1.49+ on Intel-mac CI to install the prebuilt `macosx_x86_64` wheel instead of falling back to source build. Apple-silicon hosts and other platforms are unaffected.",
     "deadline": null,
-    "tags": ["wheel", "macos", "packaging"]
+    "tags": [
+      "wheel",
+      "macos",
+      "packaging"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

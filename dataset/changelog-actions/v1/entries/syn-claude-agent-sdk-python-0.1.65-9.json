@@ -16,14 +16,17 @@
     "subject": "Bundled Claude CLI bumped to 2.1.118",
     "action_text": "Upgrade claude-agent-sdk-python 0.1.65+ to pick up bundled Claude CLI 2.1.118. Source entry doesn't enumerate CLI changes; read the claude-code 2.1.118 release notes for the actionable detail.",
     "deadline": null,
-    "tags": ["dependency-bump", "bundled-cli"]
+    "tags": [
+      "dependency-bump",
+      "bundled-cli"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

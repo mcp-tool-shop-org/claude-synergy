@@ -16,14 +16,19 @@
     "subject": "macOS /private symlink paths now dangerous under Bash(rm:*) rules",
     "action_text": "Upgrade macOS `claude-code` hosts to 2.1.113+ to treat `/private/{etc,var,tmp,home}` as dangerous removal targets under `Bash(rm:*)` allow rules. Pre-fix, macOS-specific symlink layout let `rm /private/etc/X` evade rules expecting the canonical `/etc/X` path.",
     "deadline": null,
-    "tags": ["sandbox-bypass", "macos", "symlink-evasion", "destructive-rm"]
+    "tags": [
+      "sandbox-bypass",
+      "macos",
+      "symlink-evasion",
+      "destructive-rm"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

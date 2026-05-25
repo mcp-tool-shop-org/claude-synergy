@@ -16,14 +16,18 @@
     "subject": "Backward-compat aliases restored for removed nested UserLocation classes",
     "action_text": "Upgrade `anthropic-sdk-python` to 0.82.0+ if a recent release broke imports of nested `UserLocation` classes. Aliases for the removed nested classes are reinstated; no caller-side code change required.",
     "deadline": null,
-    "tags": ["anthropic-sdk-python", "userlocation", "compat"]
+    "tags": [
+      "anthropic-sdk-python",
+      "userlocation",
+      "compat"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

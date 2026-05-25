@@ -16,14 +16,18 @@
     "subject": "Broken link in cloud-providers.md fixed",
     "action_text": "Read the updated `cloud-providers.md` in `claude-code-action` v1.0.28+ if you previously hit a broken link there. Doc-only fix; action behavior is unchanged and the upgrade is not required to use the action.",
     "deadline": null,
-    "tags": ["docs", "broken-link", "cloud-providers"]
+    "tags": [
+      "docs",
+      "broken-link",
+      "cloud-providers"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

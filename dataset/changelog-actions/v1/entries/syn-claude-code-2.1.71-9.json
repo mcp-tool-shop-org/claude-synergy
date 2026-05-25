@@ -16,14 +16,18 @@
     "subject": "Read tool no longer leaks oversized images into context on image-processing failure",
     "action_text": "Upgrade Claude Code to 2.1.71 for any image-heavy workflow using the `Read` tool. Pre-fix, when image processing failed the oversized raw image still entered context, breaking later turns silently as the context filled — recovers from a silent-failure mode that compounds across long sessions.",
     "deadline": null,
-    "tags": ["read-tool", "images", "context-window"]
+    "tags": [
+      "read-tool",
+      "images",
+      "context-window"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch01",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

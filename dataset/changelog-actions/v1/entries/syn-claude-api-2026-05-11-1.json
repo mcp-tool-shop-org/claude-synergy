@@ -16,14 +16,18 @@
     "subject": "Claude Platform on AWS launched",
     "action_text": "Reach the Claude API through `Claude Platform on AWS` if you prefer AWS billing and IAM auth — Messages, Files, Batches, CMA, Skills, code execution, and tool use are all available via native AWS endpoints. Existing direct-API consumers are unaffected.",
     "deadline": null,
-    "tags": ["api", "aws", "platform"]
+    "tags": [
+      "api",
+      "aws",
+      "platform"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "@modelcontextprotocol/client OAuth metadata discovery now tolerates 502",
     "action_text": "Upgrade `@modelcontextprotocol/client` to 2.0.0-alpha.1+ if your MCP server runs behind a reverse proxy that returns 502 for path-aware OAuth metadata URLs. Discovery now continues on 502 like it already did on 4xx; other 5xx responses still throw to avoid hammering overloaded backends.",
     "deadline": null,
-    "tags": ["oauth", "metadata-discovery", "reverse-proxy"]
+    "tags": [
+      "oauth",
+      "metadata-discovery",
+      "reverse-proxy"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

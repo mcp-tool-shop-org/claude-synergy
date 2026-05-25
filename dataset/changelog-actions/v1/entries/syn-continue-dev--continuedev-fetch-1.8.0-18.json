@@ -16,14 +16,19 @@
     "subject": "root `eslint` constrained to v8 to match core dependency",
     "action_text": "Pin `eslint` to v8 if you build `@continuedev/fetch` from source. Upstream constrained the root package to v8 to match core; mixing eslint v9 produces config-loader incompatibilities.",
     "deadline": null,
-    "tags": ["eslint", "dependency", "build", "internal"]
+    "tags": [
+      "eslint",
+      "dependency",
+      "build",
+      "internal"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch08",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

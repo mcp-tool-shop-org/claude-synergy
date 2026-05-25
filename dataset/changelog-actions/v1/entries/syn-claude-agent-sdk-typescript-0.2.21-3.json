@@ -16,14 +16,18 @@
     "subject": "disabled status added to McpServerStatus",
     "action_text": "Upgrade to `claude-agent-sdk-typescript` 0.2.21+ to read the new `disabled` value from `McpServerStatus`. Widen any exhaustive switch over the status enum to handle `disabled` so TypeScript stops narrowing it away as `never`.",
     "deadline": null,
-    "tags": ["agent-sdk", "mcp", "status-enum"]
+    "tags": [
+      "agent-sdk",
+      "mcp",
+      "status-enum"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch02",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

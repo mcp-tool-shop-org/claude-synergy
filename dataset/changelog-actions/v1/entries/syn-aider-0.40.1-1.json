@@ -16,14 +16,17 @@
     "subject": "repomap context awareness improved",
     "action_text": "Upgrade aider 0.40.1+ for improved repomap context awareness. Source entry doesn't specify which scenarios changed; no API or config update needed.",
     "deadline": null,
-    "tags": ["aider", "repomap"]
+    "tags": [
+      "aider",
+      "repomap"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

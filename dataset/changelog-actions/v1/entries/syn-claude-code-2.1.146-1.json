@@ -16,14 +16,17 @@
     "subject": "/simplify slash command renamed to /code-review",
     "action_text": "Replace `/simplify` with `/code-review`. The new command accepts an effort suffix (`/code-review high`); the default behavior matches the old `/simplify`.",
     "deadline": null,
-    "tags": ["slash-command", "rename"]
+    "tags": [
+      "slash-command",
+      "rename"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

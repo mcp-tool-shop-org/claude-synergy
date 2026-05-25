@@ -16,14 +16,19 @@
     "subject": "includeGitInstructions setting to drop built-in git/PR system prompt",
     "action_text": "Set `includeGitInstructions: false` in settings.json (or `CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS=1`) to strip the built-in commit and PR workflow guidance from Claude's system prompt. Useful when you maintain your own git instructions in CLAUDE.md; default behavior unchanged.",
     "deadline": null,
-    "tags": ["claude-code", "settings", "env-var", "system-prompt"]
+    "tags": [
+      "claude-code",
+      "settings",
+      "env-var",
+      "system-prompt"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,19 @@
     "subject": "Cursor subagent permission-request flow polished (unspecified)",
     "action_text": "Re-run a subagent prompt on Cursor 2-5+ to see the updated permission-request flow; upstream notes don't enumerate which prompts moved or what default changed. Re-verify any subagent automation that depended on prior prompt placement.",
     "deadline": null,
-    "tags": ["cursor", "subagents", "permissions", "release-notes-vague"]
+    "tags": [
+      "cursor",
+      "subagents",
+      "permissions",
+      "release-notes-vague"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch05",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

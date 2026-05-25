@@ -16,14 +16,19 @@
     "subject": "--bare flag for low-overhead scripted -p calls",
     "action_text": "Pass `--bare` to scripted `claude -p` calls in 2.1.81+ to skip hooks, LSP, plugin sync, skill directory walks, and auto-memory. Requires `ANTHROPIC_API_KEY` env var or an `apiKeyHelper` via `--settings`; OAuth and keychain auth are disabled in this mode.",
     "deadline": null,
-    "tags": ["claude-code", "cli-flag", "scripting", "performance"]
+    "tags": [
+      "claude-code",
+      "cli-flag",
+      "scripting",
+      "performance"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

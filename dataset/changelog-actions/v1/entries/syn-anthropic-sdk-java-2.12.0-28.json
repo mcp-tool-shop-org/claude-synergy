@@ -16,14 +16,18 @@
     "subject": "claude-3-5-haiku marked deprecated in anthropic-sdk-java",
     "action_text": "Migrate `claude-3-5-haiku` model IDs in anthropic-sdk-java client code to a current Haiku model. Source entry doesn't name the replacement; check Anthropic's models page for the latest Haiku ID.",
     "deadline": null,
-    "tags": ["model-deprecation", "claude-3-5-haiku", "java"]
+    "tags": [
+      "model-deprecation",
+      "claude-3-5-haiku",
+      "java"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

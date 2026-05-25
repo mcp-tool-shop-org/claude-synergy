@@ -16,14 +16,20 @@
     "subject": "`/simplify` replaced by `/code-review` with new semantics (cleanup-and-fix removed)",
     "action_text": "Replace `/simplify` with `/code-review` and accept the new effort suffix (`/code-review high`). The old cleanup-and-fix behavior is gone in 2.1.147; the new command reports correctness bugs and posts inline GitHub PR comments when you pass `--comment`.",
     "deadline": null,
-    "tags": ["claude-code", "slash-command", "rename", "behavior-change", "pr-review"]
+    "tags": [
+      "claude-code",
+      "slash-command",
+      "rename",
+      "behavior-change",
+      "pr-review"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

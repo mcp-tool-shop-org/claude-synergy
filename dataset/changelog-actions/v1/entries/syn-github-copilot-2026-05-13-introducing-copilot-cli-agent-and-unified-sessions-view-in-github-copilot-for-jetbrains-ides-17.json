@@ -16,14 +16,19 @@
     "subject": "Copilot CLI now confirms before cancelling the active command",
     "action_text": "Expect a confirmation prompt before a new command interrupts the active one in the GitHub Copilot CLI agent (2026-05-13 release). Adjust scripted workflows that fired back-to-back commands assuming silent preemption; you now need to accept the cancel explicitly.",
     "deadline": null,
-    "tags": ["github-copilot", "cli-agent", "confirmation", "ux"]
+    "tags": [
+      "github-copilot",
+      "cli-agent",
+      "confirmation",
+      "ux"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

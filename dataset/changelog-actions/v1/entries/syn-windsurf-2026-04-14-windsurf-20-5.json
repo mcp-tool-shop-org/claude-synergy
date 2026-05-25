@@ -16,14 +16,18 @@
     "subject": "Kanban view for local + cloud agent sessions",
     "action_text": "Open Windsurf's new Kanban view to see all local and cloud agent sessions grouped by status. Opt-in UI; no migration needed.",
     "deadline": null,
-    "tags": ["windsurf", "ui-feature", "agent-sessions"]
+    "tags": [
+      "windsurf",
+      "ui-feature",
+      "agent-sessions"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

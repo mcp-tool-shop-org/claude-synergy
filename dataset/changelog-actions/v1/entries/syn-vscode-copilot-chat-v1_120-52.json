@@ -16,14 +16,18 @@
     "subject": "Dead-connection detection via keepalive timeout (PR #310131)",
     "action_text": "Upgrade VS Code to v1_120+ to benefit from keepalive-timeout detection of dead connections. The runtime change is internal; no user config or surface change required.",
     "deadline": null,
-    "tags": ["vscode", "networking", "keepalive"]
+    "tags": [
+      "vscode",
+      "networking",
+      "keepalive"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch10",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

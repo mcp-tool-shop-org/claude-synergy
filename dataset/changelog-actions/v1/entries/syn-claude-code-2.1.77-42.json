@@ -16,14 +16,18 @@
     "subject": "`/fork` renamed to `/branch` (alias retained)",
     "action_text": "Replace `/fork` with `/branch` in hooks, docs, and muscle memory. The old slash command still works as an alias in 2.1.77, but `/branch` is the canonical name going forward and is what surfaces in help and autocomplete.",
     "deadline": null,
-    "tags": ["claude-code", "slash-command", "rename"]
+    "tags": [
+      "claude-code",
+      "slash-command",
+      "rename"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch06",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

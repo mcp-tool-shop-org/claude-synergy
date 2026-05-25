@@ -16,14 +16,20 @@
     "subject": "unstable_v2_createSession ignored cwd, settingSources, and permission bypass options",
     "action_text": "Upgrade to 0.2.110+ if you call `unstable_v2_createSession`. Pre-fix `cwd`, `settingSources`, and `allowDangerouslySkipPermissions` were silently ignored — sessions ran in the wrong directory, loaded the wrong settings, or refused permission bypass that the caller had explicitly requested.",
     "deadline": null,
-    "tags": ["sdk-v2", "session", "cwd", "permissions", "silent-failure"]
+    "tags": [
+      "sdk-v2",
+      "session",
+      "cwd",
+      "permissions",
+      "silent-failure"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch04",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

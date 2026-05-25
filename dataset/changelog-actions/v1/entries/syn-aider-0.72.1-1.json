@@ -16,14 +16,19 @@
     "subject": "Model metadata for openrouter/deepseek/deepseek-r1",
     "action_text": "Upgrade `aider` to 0.72.1+ if you route through `openrouter/deepseek/deepseek-r1`. Pre-fix metadata likely surfaced wrong context-window or pricing values; the change is config-only, not behavioral.",
     "deadline": null,
-    "tags": ["aider", "model-metadata", "openrouter", "deepseek"]
+    "tags": [
+      "aider",
+      "model-metadata",
+      "openrouter",
+      "deepseek"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

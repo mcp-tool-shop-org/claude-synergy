@@ -16,14 +16,18 @@
     "subject": "Markdown blockquotes show continuous left bar across wrapped lines",
     "action_text": "Upgrade Claude Code to 2.1.97+ to render markdown blockquotes with a continuous left bar across wrapped lines instead of a broken bar. Cosmetic rendering fix; content is unchanged.",
     "deadline": null,
-    "tags": ["markdown", "blockquote", "rendering"]
+    "tags": [
+      "markdown",
+      "blockquote",
+      "rendering"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

@@ -16,14 +16,18 @@
     "subject": "rmcp-macros tool examples corrected to use Parameters<T>",
     "action_text": "Read the updated `rmcp-macros` tool examples for the correct `Parameters<T>` syntax. Doc-only fix; runtime behavior unchanged. Older examples copy-pasted from docs may fail to compile against the documented macro shape.",
     "deadline": null,
-    "tags": ["docs", "rmcp-macros", "rust"]
+    "tags": [
+      "docs",
+      "rmcp-macros",
+      "rust"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

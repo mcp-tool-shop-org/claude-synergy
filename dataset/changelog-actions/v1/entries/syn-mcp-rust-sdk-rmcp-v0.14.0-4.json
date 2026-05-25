@@ -16,14 +16,17 @@
     "subject": "hyper-mcp added to the 'built with rmcp' README list",
     "action_text": "Skip — the `rmcp` README's 'built with' list now includes `hyper-mcp` as an example project. Informational only; no consumer action.",
     "deadline": null,
-    "tags": ["docs", "readme-update"]
+    "tags": [
+      "docs",
+      "readme-update"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

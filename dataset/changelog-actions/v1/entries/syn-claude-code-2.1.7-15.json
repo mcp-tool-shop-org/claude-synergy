@@ -16,14 +16,18 @@
     "subject": "VS Code claudeProcessWrapper now passes wrapper path, not binary path",
     "action_text": "Upgrade Claude Code to 2.1.7+ if you set `claudeProcessWrapper` in VS Code. Pre-fix the extension passed the wrapper path where the Claude binary path was expected, so the wrapper never wrapped the right process. No config change needed; behavior matches the setting's documented intent.",
     "deadline": null,
-    "tags": ["vscode", "process-wrapper", "settings"]
+    "tags": [
+      "vscode",
+      "process-wrapper",
+      "settings"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch03",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

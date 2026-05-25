@@ -16,14 +16,18 @@
     "subject": "PATH_TO_CLAUDE_CODE_EXECUTABLE rejects control characters",
     "action_text": "Upgrade `claude-code-action` to v1.0.90+ — `PATH_TO_CLAUDE_CODE_EXECUTABLE` input values containing control characters are now rejected. Defense-in-depth against shell-meta injection via the workflow input; no known exploit but the input was previously unsanitized.",
     "deadline": null,
-    "tags": ["input-validation", "shell-injection", "defense-in-depth"]
+    "tags": [
+      "input-validation",
+      "shell-injection",
+      "defense-in-depth"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session-a25",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

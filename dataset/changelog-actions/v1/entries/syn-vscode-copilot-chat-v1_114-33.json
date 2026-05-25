@@ -16,14 +16,18 @@
     "subject": "VS Code Copilot Chat Edit Mode deprecated as of 1.110",
     "action_text": "Migrate VS Code Copilot Chat workflows off Edit Mode (deprecated as of 1.110). Re-enable temporarily via the `chat.editMode.hidden` setting; no removal date is given.",
     "deadline": null,
-    "tags": ["vscode", "edit-mode", "ui-feature"]
+    "tags": [
+      "vscode",
+      "edit-mode",
+      "ui-feature"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-this-session",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

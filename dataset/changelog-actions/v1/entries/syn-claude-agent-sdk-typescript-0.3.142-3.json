@@ -16,14 +16,20 @@
     "subject": "TodoWrite replaced by TaskCreate/TaskUpdate/TaskGet/TaskList in SDK sessions",
     "action_text": "Replace any `TodoWrite` consumer in headless/SDK sessions with the `TaskCreate` / `TaskUpdate` / `TaskGet` / `TaskList` tool family. Accumulate by task ID rather than replacing a snapshot list — tool shape changed, not just the name. Silent-failure risk if old `TodoWrite` handlers are wired and never fire.",
     "deadline": null,
-    "tags": ["sdk", "tools", "task", "todowrite", "silent-failure"]
+    "tags": [
+      "sdk",
+      "tools",
+      "task",
+      "todowrite",
+      "silent-failure"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch09",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",

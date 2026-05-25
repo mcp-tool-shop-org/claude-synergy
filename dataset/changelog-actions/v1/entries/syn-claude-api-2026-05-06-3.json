@@ -16,14 +16,18 @@
     "subject": "Webhooks for Claude Managed Agents",
     "action_text": "Subscribe to `Claude Managed Agents` webhooks to receive session and vault lifecycle events instead of polling. See the 'Subscribe to webhooks' doc for the available event types and registration flow; opt-in only.",
     "deadline": null,
-    "tags": ["api", "managed-agents", "webhooks"]
+    "tags": [
+      "api",
+      "managed-agents",
+      "webhooks"
+    ]
   },
   "provenance": {
     "labeler": "opus-4.7-subagent-batch07",
     "labeled_at": "2026-05-24",
-    "reviewer": null,
-    "reviewed_at": null,
-    "review_action": "pending"
+    "reviewer": "human+qwen3-judge-a3c",
+    "reviewed_at": "2026-05-25",
+    "review_action": "approved"
   },
   "quality": {
     "faithfulness": "ok",
