@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Dati aggiornati (alla versione 1.2.1):** 44 prodotti / 1.171 file di rilascio / 6.573 modifiche / 1.260 entità / 12 sinergie / 519 test / 13 strumenti MCP / 17 comandi CLI. (Il database è stato aggiornato tramite `sync_now` il 24 maggio 2026.)
+**Dati aggiornati (alla versione v1.2.1):** 44 prodotti / 1.171 file di rilascio / 6.573 modifiche / 1.260 entità / 12 sinergie / 519 test / 13 strumenti MCP / 17 comandi CLI. (Il database è stato aggiornato tramite `sync_now` il 24 maggio 2026.)
 
 ---
 
@@ -91,7 +91,8 @@ claude-synergy/
 | **4d — Playwright + registro MCP + configurazione YAML** | ✅ implementato | Windsurf tramite Playwright; Smithery + registro ufficiale MCP come cataloghi del livello 4; prodotti consolidati in `products.yaml`. |
 | **5 — v1.1: navigazione con finestre + integrazione OpenAI** | ✅ implementato | `hk diff` / `hk breaking`, limiti di data per tutti i comandi di navigazione, 3 nuovi strumenti MCP (totale di 11), provider di embedding OpenAI, dimensione dell'embedding configurabile, sincronizzazione automatica di `claude-code`, parser generico `keep-a-changelog`. |
 | **6 — v1.2: sincronizzazione da MCP** | ✅ implementato | `sync_status` (freschezza per prodotto, rilevamento di dati obsoleti) e `sync_now` (recupero su richiesta → ingestione → embedding con anteprima `dry_run` + blocco di concorrenza in-process). Risolve il problema in cui un'applicazione poteva interrogare il database ma non aggiornarlo. **Corregge anche:** un bug che causava la cancellazione di tutti i marker quando `INSERT OR REPLACE INTO products` propagava una cancellazione sulla chiave esterna `markers`, reimpostando silenziosamente il cursore `since` di ogni prodotto ad ogni ingestione (regressione §8.20). |
-| **6.1 — Centralizzazione del marcatore nel modulo fetcher (versione 1.2.1)** | ✅ implementato | La funzione `writeMarker` è stata centralizzata in `fetchOne` in modo che ogni operazione di recupero riuscita aggiorni il marcatore. Le strategie che restituivano 0 elementi datati all'interno della finestra temporale (in particolare, il registro delle modifiche "raw" di `aider`) non scrivevano mai un marcatore e scaricavano ripetutamente il file `HISTORY.md` ad ogni sincronizzazione. La strategia `webfetch` non implementata è stata rinominata in `manual` per `claude-api` e `anthropic-apps`; `sync_status` ora visualizza i prodotti configurati manualmente come "manual" invece di "mai" e li esclude da `stale_only` (regressione §8.21). |
+| **6.1 — v1.2.1: centralizzazione del marcatore di recupero** | ✅ implementato | È stato centralizzato il metodo `writeMarker` in `fetchOne` in modo che ogni recupero riuscito aggiorni il marcatore. Le strategie che restituivano 0 elementi datati all'interno dell'intervallo (in particolare, il log delle modifiche "raw" di `aider`) non scrivevano mai un marcatore e ri-scaricavano sempre `HISTORY.md` ad ogni sincronizzazione. La strategia `webfetch` non implementata è stata rinominata in `manual` per `claude-api` e `anthropic-apps`; ora `sync_status` visualizza i prodotti manuali come "manual" invece di "mai" ed esclude questi prodotti da `stale_only` (regressione §8.21). |
+| **7 — v1.3: sintetizzatore ottimizzato cs-actions:v1** | ✅ implementato | Primo modello downstream addestrato sul database. Converte una voce del log delle modifiche in un'azione in formato JSON rigoroso: `{kind, severity, subject, action_text, deadline, tags}`. Modello Qwen2.5-7B + LoRA su 242 voci di `dataset/changelog-actions/v1/`, in formato GGUF q8_0, distribuito tramite Ollama. Valutazione preliminare: **88,1% per la classificazione (kind) / 79,7% per la gravità (severity) / 0,842 macro-F1** rispetto ai dati di riferimento su 59 voci stratificate (+10,1 punti percentuali / +27,2 punti percentuali / +0,041 rispetto al modello base qwen3:8b). È stato assegnato il tag `cs-actions-v1`; il rapporto di valutazione è allegato al [rilascio di GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) come download di un singolo file. **Limitazione documentata della versione 1:** pregiudizio anti-"sconosciuto" (precisione 1,000 / richiamo 0,286) — il modello sottostima la classificazione di input ambigui. Consultare [manuale → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md). |
 
 Roadmap per la versione 0.8+: disponibile in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) e nella sezione issues.
 
@@ -287,6 +288,37 @@ Strategie di acquisizione: `gh-releases | rss | raw-changelog | html-scrape | ca
 - **12 — Formato di configurazione MCP: attenzione!** Copilot utilizza `servers`; tutti gli altri utilizzano `mcpServers`.
 
 Indice completo in [synergies/INDEX.md](synergies/INDEX.md).
+
+---
+
+## Dataset e modelli ottimizzati
+
+Il database ha un livello downstream: **dataset** curati derivati da voci di log delle modifiche e **modelli ottimizzati** addestrati su tali dataset. Il dataset è l'artefatto in questo repository; il modello è downstream.
+
+### `dataset/changelog-actions/v1` — 301 voci
+
+Ogni voce associa una voce di log delle modifiche dal database a un'azione scritta a mano: `{kind, severity, subject, action_text, deadline, tags}`. Tassonomia `kind` con 8 valori possibili (`breaking | deprecation | security | feature | fix | performance | docs | unknown`), suddivisione in training/holdout 80/20, revisionato da esseri umani e da un modello qwen3:8b (accordo del 92,4%). Consultare [`dataset/README.md`](dataset/README.md) per la tabella di distribuzione, [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) per la descrizione dei campi e [`STYLE.md`](dataset/changelog-actions/STYLE.md) per le regole di scrittura di `action_text`.
+
+### `cs-actions:v1` — sintetizzatore ottimizzato
+
+Primo modello addestrato sul dataset. Modello Qwen2.5-7B-Instruct + LoRA (rank-256 / all-linear, 100 passaggi QLoRA su 242 voci di training), in formato GGUF q8_0, distribuito tramite un Modelfile Ollama a due fasi (`cs-actions-base` + `cs-actions:v1`).
+
+**Valutazione preliminare** (59 voci stratificate, tre esecuzioni, tutte superate, zero errori di parsing):
+
+| Metrica | qwen3:8b base | cs-actions:v1 | Delta |
+|---|---|---|---|
+| Accordo con la classificazione rispetto ai dati di riferimento | 78.0% | **88.1%** | +10,1pp |
+| Accordo con la gravità rispetto ai dati di riferimento | 52.5% | **79.7%** | +27,2pp |
+| Macro-F1 (classi ben popolate) | 0.801 | **0.854** | +0.053 |
+| Esecuzione 3 — rimozione del suggerimento (con suggerimento / senza) | — | 0.842 / 0.777 | 6,5 punti → zona target |
+
+Criterio di superamento della valutazione `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0,780 ≥ 0,780`) — PASS ✓. I risultati dettagliati per ogni voce sono disponibili in [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json), allegato anche al [rilascio di GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) come download di un singolo file.
+
+**Limitazione documentata della versione v1: pregiudizio nei confronti di "unknown".** "unknown" è l'unica classe in cui cs-actions:v1 ottiene risultati inferiori rispetto a qwen3:8b (F1 0.444 vs 0.545). Precisione 1.000 / richiamo 0.286: quando l'input è genuinamente ambiguo, il modello si orienta verso una categoria specifica anziché astenersi. Ha ereditato le caratteristiche della famiglia qwen, che non sono state completamente sovrascritte tramite LoRA. I sistemi che utilizzano questo modello dovrebbero considerare una percentuale di "kind: "unknown"" inferiore al previsto come un segnale per indirizzare i batch a una revisione umana. Il [piano per la versione v2](dataset/README.md) affronta questo problema con l'aumento della classe "unknown" e la randomizzazione degli indizi.
+
+**Non distribuito tramite questo repository** — il file GGUF q8_0 ha una dimensione di circa 5 GB e il checkpoint unito ha una dimensione di circa 15 GB. Il dataset e la pipeline di costruzione sono ciò che viene pubblicato; il modello viene ricostruito localmente secondo le istruzioni in [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) (sequenza manuale in 4 fasi, circa 88 minuti di riscaldamento su un laptop RTX 5080 con 16 GB di VRAM). Il contratto di rilascio, che prevede tre iterazioni, è disponibile in [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md).
+
+Una guida completa all'utilizzo, inclusa l'invocazione locale tramite Ollama, il requisito di specificare `format: "json"` per ogni richiesta e la pipeline di ricostruzione, è disponibile nella pagina [handbook → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/).
 
 ---
 

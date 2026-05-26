@@ -92,6 +92,7 @@ claude-synergy/
 | **5 — Navigation avec fenêtrage v1.1 + intégration OpenAI** | ✅ réalisé | `hk diff` / `hk breaking`, limites de date pour toutes les commandes de navigation, 3 nouveaux outils MCP (total de 11), fournisseur d'intégration OpenAI, dimension d'intégration configurable, synchronisation automatique de `claude-code`, analyseur générique `keep-a-changelog`. |
 | **6 — v1.2 synchronisation à partir de MCP** | ✅ réalisé | `sync_status` (état de fraîcheur par produit, détection "jamais/obsolète") et `sync_now` (récupération à la demande → ingestion → intégration avec aperçu `dry_run` + verrouillage de concurrence en cours). Comble le fossé où un agent pouvait interroger la base de données, mais pas la mettre à jour. **Corrige également :** un bug de suppression de marqueur où `INSERT OR REPLACE INTO products` déclenchait une suppression sur la clé étrangère `markers`, remettant silencieusement à zéro le curseur `since` de chaque produit à chaque ingestion (régression §8.20). |
 | **6.1 — v1.2.1 centralisation des marqueurs de récupération** | ✅ réalisé | La fonction `writeMarker` a été centralisée dans `fetchOne` afin que chaque récupération réussie mette à jour le marqueur. Les stratégies qui renvoyaient 0 éléments datés dans la plage spécifiée (notamment `aider` pour le journal des modifications brut) n'écrivaient pas de marqueur et ré-téléchargeaient `HISTORY.md` à chaque synchronisation. La stratégie `webfetch` non implémentée a été renommée en `manual` pour `claude-api` et `anthropic-apps` ; `sync_status` affiche désormais les produits "manuels" comme "manual" au lieu de "jamais" et les exclut de `stale_only` (régression §8.21). |
+| **7 — v1.3 cs-actions:v1, synthétiseur affiné** | ✅ réalisé | Premier modèle descendant entraîné sur le corpus. Convertit une entrée de journal des modifications en une action structurée au format JSON : `{kind, severity, subject, action_text, deadline, tags}`. Qwen2.5-7B + LoRA sur 242 entrées provenant de `dataset/changelog-actions/v1/`, format GGUF q8_0, déployé via Ollama. Évaluation pour la validation de la version : **88,1 % pour la catégorie / 79,7 % pour la gravité / 0,842 pour le macro-F1** par rapport aux données réelles sur un ensemble de 59 entrées stratifiées (+10,1 points de pourcentage / +27,2 points de pourcentage / +0,041 par rapport au modèle de base qwen3:8b). Étiqueté `cs-actions-v1`; le rapport d'évaluation est joint à la [publication GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) en tant que fichier unique. **Limitation documentée de la version 1 :** biais anti-`inconnu` (précision de 1,000 / rappel de 0,286) — le modèle attribue incorrectement des catégories à des entrées ambiguës. Consultez le [guide → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md). |
 
 Feuille de route pour la version 0.8+ : consultable dans [URGENT_FINDINGS.md](URGENT_FINDINGS.md) et les problèmes.
 
@@ -287,6 +288,37 @@ Stratégies de récupération : `gh-releases | rss | raw-changelog | html-scrape
 - **12 — Piège du format de configuration MCP** : Copilot utilise `servers` ; tout le monde utilise `mcpServers`.
 
 Index complet dans [synergies/INDEX.md](synergies/INDEX.md).
+
+---
+
+## Ensembles de données et modèles affinés
+
+Le corpus comprend une couche descendante : des **ensembles de données** soigneusement sélectionnés dérivés de descriptions de modifications, et des **modèles affinés** entraînés sur ces ensembles de données. L'ensemble de données est l'artefact dans ce dépôt ; le modèle est descendant.
+
+### `dataset/changelog-actions/v1` — 301 entrées
+
+Chaque entrée associe une description de modification du corpus à une action rédigée manuellement : `{kind, severity, subject, action_text, deadline, tags}`. Taxonomie de 8 catégories (`breaking | deprecation | security | feature | fix | performance | docs | unknown`), répartition 80/20 pour l'entraînement et la validation, revue par un humain et par un juge Qwen3:8b (accord de 92,4 %). Consultez [`dataset/README.md`](dataset/README.md) pour le tableau de distribution, [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) pour la description de chaque champ, et [`STYLE.md`](dataset/changelog-actions/STYLE.md) pour les règles de rédaction de la partie `action_text`.
+
+### `cs-actions:v1` — synthétiseur affiné
+
+Premier modèle entraîné sur l'ensemble de données. Qwen2.5-7B-Instruct + LoRA (rang-256 / linéaire, 100 étapes QLoRA sur 242 entrées d'entraînement), format GGUF q8_0, déployé via un fichier Modelfile Ollama en deux étapes (`cs-actions-base` + `cs-actions:v1`).
+
+**Évaluation pour la validation de la version** (ensemble de 59 entrées stratifiées, trois exécutions, toutes réussies, aucune erreur d'analyse) :
+
+| Métrique | qwen3:8b base | cs-actions:v1 | Différence |
+|---|---|---|---|
+| Accord de catégorie par rapport aux données réelles | 78.0% | **88.1%** | +10,1 points de pourcentage |
+| Accord de gravité par rapport aux données réelles | 52.5% | **79.7%** | +27,2 points de pourcentage |
+| Macro-F1 (classes bien représentées) | 0.801 | **0.854** | +0.053 |
+| Exécution 3 — suppression de l'indice de catégorie (avec indice / sans indice) | — | 0.842 / 0.777 | 6,5 points → zone cible |
+
+Critère de validation de la version `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0,780 ≥ 0,780`) — RÉUSSI ✓. Les verdicts détaillés pour chaque entrée se trouvent dans [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json), également joints à la [publication GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) en tant que fichier unique.
+
+**Limitation documentée de la version 1 : biais anti-`inconnu`.** La catégorie `inconnu` est la seule catégorie où cs-actions:v1 est moins performant que qwen3:8b (F1 de 0,444 contre 0,545). La précision est de 1,000 / le rappel est de 0,286 — lorsque l'entrée est réellement ambiguë, le modèle choisit une catégorie spécifique plutôt que de s'abstenir. Hérité du modèle de base de la famille qwen, et non entièrement remplacé par LoRA. Les utilisateurs doivent considérer un taux de `kind: "unknown"` inférieur à celui attendu comme un signal pour envoyer des lots à une révision humaine. Le [plan de la version 2](dataset/README.md) vise à résoudre ce problème grâce à l'augmentation de la classe inconnue et à la randomisation des indices.
+
+**Non distribué via ce dépôt** — le fichier GGUF q8_0 fait environ 5 Go et le checkpoint fusionné fait environ 15 Go. Seuls le jeu de données et le pipeline de construction sont publiés ; le modèle est reconstruit localement conformément à [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) (chaîne manuelle en 4 étapes, environ 88 minutes de préchauffage sur un ordinateur portable RTX 5080 avec 16 Go de VRAM). Le contrat de validation pour la publication, qui comprend trois étapes, se trouve dans [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md).
+
+Un guide d'utilisation complet, incluant l'invocation locale via Ollama, l'exigence de spécifier `format: "json"` pour chaque requête, et le pipeline de reconstruction, est disponible sur la page [du manuel → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/).
 
 ---
 

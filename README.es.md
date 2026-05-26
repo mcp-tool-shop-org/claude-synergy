@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Datos actualizados (a partir de la versión 1.2.1):** 44 productos / 1.171 archivos de lanzamiento / 6.573 cambios / 1.260 entidades / 12 sinergias / 519 pruebas / 13 herramientas MCP / 17 comandos de línea de comandos. (La base de datos se actualizó mediante `sync_now` el 24 de mayo de 2026).
+**Cifras actualizadas (a partir de la versión 1.2.1):** 44 productos / 1.171 archivos de lanzamiento / 6.573 cambios / 1.260 entidades / 12 sinergias / 519 pruebas / 13 herramientas MCP / 17 comandos de línea de comandos. (El corpus se actualizó mediante `sync_now` el 24 de mayo de 2026).
 
 ---
 
@@ -91,7 +91,8 @@ claude-synergy/
 | **4d — Playwright + registro de MCP + configuración YAML** | ✅ implementado | Windsurf a través de Playwright; Smithery + registro oficial de MCP como catálogos de la etapa 4; productos consolidados en `products.yaml`. |
 | **5 — Navegación con ventanas en la versión 1.1 + integración de OpenAI** | ✅ implementado | `hk diff` / `hk breaking`, límites de fecha para todos los comandos de navegación, 3 nuevas herramientas MCP (un total de 11), proveedor de incrustación de OpenAI, dimensión de incrustación configurable, sincronización automática de `claude-code`, analizador genérico `keep-a-changelog`. |
 | **6 — Sincronización desde MCP en la versión 1.2** | ✅ implementado | `sync_status` (frescura por producto, detección de "obsoleto") y `sync_now` (obtención bajo demanda → ingestión → incrustación con vista previa de `dry_run` + bloqueo de concurrencia en el proceso). Elimina la brecha donde un agente podía consultar la base de datos pero no actualizarla. **También corrige:** el error de "limpieza de marcadores" donde `INSERT OR REPLACE INTO products` desencadenaba un DELETE en la clave externa `markers`, restableciendo silenciosamente el cursor `since` de cada producto en cada ingestión (regresión §8.20). |
-| **6.1 — Centralización de marcadores en la versión 1.2.1** | ✅ implementado | Se centralizó la función `writeMarker` en `fetchOne` para que cada extracción exitosa actualice el marcador. Las estrategias que devolvían 0 elementos con fecha dentro del período especificado (especialmente el registro de cambios "raw" de `aider`) nunca escribían un marcador y volvían a descargar `HISTORY.md` en cada sincronización. Se renombró la estrategia `webfetch` no implementada a `manual` para `claude-api` y `anthropic-apps`; ahora, `sync_status` muestra los productos configurados manualmente como "manual" en lugar de "nunca" y los excluye de `stale_only` (regresión §8.21). |
+| **6.1 — v1.2.1: Centralización del marcador de extracción** | ✅ implementado | Se centralizó `writeMarker` en `fetchOne` para que cada extracción exitosa actualice el marcador. Las estrategias que devolvían 0 elementos con fecha dentro del período especificado (especialmente el registro de cambios "raw" de `aider`) nunca escribían un marcador y volvían a descargar `HISTORY.md` en cada sincronización. Se renombró la estrategia `webfetch` no implementada a `manual` para `claude-api` + `anthropic-apps`; ahora, `sync_status` muestra los productos manuales como "manual" en lugar de "nunca" y los excluye de `stale_only` (regresión §8.21). |
+| **7 — v1.3: Sintetizador ajustado "cs-actions:v1"** | ✅ implementado | Primer modelo derivado entrenado en el corpus. Convierte una entrada de registro de cambios en un elemento de acción estricto en formato JSON: `{kind, severity, subject, action_text, deadline, tags}`. Qwen2.5-7B + LoRA en 242 entradas de `dataset/changelog-actions/v1/`, formato GGUF q8_0, implementado con Ollama. Evaluación de la versión: **88.1% de precisión en "kind" / 79.7% de precisión en "severity" / 0.842 macro-F1** frente a la verdad fundamental en un conjunto de 59 entradas estratificadas (+10.1 puntos porcentuales / +27.2 puntos porcentuales / +0.041 sobre la base qwen3:8b). Se etiquetó como `cs-actions-v1`; el informe de evaluación está adjunto a la [versión de GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) como una descarga de un solo archivo. **Limitación de la versión 1 documentada:** sesgo anti-"desconocido" (precisión 1.000 / recuperación 0.286) — el modelo subestima la clasificación de entradas ambiguas. Consulte el [manual → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md). |
 
 Hoja de ruta para la versión 0.8+: se encuentra en [URGENT_FINDINGS.md](URGENT_FINDINGS.md) y en los problemas.
 
@@ -287,6 +288,37 @@ Estrategias de recuperación: `gh-releases | rss | raw-changelog | html-scrape |
 - **12 — MCP config format gotcha**: Copilot usa `servers`; todos los demás usan `mcpServers`.
 
 Índice completo en [synergies/INDEX.md](synergies/INDEX.md).
+
+---
+
+## Conjuntos de datos y modelos ajustados
+
+El corpus tiene una capa de modelos derivados: **conjuntos de datos** curados derivados de los puntos de los registros de cambios, y **modelos ajustados** entrenados en esos conjuntos de datos. El conjunto de datos es el artefacto en este repositorio; el modelo es el derivado.
+
+### `dataset/changelog-actions/v1` — 301 entradas
+
+Cada entrada combina un punto de cambio del corpus con un elemento de acción escrito a mano: `{kind, severity, subject, action_text, deadline, tags}`. Taxonomía de 8 elementos para `kind` (`breaking | deprecation | security | feature | fix | performance | docs | unknown`), división de entrenamiento/validación estratificada 80/20, revisado por humanos y por un juez qwen3:8b de la familia cruzada (92.4% de acuerdo). Consulte [`dataset/README.md`](dataset/README.md) para la tabla de distribución, [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) para el contrato de campo por campo y [`STYLE.md`](dataset/changelog-actions/STYLE.md) para las reglas de escritura de `action_text`.
+
+### `cs-actions:v1` — sintetizador ajustado
+
+Primer modelo entrenado en el conjunto de datos. Qwen2.5-7B-Instruct + LoRA (rango-256 / lineal completo, 100 pasos QLoRA en 242 entradas de entrenamiento), formato GGUF q8_0, implementado mediante un archivo de modelo Ollama de dos etapas (`cs-actions-base` + `cs-actions:v1`).
+
+**Evaluación de la versión** (conjunto de validación estratificado de 59 entradas, tres ejecuciones, todas aprobadas, sin errores de análisis):
+
+| Métrica | qwen3:8b base | cs-actions:v1 | Diferencia |
+|---|---|---|---|
+| Precisión en "kind" vs. verdad fundamental | 78.0% | **88.1%** | +10.1pp |
+| Precisión en "severity" vs. verdad fundamental | 52.5% | **79.7%** | +27.2pp |
+| Macro-F1 (clases con buena población) | 0.801 | **0.854** | +0.053 |
+| Ejecución 3 — ablación de la sugerencia de "kind" (con sugerencia / sin sugerencia) | — | 0.842 / 0.777 | 6.5pt → zona objetivo |
+
+Criterio de aprobación de la versión `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0.780 ≥ 0.780`) — APROBADO ✓. Veredictos individuales en [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json), también adjunto a la [versión de GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) como una descarga de un solo archivo.
+
+**Limitación documentada de la versión 1: sesgo contra "desconocido".** "desconocido" es la única clase en la que cs-actions:v1 tiene un rendimiento inferior a qwen3:8b (F1 de 0.444 frente a 0.545). Precisión 1.000 / recuperación 0.286: cuando la entrada es genuinamente ambigua, el modelo se compromete con un tipo específico en lugar de abstenerse. Hereda el conocimiento previo de la familia qwen, que no se ha anulado completamente con LoRA. Los usuarios finales deben considerar una tasa de "kind: "desconocido"" inferior a la esperada como una señal para redirigir los lotes a una revisión humana. El [plan de la versión 2](dataset/README.md) aborda esto mediante la ampliación de la clase "desconocido" y la aleatorización de pistas.
+
+**No se distribuye a través de este repositorio:** el formato GGUF q8_0 tiene aproximadamente 5 GB y el punto de control combinado tiene aproximadamente 15 GB. El conjunto de datos y la canalización de construcción son lo que se publica; el modelo se reconstruye localmente según [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) (cadena manual de 4 etapas, aproximadamente 88 minutos de calentamiento en una computadora portátil RTX 5080 con 16 GB de VRAM). El contrato de lanzamiento de tres ejecuciones se encuentra en [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md).
+
+Una guía completa de uso, que incluye la invocación local de Ollama, el requisito de "format: "json"" para cada solicitud y la canalización de reconstrucción, se encuentra en la página del [manual → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/).
 
 ---
 

@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**实时数据（截至 v1.2.1 版本）：** 44 个产品 / 1,171 个发布文件 / 6,573 个变更 / 1,260 个实体 / 12 个协同关系 / 519 个测试 / 13 个 MCP 工具 / 17 个 CLI 命令。（语料库已于 2026-05-24 通过 `sync_now` 命令刷新。）
+**实时数据（截至 v1.2.1 版本）：** 44 个产品 / 1,171 个发布文件 / 6,573 个变更 / 1,260 个实体 / 12 个协同项目 / 519 个测试 / 13 个 MCP 工具 / 17 个 CLI 命令。（语料库已于 2026-05-24 通过 `sync_now` 命令刷新。）
 
 ---
 
@@ -91,7 +91,8 @@ claude-synergy/
 | 4d — playwright + MCP 注册 + YAML 配置文件。 | ✅ 已发货。 | 使用 Playwright 进行网页抓取；Smithery + 官方 MCP 注册信息作为第四级目录；产品信息已整合到 `products.yaml` 文件中。 |
 | **5 — v1.1 版本：窗口浏览 + OpenAI 嵌入** | ✅ 已发货。 | `hk diff` / `hk breaking`，所有浏览命令都支持日期范围；3 个新的 MCP 工具 (总共 11 个)；OpenAI 嵌入提供程序；可配置的嵌入维度；`claude-code` 自动同步；通用的 `keep-a-changelog` 解析器。 |
 | **6 — v1.2 版本：从 MCP 同步** | ✅ 已发货。 | `sync_status` (报告每个产品的更新状态，检测是否过时) 和 `sync_now` (按需获取 → 导入 → 嵌入，并提供 `dry_run` 预览 + 进程内并发锁定)。 解决了调用方可以查询语料库，但无法刷新的问题。 **此外，还修复了：** 标记清除错误，即 `INSERT OR REPLACE INTO products` 会级联删除 `markers` 上的外键，从而在每次导入时静默地重置每个产品的 `since` 游标 (回归 §8.20)。 |
-| **6.1 — v1.2.1：Fetcher 标记集中化** | ✅ 已发货。 | 将 `writeMarker` 函数集中到 `fetchOne` 函数中，以便每次成功的获取都更新标记。之前，一些策略（特别是 `aider` 原始变更日志）返回 0 个在窗口期内的条目，因此从未写入标记，并且每次同步都会重新拉取 `HISTORY.md` 文件。已将未实现的 `webfetch` 策略重命名为 `manual`，适用于 `claude-api` 和 `anthropic-apps`。现在，`sync_status` 会将手动配置的产品显示为 "manual"，而不是 "never"，并且将其排除在 `stale_only` 列表中（回归问题 §8.21）。 |
+| **6.1 — v1.2.1：fetcher-marker 集中化** | ✅ 已发货。 | 将 `writeMarker` 函数集中到 `fetchOne` 函数中，以便每次成功的获取都更新标记。之前，某些策略（特别是 `aider` 的原始变更日志）在窗口期内没有返回任何条目，因此从未写入标记，并且每次同步都会重新拉取 `HISTORY.md` 文件。将未实现的 `webfetch` 策略重命名为 `manual`，用于 `claude-api` + `anthropic-apps`；现在，`sync_status` 将手动产品显示为 "manual"，而不是 "never"，并且将其排除在 `stale_only` 之外（回归 §8.21）。 |
+| **7 — v1.3：cs-actions:v1：微调的合成器** | ✅ 已发货。 | 第一个基于语料库训练的下游模型。将一条变更日志条目转换为一个严格的 JSON 格式的操作项：`{kind, severity, subject, action_text, deadline, tags}`。使用 Qwen2.5-7B + LoRA，基于 `dataset/changelog-actions/v1/` 中的 242 个条目进行训练，使用 q8_0 GGUF 格式，并通过 Ollama 部署。发布前评估：**kind 类别准确率 88.1% / severity 严重程度准确率 79.7% / macro-F1 值为 0.842**，与 59 个分层验证集中的真实值相比（相对于 qwen3:8b 基础模型，分别提高了 +10.1pp / +27.2pp / +0.041）。已标记为 `cs-actions-v1`；评估报告已附加到 [GitHub 发布页面](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1)，以单个文件的形式下载。**记录了 v1 版本的限制：**存在对 "unknown" 类型的偏见（精确率 1.000 / 召回率 0.286）——模型会低估不明确的输入。请参阅 [手册 → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md)。 |
 
 v0.8 及后续版本的开发计划，请参考 [URGENT_FINDINGS.md](URGENT_FINDINGS.md) 文件以及相关问题列表。
 
@@ -287,6 +288,37 @@ v1.1 版本的工具模仿了 `hk diff` / `hk breaking` 命令，以及以前需
 - **12 — MCP 配置格式的常见问题**：Copilot 使用 `servers`，其他组件使用 `mcpServers`。
 
 完整的索引请参考 [synergies/INDEX.md](synergies/INDEX.md)。
+
+---
+
+## 数据集和微调模型
+
+语料库包含一个下游层：从变更条目中提取的**数据集**，以及基于这些数据集训练的**微调模型**。数据集是此仓库中的文件，而模型是下游应用。
+
+### `dataset/changelog-actions/v1` — 301 个条目
+
+每个条目将语料库中的一条变更条目与人工编写的操作项配对：`{kind, severity, subject, action_text, deadline, tags}`。`kind` 类别采用 8 种枚举类型（`breaking | deprecation | security | feature | fix | performance | docs | unknown`），采用 80/20 的分层训练/验证集划分，由人工和跨家族的 qwen3:8b 评委进行 A3c 审查（一致性为 92.4%）。请参阅 [`dataset/README.md`](dataset/README.md) 以获取分布表，[`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) 以获取字段级别的说明，以及 [`STYLE.md`](dataset/changelog-actions/STYLE.md) 以获取 `action_text` 编写规则。
+
+### `cs-actions:v1` — 微调的合成器
+
+第一个基于数据集训练的模型。使用 Qwen2.5-7B-Instruct + LoRA（rank-256 / all-linear，使用 QLoRA 方法在 242 个训练条目上进行 100 步训练），使用 q8_0 GGUF 格式，并通过双阶段的 Ollama Modelfile 部署（`cs-actions-base` + `cs-actions:v1`）。
+
+**发布前评估**（59 个分层验证集，三次运行，均通过，无解析错误）：
+
+| 指标 | qwen3:8b 基础模型 | cs-actions:v1 | 增量 |
+|---|---|---|---|
+| 与真实值相比的 kind 类别准确率 | 78.0% | **88.1%** | +10.1pp |
+| 与真实值相比的 severity 严重程度准确率 | 52.5% | **79.7%** | +27.2pp |
+| Macro-F1 (类别分布均衡) | 0.801 | **0.854** | +0.053 |
+| 第三次运行 — 移除 hint 的实验 (带 hint / 不带 hint) | — | 0.842 / 0.777 | 6.5pt → 目标区域 |
+
+发布通过标准：`qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0.780 ≥ 0.780`) — 通过 ✓。每个条目的详细评估结果位于 [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json)，也已附加到 [GitHub 发布页面](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1)，以单个文件的形式下载。
+
+**已记录的 v1 版本限制 — 对“未知”类别的偏见。** “未知”是唯一一个在 cs-actions:v1 中表现不如 qwen3:8b 的类别（F1 分数：0.444 vs 0.545）。 准确率 1.000 / 召回率 0.286 — 当输入确实存在歧义时，模型会倾向于选择一种特定的类别，而不是选择“未知”。 该模型继承了 qwen 系列的先验知识，但 LoRA 并没有完全覆盖。下游应用应该将低于预期“kind: "unknown"”的出现率视为一个信号，用于将批次发送到人工审核。 [v2 计划](dataset/README.md) 通过增加“未知”类别的样本以及提示随机化来解决这个问题。
+
+**未通过此仓库分发** — q8_0 GGUF 文件约为 5 GB，合并后的检查点文件约为 15 GB。 发布的是数据集和构建流水线；模型需要在本地进行重建，具体步骤请参考 [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md)（包含 4 个手动步骤，在 RTX 5080 笔记本电脑上，16 GB 显存，需要约 88 分钟的预热）。 三次运行的发布流程规范位于 [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md)。
+
+完整的用法指南 — 包括本地 Ollama 调用、每个请求的 `format: "json"` 格式要求以及重建流水线 — 可以在 [手册 → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) 页面上找到。
 
 ---
 

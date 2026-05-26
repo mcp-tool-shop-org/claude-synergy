@@ -92,6 +92,7 @@ claude-synergy/
 | **5 — Navegação com janelas (v1.1) + incorporação da OpenAI** | ✅ implementado | `hk diff` / `hk breaking`, limites de data em todos os comandos de navegação, 3 novas ferramentas MCP (total de 11), provedor de incorporação da OpenAI, dimensão de incorporação configurável, sincronização automática do `claude-code`, analisador genérico `keep-a-changelog`. |
 | **6 — v1.2 sync-from-MCP** | ✅ implementado | `sync_status` (frescor por produto, detecção de "obsoleto") e `sync_now` (busca sob demanda → ingestão → incorporação com visualização "dry_run" + bloqueio de concorrência em processo). Elimina a lacuna onde um agente poderia consultar o corpus, mas não atualizá-lo. **Corrige também:** um erro em que a exclusão de marcadores, ao usar `INSERT OR REPLACE INTO products`, causava uma exclusão em cascata na chave estrangeira `markers`, reiniciando silenciosamente o cursor "since" de cada produto a cada ingestão (regressão §8.20). |
 | **6.1 — Centralização do marcador de recuperação (versão 1.2.1)** | ✅ implementado | Centralizei a função `writeMarker` em `fetchOne` para que cada recuperação bem-sucedida atualize o marcador. Estratégias que retornavam 0 itens datados dentro do período especificado (principalmente o "changelog" bruto do `aider`) nunca escreviam um marcador e, portanto, baixavam o arquivo `HISTORY.md` a cada sincronização. Renomeei a estratégia `webfetch` não implementada para `manual` para as APIs `claude-api` e `anthropic-apps`. Agora, o `sync_status` exibe os produtos configurados como "manual" em vez de "nunca" e os exclui do processo `stale_only` (regressão §8.21). |
+| **7 — v1.3 cs-actions:v1, sintetizador ajustado** | ✅ implementado | Primeiro modelo derivado treinado no conjunto de dados. Converte uma entrada do changelog em um item de ação estrito em formato JSON: `{kind, severity, subject, action_text, deadline, tags}`. Qwen2.5-7B + LoRA em 242 entradas de `dataset/changelog-actions/v1/`, formato GGUF q8_0, implantado via Ollama. Avaliação para lançamento: **88,1% de precisão em "kind" / 79,7% de precisão em "severity" / 0,842 de macro-F1** em comparação com a referência em 59 entradas estratificadas (+10,1 pontos percentuais / +27,2 pontos percentuais / +0,041 em relação à versão base qwen3:8b). Marcado como `cs-actions-v1`; o relatório de avaliação está anexado à [versão do GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) como um arquivo único para download. **Limitação documentada da versão 1:** viés anti-"desconhecido" (precisão de 1,000 / revocação de 0,286) — o modelo classifica incorretamente entradas ambíguas. Consulte o [manual → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md). |
 
 Roteiro para a versão 0.8+: acompanhado em [URGENT_FINDINGS.md](URGENT_FINDINGS.md) e nas issues.
 
@@ -287,6 +288,37 @@ Estratégias de busca: `gh-releases | rss | raw-changelog | html-scrape | catalo
 - **12 — MCP config format gotcha**: o Copilot usa `servers`; todos os outros usam `mcpServers`.
 
 Índice completo em [synergies/INDEX.md](synergies/INDEX.md).
+
+---
+
+## Conjuntos de dados e modelos ajustados
+
+O conjunto de dados possui uma camada de aplicação: **conjuntos de dados** selecionados derivados de descrições de alterações e **modelos ajustados** treinados nesses conjuntos de dados. O conjunto de dados é o artefato neste repositório; o modelo é a aplicação.
+
+### `dataset/changelog-actions/v1` — 301 entradas
+
+Cada entrada associa uma descrição de alteração do conjunto de dados a um item de ação escrito manualmente: `{kind, severity, subject, action_text, deadline, tags}`. Taxonomia de 8 categorias para "kind" (`breaking | deprecation | security | feature | fix | performance | docs | unknown`), divisão estratificada de 80/20 para treinamento/validação, revisado por humanos e por um modelo de referência qwen3:8b (92,4% de concordância). Consulte [`dataset/README.md`](dataset/README.md) para a tabela de distribuição, [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) para o contrato de campo a campo e [`STYLE.md`](dataset/changelog-actions/STYLE.md) para as regras de escrita de `action_text`.
+
+### `cs-actions:v1` — sintetizador ajustado
+
+Primeiro modelo treinado no conjunto de dados. Qwen2.5-7B-Instruct + LoRA (rank-256 / all-linear, 100 etapas de QLoRA em 242 entradas de treinamento), formato GGUF q8_0, implantado via Modelfile de duas etapas do Ollama (`cs-actions-base` + `cs-actions:v1`).
+
+**Avaliação para lançamento** (59 entradas estratificadas, três execuções, todas aprovadas, sem erros de análise):
+
+| Métrica | qwen3:8b base | cs-actions:v1 | Diferença |
+|---|---|---|---|
+| Precisão em "kind" vs. referência | 78.0% | **88.1%** | +10,1 pp |
+| Precisão em "severity" vs. referência | 52.5% | **79.7%** | +27,2 pp |
+| Macro-F1 (classes com muitos exemplos) | 0.801 | **0.854** | +0.053 |
+| Execução 3 — ablação de "hint" (com "hint" / sem "hint") | — | 0.842 / 0.777 | 6,5 pontos → zona alvo |
+
+Critério de aprovação para lançamento `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0,780 ≥ 0,780`) — APROVADO ✓. Resultados detalhados para cada entrada em [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json), também anexado à [versão do GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) como um arquivo único para download.
+
+**Limitação documentada da versão 1 — viés anti-"desconhecido".** "desconhecido" é a única classe em que cs-actions:v1 tem desempenho inferior ao qwen3:8b (F1 de 0,444 vs 0,545). Precisão de 1,000 / revocação de 0,286 — quando a entrada é genuinamente ambígua, o modelo escolhe uma categoria específica em vez de abster-se. Herda o comportamento padrão da família qwen, que não foi totalmente substituído pelo LoRA. Os usuários devem tratar uma taxa de "kind: "desconhecido"" inferior ao esperado como um sinal para encaminhar lotes para revisão humana. O [plano da versão 2](dataset/README.md) aborda isso com a ampliação da classe "desconhecido" e a randomização de "hints".
+
+**Não distribuído através deste repositório** — o arquivo GGUF q8_0 tem aproximadamente 5 GB e o checkpoint combinado tem aproximadamente 15 GB. O conjunto de dados e o processo de construção são o que está publicado; o modelo é reconstruído localmente, conforme descrito em [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) (processo manual em 4 etapas, leva cerca de 88 minutos para ser carregado em uma placa RTX 5080 para laptop com 16 GB de VRAM). O contrato de validação para a versão final está em [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md).
+
+Um guia completo de uso — incluindo a invocação local via Ollama, a exigência de formatação "json" para cada requisição e o processo de reconstrução — está disponível na página do [manual → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/).
 
 ---
 

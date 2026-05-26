@@ -92,8 +92,9 @@ claude-synergy/
 | **5 — v1.1 windowed browsing + OpenAI embed** | ✅ shipped | `hk diff` / `hk breaking`, date bounds across all browsing commands, 3 new MCP tools (11 total), OpenAI embedding provider, configurable embedding dimension, `claude-code` auto-sync, generic `keep-a-changelog` parser |
 | **6 — v1.2 sync-from-MCP** | ✅ shipped | `sync_status` (per-product freshness, never/stale detection) and `sync_now` (on-demand fetch → ingest → embed with `dry_run` preview + in-process concurrency lock). Closes the seam where a calling agent could query the corpus but not refresh it. **Also fixes:** marker-wipe bug where `INSERT OR REPLACE INTO products` cascaded a DELETE on the `markers` FK, silently resetting every product's `since` cursor on each ingest (regression §8.20). |
 | **6.1 — v1.2.1 fetcher-marker centralization** | ✅ shipped | Centralized `writeMarker` in `fetchOne` so every successful fetch updates the marker — pre-fix, strategies that returned 0 in-window dated items (most notably `aider` raw-changelog) never wrote a marker and re-pulled `HISTORY.md` on every sync. Renamed unimplemented `webfetch` strategy to `manual` for `claude-api` + `anthropic-apps`; `sync_status` now renders manual products as "manual" instead of "never" and excludes them from `stale_only` (regression §8.21). |
+| **7 — v1.3 cs-actions:v1 fine-tuned synthesizer** | ✅ shipped | First downstream model trained on the corpus. Converts one changelog entry → one strict-JSON action item `{kind, severity, subject, action_text, deadline, tags}`. Qwen2.5-7B + LoRA on 242 entries from `dataset/changelog-actions/v1/`, q8_0 GGUF, Ollama-deployed. Release-gate eval: **88.1% kind / 79.7% severity / 0.842 macro-F1** vs ground truth on 59-entry stratified holdout (+10.1pp / +27.2pp / +0.041 over qwen3:8b base). Tagged `cs-actions-v1`; eval report attached to the [GitHub Release](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) as a single-file download. **Documented v1 limitation:** anti-`unknown` bias (precision 1.000 / recall 0.286) — model under-flags ambiguous inputs. See [handbook → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md). |
 
-Roadmap beyond v1.2: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
+Roadmap beyond v1.3: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and issues.
 
 ---
 
@@ -287,6 +288,37 @@ Fetch strategies: `gh-releases | rss | raw-changelog | keep-a-changelog | html-s
 - **12 — MCP config format gotcha**: Copilot uses `servers`; everyone else uses `mcpServers`
 
 Full index in [synergies/INDEX.md](synergies/INDEX.md).
+
+---
+
+## Datasets and fine-tuned models
+
+The corpus has a downstream layer: curated **datasets** derived from change bullets, and **fine-tuned models** trained on those datasets. The dataset is the artifact in this repo; the model is downstream.
+
+### `dataset/changelog-actions/v1` — 301 entries
+
+Each entry pairs one change bullet from the corpus with a hand-written action item: `{kind, severity, subject, action_text, deadline, tags}`. 8-enum `kind` taxonomy (`breaking | deprecation | security | feature | fix | performance | docs | unknown`), stratified 80/20 train/holdout, A3c-reviewed by human + cross-family qwen3:8b judge (92.4% agreement). See [`dataset/README.md`](dataset/README.md) for the distribution table, [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) for the field-by-field contract, and [`STYLE.md`](dataset/changelog-actions/STYLE.md) for the `action_text` writing rules.
+
+### `cs-actions:v1` — fine-tuned synthesizer
+
+First model trained on the dataset. Qwen2.5-7B-Instruct + LoRA (rank-256 / all-linear, 100 steps QLoRA on 242 training entries), q8_0 GGUF, deployed via two-stage Ollama Modelfile (`cs-actions-base` + `cs-actions:v1`).
+
+**Release-gate eval** (59-entry stratified holdout, three runs, all passed, zero parse errors):
+
+| Metric | qwen3:8b base | cs-actions:v1 | Delta |
+|---|---|---|---|
+| Kind agreement vs ground truth | 78.0% | **88.1%** | +10.1pp |
+| Severity agreement vs ground truth | 52.5% | **79.7%** | +27.2pp |
+| Macro-F1 (well-populated classes) | 0.801 | **0.854** | +0.053 |
+| Run 3 — kind-hint ablation (with hint / without) | — | 0.842 / 0.777 | 6.5pt → target zone |
+
+Release pass criterion `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0.780 ≥ 0.780`) — PASS ✓. Full per-entry verdicts in [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json), also attached to the [GitHub Release](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) as a single-file download.
+
+**Documented v1 limitation — anti-`unknown` bias.** `unknown` is the only class where cs-actions:v1 underperforms qwen3:8b (F1 0.444 vs 0.545). Precision 1.000 / recall 0.286 — when input is genuinely ambiguous, the model commits to a specific kind rather than abstain. Inherited qwen-family prior, not fully overridden by the LoRA. Downstream consumers should treat a lower-than-expected `kind: "unknown"` rate as a signal to route batches to human review. The [v2 plan](dataset/README.md) addresses this with unknown-class augmentation plus hint-randomization.
+
+**Not distributed through this repo** — the q8_0 GGUF is ~5 GB and the merged checkpoint is ~15 GB. The dataset and the build pipeline are what's published; the model rebuilds locally per [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) (4-stage manual chain, ~88 min warm on RTX 5080 Laptop 16 GB VRAM). The three-run release-gate contract lives in [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md).
+
+Full usage walkthrough — including local Ollama invocation, the `format: "json"` per-request caller requirement, and the rebuild pipeline — is on the [handbook → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) page.
 
 ---
 

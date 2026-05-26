@@ -92,6 +92,7 @@ claude-synergy/
 | **5 — v1.1：ウィンドウ表示機能 + OpenAIの埋め込み機能** | ✅ リリース済み | `hk diff` / `hk breaking`：すべての閲覧コマンドで日付範囲を指定可能。3つの新しいMCPツール（合計11個）、OpenAIの埋め込み機能、設定可能な埋め込み次元、`claude-code`の自動同期、汎用的な`keep-a-changelog`パーサー。 |
 | **6 — v1.2 sync-from-MCP** | ✅ リリース済み | `sync_status`（製品ごとの鮮度、"never"または"stale"の状態検出）と`sync_now`（オンデマンドでの取得→取り込み→埋め込み。`dry_run`プレビューと、処理中の同時実行ロック機能付き）。 これにより、コーパスを問い合わせできるものの、更新できないという問題を解消します。 **また、以下の問題を修正:** `INSERT OR REPLACE INTO products`によって`markers`の外部キーにDELETEが連鎖し、すべての製品の`since`カーソルが、取り込みのたびにリセットされていたバグ（回帰 §8.20）。 |
 | **6.1 — v1.2.1 fetcher-markerの中央管理** | ✅ リリース済み | `fetchOne`内で`writeMarker`を中央管理化し、すべての正常な取得でマーカーを更新するようにしました。 以前は、一定期間内に0件のアイテムを返した戦略（特に`aider`のraw-changelog）は、マーカーを書き込まず、`HISTORY.md`を毎回再取得していました。 実装されていない`webfetch`戦略を、`claude-api`および`anthropic-apps`向けに`manual`に改名しました。 `sync_status`では、現在、手動で設定された製品を"never"ではなく"manual"として表示し、`stale_only`から除外するようにしました（回帰 §8.21）。 |
+| **7 — v1.3 cs-actions:v1 ファインチューニングされたシンセサイザー** | ✅ リリース済み | このモデルは、最初にトレーニングされたダウンストリームモデルです。変更履歴のエントリを、厳密なJSON形式のアクションアイテム `{kind, severity, subject, action_text, deadline, tags}` に変換します。Qwen2.5-7B + LoRA を使用し、`dataset/changelog-actions/v1/` から取得した242のエントリでトレーニング。q8_0 GGUF形式で、Ollamaを使用してデプロイされています。リリース前の評価では、**kind に関して 88.1%、severity に関して 79.7%、macro-F1 が 0.842** という結果であり、これは59エントリの検証データセットにおける ground truth と比較して、qwen3:8b のベースモデルと比較してそれぞれ +10.1pp、+27.2pp、+0.041 の改善です。`cs-actions-v1` というタグが付けられ、評価レポートは[GitHub Release](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) に単一ファイルとして添付されています。**v1 の制限事項として、`unknown` バイアス** が文書化されています (precision 1.000 / recall 0.286)。これは、モデルが曖昧な入力を適切に判断せず、誤ったカテゴリに分類してしまうことを意味します。詳細については、[handbook → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/)、[`dataset/README.md`](dataset/README.md)、[`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md)、[`EVAL.md`](dataset/changelog-actions/v1/EVAL.md) を参照してください。 |
 
 v0.8以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)およびissueで追跡中。
 
@@ -287,6 +288,37 @@ v1.1のツールは、`hk diff` / `hk breaking`および、以前はスクリプ
 - **12 — MCP config format gotcha**: Copilotは`servers`を使用するが、他の環境では`mcpServers`を使用する。
 
 詳細なインデックスは、[synergies/INDEX.md](synergies/INDEX.md)を参照してください。
+
+---
+
+## データセットとファインチューニングされたモデル
+
+このリポジトリには、変更履歴から作成された **データセット** と、それらのデータセットでトレーニングされた **ファインチューニングされたモデル** が含まれています。データセットはリポジトリ内のファイルであり、モデルはダウンストリームで使用されます。
+
+### `dataset/changelog-actions/v1` — 301 エントリ
+
+各エントリは、変更履歴からの変更内容と、手書きで作成されたアクションアイテム `{kind, severity, subject, action_text, deadline, tags}` を組み合わせたものです。`kind` は 8 つのカテゴリ（`breaking | deprecation | security | feature | fix | performance | docs | unknown`）を持つタクソノミーであり、80/20 の割合でトレーニングデータと検証データに分割されています。A3c によるレビューは、人間と qwen3:8b の判断者によって行われ、92.4% の合意が得られました。分布については [`dataset/README.md`](dataset/README.md) を、各フィールドの説明については [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) を、アクションテキストの書き方については [`STYLE.md`](dataset/changelog-actions/STYLE.md) を参照してください。
+
+### `cs-actions:v1` — ファインチューニングされたシンセサイザー
+
+このモデルは、データセットでトレーニングされた最初のモデルです。Qwen2.5-7B-Instruct + LoRA (rank-256 / all-linear, 100 steps QLoRA) を使用し、242 のトレーニングエントリでトレーニング。q8_0 GGUF 形式で、Ollama Modelfile (`cs-actions-base` + `cs-actions:v1`) を使用してデプロイされています。
+
+**リリース前の評価** (59 エントリの検証データセット、3 回の実行、すべて合格、パースエラーはゼロ):
+
+| 指標 | qwen3:8b (ベース) | cs-actions:v1 | 差分 |
+|---|---|---|---|
+| ground truth との kind の一致率 | 78.0% | **88.1%** | +10.1pp |
+| ground truth との severity の一致率 | 52.5% | **79.7%** | +27.2pp |
+| Macro-F1 (十分に多くのカテゴリが存在する場合) | 0.801 | **0.854** | +0.053 |
+| 3 回目の実行 — kind のヒントの有無による比較 | — | 0.842 / 0.777 | 6.5pt → 目標範囲 |
+
+リリース基準: `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0.780 ≥ 0.780`) — 合格 ✓。各エントリの詳細な結果は [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json) に記載されており、[GitHub Release](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) に単一ファイルとして添付されています。
+
+**v1 の制限事項 — `unknown` バイアス。** `unknown` は、cs-actions:v1 が qwen3:8b よりも性能が低い唯一のカテゴリです (F1 スコア 0.444 vs 0.545)。precision は 1.000、recall は 0.286 であり、入力が実際に曖昧な場合、モデルは特定のカテゴリに分類する傾向があり、不明と判断しません。このバイアスは、qwen ファミリーの既存の傾向に由来し、LoRA によって完全に修正されていません。ダウンストリームの利用者は、期待よりも `kind: "unknown"` の割合が低い場合、そのバッチを人間のレビューに回すようにする必要があります。この問題は、[v2 の計画](dataset/README.md) で、`unknown` クラスのデータ拡張とヒントのランダム化によって解決される予定です。
+
+**このリポジトリからは配布されません**。q8_0形式のGGUFファイルは約5GB、マージされたチェックポイントは約15GBです。公開されているのはデータセットとビルドパイプラインであり、モデルはローカルで再構築されます（詳細については[`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md)を参照）。4段階の手動プロセスで、RTX 5080のノートパソコン（16GBのVRAM）で約88分かかります。リリースに関する契約は[`EVAL.md`](dataset/changelog-actions/v1/EVAL.md)に記載されています。
+
+ローカルでのOllamaの利用方法、リクエストごとに`format: "json"`を指定する必要性、および再構築パイプラインなど、詳細な利用方法については、[ハンドブック → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/)のページをご覧ください。
 
 ---
 
