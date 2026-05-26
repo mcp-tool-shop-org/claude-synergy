@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-05-25
+
+Docs-only patch. No code, schema, or behavior change. The `dist/` tarball is byte-identical to 1.2.1.
+
+### Changed
+- **README.md** — added Tier 7 row for v1.3 `cs-actions:v1` fine-tuned synthesizer (release-gate eval numbers + anti-`unknown` bias as documented v1 limitation + pointer to handbook + dataset/README.md + TRAINING.md + EVAL.md).
+- **README.md** — new top-level "Datasets and fine-tuned models" section covering `dataset/changelog-actions/v1` (301 entries, 8-enum taxonomy, A3c review) and `cs-actions:v1` (Qwen2.5-7B + LoRA, Ollama-deployed, eval table, anti-`unknown` bias, "not distributed through this repo" note).
+- **README.{ja,zh,es,fr,hi,it,pt-BR}.md** — all 7 translations refreshed via TranslateGemma 12B (local, zero API cost).
+
+### Out of npm shape
+- New handbook page `site/src/content/docs/handbook/cs-actions-v1.md` ships in the repo + on the [landing page](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) but is not in the npm tarball (`site/` is outside `files[]`).
+- Dataset directory `dataset/changelog-actions/v1/` is in the repo + on the [`cs-actions-v1` GitHub Release](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) (eval-report.v1.json as single-file asset) but is not in the npm tarball.
+
+## [1.2.1] - 2026-05-24
+
+### Fixed
+- **Fetcher-marker centralization** — `writeMarker` is now called from `fetchOne` on every successful fetch, not from inside each strategy. Strategies that returned 0 in-window dated items (most notably `aider` raw-changelog) never wrote a marker pre-fix and re-pulled the full source on every sync. Regression §8.21 protects against the re-pull behavior.
+
+### Changed
+- **`webfetch` strategy renamed to `manual`** for `claude-api` + `anthropic-apps` to reflect reality — nothing in `fetch.ts` dispatches the strategy, so seeding is currently manual. `sync_status` now renders manual products as `manual` instead of `never` and excludes them from `--stale-only`.
+
+## [1.2.0] - 2026-05-24
+
+### Added
+- **`sync_status` MCP tool** — per-product sync freshness. Inputs: `product?`, `stale_only?`, `stale_hours?`. Returns last fetch timestamp, hours since fetch, ingested release count. Use BEFORE trusting `latest_releases` to know if the corpus is stale.
+- **`sync_now` MCP tool** — on-demand refresh (mirrors `hk sync`). Inputs: `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Rejects with `InvalidParams` if another `sync_now` is already in flight (in-process concurrency lock). Does NOT commit to git.
+- MCP tool count 11 → 13.
+
+### Fixed
+- **Marker-wipe bug (regression §8.20)** — `INSERT OR REPLACE INTO products` was cascading a `DELETE` to the `markers` FK on every `hk ingest`, silently resetting every product's `since` cursor. Replaced with `INSERT … ON CONFLICT(slug) DO UPDATE` to upsert in place without triggering the cascade.
+
 ## [1.1.1] - 2026-05-22
 
 ### Removed
