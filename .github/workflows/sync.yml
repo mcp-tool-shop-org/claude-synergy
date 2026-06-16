@@ -23,7 +23,7 @@ jobs:
         run: npm install -g pnpm@10
 
       - name: Install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
           timeout_minutes: 5
           max_attempts: 3
@@ -31,7 +31,7 @@ jobs:
           command: pnpm install --frozen-lockfile
 
       - name: Install Ollama (free LLM provider)
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
           timeout_minutes: 8
           max_attempts: 3
@@ -47,7 +47,7 @@ jobs:
         run: pnpm build
 
       - name: Sync (fetch + ingest + embed)
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
