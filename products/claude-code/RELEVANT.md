@@ -38,7 +38,7 @@ Triage of items from the recent release window that affect existing workflows, h
 
 > Added hook `args: string[]` field (exec form) that spawns the command directly without a shell, so path placeholders never need quoting
 
-**Why this matters:** existing memory-gate hook at `C:/Users/mikey/.claude/hooks/memory-gate.py` is invoked via shell-string. Path quoting is implicit-and-brittle. Exec form is safer and faster.
+**Why this matters:** existing memory-gate hook at `~/.claude/hooks/memory-gate.py` is invoked via shell-string. Path quoting is implicit-and-brittle. Exec form is safer and faster.
 
 **Action:** consider migrating hook configs to `args: string[]` exec form. Low priority unless a quoting bug bites.
 

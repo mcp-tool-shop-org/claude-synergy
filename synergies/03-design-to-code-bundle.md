@@ -22,7 +22,7 @@ last_validated: 2026-05-21
 
 **Evidence:**
 
-- [Claude Design skill description](C:/Users/mikey/.claude/skills/claude-design/SKILL.md): "exports to standalone HTML / PDF / PPTX / Canva / .zip, hands off to Claude Code via a packaged bundle"
+- [Claude Design skill description](~/.claude/skills/claude-design/SKILL.md): "exports to standalone HTML / PDF / PPTX / Canva / .zip, hands off to Claude Code via a packaged bundle"
 - [Anthropic Apps release notes 2026-04-17](https://support.claude.com/en/articles/12138966-release-notes): "Claude Design, a new Anthropic Labs product for visual collaboration including designs, prototypes, slides, and one-pagers"
 - Powered by Opus 4.7 specifically for visual iteration
 

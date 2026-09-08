@@ -24,9 +24,9 @@ This is a Mike-specific synergy (not an Anthropic-product synergy) because the b
 
 **Evidence:**
 
-- [ollama-intern-mcp skill description](C:/Users/mikey/.claude/skills/ollama-intern/SKILL.md): "28 frozen primitive tools (15 atoms + 3 briefs + 3 packs + 7 artifact tools) for delegating bulk analysis to a local Ollama model. Hermes integration, incident pack, change pack, repo pack, delegate to 8B"
+- [ollama-intern-mcp skill description](~/.claude/skills/ollama-intern/SKILL.md): "28 frozen primitive tools (15 atoms + 3 briefs + 3 packs + 7 artifact tools) for delegating bulk analysis to a local Ollama model. Hermes integration, incident pack, change pack, repo pack, delegate to 8B"
 - [Self-hosted sandboxes for Claude Managed Agents (2026-05-19)](https://platform.claude.com/docs/en/release-notes/overview#may-19-2026) — same pattern at the API layer; Anthropic now supports self-hosted execution sandboxes for Managed Agents
-- TranslateGemma 12B local pattern proven for translation workloads ([global CLAUDE.md translation rule](C:/Users/mikey/.claude/CLAUDE.md))
+- TranslateGemma 12B local pattern proven for translation workloads ([global CLAUDE.md translation rule](~/.claude/CLAUDE.md))
 
 **Caveats:**
 

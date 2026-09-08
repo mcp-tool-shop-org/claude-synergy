@@ -28,6 +28,6 @@ last_validated: 2026-05-21
 **Caveats:**
 
 - Computer Use carries real safety considerations — agents can take destructive actions; always start with read-only scope (`request_access` tier "read") and escalate
-- Tier-"read" browsers and tier-"click" terminals/IDEs limit what computer-use can do inside them per the global computer-use protocol (see [user CLAUDE.md](C:/Users/mikey/.claude/CLAUDE.md) for the rule)
+- Tier-"read" browsers and tier-"click" terminals/IDEs limit what computer-use can do inside them per the global computer-use protocol (see [user CLAUDE.md](~/.claude/CLAUDE.md) for the rule)
 - Cost differs significantly across surfaces — Claude.ai is included in Pro/Max; API is per-call; Code MCP is included in the Code subscription
 - Link-clicking via computer use is disallowed for safety; use the claude-in-chrome MCP for verified link navigation
