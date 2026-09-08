@@ -13,6 +13,7 @@
   },
   "scripts": {
     "build": "tsup src/cli.ts src/mcp-server.ts --format esm --target node22 --shims --clean --external playwright",
+    "typecheck": "tsc --noEmit",
     "dev": "tsx src/cli.ts",
     "mcp": "tsx src/mcp-server.ts",
     "init": "tsx src/cli.ts init",

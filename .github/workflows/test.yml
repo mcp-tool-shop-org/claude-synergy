@@ -34,6 +34,14 @@ jobs:
       - name: Dependency audit
         run: pnpm audit --audit-level=high || true
 
+      # typescript was a devDependency nothing invoked: the build is tsup and
+      # the tests are vitest, both esbuild, which strips types without checking
+      # them. So the TS 5->7 bump landed inert and five real type errors sat
+      # invisible in src/fetch-playwright.ts. This step is what makes the
+      # dependency mean something.
+      - name: Typecheck
+        run: pnpm typecheck
+
       - name: Run tests with coverage
         run: pnpm test:coverage
 
