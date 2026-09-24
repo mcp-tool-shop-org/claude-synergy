@@ -25,6 +25,9 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Atlas check
+        run: npx --yes @dogfood-lab/atlas@1.17.0 check
+
       - name: Install pnpm
         run: npm install -g pnpm@10
 
