@@ -2,18 +2,10 @@
   "authored": [
     ".github/",
     "docs/",
+    "products/",
+    "root",
     "site/",
     "synergies/"
-  ],
-  "authoredWritten": [
-    {
-      "byPeople": 7,
-      "commits": 7,
-      "place": "products/",
-      "writers": [
-        ".github/workflows/sync.yml"
-      ]
-    }
   ],
   "breaks": [
     {
@@ -24,7 +16,10 @@
       ],
       "kind": "part",
       "name": "src",
-      "partLabel": "src"
+      "partLabel": "src",
+      "spawnedBy": [
+        "scripts"
+      ]
     },
     {
       "doors": 2,
@@ -56,7 +51,47 @@
     }
   ],
   "changes": {
-    "first": true
+    "fileCounts": {
+      "added": 1,
+      "changed": 1701,
+      "moved": 0,
+      "parts": 9,
+      "removed": 0
+    },
+    "items": [
+      {
+        "kind": "landing",
+        "sentence": "synergies/ is now read by src/mcp-server.ts.",
+        "subjects": [
+          "synergies/",
+          "src/mcp-server.ts"
+        ]
+      },
+      {
+        "kind": "origin",
+        "sentence": "products was generated and is now authored.",
+        "subjects": [
+          "products"
+        ]
+      },
+      {
+        "kind": "origin",
+        "sentence": "the repository root was mixed and is now authored.",
+        "subjects": [
+          "root"
+        ]
+      },
+      {
+        "kind": "counts",
+        "sentence": "1 file added and 1701 changed content, across 9 parts.",
+        "subjects": []
+      }
+    ],
+    "since": {
+      "commit": "fb90b80c2a5dbd4e51646bf8642a81f63c4c92b9",
+      "generatedAt": "2026-09-24T09:07:24.868Z"
+    },
+    "unchanged": false
   },
   "changesTogether": [
     {
@@ -121,19 +156,20 @@
     }
   ],
   "changesTogetherNote": [
-    "Confidence is low: fewer than 20 source files reach 10 revisions in the window.",
+    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "fb90b80c2a5dbd4e51646bf8642a81f63c4c92b9",
+  "commit": "819f3d309888820d0eb3817439dcd56fe57419a2",
   "defaultBranch": "main",
-  "derived": "10 parts, mostly TypeScript (83 files). Work enters through 7 doors; the busiest is Daily sync, which reaches 1 part and commits into the repository (Tests reaches 2 but commits nothing). It publishes to npm. People run claude-synergy-mcp and hk. People import @mcptoolshop/claude-synergy.",
+  "derived": "10 parts, mostly Markdown (1273 files) and JSON data (317); code in TypeScript (83), JavaScript (9), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; the busiest is Daily sync, which reaches 1 part and commits into the repository (Tests reaches 2 but commits nothing). It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
     {
       "checks": [
         "src/"
       ],
       "checksCount": 1,
+      "checksMore": 0,
       "file": ".github/workflows/test.yml",
       "id": ".github/workflows/test.yml",
       "landings": [],
@@ -157,20 +193,25 @@
         "test/unit/"
       ],
       "runsCount": 3,
-      "sends": [],
+      "runsMore": 0,
+      "sends": [
+        "uploads coverage to Codecov"
+      ],
       "stages": [],
       "triggers": [
-        "on a pull request",
+        "on a pull request to main",
         "on a push to main",
         "or by hand"
       ]
     },
     {
-      "checks": [
+      "builds": [
         "src/cli.ts",
         "src/mcp-server.ts"
       ],
-      "checksCount": 2,
+      "checks": [],
+      "checksCount": 0,
+      "checksMore": 0,
       "file": ".github/workflows/release.yml",
       "id": ".github/workflows/release.yml",
       "landings": [],
@@ -194,6 +235,7 @@
         "test/unit/"
       ],
       "runsCount": 3,
+      "runsMore": 0,
       "sends": [
         "publishes to npm",
         "creates a GitHub release"
@@ -207,6 +249,7 @@
     {
       "checks": [],
       "checksCount": 0,
+      "checksMore": 0,
       "file": ".github/workflows/pages.yml",
       "id": ".github/workflows/pages.yml",
       "landings": [],
@@ -216,7 +259,7 @@
         {
           "boundary": "site",
           "depth": 0,
-          "files": 3
+          "files": 5
         }
       ],
       "runs": [
@@ -224,6 +267,7 @@
         "site/src/"
       ],
       "runsCount": 2,
+      "runsMore": 0,
       "sends": [
         "deploys the site"
       ],
@@ -234,17 +278,15 @@
       ]
     },
     {
-      "checks": [
+      "builds": [
         "src/mcp-server.ts"
       ],
-      "checksCount": 1,
+      "checks": [],
+      "checksCount": 0,
+      "checksMore": 0,
       "file": ".github/workflows/sync.yml",
       "id": ".github/workflows/sync.yml",
-      "landings": [
-        "SOURCES.md",
-        "URGENT_FINDINGS.md",
-        "products/"
-      ],
+      "landings": [],
       "name": "Daily sync",
       "programs": [
         "gh"
@@ -261,6 +303,7 @@
         "src/cli.ts"
       ],
       "runsCount": 1,
+      "runsMore": 0,
       "sends": [],
       "stages": [
         "LATEST.txt",
@@ -273,11 +316,17 @@
       "triggers": [
         "on a schedule (`0 12 * * *`)",
         "or by hand"
+      ],
+      "unwrittenStages": [
+        "SOURCES.md",
+        "URGENT_FINDINGS.md",
+        "products"
       ]
     },
     {
       "checks": [],
       "checksCount": 0,
+      "checksMore": 0,
       "file": "package.json",
       "id": "package.json#@mcptoolshop/claude-synergy",
       "kind": "package",
@@ -295,7 +344,9 @@
         "src/cli.ts",
         "src/mcp-server.ts"
       ],
+      "runsCommand": "hk",
       "runsCount": 2,
+      "runsMore": 0,
       "sends": [],
       "stages": [],
       "triggers": []
@@ -303,6 +354,7 @@
     {
       "checks": [],
       "checksCount": 0,
+      "checksMore": 0,
       "file": "package.json",
       "id": "package.json#claude-synergy-mcp",
       "kind": "command",
@@ -323,6 +375,7 @@
         "src/mcp-server.ts"
       ],
       "runsCount": 1,
+      "runsMore": 0,
       "sends": [],
       "stages": [],
       "triggers": []
@@ -330,6 +383,7 @@
     {
       "checks": [],
       "checksCount": 0,
+      "checksMore": 0,
       "file": "package.json",
       "id": "package.json#hk",
       "kind": "command",
@@ -350,6 +404,7 @@
         "src/cli.ts"
       ],
       "runsCount": 1,
+      "runsMore": 0,
       "sends": [],
       "stages": [],
       "triggers": []
@@ -365,19 +420,8 @@
       "to": "src"
     }
   ],
+  "engine": "1.24.0",
   "generated": [
-    {
-      "place": "SOURCES.md",
-      "writers": [
-        ".github/workflows/sync.yml"
-      ]
-    },
-    {
-      "place": "URGENT_FINDINGS.md",
-      "writers": [
-        ".github/workflows/sync.yml"
-      ]
-    },
     {
       "place": "dataset/changelog-actions/v1/entries/",
       "writers": [
@@ -421,12 +465,12 @@
       ]
     }
   ],
-  "generatedAt": "2026-09-24T09:07:24.868Z",
+  "generatedAt": "2026-09-30T20:09:02.707Z",
   "limits": [
-    "5 reads use paths built at run time and are not named here.",
-    "10 writes and 45 reads go to the directory the command is run in, the home directory or a path its caller passes, not to this repository.",
-    "5 commands are built at run time and not followed, 4 of them in tests.",
-    "Statistics confidence is low: fewer than 20 source files reach 10 revisions in the window."
+    "9 writes and 32 reads go to a path their caller passes, not to this repository.",
+    "1 write and 8 reads go to the directory the command is run in (data/ and synergies/) or a path their caller passes, not to this repository.",
+    "8 reads go to the directory the command is run in (products.yaml, schema-vec.sql, schema.sql and 1 more place), not to this repository.",
+    "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/sync.yml",
   "partLabels": {
@@ -442,43 +486,25 @@
     "test": "test"
   },
   "parts": 10,
-  "readers": [
-    {
-      "readers": [
-        "scripts/verify-citations-sample.mjs"
-      ],
-      "target": "products/",
-      "tests": 1
-    }
-  ],
+  "readers": [],
   "repo": "mcp-tool-shop-org/claude-synergy",
   "sequences": [],
-  "startDoor": ".github/workflows/test.yml",
+  "startDoor": "package.json#claude-synergy-mcp",
   "startHere": [
-    ".github/workflows/test.yml",
-    "src/cli.ts"
+    "src/mcp-server.ts",
+    "src/db.ts",
+    "src/errors.ts"
   ],
+  "startReason": "This path follows claude-synergy-mcp (a command people run) from its entry, since Tests runs only tests and checks.",
   "summary": null,
   "summaryFrom": null,
   "testFiles": 77,
   "testedBy": {
     "scripts": 0,
-    "src": 44
+    "src": 45
   },
   "unnamedWrites": 0,
   "unread": [
-    {
-      "place": "SOURCES.md",
-      "writers": [
-        ".github/workflows/sync.yml"
-      ]
-    },
-    {
-      "place": "URGENT_FINDINGS.md",
-      "writers": [
-        ".github/workflows/sync.yml"
-      ]
-    },
     {
       "place": "dataset/changelog-actions/v1/eval-report-run1.json",
       "writers": [
@@ -513,6 +539,9 @@
       "testedBy": 0
     }
   ],
-  "untestedNote": [],
-  "written": 10
+  "untestedNote": [
+    "test/smoke/full-corpus.test.ts runs in no workflow.",
+    "verify.sh runs in no workflow."
+  ],
+  "written": 7
 }
