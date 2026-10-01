@@ -21,7 +21,7 @@
           "path": ".github/workflows/release.yml"
         },
         {
-          "hash": "45c5c16ffb7903230f197d4efbb7d8deea342361fe96bbab5438e4030c705c8c",
+          "hash": "9b45f4acfd0c7c9da7623b07585691b65f0a9959e711a4de1e7bd21be9a6db8b",
           "path": ".github/workflows/sync.yml"
         },
         {
@@ -10741,7 +10741,7 @@
   ],
   "engine": "1.24.0",
   "generatedFrom": {
-    "commit": "819f3d309888820d0eb3817439dcd56fe57419a2",
+    "commit": "a222e671c2f750517f49444564d3eb2c7144cd0c",
     "tracked": 1704
   },
   "landings": [

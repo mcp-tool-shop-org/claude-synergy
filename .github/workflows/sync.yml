@@ -30,6 +30,14 @@ jobs:
           retry_wait_seconds: 15
           command: pnpm install --frozen-lockfile
 
+      - name: Install Playwright Chromium (windsurf source)
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 15
+          command: pnpm exec playwright install --with-deps chromium
+
       - name: Install Ollama (free LLM provider)
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
