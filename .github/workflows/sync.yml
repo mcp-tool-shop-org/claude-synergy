@@ -15,7 +15,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -78,12 +78,22 @@ jobs:
       - name: Build CLI
         run: pnpm build
 
+      # data/*.db is gitignored, so without this every run re-embedded all
+      # ~17k chunks from scratch (~28 min on CPU). Restoring the previous DB
+      # makes embed incremental; the first (cold) run still needs the long budget.
+      - name: Restore sync database cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: data/claude-synergy.db
+          key: sync-db-${{ github.run_id }}
+          restore-keys: sync-db-
+
       - name: Sync (fetch + ingest + embed)
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          timeout_minutes: 20
+          timeout_minutes: 50
           max_attempts: 1
           command: node dist/cli.js sync
 
