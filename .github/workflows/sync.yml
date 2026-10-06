@@ -8,10 +8,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -38,18 +42,38 @@ jobs:
           retry_wait_seconds: 15
           command: pnpm exec playwright install --with-deps chromium
 
-      - name: Install Ollama (free LLM provider)
+      - name: Install Ollama (local models only)
         uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         with:
-          timeout_minutes: 8
+          timeout_minutes: 5
+          max_attempts: 2
+          retry_wait_seconds: 10
+          command: curl -fsSL https://ollama.ai/install.sh | sh
+
+      # The daemon must outlive its step. Starting it inside the retry wrapper's
+      # child process (the old way) killed it when that step exited, so the
+      # embed stage later got "fetch failed" on localhost:11434.
+      - name: Start Ollama daemon
+        run: |
+          if ! curl -sf http://127.0.0.1:11434/api/tags >/dev/null; then
+            nohup ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+          fi
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:11434/api/tags >/dev/null && echo "ollama ready after ${i}s" && exit 0
+            sleep 1
+          done
+          echo "ollama did not become ready"; cat "$RUNNER_TEMP/ollama.log" || true
+          exit 1
+
+      # Sync embeds with the structured context provider, so only the embedding
+      # model is needed (no chat model).
+      - name: Pull embedding model
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        with:
+          timeout_minutes: 5
           max_attempts: 3
           retry_wait_seconds: 10
-          command: |
-            curl -fsSL https://ollama.ai/install.sh | sh
-            ollama serve &
-            sleep 5
-            ollama pull llama3.2:3b
-            ollama pull nomic-embed-text
+          command: ollama pull nomic-embed-text
 
       - name: Build CLI
         run: pnpm build
@@ -59,9 +83,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          timeout_minutes: 10
-          max_attempts: 3
-          retry_wait_seconds: 30
+          timeout_minutes: 20
+          max_attempts: 1
           command: node dist/cli.js sync
 
       - name: Refresh top-level summaries
