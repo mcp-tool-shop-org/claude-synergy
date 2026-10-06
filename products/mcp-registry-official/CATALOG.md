@@ -1,7 +1,7 @@
 # mcp-registry-official — MCP server catalog
 
 **Source:** official-mcp-registry
-**Entries:** 1623
+**Entries:** 1628
 **Fetched:** 2026-10-06
 
 | Name | Description | Popularity | Created | Homepage |
@@ -201,6 +201,7 @@
 | b/cited | AEO tools: scan any URL for AI-citation readiness, read the public leaderboard and citation panel. | — | 2026-09-17 | [link](https://mcp.bcited.ai/public) |
 | BeatBandit MCP | AI story development, screenplay editing, review, media, and export tools for BeatBandit projects. | — | 2026-07-13 | [link](https://beatbandit.ai/api/mcp) |
 | Beatra | Images, video, music, speech, and public social data for AI agents. | — | 2026-09-20 | [link](https://mcp.beatra.ai/mcp) |
+| BeevR | Read-only access to BeevR's services, fixed-price MVP packages, case studies and articles (EN/VI). | — | 2026-10-06 | [link](https://beevr.ai/mcp) |
 | ai.beket/audit | See how AI assistants answer about your brand | — | 2026-08-06 | [link](https://mcp.beket.ai/registry/mcp) |
 | BenchGecko | AI model prices per provider, benchmarks, own AI behavior tests and AI economy data, with sources. | — | 2026-10-05 | [link](https://benchgecko.ai/api/mcp) |
 | B4 Index | Independent build-vs-buy index: score software categories BUILD/BUY/BRIDGE/BEWARE. | — | 2026-07-03 | [link](https://b4-index.vercel.app/mcp) |
@@ -437,6 +438,7 @@
 | Dynt | Company finances for agents: transactions, invoices, bills, expenses, subscriptions, receipts. | — | 2026-08-28 | [link](https://api.dynt.ai/mcp) |
 | EasyTerritory MCP | Build, balance, realign and analyze sales/service territories; geocode, route, schedule, live map. | — | 2026-09-29 | [link](https://mcp.easyterritory.ai/) |
 | ai.echoloc/company-technographics | Search 760K+ companies by technographics with direction of change: adopting, replacing, evaluating | — | 2026-07-27 | [link](https://api.echoloc.ai/mcp) |
+| EcoCheck | Vietnam GHG inventory obligation checker, 2026 regulations, CBAM and ESG articles (read-only). | — | 2026-10-06 | [link](https://ecocheck.ai/mcp) |
 | ai.edge-agents/intelligence | Macro, market and decision intelligence over x402. Gaps are unavailable rather than estimated. | — | 2026-09-13 | [link](https://pay.edge-agents.ai/mcp) |
 | Edgepedia | Search and read Edgepedia, a free and growing encyclopedia with citations. No key. | — | 2026-10-02 | [link](https://www.edgechat.ai/mcp) |
 | ai.edusignal/districts | K-12 school district data for all 50 US states. Enrollment, demographics, and academics. | — | 2026-06-02 | [link](https://edusignal.ai/mcp) |
@@ -521,6 +523,7 @@
 | FoodPhoto | Create food photos, menus and restaurant campaigns. Account-based paid service with Stripe checkout. | — | 2026-09-12 | [link](https://foodphoto.ai/mcp) |
 | Forkmate | Free AI calorie & macro tracker: tell your AI what you ate and it logs it to your private food diary | — | 2026-10-02 | [link](https://mcp.forkmate.ai/) |
 | ai.foura/mcp | Reliable web access for AI agents: smart HTTP, rotating proxies, and full-browser rendering. | — | 2026-09-22 | [link](https://mcp.foura.ai/mcp) |
+| Frameo | AI video production, idea to final cut: generate, edit and assemble films, ads and social video. | — | 2026-10-06 | [link](https://mcp.frameo.ai/mcp) |
 | FrameThrower | Film stills from 5,489 films, searchable by lighting, lens character, shot size, colour and mood. | — | 2026-08-12 | [link](https://framethrower.ai/api/mcp) |
 | Freudly psychological tests | Find psychological self-assessment tests in English, Spanish and Russian, with links to take them. | — | 2026-10-01 | [link](https://freudly.ai/mcp) |
 | ai.fugentic/fugentic | Fugentic helps any business to be found by customers using AI to find products and service. | — | 2026-09-23 | [link](https://fugentic.mcp.fugentic.ai/mcp) |
@@ -758,6 +761,7 @@
 | ai.klavis/strata | MCP server for progressive tool usage at any scale (see https://klavis.ai) | — | 2025-09-28 | [link](https://strata.klavis.ai/mcp/) |
 | ai.klipy/klipy | AI CRO for Agencies and MSPs: full automatic CRM; multichannel tracking; draft follow-ups. | — | 2026-09-18 | [link](https://api.klipy.ai/mcp) |
 | Клод Кот — генерация изображений и видео | Best Image and video generation: 20+ models (Kling, Seedance, Veo, NB, FLUX.2), OAuth, pay-per-use. | — | 2026-07-14 | [link](https://mcp.klodkot.ai/mcp) |
+| Kloudy | Find public MCP tools and SDKs. Compact setup and Sample cards. Free discovery needs no key. | — | 2026-10-06 | [link](https://kloudy.ai/mcp) |
 | Klox | Build and edit AI videos on Klox canvases: script, storyboard, shots and final cut. | — | 2026-09-29 | [link](https://klox.ai/mcp) |
 | Klyf | AI YouTube analyst in Claude for creators: audit, fix, decide what to make next, grow subs. | — | 2026-08-20 | [link](https://klyf.ai/api/mcp) |
 | Reverie | Graph memory that dreams: Neo4j knowledge-graph memory for AI agents with hybrid search | — | 2026-09-24 | — |
@@ -1168,6 +1172,7 @@
 | ScoreIA La Forge | 3D AI benchmark over MCP: forge a knight, cut posts, duel other AIs; a program referees it. | — | 2026-09-27 | [link](https://scoreia.ai/forge/mcp) |
 | ScoreIA Open Labyrinth | A public MCP labyrinth for AI agents: explore, find the gold, return; every sealed card is public. | — | 2026-09-24 | [link](https://scoreia.ai/open-labyrinth/mcp) |
 | ai.scout7/scout7 | Marketing MCP: your AI agent runs your organic growth loop — you approve before it ships. | — | 2026-09-23 | [link](https://mcp.scout7.ai/mcp) |
+| Scrapewise | Scrape, clean and match product and price data from any website | — | 2026-10-06 | [link](https://mcp.scrapewise.ai/mcp) |
 | ai.sealgate/gateway | MCP gateway with runtime security policy, tool-call-level control, and audit of agent actions. | — | 2026-09-01 | [link](https://mcp.sealgate.ai/mcp) |
 | SeaOtter Dispatch | SeaOtter dispatches work to a Superteam and checks the delivered outcome before money moves. | — | 2026-08-26 | [link](https://mcp.seaotter.ai/mcp) |
 | SearchConsole.ai | Read-only Search Console analytics, URL inspection, indexing diagnostics, and sitemaps. | — | 2026-09-22 | [link](https://searchconsole.ai/mcp) |
