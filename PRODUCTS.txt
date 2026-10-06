@@ -1,8 +1,8 @@
 Product                              Releases  Latest
 ───────────────────────────────────  ────────  ──────────────────
-claude-code                               241  2.1.291 (2026-10-06)
-claude-agent-sdk-typescript               232  0.3.291 (2026-10-06)
-claude-code-action                        216  1.0.243 (2026-10-06)
+claude-code                               242  2.1.291 (2026-10-06)
+claude-agent-sdk-typescript               233  0.3.291 (2026-10-06)
+claude-code-action                        217  1.0.243 (2026-10-06)
 anthropic-sdk-typescript                  180  aws-sdk-v0.7.6 (2026-09-30)
 claude-agent-sdk-python                   143  0.2.163 (2026-09-30)
 mcp-typescript-sdk                        118  1.32.1 (2026-10-05)
