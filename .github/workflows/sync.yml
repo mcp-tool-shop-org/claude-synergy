@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,6 +16,14 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # main is protected (required check "test"), so the bot never pushes to it.
+    # It force-updates one rolling branch, opens or refreshes a PR, dispatches
+    # the test workflow on that branch (a GITHUB_TOKEN push or PR triggers no
+    # workflows, but a dispatch does), and lets auto-merge land it when green.
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -88,23 +96,48 @@ jobs:
           key: sync-db-${{ github.run_id }}
           restore-keys: sync-db-
 
+      # One attempt: a retry would re-run a 20+ minute embed inside the same job budget.
       - name: Sync (fetch + ingest + embed)
-        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+        timeout-minutes: 50
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          timeout_minutes: 50
-          max_attempts: 1
-          command: node dist/cli.js sync
+        run: |
+          set -o pipefail
+          node dist/cli.js sync 2>&1 | tee "$RUNNER_TEMP/sync.log"
 
       - name: Refresh top-level summaries
         run: |
           node dist/cli.js products > PRODUCTS.txt
           node dist/cli.js latest --limit 50 > LATEST.txt
 
-      - name: Commit changes if any
+      - name: Open or refresh the sync pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "claude-synergy-bot"
           git config user.email "bot@mcp-tool-shop.dev"
           git add -A data/ products/ URGENT_FINDINGS.md SOURCES.md PRODUCTS.txt LATEST.txt
-          git diff --staged --quiet || (git commit -m "Daily sync $(date -I)" && git push)
+          if git diff --staged --quiet; then echo "No changes to sync."; exit 0; fi
+          day=$(date -u +%F)
+          git commit -q -m "Daily sync $day"
+          git push --force origin HEAD:refs/heads/sync/daily
+
+          {
+            echo "Automated daily sync, $day (run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+            echo
+            echo '```'
+            grep -E '^(Sync complete|ingested|embedded)' "$RUNNER_TEMP/sync.log" || true
+            git diff --shortstat HEAD~1 HEAD
+            echo '```'
+            echo
+            echo "Merges itself when the required \`test\` check passes. If it is still open, \`test\` failed: read that run before tomorrow's sync replaces this branch."
+          } > "$RUNNER_TEMP/body.md"
+
+          num=$(gh pr list --head sync/daily --base main --state open --json number -q '.[0].number')
+          if [ -z "$num" ]; then
+            gh pr create --base main --head sync/daily --title "Daily sync $day" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr edit "$num" --title "Daily sync $day" --body-file "$RUNNER_TEMP/body.md"
+          fi
+          gh workflow run test.yml --ref sync/daily
+          gh pr merge sync/daily --auto --squash
