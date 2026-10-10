@@ -2,7 +2,7 @@
 
 **Source:** smithery
 **Entries:** 200
-**Fetched:** 2026-10-06
+**Fetched:** 2026-10-10
 
 | Name | Description | Popularity | Created | Homepage |
 |------|-------------|------------|---------|----------|
@@ -90,7 +90,7 @@
 | Vivaldo Product Discovery | Public read-only MCP server for Vivaldo.shop, a European online store for MacBook cases, iPad cases, laptop sleeves, keyboard covers, screen protectors and ever | 7716 | 2026-06-25 | [link](https://www.vivaldo.shop/) |
 | witness-protocol |  | 7637 | 2026-04-19 | [link](https://smithery.ai/servers/delx/witness-protocol) |
 | witness-protocol |  | 7637 | 2026-04-19 | [link](https://smithery.ai/servers/delx/witness-protocol) |
-| Voidly Atlas | Live internet-censorship data for AI agents. Check whether a website or app is blocked in a country, read dated incident records with links to the raw evidence, | 7463 | 2026-03-25 | [link](https://voidly.ai/atlas) |
+| Voidly Atlas | Connect to Voidly’s hosted MCP entry point for Atlas censorship data, marketplace discovery, agent mail, and available board and bounty workflows. Public discov | 7463 | 2026-03-25 | [link](https://voidly.ai/atlas) |
 | Ignav Flights | Hosted MCP server providing live flight prices, booking links, and airport lookup for AI agents and travel apps. | 7205 | 2026-06-17 | [link](https://ignav.com/docs/mcp) |
 | Ignav Flights | Hosted MCP server providing live flight prices, booking links, and airport lookup for AI agents and travel apps. | 7205 | 2026-06-17 | [link](https://ignav.com/docs/mcp) |
 | Delx MCP Server | Agent operations platform with 20+ tools for AI agents. Dual-protocol MCP + A2A support, session memory, mood tracking, reliability metrics, and structured DELX | 7043 | 2026-03-08 | [link](https://smithery.ai/servers/delx/delx-mcp) |
@@ -168,7 +168,6 @@
 | MCP Seeker | Search hotels by city, state, country, or geolocation and explore detailed property info. Check live availability, compare rates and room types, and review boar | 4405 | 2025-10-10 | [link](https://smithery.ai/servers/agonzalez/prueba-mcp-seeker) |
 | AgentNDX | Search and discover MCP servers, A2A agents, and x402-enabled services. The agentic web's directory — add `https://agentndx.ai/mcp` to your MCP client to search | 4376 | 2026-04-11 | [link](https://agentndx.ai) |
 | SkillAudit | Security scanner for AI agent skills and MCP servers. Detects credential theft, data exfiltration, prompt injection, obfuscated code, and 80+ threat patterns. F | 4310 | 2026-02-15 | [link](https://skillaudit.vercel.app) |
-| Glassnode | Access institutional-grade on-chain cryptocurrency metrics and market data for Bitcoin, Ethereum, and DeFi. Compare multiple assets efficiently through bulk dat | 4210 | 2026-03-10 | [link](https://docs.glassnode.com/guides-and-tutorials/glassnode-mcp-server) |
 | ParaSure | AI-native parametric insurance infrastructure. Live weather risk assessment via x402 (USDC on Solana). Full quote, bind, and settle protocol loop available in s | 4198 | 2026-05-26 | [link](https://parasure.xyz) |
 | IBANforge | IBAN validation and bank-data tools for AI agents, ERP, invoicing and payroll workflows. IBANforge covers 89 countries and provides BIC/SWIFT lookup, Swiss clea | 4179 | 2026-04-15 | [link](https://ibanforge.com) |
 | LangSmith Traced OpenAI Agent | LangSmith Traced OpenAI Agent: composes langchain-core + langchain-openai + langsmith + openai — orchestration, observability, llm-client via A2A + MCP. | 4178 | 2026-05-31 | [link](https://langchain-core-langchain-openai-l-736876.getvda.ai) |
@@ -206,3 +205,4 @@
 | The STALL | 293 AI-callable finance and data tools over MCP. No API keys required. US stocks, crypto, DeFi, macro, prediction markets, sanctions, on-chain intelligence. x40 | 3348 | 2026-06-05 | [link](https://smithery.ai/servers/thebrierfox/the-stall) |
 | Amalgix Document Intelligence | Cross-model evidence pipeline for financial filing and contract intelligence. Two core paid workflows — analyze_public_filing (SEC 10-K/10-Q/20-F, ticker/CIK lo | 3322 | 2026-05-18 | [link](https://amalgix.io) |
 | AI Answer Copier | AI Answer Copier is a Model Context Protocol (MCP) server that solves the "Final Mile" friction in educational content creation. It enables AI models to move be | 3292 | 2026-02-03 | [link](https://smithery.ai/servers/XJTLUmedia/x23) |
+| MAQAMI Travel | Search hotels (3M+ hotels) and flights worldwide, read hotel details, then prebook and book. Remote Streamable HTTP, no API key. | 3255 | 2026-07-02 | [link](https://maqami.co) |
