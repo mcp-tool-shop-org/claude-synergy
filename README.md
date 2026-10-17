@@ -241,6 +241,9 @@ No search term needed — `hk breaking` is the answer to "did anything load-bear
 
 For GitHub Copilot's `.vscode/mcp.json`, use the `servers` wrapper instead of `mcpServers` (see [synergy 12](synergies/12-mcp-config-format-gotcha.md)).
 
+To verify local changelog findings against current upstream release notes, see
+[optional web research with Parallel Search MCP](docs/parallel-research.md).
+
 Tools exposed:
 
 | Tool | Purpose |
