@@ -2,7 +2,7 @@
 
 **Source:** smithery
 **Entries:** 200
-**Fetched:** 2026-10-06
+**Fetched:** 2026-10-31
 
 | Name | Description | Popularity | Created | Homepage |
 |------|-------------|------------|---------|----------|
@@ -38,13 +38,11 @@
 | pubmed-mcp-server | Search PubMed/Europe PMC, fetch articles and full text (PMC/EPMC/Unpaywall), citations, MeSH terms. | 13948 | 2026-04-19 | [link](https://pubmed.caseyjhand.com/mcp) |
 | Naver Search | Search Naver across news, blogs, books, encyclopedia, cafe posts, Knowledge iN, local places, images, shopping, and professional documents. Returns Korean-langu | 13327 | 2026-05-18 | [link](https://search.naver.com) |
 | NPM Sentinel MCP | Provide AI-powered real-time analysis and intelligence on NPM packages, including security, dependencies, performance, and quality metrics. Enable faster and sa | 13278 | 2025-04-19 | [link](https://github.com/Nekzus/npm-sentinel-mcp#readme) |
-| DuckDuckGo & Felo AI Search | Provide fast, privacy-friendly web and AI-powered search capabilities with integrated content and metadata extraction. Enhance your AI assistants by enabling co | 12697 | 2025-08-22 | [link](https://smithery.ai/servers/OEvortex/ddg_search) |
-| DuckDuckGo & Felo AI Search | Provide fast, privacy-friendly web and AI-powered search capabilities with integrated content and metadata extraction. Enhance your AI assistants by enabling co | 12697 | 2025-08-22 | [link](https://smithery.ai/servers/OEvortex/ddg_search) |
 | nutribalance-mcp | Free nutrition tools for AI assistants — calculate TDEE & | 12688 | 2026-04-05 | [link](https://thenutritrackerapp-creator-nutribal.vercel.app) |
 | nist-nvd-mcp-server | Search and audit NIST NVD CVEs by keyword, severity, CWE, CISA KEV status, and CPE. | 12481 | 2026-07-10 | [link](https://nist-nvd.caseyjhand.com/mcp) |
 | nist-nvd-mcp-server | Search and audit NIST NVD CVEs by keyword, severity, CWE, CISA KEV status, and CPE. | 12481 | 2026-07-10 | [link](https://nist-nvd.caseyjhand.com/mcp) |
 | cityparity | cityparity compares two cities on the numbers that actually decide a move. Give it a salary and a family situation and it returns take-home pay, a full cost bre | 12406 | 2026-06-01 | [link](https://cityparity.com/mcp/) |
-| ia-qa.com/mcp llm and RAG testing - Dev/QA toolbox | IA-QA as an MCP Server | 12266 | 2026-04-01 | [link](https://www.ia-qa.com/mcp-server) |
+| ia-qa mcp llm and RAG testing - Dev/QA toolbox | IA-QA as an MCP Server | 12266 | 2026-04-01 | [link](https://www.ia-qa.com/mcp-server) |
 | Slack | Read Slack conversations, threads, and user directories, send messages, and invite users to channels. | 12110 | 2025-11-19 | [link](https://smithery.ai/servers/slack) |
 | Framesail | Create long-form (faceless YouTube) videos end to end from any MCP client: script, locked character references, storyboard, voiceover, and final video editing — | 11533 | 2026-07-09 | [link](https://framesail.com/developers) |
 | Coin Railz | 63 x402 micropayment services via USDC — crypto analytics, trading signals, NASA/ESA satellite data, IoT sensors, AI inference, and prediction markets. Coinbase | 11447 | 2026-06-12 | [link](https://coinrailz.com) |
@@ -54,14 +52,13 @@
 | Polymarket | Discover and filter Polymarket prediction markets and events by tags, volume, liquidity, and activity. Analyze individual markets with probabilities, market hea | 10102 | 2025-11-08 | [link](https://github.com/aryankeluskar/polymarket-mcp) |
 | Your-Echo-Agent- | Built by a PR tech publicist, Your Echo Agent delivers truly personalized cold emails tied to LinkedIn campaigns for SaaS, agencies, e-commerce, founders, local | 10070 | 2026-06-20 | [link](https://yourechoagent.com) |
 |  Gapup MCP — 270+ Agent-payable AI Tools | 270+ agent-payable C-suite expertises (competitive intel, SEC filings, sanctions multi-jurisdiction, KYC, | 10042 | 2026-05-23 | [link](https://hub.gapup.io/agents-api) |
-| Weather MCP Server | Retrieve real-time weather information effortlessly for any city. Get accurate weather updates using a simple command or API call without needing an API key. En | 9970 | 2025-03-17 | [link](https://github.com/isdaniel/mcp_weather_server) |
 | lad-lviv-ua | Lviv (Ukraine) public transport MCP server — live arrivals, vehicle positions, stop discovery, route shapes, and static timetables. No API key required. | 9780 | 2026-04-29 | [link](https://lad.lviv.ua/) |
 | social-superpowers | Live X/Twitter and Reddit research. 10 read-only MCP tools, Google/GitHub sign-in. Free tier. | 9761 | 2026-05-03 | [link](https://superpowers.social) |
 | Developer Utilities | Streamline technical workflows with a comprehensive suite of data transformation and validation utilities. Convert between diverse formats like JSON, CSV, and M | 9739 | 2026-03-05 | [link](https://smithery.ai/servers/aparajithn/agent-utils) |
 | Developer Utilities | Streamline technical workflows with a comprehensive suite of data transformation and validation utilities. Convert between diverse formats like JSON, CSV, and M | 9739 | 2026-03-05 | [link](https://smithery.ai/servers/aparajithn/agent-utils) |
 | menjometre | Menjometre is an independent observatory of Catalan public spending. This MCP server gives any LLM client read-only access to the full dataset and the statistic | 9534 | 2026-04-11 | [link](https://menjometre.cat) |
-| backtesting-arena | Quantitative crypto backtesting & Bitcoin market-regime analytics. 73 MCP tools: honest look-ahead-aware backtest validation with Deflated-Sharpe-Ratio correcti | 9340 | 2026-07-05 | [link](https://tradingstrategies.work/api) |
-| backtesting-arena | Quantitative crypto backtesting & Bitcoin market-regime analytics. 73 MCP tools: honest look-ahead-aware backtest validation with Deflated-Sharpe-Ratio correcti | 9340 | 2026-07-05 | [link](https://tradingstrategies.work/api) |
+| backtesting-arena | Connect directly: https://tradingstrategies.work/api/mcp | 9340 | 2026-07-05 | [link](https://tradingstrategies.work/api) |
+| backtesting-arena | Connect directly: https://tradingstrategies.work/api/mcp | 9340 | 2026-07-05 | [link](https://tradingstrategies.work/api) |
 | Exa Search | Fast, intelligent web search and web crawling. Get fresh information about libraries, APIs, and SDKs. | 9181 | 2024-12-13 | [link](https://exa.ai) |
 | census-mcp-server | Query U.S. Census Bureau data, variables, and geography via MCP. | 9002 | 2026-07-10 | [link](https://census.caseyjhand.com/mcp) |
 | census-mcp-server | Query U.S. Census Bureau data, variables, and geography via MCP. | 9002 | 2026-07-10 | [link](https://census.caseyjhand.com/mcp) |
@@ -90,7 +87,7 @@
 | Vivaldo Product Discovery | Public read-only MCP server for Vivaldo.shop, a European online store for MacBook cases, iPad cases, laptop sleeves, keyboard covers, screen protectors and ever | 7716 | 2026-06-25 | [link](https://www.vivaldo.shop/) |
 | witness-protocol |  | 7637 | 2026-04-19 | [link](https://smithery.ai/servers/delx/witness-protocol) |
 | witness-protocol |  | 7637 | 2026-04-19 | [link](https://smithery.ai/servers/delx/witness-protocol) |
-| Voidly Atlas | Live internet-censorship data for AI agents. Check whether a website or app is blocked in a country, read dated incident records with links to the raw evidence, | 7463 | 2026-03-25 | [link](https://voidly.ai/atlas) |
+| Voidly Atlas | Connect to Voidly’s hosted MCP entry point for Atlas censorship data, marketplace discovery, agent mail, and available board and bounty workflows. Public discov | 7463 | 2026-03-25 | [link](https://voidly.ai/atlas) |
 | Ignav Flights | Hosted MCP server providing live flight prices, booking links, and airport lookup for AI agents and travel apps. | 7205 | 2026-06-17 | [link](https://ignav.com/docs/mcp) |
 | Ignav Flights | Hosted MCP server providing live flight prices, booking links, and airport lookup for AI agents and travel apps. | 7205 | 2026-06-17 | [link](https://ignav.com/docs/mcp) |
 | Delx MCP Server | Agent operations platform with 20+ tools for AI agents. Dual-protocol MCP + A2A support, session memory, mood tracking, reliability metrics, and structured DELX | 7043 | 2026-03-08 | [link](https://smithery.ai/servers/delx/delx-mcp) |
@@ -143,6 +140,8 @@
 | defi-intel | Operator-grade DeFi intelligence MCP.  | 5847 | 2026-05-25 | [link](https://paragraph.com/dashboard/@0x836c370ab3ca72a823ec7f1a9c148305db3e5812/metrics/post/yzf7MbpMJr9LMKnNqdHa) |
 | pinescript | MCP server providing Pine Script v6 documentation for AI assistants. | 5840 | 2026-04-29 | [link](https://bouch.dev/products/pinescript-mcp/) |
 | Govbase | Govbase provides U.S. federal policy data — search bills, executive orders, look up Congress members and voting records, browse narrative story bundles, and get | 5784 | 2026-03-27 | [link](https://govbase.com) |
+| Govbase | Govbase provides U.S. federal policy data — search bills, executive orders, look up Congress members and voting records, browse narrative story bundles, and get | 5784 | 2026-03-27 | [link](https://govbase.com) |
+| URL Safety Validator MCP | URL safety checker for AI agents. Detects phishing and malware before your agent visits any link. | 5626 | 2026-04-22 | [link](https://kordagencies.com) |
 | openfda-mcp-server | Query FDA data on drugs, food, devices, and recalls via openFDA. STDIO or Streamable HTTP. | 5433 | 2026-07-10 | [link](https://openfda.caseyjhand.com/mcp) |
 | DomainKits MCP - the domain name intelligence | # DomainKits MCP | 5388 | 2026-05-11 | [link](https://domainkits.com/) |
 | kdata-gate | Korean market data for AI agents and e-commerce sellers sourcing from Korea — K-beauty/K-food/K-pop product search, Naver search trends, Korean stocks with Engl | 5352 | 2026-06-12 | [link](https://kdata-gate.vercel.app) |
@@ -155,12 +154,11 @@
 | autario | autario is data app infrastructure: your tools and thousands of public datasets in one normalized layer, with the data apps that run on top of it. Connect Shopi | 5089 | 2026-04-05 | [link](https://autario.com) |
 | Chessagine | Analyze chess positions using powerful engines like Stockfish, Leela, and Maia. Retrieve games, puzzles, and opening statistics directly from Lichess and specia | 5030 | 2026-02-14 | [link](https://smithery.ai/servers/jalpp/chessagine) |
 | MLB Stats Server | Provide structured access to Major League Baseball statistics through an MCP server. Query and retrieve detailed baseball data including statcast, fangraphs, an | 4958 | 2025-06-30 | [link](https://smithery.ai/servers/etweisberg/mlb-mcp) |
-| Geppetto-Robot-Directory | Query the world's robot directory - 812 robots across 30 categories and 319 brands. Tools: search_robots (by category, brand, price, use case), get_robot and ge | 4913 | 2026-07-13 | [link](https://geppettorobotdirectory.com) |
+| Geppetto-Robot-Directory | Geppetto is the platform where people, AI agents and physical robots find each other - 800+ robots across 30+ categories and 300+ brands. Tools: search_robots ( | 4913 | 2026-07-13 | [link](https://geppettorobotdirectory.com) |
 | e3d.ai | Blockchain analytics and AI agent platform for Ethereum. Query live token prices, on-chain stories, investment theses, and the E3D autonomous agent system — all | 4880 | 2026-05-26 | [link](https://e3d.ai) |
 | xpoz | Social media intelligence for AI agents: search and analyze Twitter/X, Instagram, Reddit, and TikTok through natural language. Billions of posts indexed, includ | 4846 | 2025-11-17 | [link](https://xpoz.ai) |
 | hsk-mcp | A remote Model Context Protocol (MCP) server that gives AI assistants structured access to the complete HSK Chinese vocabulary dataset. It exposes 13 tools and  | 4831 | 2026-04-13 | [link](https://github.com/kuibinlin/hsk-mcp-server) |
 | mcp-graphql-enhanced | Federated GraphQL-to-MCP bridge. Enables seamless execution of GraphQL queries with built-in introspection and schema evolution tracking. | 4795 | 2026-06-20 | [link](https://smithery.ai/servers/letoribo/mcp-graphql-enhanced) |
-| ATOM Pricing Intelligence | ATOM is the Global Price Benchmark for AI Inference, delivered as a native tool for AI agents. Query live pricing across the inference market through the AIPI ( | 4780 | 2026-03-04 | [link](https://a7om.com/mcp) |
 | tls-radar | Run SSL/TLS scans, issue free Let's Encrypt certificates (private key stays local), and monitor certificate expiry from inside Claude Code or Cowork - through a | 4755 | 2026-06-17 | [link](https://tlsradar.com/cli) |
 | NEXUS Intelligence API | 58-endpoint utility hub - DNS lookup, web scraping, CVE scanning, AI translation, PII detection, domain health audit, company intelligence. Pay per call via x40 | 4735 | 2026-05-12 | [link](https://nexus-agent-xa12.onrender.com) |
 | Surprise Buddy | ## What is Surprise Buddy? | 4734 | 2026-05-16 | [link](https://surprise-buddy.com) |
@@ -168,8 +166,6 @@
 | MCP Seeker | Search hotels by city, state, country, or geolocation and explore detailed property info. Check live availability, compare rates and room types, and review boar | 4405 | 2025-10-10 | [link](https://smithery.ai/servers/agonzalez/prueba-mcp-seeker) |
 | AgentNDX | Search and discover MCP servers, A2A agents, and x402-enabled services. The agentic web's directory — add `https://agentndx.ai/mcp` to your MCP client to search | 4376 | 2026-04-11 | [link](https://agentndx.ai) |
 | SkillAudit | Security scanner for AI agent skills and MCP servers. Detects credential theft, data exfiltration, prompt injection, obfuscated code, and 80+ threat patterns. F | 4310 | 2026-02-15 | [link](https://skillaudit.vercel.app) |
-| Glassnode | Access institutional-grade on-chain cryptocurrency metrics and market data for Bitcoin, Ethereum, and DeFi. Compare multiple assets efficiently through bulk dat | 4210 | 2026-03-10 | [link](https://docs.glassnode.com/guides-and-tutorials/glassnode-mcp-server) |
-| ParaSure | AI-native parametric insurance infrastructure. Live weather risk assessment via x402 (USDC on Solana). Full quote, bind, and settle protocol loop available in s | 4198 | 2026-05-26 | [link](https://parasure.xyz) |
 | IBANforge | IBAN validation and bank-data tools for AI agents, ERP, invoicing and payroll workflows. IBANforge covers 89 countries and provides BIC/SWIFT lookup, Swiss clea | 4179 | 2026-04-15 | [link](https://ibanforge.com) |
 | LangSmith Traced OpenAI Agent | LangSmith Traced OpenAI Agent: composes langchain-core + langchain-openai + langsmith + openai — orchestration, observability, llm-client via A2A + MCP. | 4178 | 2026-05-31 | [link](https://langchain-core-langchain-openai-l-736876.getvda.ai) |
 | satoshidata — Bitcoin entity intelligence | A keyless Bitcoin chain-intelligence API built for autonomous agents. Resolve addresses to known entities, pull wallet evidence packs, and check sanctions / ill | 4144 | 2026-03-24 | [link](https://satoshidata.ai) |
@@ -180,8 +176,8 @@
 | Infobip Search MCP | Search Infobip documentation to quickly find guides, use cases, and best practices. Unblock integration and messaging workflows with precise, context-aware answ | 4015 | 2025-10-16 | [link](https://github.com/infobip/mcp) |
 | SubwayInfo NYC | Real-time NYC transit data for subway, bus, ferry, commuter rail, and Citi Bike. Get live arrivals, service alerts, trip planning, and station info across all M | 3955 | 2026-01-29 | [link](https://subwayinfo.nyc) |
 | Korean Crypto | Access real-time price data, order books, and candle information from major Korean exchanges like Upbit and Bithumb. Track the Kimchi premium by comparing local | 3930 | 2026-02-21 | [link](https://smithery.ai/servers/koreafintech/korean-crypto-mcp) |
-| Transita MCP | Visa eligibility matcher and immigration intelligence for MCP-compatible AI assistants. Scores 100+ visa pathways across 15 countries with country comparisons,  | 3913 | 2026-05-02 | [link](ttps://transita.app/mcp) |
-| Himalayas Remote Jobs | Search remote jobs, post job listings, find remote candidates, check salary benchmarks, and manage your career, all through AI conversation. The Himalayas Remot | 3874 | 2026-03-02 | [link](https://himalayas.app) |
+| Transita MCP | Connect directly: https://transita.app/api/mcp (Streamable HTTP, no auth). Smithery's hosted URL stops working on 31 October 2026, so use the direct URL. | 3913 | 2026-05-02 | [link](https://transita.app/mcp) |
+| Himalayas Remote Jobs | Himalayas is a remote jobs marketplace. Job seekers search remote jobs by role, country, seniority and salary, save them to an application tracker, tailor a res | 3874 | 2026-03-02 | [link](https://himalayas.app) |
 | youtube-mcp | Search and browse videos, channels, and playlists to fetch titles, descriptions, stats, and durations. | 3827 | 2025-11-20 | [link](https://github.com/sfiorini/youtube-mcp) |
 | Web Auditor | Analyze web pages and entire sites for SEO, accessibility, performance, and security compliance. Generate detailed reports and actionable issue lists to improve | 3818 | 2026-02-15 | [link](https://smithery.ai/servers/yakenator/web-inspector) |
 | GitHub Code Search | Search millions of public GitHub repositories for real-world code patterns and implementation examples. Discover how developers use specific libraries and handl | 3818 | 2026-02-07 | [link](https://smithery.ai/servers/arjunkmrm/grep) |
@@ -206,3 +202,7 @@
 | The STALL | 293 AI-callable finance and data tools over MCP. No API keys required. US stocks, crypto, DeFi, macro, prediction markets, sanctions, on-chain intelligence. x40 | 3348 | 2026-06-05 | [link](https://smithery.ai/servers/thebrierfox/the-stall) |
 | Amalgix Document Intelligence | Cross-model evidence pipeline for financial filing and contract intelligence. Two core paid workflows — analyze_public_filing (SEC 10-K/10-Q/20-F, ticker/CIK lo | 3322 | 2026-05-18 | [link](https://amalgix.io) |
 | AI Answer Copier | AI Answer Copier is a Model Context Protocol (MCP) server that solves the "Final Mile" friction in educational content creation. It enables AI models to move be | 3292 | 2026-02-03 | [link](https://smithery.ai/servers/XJTLUmedia/x23) |
+| MAQAMI Travel | Search hotels (3M+ hotels) and flights worldwide, read hotel details, then prebook and book. Remote Streamable HTTP, no API key. | 3255 | 2026-07-02 | [link](https://maqami.co) |
+| Guardian | Deterministic recipe verification for AI agents. Catches hallucinated temperatures, missing techniques, wrong ingredients, and impossible cooking steps — then s | 3246 | 2026-02-27 | [link](https://github.com/kaimeilabs/guardian-api-docs) |
+| Public Transport | Access real-time public transport across Europe with live departures, connections, and vehicle details. Plan door-to-door trips, search stations and places, and | 3245 | 2026-01-02 | [link](https://github.com/mirodn/mcp-server-public-transport) |
+| Wellness Pulse | Wellness Pulse MCP is a plug-and-play intelligence layer that transforms raw wellbeing data into clear, actionable insights for AI systems. | 3241 | 2026-04-04 | [link](https://wpulse.org/mcp-wellpulse.html) |
