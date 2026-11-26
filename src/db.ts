@@ -21,9 +21,20 @@ export const SCHEMA_VERSION = 3;
 /** Default embedding dimension when none is recorded (matches v2 behavior). */
 export const DEFAULT_EMBEDDING_DIM = 768;
 
-/** What better-sqlite3 throws when its native binding is missing or was built for another Node. */
+/**
+ * What better-sqlite3 13 throws when its native driver cannot load: no prebuild for the platform
+ * (it falls back to build/Release/better_sqlite3.node, which is absent), a prebuild that fails to
+ * dlopen (wrong libc, corrupt file), or a binary built for another Node.
+ */
 const BINDING_ERROR_RE =
-  /better_sqlite3\.node|Could not locate the bindings file|NODE_MODULE_VERSION|compiled against a different Node\.js version/i;
+  /better_sqlite3\.node|better-sqlite3[\\/](?:prebuilds|build)[\\/]|NODE_MODULE_VERSION|compiled against a different Node\.js version/i;
+
+function isBindingError(e: unknown): boolean {
+  const code = (e as { code?: unknown } | null)?.code;
+  if (code === 'ERR_DLOPEN_FAILED') return true;
+  const detail = e instanceof Error ? e.message : String(e);
+  return BINDING_ERROR_RE.test(detail);
+}
 
 /**
  * Open a SQLite database, turning a missing or mismatched native driver into a named
@@ -38,7 +49,7 @@ export function openSqlite(
     return open(abs);
   } catch (e: unknown) {
     const detail = e instanceof Error ? e.message : String(e);
-    if (BINDING_ERROR_RE.test(detail)) {
+    if (isBindingError(e)) {
       throw new AppError({
         code: 'SQLITE_BINDING_ERROR',
         message: 'The SQLite driver (better-sqlite3) could not be loaded on this platform.',

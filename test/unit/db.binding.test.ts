@@ -12,7 +12,8 @@ const fail = (message: string) => () => {
 describe('openSqlite: missing or mismatched native driver', () => {
   const bindingFailures = [
     "Cannot find module '/x/node_modules/better-sqlite3/build/Release/better_sqlite3.node'",
-    'Could not locate the bindings file. Tried: ...',
+    String.raw`C:\x\node_modules\better-sqlite3\prebuilds\win32-x64.node is not a valid Win32 application.`,
+    '/x/node_modules/better-sqlite3/prebuilds/linuxmusl-x64.node: Error loading shared library',
     'The module was compiled against a different Node.js version using NODE_MODULE_VERSION 115.',
   ];
 
@@ -32,6 +33,20 @@ describe('openSqlite: missing or mismatched native driver', () => {
       expect(err.cause).toBe(msg);
     });
   }
+
+  it('names a dlopen failure by its error code', () => {
+    const err = Object.assign(new Error('some loader message'), { code: 'ERR_DLOPEN_FAILED' });
+    let caught: unknown;
+    try {
+      openSqlite('/tmp/x.db', () => {
+        throw err;
+      });
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(AppError);
+    expect((caught as AppError).code).toBe('SQLITE_BINDING_ERROR');
+  });
 
   it('passes other errors through unchanged', () => {
     const original = new Error('SQLITE_CANTOPEN: unable to open database file');
