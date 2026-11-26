@@ -7,11 +7,11 @@
 <p align="center">
   <a href="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml"><img src="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg" alt="tests"></a>
   <a href="https://www.npmjs.com/package/@mcptoolshop/claude-synergy"><img src="https://img.shields.io/npm/v/@mcptoolshop/claude-synergy" alt="npm"></a>
-  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
+  <a href="#ライセンス"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
   <a href="https://mcp-tool-shop-org.github.io/claude-synergy/"><img src="https://img.shields.io/badge/landing%20page-live-brightgreen" alt="landing page"></a>
 </p>
 
-Anthropic社および関連するAI開発ツールに関する変更履歴をローカルで検索可能なミラーとして提供します。さらに、複数の製品を組み合わせたワークフローを説明する**Synergy（連携）**レイヤーも搭載しており、これにより、ハネス（制御環境）内のLLMエージェントが、ハネスが何ができるかを理解できるようになります。
+ローカルで検索可能な、Anthropicおよび関連するAI開発ツールのすべての変更履歴のミラー。さらに、クロスプロダクトのワークフローを記述したキュレーションされた「Synergy」レイヤーも含まれており、これにより、ハネスの内部にあるLLMエージェントは、ハネスが何を実行できるかを把握できます。
 
 ```bash
 $ hk query redact
@@ -24,7 +24,7 @@ $ hk query redact
 ```
 
 
-**単一のFTS（Full-Text Search）クエリで、個々の変更履歴ではCVE（Common Vulnerabilities and Exposures：共通脆弱性情報）として特定されなかった、複数のSDKにまたがるセキュリティ修正をまとめて表示できます。** これが最も効果的なデモです。すべての変更履歴を並べて比較することで、パターンが見えてきます。
+単一のFTSクエリにより、個々の変更履歴ではCVEとしてフラグが立てられていなかった、調整されたクロスSDKのセキュリティ修正が明らかになります。これが最大のデモです。すべての変更履歴を並べて比較すると、パターンが見えてきます。
 
 リポジトリ：[github.com/mcp-tool-shop-org/claude-synergy](https://github.com/mcp-tool-shop-org/claude-synergy)
 
@@ -32,15 +32,15 @@ $ hk query redact
 
 ## 問題点
 
-Claude Code CLIはほぼ毎日、Claude APIはそれに近い頻度でリリースされます。SDKはCLIのリリースごとにリリースされます。Claude Design、Cowork、Chat、およびモバイル版は、統合されたヘルプセンターを通じて提供されます。MCPエコシステムでは、毎週約200〜300の新しいサーバーがリリースされます。さらに、Cursor、Aider、Continue、Copilot、Cody、Windsurfなど、7つの主要なAI開発ツールがあり、それぞれ独自の変更履歴を独自のペースで公開しています。
+Claude Code CLIはほぼ毎日リリースされます。Claude APIもほぼ同じ頻度でリリースされます。SDKはCLIリリースごとにリリースされます。Claude Design、Cowork、Chat、およびMobileは、統合されたヘルプセンターを通じて提供されます。MCPエコシステムは、週に約200〜300個の新しいサーバーをリリースします。さらに、Cursor、Aider、Continue、Copilot、Cody、Windsurfなど、7つの主要なAI開発ツールがあり、それぞれが独自のペースで独自の変更履歴をリリースしています。
 
-これらのいずれかにあるLLMエージェントは、学習データの更新が固定されています。その差は毎日広がります。エージェントが知らない機能が追加されたり、エージェントがまだ対応していないバグが修正されたり、エージェントが提案しない環境変数やフラグが追加されたりします。複数のツールを組み合わせたワークフローが発見されないままです。
+これらのツールのいずれか1つに搭載されているLLMエージェントは、トレーニングのカットオフ日が固定されています。そのギャップは日々広がっています。エージェントが認識していない機能がリリースされたり、エージェントがまだ回避策を講じているバグが修正されたりします。エージェントが提案することのない環境変数やフラグが追加されます。複数のコンポーネントを組み合わせたクロスプロダクトのワークフローは、まだ発見されていません。
 
-**このリポジトリは、そのギャップを埋めます。** Synergyセクションは、単なるミラーではなく、製品としての価値を高めます。
+**このリポジトリは、そのギャップを解消します。** Synergyセクションにより、これは単なるミラーではなく、製品になります。
 
 ---
 
-## このリポジトリに含まれるもの
+## ここに何があるか
 
 ```
 claude-synergy/
@@ -73,34 +73,36 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**現在の数値 (v1.2.1時点):** 44製品 / 1,171リリースファイル / 6,573変更 / 1,260エンティティ / 12の相乗効果 / 519テスト / 13のMCPツール / 17のCLIコマンド。 (2026年5月24日に`sync_now`でコーパスを更新しました。)
+**最新の数値（v1.2.1時点）：** 44個の製品/1,171個のリリースファイル/6,573個の変更/1,260個のエンティティ/12個のシナジー/519個のテスト/13個のMCPツール/17個のCLIコマンド。（2026年5月24日に`sync_now`を通じて更新されたコーパス。）
 
 ---
 
-## ステータス — すべてのティアがリリース済み
+## ステータス - すべての階層がリリース済み
 
-| ティア | ステータス | 内容 |
+| 階層 | ステータス | そこに何があるか |
 |------|--------|--------------|
-| **1 — ブートストラップ（Markdownコーパス）** | ✅ リリース済み | Study-swarmが706のリリースファイルを2026年1月から5月までに収集し、Tier 4で1,186に拡張。 |
-| **2a — SQLite + FTS5 + CLI** | ✅ リリース済み | `hk` CLI; 15のサブコマンド; 300ms未満のインジェスト速度 |
-| **2b — sqlite-vec + コンテキスト検索** | ✅ リリース済み | プロバイダープラグ可能（なし/構造化/Ollama/Claude-Haiku コンテキスト × Ollama/Voyage埋め込み × なし/Ollama-Judge/Voyage/Cohere リランク） |
-| **3 — 同期 + MCPサーバー** | ✅ リリース済み | `hk fetch / sync / seed-markers`; `claude-synergy-mcp`は、標準入出力経由で11のツールを提供します（v1.1で追加された3つを含む、元々のTier-3で提供されていた8つに加え）。 |
-| **4a — Anthropic社以外の拡張** | ✅ リリース済み | +15のMCP SDK、Cursor（RSS）、Aider（HISTORY.md）、Continue.dev、Cody Enterprise（RSSフィルタリング） |
-| **4b — HTMLスクレイピングフェッチャー** | ✅ リリース済み | GitHub Copilot + VS Code Chat（WindsurfはPlaywrightが必要 — v0.7） |
-| **4c — turndown HTML→Markdownインジェスト** | ✅ リリース済み | HTMLの本文（Copilot/VS Code/Cursor）が、FTS5とエンティティ抽出のための、行ごとのリストを生成 |
-| **4d — Playwright + MCPレジストリ + YAML設定** | ✅ リリース済み | WindsurfはPlaywright経由; Smitheryと公式MCPレジストリをTier-4カタログとして使用; 製品は`products.yaml`に統合 |
-| **5 — v1.1：ウィンドウ表示機能 + OpenAIの埋め込み機能** | ✅ リリース済み | `hk diff` / `hk breaking`：すべての閲覧コマンドで日付範囲を指定可能。3つの新しいMCPツール（合計11個）、OpenAIの埋め込み機能、設定可能な埋め込み次元、`claude-code`の自動同期、汎用的な`keep-a-changelog`パーサー。 |
-| **6 — v1.2 sync-from-MCP** | ✅ リリース済み | `sync_status`（製品ごとの鮮度、"never"または"stale"の状態検出）と`sync_now`（オンデマンドでの取得→取り込み→埋め込み。`dry_run`プレビューと、処理中の同時実行ロック機能付き）。 これにより、コーパスを問い合わせできるものの、更新できないという問題を解消します。 **また、以下の問題を修正:** `INSERT OR REPLACE INTO products`によって`markers`の外部キーにDELETEが連鎖し、すべての製品の`since`カーソルが、取り込みのたびにリセットされていたバグ（回帰 §8.20）。 |
-| **6.1 — v1.2.1 fetcher-markerの中央管理** | ✅ リリース済み | `fetchOne`内で`writeMarker`を中央管理化し、すべての正常な取得でマーカーを更新するようにしました。 以前は、一定期間内に0件のアイテムを返した戦略（特に`aider`のraw-changelog）は、マーカーを書き込まず、`HISTORY.md`を毎回再取得していました。 実装されていない`webfetch`戦略を、`claude-api`および`anthropic-apps`向けに`manual`に改名しました。 `sync_status`では、現在、手動で設定された製品を"never"ではなく"manual"として表示し、`stale_only`から除外するようにしました（回帰 §8.21）。 |
-| **7 — v1.3 cs-actions:v1 ファインチューニングされたシンセサイザー** | ✅ リリース済み | このモデルは、最初にトレーニングされたダウンストリームモデルです。変更履歴のエントリを、厳密なJSON形式のアクションアイテム `{kind, severity, subject, action_text, deadline, tags}` に変換します。Qwen2.5-7B + LoRA を使用し、`dataset/changelog-actions/v1/` から取得した242のエントリでトレーニング。q8_0 GGUF形式で、Ollamaを使用してデプロイされています。リリース前の評価では、**kind に関して 88.1%、severity に関して 79.7%、macro-F1 が 0.842** という結果であり、これは59エントリの検証データセットにおける ground truth と比較して、qwen3:8b のベースモデルと比較してそれぞれ +10.1pp、+27.2pp、+0.041 の改善です。`cs-actions-v1` というタグが付けられ、評価レポートは[GitHub Release](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) に単一ファイルとして添付されています。**v1 の制限事項として、`unknown` バイアス** が文書化されています (precision 1.000 / recall 0.286)。これは、モデルが曖昧な入力を適切に判断せず、誤ったカテゴリに分類してしまうことを意味します。詳細については、[handbook → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/)、[`dataset/README.md`](dataset/README.md)、[`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md)、[`EVAL.md`](dataset/changelog-actions/v1/EVAL.md) を参照してください。 |
+| **1 - ブートストラップ（マークダウンコーパス）** | ✅ リリース済み | Study-swarmは、2026年1月から5月にかけて706個のリリースファイルを収集し、Tier 4dで1,186個に拡張しました。 |
+| **2a - SQLite + FTS5 + CLI** | ✅ リリース済み | `hk` CLI、15個のサブコマンド、sub-300ms インジェスト |
+| **2b - sqlite-vec + コンテキスト検索** | ✅ リリース済み | プロバイダープラグ可能（なし/構造化/ollama/claude-haikuコンテキスト × ollama/voyage埋め込み × なし/ollama-judge/voyage/cohere再ランキング） |
+| **3 - 同期 + MCPサーバー** | ✅ リリース済み | `hk fetch / sync / seed-markers`、`claude-synergy-mcp`は、標準出力経由で13個のツールを公開します（元のTier-3リリース時の8個、v1.1で3個追加、v1.2で2個追加） |
+| **4a - Anthropicを超えて拡張** | ✅ リリース済み | +15個のMCP SDK、Cursor（RSS）、Aider（HISTORY.md）、Continue.dev、Cody Enterprise（RSSでフィルタリング） |
+| **4b - HTMLスクレイプフェッチャー** | ✅ リリース済み | GitHub Copilot + VS Code Chat（WindsurfにはPlaywrightが必要 - v0.7） |
+| **4c - HTMLからマークダウンへの変換によるインジェスト** | ✅ リリース済み | HTML本文（Copilot/VS Code/Cursor）は、現在、FTS5とエンティティ抽出のために、箇条書きごとの行を生成します。 |
+| **4d - Playwright + MCPレジストリ + YAML構成** | ✅ リリース済み | WindsurfはPlaywright経由、Smitheryと公式のMCPレジストリをTier-4カタログとして使用、製品は`products.yaml`に統合されます。 |
+| **5 - v1.1 ウィンドウ化されたブラウジング + OpenAI 埋め込み** | ✅ リリース済み | `hk diff` / `hk breaking`、すべてのブラウジングコマンドにわたる日付範囲、3つの新しいMCPツール（合計11個）、OpenAI埋め込みプロバイダー、構成可能な埋め込み次元、`claude-code`自動同期、汎用的な`keep-a-changelog`パーサー。 |
+| **6 - v1.2 MCPからの同期** | ✅ リリース済み | `sync_status`（製品ごとの鮮度、存在しない/古い状態の検出）と`sync_now`（オンデマンドフェッチ → インジェスト → `dry_run`プレビュー + インプロセス同時実行ロックによる埋め込み）。呼び出しエージェントがコーパスをクエリできるが、更新できないという問題を解決します。**また、次の問題を修正します。** `INSERT OR REPLACE INTO products`が`markers`の外部キーに対してDELETEをカスケードし、すべての製品の`since`カーソルを各インジェストでサイレントにリセットするマーカー消去バグ（回帰 §8.20）。 |
+| **6.1 - v1.2.1 フェッチャーマーカーの中央化** | ✅ リリース済み | `fetchOne`に`writeMarker`を集中化することで、すべての正常なフェッチがマーカーを更新します。修正前は、ウィンドウ内に日付の項目が0個返された戦略（特に`aider`の生の変更履歴）は、マーカーを書き込まず、各同期で`HISTORY.md`を再プルしていました。実装されていない`webfetch`戦略を`claude-api`と`anthropic-apps`のために`manual`に変更しました。`sync_status`は、手動で追加された製品を「手動」としてレンダリングし、「存在しない」とは表示せず、`stale_only`から除外します（回帰 §8.21）。 |
+| **7 - v1.3 cs-actions:v1 微調整された合成器** | ✅ リリース済み | コーパスでトレーニングされた最初のダウンストリームモデル。1つの変更履歴エントリを1つの厳密なJSONアクションアイテム`{kind, severity, subject, action_text, deadline, tags}`に変換します。Qwen2.5-7BとLoRAを242個のエントリ（`dataset/changelog-actions/v1/`から）に適用し、q8_0 GGUFをOllamaにデプロイします。リリースゲート評価：**88.1%の種類 / 79.7%の重大度 / 0.842 macro-F1** vs 59個のエントリの層化されたホールドアウトにおける真の値（+10.1pp / +27.2pp / +0.041 over qwen3:8bベース）。`cs-actions-v1`としてタグ付けし、評価レポートを[GitHub リリース](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1)に単一のファイルとしてダウンロードできるように添付しました。**文書化されたv1の制限事項：** `unknown`に対するバイアス（精度1.000 / リコール0.286） - モデルは曖昧な入力を過小評価します。[ハンドブック → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md)を参照してください。 |
 
-v0.8以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)およびissueで追跡中。
+v1.3以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)と課題で追跡します。
 
 ---
 
 ## セキュリティとデータモデル
 
-このツールはローカルで動作します。**アクセスするデータ：** 派生したSQLiteデータベースと、マークダウン形式のリリースファイル。これらはすべて再作成可能です。**ネットワーク：** `hk fetch` または `hk sync` コマンド（GitHub API、RSSフィード、変更履歴ページ、MCPレジストリ）、またはリモートプロバイダー（Voyage、Cohere）を使用する `hk embed` コマンドを実行する場合にのみ、HTTPS経由で外部サーバーと通信します。**機密情報：** `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` を環境変数から読み込みます。これらの情報はログに記録されることも、ディスクに保存されることもありません。**テレメトリー機能はありません。** セキュリティに関するポリシーについては、[SECURITY.md](SECURITY.md) を参照してください。
+このツールはローカルで実行されます。**アクセスするデータ:** 派生したSQLiteデータベースと、リリース用のマークダウンファイル。これらはすべて再作成可能です。**ネットワーク:** `hk fetch`/`hk sync`を実行する場合、エージェントがMCP`sync_now`ツールを呼び出す場合、および初回使用時に、アウトバウンドHTTPS通信が発生します。空のストアに対してクエリコマンドまたはMCPツールを実行すると、自動的に同期されます（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1`でこれを無効にできます）。宛先は、GitHub API、RSSフィード、変更履歴ページ、およびMCPレジストリです。さらに、リモートプロバイダーを使用する`hk embed`の場合に限り、VoyageまたはCohereも使用されます。**機密情報:** 環境変数から`GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY`を読み込みます。ログに記録したり、ディスクに保存したりすることはありません。**テレメトリーは行いません。**報告ポリシーについては、[SECURITY.md](SECURITY.md)を参照してください。
+
+**ベンダーのテキスト:** サードパーティのリリースノートとカタログエントリは、引用されたデータとして厳密に扱われ、指示として解釈されることはありません。リリーステキストは、取り込み時に決定的にスクリーニングされます（隠された Unicode 制御文字の削除、画像/安全でないリンクの中和、メールアドレスとホームパスの削除、および指示のようなパターンにフラグを立てる）。その後、6 つの MCP ツールによって固定データフレームにラップされ、リリーステキストが返され、インラインの `[flagged: …]` マーカーが追加されます。リリーステキストは、指示ファイルには書き込まれません。
 
 ---
 
@@ -114,11 +116,22 @@ pnpm build       # produces dist/cli.js + dist/mcp-server.js
 npm link         # makes `hk` and `claude-synergy-mcp` available globally
 ```
 
-開発環境でビルドせずに使用するには、`npx tsx src/cli.ts ...`を直接実行します。**pnpm 10の注意点:** `pnpm dev`は、`--`以降のCLIフラグを無視します。開発には`npx tsx`を使用してください。
+または、`@mcptoolshop/claude-synergy` をインストールした後に直接実行します。 `hk` と `claude-synergy-mcp` の両方で、ローカルストアは同じ 4 段階の順序で解決されます。
+
+1. `CLAUDE_SYNERGY_DB` 環境変数
+2. 明示的な `--db <path>` (CLI) または位置引数の argv パス (MCP)
+3. `<cwd>/data/claude-synergy.db` **（ただし、そのファイルがすでに存在する場合のみ）**（リポジトリクローンでの使用を維持）
+4. `<home>/.claude-synergy/data/claude-synergy.db`（`<home>/.claude-synergy/products` の下にある製品を含む）
+
+`CLAUDE_SYNERGY_PRODUCTS_ROOT` は、製品ディレクトリを上書きします。
+
+**初回使用時の自動同期:** クエリコマンドまたは MCP ツールが、存在しない、または空のストアに対して実行された場合、スキーマを初期化し、自動的に `fetch` → `ingest` を実行します（埋め込みステップは行わず、タイムアウトによって制限され、到達不能なフィードはスキップします）。そして、すべての応答に `data as of: …` を付与します。 `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` を設定すると、初回使用時の自動同期が無効になり、代わりに空のコーパスの指示で失敗/警告が表示されます。
+
+ビルドなしで開発を行う場合は、`npx tsx src/cli.ts ...` を直接使用します。 **pnpm 10 の特異性:** `pnpm dev` は、`--` の後の CLI フラグを無視します。開発には `npx tsx` を使用してください。
 
 ---
 
-## CLIインターフェース — 15のコマンド
+## CLI のインターフェース — 17 個のコマンド
 
 ```
 # DB lifecycle
@@ -152,13 +165,13 @@ hk top env_var                       # most-mentioned by entity type
                                      #  hook_event, setting_key)
 ```
 
-**v1.1の新機能:** `hk diff`と`hk breaking`は、検索語句なしで「最近何が変わったか」を教えてくれます。日付範囲はすべて統一されており、すべての閲覧コマンドで`--since`と`--until`を`YYYY-MM-DD`形式（または完全なISO 8601形式）、または相対形式（`7d`、`2w`、`3m`、`1y`）で指定できます。
+**v1.1 での新機能:** `hk diff` と `hk breaking` は、検索語句を必要とせずに、「最近何が変わったのか？」に答えます。日付の範囲は一貫しています。すべてのブラウジングコマンドは、`--since` と `--until` を `YYYY-MM-DD` (または完全な ISO 8601) で受け取るか、相対的な形式 (`7d`、`2w`、`3m`、`1y`) を受け取ります。
 
 ---
 
 ## 例：ワークフロー
 
-**Claude Codeの環境変数導入時期の特定:**
+**Claude Code 環境変数がいつ導入されたか:**
 ```
 $ hk env-var CLAUDE_CODE_WORKFLOWS
 env var CLAUDE_CODE_WORKFLOWS — 1 mention:
@@ -168,7 +181,7 @@ env var CLAUDE_CODE_WORKFLOWS — 1 mention:
   It is off by default — set `CLAUDE_CODE_WORKFLOWS=1` to enable
 ```
 
-**SDK全体に影響する破壊的変更の追跡:**
+**クロス SDK の破壊的変更を追跡:**
 ```
 $ hk query TodoWrite --limit 5
 2026-05-15  claude-agent-sdk-python@0.2.82       [breaking]   Headless and SDK sessions now use Task tools...
@@ -176,7 +189,7 @@ $ hk query TodoWrite --limit 5
 2026-05-08  claude-agent-sdk-typescript@0.2.136  [deprecated] Deprecated TodoWrite tool...
 ```
 
-**モデル移行計画の策定:**
+**モデルの移行を計画:**
 ```
 $ hk model claude-opus-4-20250514
 model id claude-opus-4-20250514 — 2 mentions:
@@ -186,7 +199,7 @@ model id claude-opus-4-20250514 — 2 mentions:
   with retirement on the Claude API scheduled for June 15, 2026...
 ```
 
-**全ドキュメントに対する意味検索:**
+**全体的なコーパスでセマンティック検索:**
 ```
 $ hk hybrid "credential exfiltration" --limit 3
 2026-03-25  claude-code@2.1.83  [added]          vec#5 rrf=0.0154
@@ -194,9 +207,9 @@ $ hk hybrid "credential exfiltration" --limit 3
   cloud provider credentials from subprocess environments...
 ```
 
-この検索クエリは「env_scrub」という文字列を含みません。代わりに、意味的な類似性に基づいて表示されます。従来の完全一致検索では、該当する情報を見つけることができません。
+クエリは「env_scrub」とは言いません。セマンティックな類似性によって、vec がそれを表示します。純粋な FTS5 では、完全に見逃されます。
 
-**今週のclaude-codeの変更点:**
+**claude-code で今週何が変わったか:**
 ```
 $ hk diff claude-code --since 7d
 claude-code@2.1.147  2026-05-21  (3 changes)
@@ -208,7 +221,7 @@ claude-code@2.1.146  2026-05-19  (1 change)
   [fixed]     Restored `--debug` flag accidentally removed in 2.1.144.
 ```
 
-**コーパス全体における変更点を閲覧:**
+**コーパス全体で破壊的変更を閲覧:**
 ```
 $ hk breaking --since 30d --limit 5
 2026-05-15  claude-agent-sdk-python@0.2.82       Headless and SDK sessions now use Task tools by default.
@@ -218,113 +231,112 @@ $ hk breaking --since 30d --limit 5
 2026-04-22  windsurf@1.10.0                      Removed `cascade.run` JSON-RPC method.
 ```
 
-検索語句は不要 — `hk breaking`は「最近、重要な変更はありましたか？」という質問への答えです。
+検索語句は必要ありません。`hk breaking` は、「最近、重要な変更はありましたか？」に対する答えです。
 
 ---
 
-## MCPサーバー：エージェントがこのドキュメント群にアクセスできるようにします
+## MCP サーバー — エージェントにこのコーパスへのアクセス権を与えます
 
-`claude-synergy-mcp`は、標準入出力（stdio）を介して8つのツールを提供します。`~/.claude/.mcp.json`またはプロジェクトの`.mcp.json`ファイルを通じて、Claude Code（または任意のMCPホスト）に接続します。
+`claude-synergy-mcp` は、stdio を介して 13 個のツールを公開します。Claude Code (または任意の MCP ホスト) に、`~/.claude/.mcp.json` またはプロジェクトの `.mcp.json` を介して接続します。
 
 ```json
 {
   "mcpServers": {
     "claude-synergy": {
-      "command": "claude-synergy-mcp",
-      "env": {
-        "CLAUDE_SYNERGY_DB": "/path/to/claude-synergy/data/claude-synergy.db"
-      }
+      "command": "claude-synergy-mcp"
     }
   }
 }
 ```
 
-GitHub Copilotの`.vscode/mcp.json`ファイルでは、`mcpServers`ではなく`servers`ラッパーを使用してください（[synergy 12](synergies/12-mcp-config-format-gotcha.md)を参照）。
+カスタムストアパスが必要な場合は、`env` で `CLAUDE_SYNERGY_DB` を設定します。そうでない場合は、既存の `./data/claude-synergy.db` または `~/.claude-synergy/data/claude-synergy.db` を使用し、最初のツールの使用時に自動的に同期します (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` はこれを無効にします)。すべてのツールの応答の最後には、`data as of:` の鮮度スタンプが付加されます (7 日後には `STALE:` がプレフィックスとして付加されます)。
 
-提供されるツール：
+GitHub Copilotの`.vscode/mcp.json`については、`mcpServers`の代わりに`servers`ラッパーを使用してください（[synergy 12](synergies/12-mcp-config-format-gotcha.md)を参照）。
+
+公開されるツール：
 
 | ツール | 目的 |
 |---|---|
-| `search` | ハイブリッドFTS5 + ベクトル; オプションで再ランキング。自然言語クエリのデフォルトモード。（`until`の日付上限付き） |
-| `lookup_entity` | 環境変数、コマンド、モデルID、CVEなどのエンティティの履歴。 |
-| `latest_releases` | 製品（または単一の製品）における最近のリリース。（`since`の日付下限付き） |
-| `get_release` | 特定のリリースに関する完全な内容。 |
-| `list_products` | カウント付きの列挙と最新バージョン。 |
-| `top_entities` | 種類ごとの最も言及されているエンティティ。 |
-| `list_synergies` | 複数の製品を横断したワークフロー。 （オプションで`product`フィルターを使用可能） |
-| `read_synergy` | 特定のシナジーファイルの内容全体。 |
-| `get_changes_since` | **新規。** 製品とバージョンごとにグループ化された、時間範囲内の変更点。入力：`since`（必須）、`until?`、`product?`、`kind?`、`limit?`。 |
-| `search_breaking_changes` | **新規。** 検索語句不要の、変更点のフラットリスト。入力：`product?`、`since?`、`until?`、`limit?`。 |
-| `compare_versions` | **新規。** 単一の製品の2つのバージョン間のすべての変更点。入力：`product`、`from_version`、`to_version`。 |
-| `sync_status` | **v1.2.** 製品ごとの同期の鮮度：最終取得時刻、取得からの経過時間、取り込まれたリリース数。 入力：`product?`、`stale_only?`、`stale_hours?`。 `latest_releases`を信頼する前に、コーパスが最新の状態かどうかを確認するために使用してください。 |
-| `sync_now` | **v1.2.** オンデマンドでの更新（`hk sync`と同様）。 入力：`product?`、`dry_run?`、`include_ingest?`、`include_embed?`、`timeout_ms?`。 別の`sync_now`が実行中の場合、`InvalidParams`エラーで拒否されます。 Gitへのコミットは行いません。 |
+| `search` | ハイブリッド FTS5 + vec。オプションのリランキング。自然言語クエリのデフォルトモード。（+ `until` 上限日付） |
+| `lookup_entity` | 正確なエンティティ履歴：環境変数、スラッシュコマンド、モデル ID、CVE など。 |
+| `latest_releases` | 製品（または 1 つの製品）における最近のリリース。（+ `since` 下限日付） |
+| `get_release` | 1 つのリリースの完全なコンテンツ |
+| `list_products` | カウントと最新バージョンを含む列挙 |
+| `top_entities` | タイプ別の最も頻繁に言及されるエンティティ |
+| `list_synergies` | キュレーションされたクロス製品のワークフロー。（+ オプションの `product` フィルター） |
+| `read_synergy` | 1 つのシナジーファイルの完全なテキスト |
+| `get_changes_since` | **新機能。** 時間ウィンドウ内の変更を、製品とバージョンごとにグループ化します。入力：`since`（必須）、`until?`、`product?`、`kind?`、`limit?`。 |
+| `search_breaking_changes` | **新機能。** 破壊的変更のフラットリスト — 検索語句は必要ありません。入力：`product?`、`since?`、`until?`、`limit?`。 |
+| `compare_versions` | **v1.1。** 1 つの製品の 2 つのバージョン間のすべての変更。入力：`product`、`from_version`、`to_version`。 |
+| `sync_status` | **v1.2。** 製品ごとの同期の鮮度 — 最後のフェッチのタイムスタンプ、フェッチからの経過時間、取り込まれたリリースの数。入力：`product?`、`stale_only?`、`stale_hours?`。コーパスが古いかどうかを確認するために `latest_releases` を信頼する前に使用してください。 |
+| `sync_now` | **v1.2.** 必要に応じて更新（`hk sync`をミラーリング）。入力：`product?`、`dry_run?`、`include_ingest?`、`include_embed?`、`timeout_ms?`。別の`sync_now`がすでに実行中の場合、`InvalidParams`で拒否します。Gitにはコミットしません。 |
 
-v1.1のツールは、`hk diff` / `hk breaking`および、以前はスクリプトが必要だったバージョン比較のワークフローを模倣しています。 v1.2の同期ツールは、セッションがコーパスを問い合わせできるものの、更新できないという問題を解消します。 `sync_status`は鮮度を報告し、`sync_now`はパイプラインを実行します。 完全な入力スキーマについては、[マニュアル → MCPサーバー](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/)を参照してください。
-
----
-
-## データソース：5つのレベル、6つの取得戦略
-
-データソースの詳細については、[SOURCES.md](SOURCES.md)を参照してください。
-
-- **Tier 1 (GitHub Releases):** `gh api repos/<owner>/<repo>/releases`。Anthropic SDK（7言語）、Agent SDK（2）、ant CLI、**claude-code**（v1.1以降はgh-releasesで自動同期 — 以前は手動で初期化）、claude-code-action、claude-code-security-review、および15のMCPエコシステムSDKを含む、23製品。
-- **Tier 2 (raw markdown):** `Aider-AI/aider/HISTORY.md`。汎用的な`keep-a-changelog`パーサー（v1.1以降）は、ソースコードがKeep-a-Changelog形式のCHANGELOG.mdファイルである製品にも利用可能です。`products.yaml`で設定します。
-- **Tier 3 (HTML / RSS):** `platform.claude.com/docs/release-notes`、`support.claude.com/articles/12138966`、`cursor.com/changelog/rss.xml`、`sourcegraph.com/changelog/featured.rss`（フィルタリング済み）、`github.blog/changelog/label/copilot/`、`code.visualstudio.com/updates/v1_NNN`
-- **Tier 4 (catalog):** `anthropics/skills`、`claude-plugins-{official,community}`、`knowledge-work-plugins`
-- **Tier 5 (advisory):** `@ClaudeCodeLog`のXアカウント; marckrennの変更ログミラー
-
-取得戦略：`gh-releases`、`rss`、`raw-changelog`、`html-scrape`、`catalog`、`playwright`。新しい製品ごとに、`products.yaml`に1つのエントリを追加します。
+v1.1のツールは、以前はスクリプトが必要だった`hk diff`/`hk breaking`の機能を再現し、バージョン比較のワークフローを実現します。v1.2の同期ツールは、セッションがコーパスを検索できるものの、更新できないという問題を解決します。具体的には、`sync_status`がデータの古さを検出し、`sync_now`がパイプラインを実行します。完全な入力スキーマについては、[ハンドブック → MCPサーバー](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/)を参照してください。
 
 ---
 
-## シナジー：利用可能な機能
+## ソース — 5 つの階層、7 つのフェッチャー戦略
 
-製品を横断した12のワークフローのコレクション。それぞれが、適切な回答となるパターン、トリガー、およびそれを可能にする変更履歴の証拠を説明します。例：
+完全な概要は、[SOURCES.md](SOURCES.md) を参照してください。
 
-- **08 — Universal SKILL.md format** (Code + Cursor + Codex)：1人のスキル作成者が、3つのエージェントによって読み込まれる。
-- **09 — MCP across seven surfaces** (Code + Cursor + Continue + Copilot + Windsurf + Cody + API)：1つのバイナリで、すべてのエージェントが利用可能。
-- **10 — Anthropic BYOK across surfaces**: 1つのAPIキーで、Claudeが7つのエディタで動作し、統一された課金体系を実現。
-- **11 — Claude Code orchestrates Aider**: Claudeが計画を立てている間、安価なモデルに編集作業を移す。
-- **12 — MCP config format gotcha**: Copilotは`servers`を使用するが、他の環境では`mcpServers`を使用する。
+- **ティア1（GitHubのリリース）** — Anthropic SDK（7言語）、Agent SDK（2）、ant CLI、**claude-code**（現在はv1.1以降、gh-releasesを通じて自動的に同期される。以前は手動で更新していた）、claude-code-action、claude-code-security-review、および15のMCPエコシステムSDKを含む23製品に対して、`gh api repos/<owner>/<repo>/releases`を適用。
+- **ティア2（生のマークダウン）** — `Aider-AI/aider/HISTORY.md`。ソースがKeep-a-Changelog形式のCHANGELOG.mdである製品であれば、汎用の`keep-a-changelog`パーサー（v1.1以降）も利用可能。`products.yaml`の1つのエントリで設定。
+- **ティア3（HTML / RSS）** — `platform.claude.com/docs/release-notes`、`support.claude.com/articles/12138966`、`cursor.com/changelog/rss.xml`、`sourcegraph.com/changelog/featured.rss`（フィルタリング済み）、`github.blog/changelog/label/copilot/`、`code.visualstudio.com/updates/v1_NNN`
+- **ティア4（カタログ）** — `anthropics/skills`、`claude-plugins-{official,community}`、`knowledge-work-plugins`
+- **ティア5（アドバイザリー）** — `@ClaudeCodeLog`のXアカウント；marckrennの変更履歴ミラー
 
-詳細なインデックスは、[synergies/INDEX.md](synergies/INDEX.md)を参照してください。
+フェッチャー戦略：`gh-releases | rss | raw-changelog | keep-a-changelog | html-scrape | catalog | playwright`。新しい製品 = `products.yaml` の 1 つのエントリ。
+
+---
+
+## シナジー — 何が実現されるか
+
+12 個のキュレーションされたクロス製品のワークフロー。それぞれは、構成パターン、それが適切な答えとなるトリガー、およびそれを実現する変更ログの証拠を記述します。例：
+
+- **08 — 汎用 SKILL.md 形式** (コード + カーソル + Codex): 1 人のスキル作成者、3 人のエージェントがそれを読み取る
+- **09 — 7 つの表面にわたる MCP** (コード + カーソル + Continue + Copilot + Windsurf + Cody + API): 1 つのバイナリ、すべてのエージェント
+- **10 — 表面にわたる Anthropic BYOK**: 1 つの API キーが、7 つのエディターで Claude を動作させ、統一された課金システムを使用
+- **11 — Claude Code が Aider をオーケストレーション**: コストのかかる編集を安価なモデルに移行し、Claude が計画を立てる
+- **12 — MCP 構成形式の注意点**: Copilot は `servers` を使用。他のすべてのエージェントは `mcpServers` を使用。
+
+完全なインデックスは [synergies/INDEX.md](synergies/INDEX.md) にあります。
 
 ---
 
 ## データセットとファインチューニングされたモデル
 
-このリポジトリには、変更履歴から作成された **データセット** と、それらのデータセットでトレーニングされた **ファインチューニングされたモデル** が含まれています。データセットはリポジトリ内のファイルであり、モデルはダウンストリームで使用されます。
+このコーパスには、変更箇条書きから派生したキュレーションされた **データセット** と、それらのデータセットでトレーニングされた **ファインチューニングされたモデル** という、下位レイヤーがあります。このリポジトリの成果物はデータセットであり、モデルは下位レイヤーです。
 
-### `dataset/changelog-actions/v1` — 301 エントリ
+### `dataset/changelog-actions/v1` — 301 件のエントリー
 
-各エントリは、変更履歴からの変更内容と、手書きで作成されたアクションアイテム `{kind, severity, subject, action_text, deadline, tags}` を組み合わせたものです。`kind` は 8 つのカテゴリ（`breaking | deprecation | security | feature | fix | performance | docs | unknown`）を持つタクソノミーであり、80/20 の割合でトレーニングデータと検証データに分割されています。A3c によるレビューは、人間と qwen3:8b の判断者によって行われ、92.4% の合意が得られました。分布については [`dataset/README.md`](dataset/README.md) を、各フィールドの説明については [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) を、アクションテキストの書き方については [`STYLE.md`](dataset/changelog-actions/STYLE.md) を参照してください。
+各エントリーは、コーパスからの 1 つの変更箇条書きと、手書きのアクションアイテムをペアにします: `{kind, severity, subject, action_text, deadline, tags}`。8 種類の `kind` タクソノミー (`breaking | deprecation | security | feature | fix | performance | docs | unknown`)、80/20 のトレーニング/ホールドアウトで層別化、A3c-reviewed による人間による評価 + クロスファミリー qwen3:8b による評価 (92.4% の合意)。分布表については [`dataset/README.md`](dataset/README.md)、フィールドごとの契約については [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md)、`action_text` の記述ルールについては [`STYLE.md`](dataset/changelog-actions/STYLE.md) を参照してください。
 
 ### `cs-actions:v1` — ファインチューニングされたシンセサイザー
 
-このモデルは、データセットでトレーニングされた最初のモデルです。Qwen2.5-7B-Instruct + LoRA (rank-256 / all-linear, 100 steps QLoRA) を使用し、242 のトレーニングエントリでトレーニング。q8_0 GGUF 形式で、Ollama Modelfile (`cs-actions-base` + `cs-actions:v1`) を使用してデプロイされています。
+最初にデータセットでトレーニングされたモデル。Qwen2.5-7B-Instruct + LoRA (ランク 256 / すべて線形、100 ステップ QLoRA、242 件のトレーニングエントリー)、q8_0 GGUF、2 段階の Ollama Modelfile (`cs-actions-base` + `cs-actions:v1`) を介してデプロイ。
 
-**リリース前の評価** (59 エントリの検証データセット、3 回の実行、すべて合格、パースエラーはゼロ):
+**リリースゲート評価** (59 件のエントリーの層別化されたホールドアウト、3 回の実行、すべてパス、パースエラーはゼロ):
 
-| 指標 | qwen3:8b (ベース) | cs-actions:v1 | 差分 |
+| メトリック | qwen3:8b ベース | cs-actions:v1 | デルタ |
 |---|---|---|---|
-| ground truth との kind の一致率 | 78.0% | **88.1%** | +10.1pp |
-| ground truth との severity の一致率 | 52.5% | **79.7%** | +27.2pp |
-| Macro-F1 (十分に多くのカテゴリが存在する場合) | 0.801 | **0.854** | +0.053 |
-| 3 回目の実行 — kind のヒントの有無による比較 | — | 0.842 / 0.777 | 6.5pt → 目標範囲 |
+| 種類の一致 vs 正解 | 78.0% | **88.1%** | +10.1pp |
+| 重大度の一致 vs 正解 | 52.5% | **79.7%** | +27.2pp |
+| Macro-F1 (十分にデータのあるクラス) | 0.801 | **0.854** | +0.053 |
+| 実行 3 — 種類ヒントの除去 (ヒントあり / ヒントなし) | — | 0.842 / 0.777 | 6.5pt → ターゲットゾーン |
 
-リリース基準: `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0.780 ≥ 0.780`) — 合格 ✓。各エントリの詳細な結果は [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json) に記載されており、[GitHub Release](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) に単一ファイルとして添付されています。
+リリースパス基準 `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0.780 ≥ 0.780`) — PASS ✓。エントリーごとの完全な結果は [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json) にあり、[GitHub リリース](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) にも単一ファイルとして添付されています。
 
-**v1 の制限事項 — `unknown` バイアス。** `unknown` は、cs-actions:v1 が qwen3:8b よりも性能が低い唯一のカテゴリです (F1 スコア 0.444 vs 0.545)。precision は 1.000、recall は 0.286 であり、入力が実際に曖昧な場合、モデルは特定のカテゴリに分類する傾向があり、不明と判断しません。このバイアスは、qwen ファミリーの既存の傾向に由来し、LoRA によって完全に修正されていません。ダウンストリームの利用者は、期待よりも `kind: "unknown"` の割合が低い場合、そのバッチを人間のレビューに回すようにする必要があります。この問題は、[v2 の計画](dataset/README.md) で、`unknown` クラスのデータ拡張とヒントのランダム化によって解決される予定です。
+**文書化された v1 の制限 — `unknown` へのバイアスに対する対策。** `unknown` は、cs-actions:v1 が qwen3:8b よりもパフォーマンスが低い唯一のクラスです (F1 0.444 vs 0.545)。精度 1.000 / リコール 0.286 — 入力が本質的に曖昧な場合、モデルは特定の種類の選択にコミットし、中立的な選択をしません。qwen ファミリーの事前知識が継承されており、LoRA によって完全に上書きされていません。下位のコンシューマーは、期待よりも低い `kind: "unknown"` のレートを、バッチを人間のレビューにルーティングするためのシグナルとして扱う必要があります。[v2 の計画](dataset/README.md) では、未知のクラスの拡張とヒントのランダム化によって、この問題を解決します。
 
-**このリポジトリからは配布されません**。q8_0形式のGGUFファイルは約5GB、マージされたチェックポイントは約15GBです。公開されているのはデータセットとビルドパイプラインであり、モデルはローカルで再構築されます（詳細については[`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md)を参照）。4段階の手動プロセスで、RTX 5080のノートパソコン（16GBのVRAM）で約88分かかります。リリースに関する契約は[`EVAL.md`](dataset/changelog-actions/v1/EVAL.md)に記載されています。
+**このリポジトリを通じて配布されない** — q8_0 GGUF は約 5 GB で、マージされたチェックポイントは約 15 GB です。データセットとビルドパイプラインが公開されるものであり、モデルは [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) (4 段階の手動チェーン、RTX 5080 Laptop 16 GB VRAM で約 88 分のウォームアップ) に従ってローカルで再構築されます。3 回の実行によるリリースゲート契約は [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md) にあります。
 
-ローカルでのOllamaの利用方法、リクエストごとに`format: "json"`を指定する必要性、および再構築パイプラインなど、詳細な利用方法については、[ハンドブック → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/)のページをご覧ください。
+完全な使用方法の説明 — ローカルの Ollama 呼び出し、`format: "json"` 単位のリクエストごとの呼び出し要件、およびビルドパイプラインを含む — は、[ハンドブック → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) ページにあります。
 
 ---
 
 ## テスト
 
-Vitestスイートは、ユニットテスト、統合テスト、回帰テスト、および初期動作確認（smoke）の各レベルをカバーします。**[test-spec-3.md](test-spec-3.md)が現在の仕様**です（v0.7.0時点）。[test-spec.md](test-spec.md)（v1）および[test-spec-2.md](test-spec-2.md)（v2）は、設計の経緯を示すための履歴として、リポジトリに残っています。
+Vitest スイートは、ユニット / 統合 / 回帰 / スモークの各層をカバーします。**[test-spec-3.md](test-spec-3.md) が v0.7.0 の時点での最新の権威**です。[test-spec.md](test-spec.md) (v1) および [test-spec-2.md](test-spec-2.md) (v2) は、設計の経緯の歴史的記録としてリポジトリに残っています。
 
 ```bash
 pnpm test               # unit + integration + regression (~36s, 519 tests)
@@ -333,96 +345,96 @@ pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 ```
 
-構成：
+レイアウト:
 
-| ディレクトリ | 内容 |
+| ディレクトリ | 対象範囲 |
 |-----|----------------|
-| `test/unit/` | モジュールごと — 抽出、取り込み、クエリ（`until` / 閲覧 / `since` / 比較を含む）、データベース（次元設定v3移行を含む）、埋め込み、ハイブリッド、取り込み + すべてのプロバイダー（Ollama / Voyage / **OpenAI**）+ RSS/変更ログの取り込み（**keep-a-changelog**パーサーを含む）/HTML + MCPレジストリの取り込み + Playwrightの取り込み + 製品設定 + 連携の取り込み/クエリ |
-| `test/integration/` | エンドツーエンド：パイプライン、同期、MCPサーバー（stdio JSON-RPC、13のツール（`sync_status` / `sync_now`を含む）、CLI（`hk diff`、`hk breaking`を含む）) |
-| `test/regression/` | §8.1–§8.19 — それぞれが、開発中に修正された実際のバグに対する対策。（§8.19：ghReleasesの早期終了ページネーションは、指定範囲内のアイテムを保持します） |
-| `test/smoke/` | 実際の`products/`ディレクトリ（1,143個のファイル）に対するフルコーパスのテスト。 |
-| `test/fixtures/` | 3つのダミー製品と、モックHTTPレスポンス（RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / 公式MCPレジストリ）。 |
+| `test/unit/` | モジュールごと — 抽出、取り込み、クエリ (`until` / 参照 / 以降 / 比較を含む)、データベース (次元構成 v3 の移行を含む)、埋め込み、ハイブリッド、フェッチ + すべてのプロバイダー (Ollama / Voyage / **OpenAI**) + フェッチ RSS/変更ログ (keep-a-changelog パーサーを含む) / HTML + フェッチ MCP レジストリ + フェッチ Playwright + 製品構成 + シナジー取り込み/クエリ |
+| `test/integration/` | エンドツーエンド — パイプライン、同期、MCP サーバー (stdio JSON-RPC、13 のツールを含む `sync_status` / `sync_now`)、CLI (`hk diff`、`hk breaking` を含む) |
+| `test/regression/` | §8.1–§8.19 — それぞれは、開発中に修正された実際のバグに対する保護を提供します (§8.19: ghReleases の早期終了ページネーションにより、ウィンドウ内のアイテムが保持されます) |
+| `test/smoke/` | 実際の `products/` (1,143 ファイル) に対して、オプトインで完全なコーパスを使用 |
+| `test/fixtures/` | 3 つの偽の製品 + モック HTTP レスポンス (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / 公式 MCP レジストリ) |
 | `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts`, `playwright-mock.ts`, `yaml-fixtures.ts` |
 
-**デフォルトではネットワーク接続なし**：プロバイダーのHTTPは`vi.spyOn(global, 'fetch')`を使用してモックされています。一時ファイルには実際のSQLiteを使用します（`:memory:`ではありません）。これは、`sqlite-vec`拡張のロード動作がバージョンによって異なり、ディスク上のものが標準的な方法であるためです。Playwrightは動的なインポートでロードされ、`vi.doMock('playwright', ...)`を使用してモックされるため、実際のブラウザのインストールなしでテストがパスします。
+**デフォルトではテストにネットワークは使用しない** — プロバイダーの HTTP は `vi.spyOn(global, 'fetch')` を介してモックされます。sqlite-vec 拡張機能のロードのセマンティクスはバージョンによって異なり、ディスク上の状態が標準的なパスであるため、実際の SQLite は一時ファイル (`:memory:` ではない) にあります。Playwright は動的インポートを介してロードされ、`vi.doMock('playwright', ...)` を介してモックされるため、実際のブラウザのインストールなしにテストがパスします。
 
-CI：`.github/workflows/test.yml`は、`pnpm test:coverage`をpushおよびプルリクエスト時に実行します。
+CI: `.github/workflows/test.yml` は、プッシュ時と PR 時には `pnpm test:coverage` を実行します。
 
 ---
 
 ## トラブルシューティング
 
-**「データベースがロックされています」またはWALエラー**
+**「データベースがロックされています」または WAL エラー**
 
-別の`hk`プロセス（または古いMCPサーバー）がSQLiteデータベースを開いている状態です。他の`hk`プロセスを閉じ、再度試してください。問題が解決しない場合は、`data/claude-synergy.db`の隣にある`-wal`または`-shm`ファイルがないか確認してください。これらは通常のWALモードのファイルで、最後の接続が閉じられるときに削除されます。別のプロセスがDBを開いている間は、これらのファイルを削除しないでください。
+別の `hk` プロセス (または古い MCP サーバー) が SQLite データベースを開いたままにしています。他の `hk` プロセスを閉じ、再試行してください。問題が解決しない場合は、`data/claude-synergy.db` の横に `-wal` または `-shm` ファイルがないか確認してください。これらは通常の WAL モードのファイルであり、最後の接続が閉じられるとクリーンアップされます。別のプロセスがデータベースを開いている間に削除しないでください。
 
-**「sqlite-vec拡張が見つかりません」/ sqlite-vecのロードに失敗しました**
+**「sqlite-vec 拡張機能が見つかりません」/ sqlite-vec のロードに失敗しました**
 
-`sqlite-vec`ネイティブ拡張のロードに失敗しました。一般的な原因：
+`sqlite-vec` ネイティブ拡張機能のロードに失敗しました。一般的な原因:
 
-1. **Nodeのバージョンが古い**：`claude-synergy`はWindows、macOS、Linux（glibc または musl）の x64 または arm64 上で Node 22.12 以降が必要です。32 ビット ARM には対応していません。`node -v`で確認してください。
-2. **ネイティブモジュールの再ビルドが必要**：`npm rebuild better-sqlite3`（または`pnpm rebuild better-sqlite3`）を実行してください。
-3. **プラットフォームの不一致**：Windows/ARMでは、`better-sqlite3`にC++のビルドツールチェーンが必要です。 [windows-build-tools](https://github.com/nicedoc/windows-build-tools)またはVisual Studio Build Toolsを「C++によるデスクトップ開発」オプションでインストールしてください。
+1. **Nodeのバージョンが古い** — `claude-synergy`は、WindowsではNode 22.12以降、macOSまたはLinux（glibcまたはmusl）、x64またはarm64が必要です。32ビットARMはサポートされていません。`node -v`で確認してください。
+2. **ネイティブモジュールを再ビルドする必要がある** — `npm rebuild better-sqlite3`（または`pnpm rebuild better-sqlite3`）を実行してください。
+3. **プラットフォームの不一致** — Windows/ARMでは、`better-sqlite3`にC++のビルドツールチェーンが必要です。[windows-build-tools](https://github.com/nicedoc/windows-build-tools)または「C++によるデスクトップ開発」を含むVisual Studio Build Toolsをインストールしてください。
 
-注：`sqlite-vec`はオプションです。FTS5キーワード検索（`hk query`）は、これなしでも動作します。`hk embed`と`hk hybrid`のみがベクトル拡張を必要とします。
+注: `sqlite-vec` はオプションです。FTS5 キーワード検索 (`hk query`) は、これなしでも機能します。`hk embed` と `hk hybrid` のみでベクター拡張機能が必要です。
 
-**「製品Xの同期に失敗しました」/ fetchエラー**
+**「製品 X の同期に失敗しました」/ フェッチエラー**
 
 `hk fetch`と`hk sync`は、外部APIを呼び出します。一般的な原因：
 
-- **GitHubのレート制限**：`gh-releases`戦略は`gh api`を呼び出し、これはあなたの`GITHUB_TOKEN`を使用します。認証されていないリクエストは、1時間あたり60件までです。`gh auth login`で認証するか、環境変数に`GITHUB_TOKEN`を設定してください。
-- **ネットワーク/プロキシ**：RSSとHTMLの取得には`fetch()`を使用します。ネットワーク接続と、企業プロキシの設定（`HTTPS_PROXY`）を確認してください。
-- **不明な製品**：`hk fetch --product foo`は、`products.yaml`にリストされている製品のみで動作します。利用可能な名前を確認するには、`hk products`を実行してください。
+- **GitHubレート制限** — `gh-releases`の戦略は、あなたの`GITHUB_TOKEN`を使用する`gh api`に処理を委譲します。認証されていないリクエストは1時間に60リクエストまでです。`gh auth login`で認証するか、環境で`GITHUB_TOKEN`を設定してください。
+- **ネットワーク/プロキシ** — RSSとHTMLフェッチャーは`fetch()`を使用します。接続性と、企業プロキシの設定（`HTTPS_PROXY`）を確認してください。
+- **不明な製品** — `hk fetch --product foo`は、`products.yaml`にリストされている製品でのみ機能します。利用可能なすべての名前を確認するには、`hk products`を実行してください。
 
-同期は冪等です。部分的な失敗の後でも、再実行しても安全です。すでに取得済みのリリースはスキップされます。
+同期はべき等です。部分的な失敗の後でも、安全に再実行できます。すでに取得済みのリリースはスキップされます。
 
-**「埋め込みプロバイダーが応答していません」**
+**「埋め込みプロバイダーが応答しません」**
 
 `hk embed`は、外部の埋め込みサービスを呼び出します。
 
-- **Ollama (デフォルト、768次元)**：Ollamaが実行されていることを確認します (`ollama serve`)。また、埋め込みモデルをダウンロードします (`ollama pull nomic-embed-text`)。
-- **Voyage (1024次元)**：環境変数 `VOYAGE_API_KEY` を設定します。APIキーは [dash.voyageai.com](https://dash.voyageai.com) で確認できます。
-- **OpenAI (デフォルト1536次元、設定可能)**：`OPENAI_API_KEY` を設定します。デフォルトのモデルは `text-embedding-3-small` です。`OPENAI_EMBED_MODEL` で別のモデルを指定できます（例：3072次元の `text-embedding-3-large`）。`hk hybrid --embed openai` または `hk embed --embed openai` コマンドで利用できます。
+- **Ollama（デフォルト、768次元）** — Ollamaが実行されている（`ollama serve`）こと、および埋め込みモデルがダウンロードされている（`ollama pull nomic-embed-text`）ことを確認してください。
+- **Voyage（1024次元）** — 環境で`VOYAGE_API_KEY`を設定します。APIキーを[dash.voyageai.com](https://dash.voyageai.com)で確認してください。
+- **OpenAI（デフォルトは1536次元、設定可能）** — `OPENAI_API_KEY`を設定します。デフォルトのモデルは`text-embedding-3-small`です。`OPENAI_EMBED_MODEL`（例：3072次元の場合は`text-embedding-3-large`）でオーバーライドできます。`hk hybrid --embed openai`または`hk embed --embed openai`を介して使用します。
 
-**プロバイダーの切り替え時の埋め込み次元の不一致**
+**プロバイダーの切り替え時に埋め込み次元が一致しない**
 
-各プロバイダーは、固定の次元を持つベクトルを生成します（Ollama: 768、Voyage: 1024、OpenAI: デフォルト1536。OpenAIは、モデルのネイティブサイズ内で設定可能な次元をサポートしています）。データベースは、アクティブな次元を `schema_meta.embedding_dim` に保存します。チャンクが存在する状態で、次元が異なるプロバイダーに切り替えると、ベクトルテーブルが静かに破損するのではなく、`EMBEDDING_DIM_MISMATCH` (`AppError`) エラーが発生します。切り替えるには、以下の手順に従ってください。
-
-```bash
-rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
-hk init
-hk ingest
-hk embed --embed openai     # new provider, new dim, fresh chunks_vec
-```
-
-OpenAIのMatryoshka切り詰め（ネイティブサイズよりも小さい次元を使用する場合）では、`OPENAI_EMBED_MODEL` を設定し、`hk embed` コマンドのプロバイダー設定を通じて、希望する次元を指定します。詳細は、[マニュアルの埋め込みに関するセクション](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions) を参照してください。
-
-**スキーマのバージョン不一致/データベースの破損**
-
-DBが古いスキーマバージョンで作成され、移行が失敗した場合、またはクラッシュ後にデータが正しくない場合：
+各プロバイダーは、固定次元のベクトルを生成します（Ollamaは768、Voyageは1024、OpenAIはデフォルトで1536 — OpenAIは、モデルのネイティブサイズ内で設定可能な次元をサポートします）。DBは、アクティブな次元を`schema_meta.embedding_dim`に保存します。チャンクが存在する状態で、異なる次元のプロバイダーに切り替えると、ベクトルテーブルがサイレントに破損するのではなく、`EMBEDDING_DIM_MISMATCH`（`AppError`）が発生します。切り替えるには：
 
 ```bash
 rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
-hk init
-hk ingest
-hk embed --context structured --embedding ollama   # optional, for vector search
+hk init --db data/claude-synergy.db
+hk ingest --db data/claude-synergy.db
+hk embed --db data/claude-synergy.db --embed openai     # new provider, new dim, fresh chunks_vec
 ```
 
-これは安全です。DBは派生キャッシュです。すべてのソースデータは`products/*/releases/*.md`ファイルにあります。
+OpenAI Matryoshka切り捨て（ネイティブ次元よりも小さい）の場合、`OPENAI_EMBED_MODEL`を設定し、目的の次元を`hk embed`のプロバイダーの構築時に渡します。詳細は、[ハンドブックの埋め込みセクション](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions)を参照してください。
+
+**スキーマバージョンが一致しない/データベースが破損している**
+
+DBが古いスキーマバージョンで作成され、移行が失敗した場合、またはクラッシュ後にデータがおかしいように見える場合：
+
+```bash
+rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
+hk init --db data/claude-synergy.db
+hk ingest --db data/claude-synergy.db
+hk embed --db data/claude-synergy.db --context structured --embedding ollama   # optional, for vector search
+```
+
+これは安全です。DBは派生キャッシュです。すべてのソースデータは、`products/*/releases/*.md`ファイルに保存されます。
 
 ---
 
 ## 関連ファイル
 
-- [CONTRIBUTING.md](CONTRIBUTING.md)：製品の追加方法、テストの実行方法、プルリクエストの送信方法
-- [URGENT_FINDINGS.md](URGENT_FINDINGS.md)：緊急度の高い問題点（セキュリティ上の脆弱性、モデルの廃止、互換性のない変更、設定に関する注意点など）、合計23項目
-- [SOURCES.md](SOURCES.md)：5段階のソースコードの構成と、それらを取得するための戦略
-- [synergies/INDEX.md](synergies/INDEX.md)：12種類の、複数の製品を連携させたワークフロー
-- [schema.sql](schema.sql) + [schema-vec.sql](schema-vec.sql)：SQLite および sqlite-vec のスキーマ定義ファイル
-- [test-spec-3.md](test-spec-3.md)（現在） + [test-spec-2.md](test-spec-2.md)、[test-spec.md](test-spec.md)（過去のもの）：テストスイートの仕様
+- [CONTRIBUTING.md](CONTRIBUTING.md) — 製品の追加、テストの実行、PRの送信の方法
+- [URGENT_FINDINGS.md](URGENT_FINDINGS.md) — 23の実行可能な項目（セキュリティCVE、モデルの廃止、破壊的な変更、設定の注意点）
+- [SOURCES.md](SOURCES.md) — 5階層のソース環境とフェッチ戦略
+- [synergies/INDEX.md](synergies/INDEX.md) — 12の厳選されたクロス製品ワークフロー
+- [schema.sql](schema.sql) + [schema-vec.sql](schema-vec.sql) — SQLite + sqlite-vecスキーマ
+- [test-spec-3.md](test-spec-3.md)（最新）+ [test-spec-2.md](test-spec-2.md)、[test-spec.md](test-spec.md)（過去）— テストスイートの仕様
 
 ---
 
 ## ライセンス
 
-MITライセンス。 <a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a> が作成しました。
+MIT。MCP Tool Shopによって作成されました。<a href="https://mcp-tool-shop.github.io/">MCP Tool Shop</a>。
