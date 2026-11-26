@@ -3,6 +3,7 @@
 // `compareVersions` in src/query.ts.
 
 import type Database from 'better-sqlite3';
+import { hasChangesFlagsColumn, hasReleasesPackageColumn } from './db.js';
 import {
   compareVersions,
   formatFlagMarker,
@@ -10,12 +11,18 @@ import {
   type ChangesSinceResult,
 } from './query.js';
 import {
+  LOCKFILE_PACKAGE_ECOSYSTEMS,
+  extractVersionFromNotesPath,
   loadProductsConfig,
+  resolveCanonicalPackageName,
+  resolveReleasePackage,
   type PackageEcosystem,
   type PackageIdentity,
   type ProductMeta,
   type ProductsConfig,
 } from './products-config.js';
+
+export { extractVersionFromNotesPath };
 import {
   normalizePackageName,
   type WorkspaceFileRead,
@@ -118,27 +125,6 @@ function loadProductCatalog(
   return [];
 }
 
-/**
- * Extract `<V>` if and only if `notesPath` is non-empty, ends with `.md`,
- * and its file stem is strictly `<releasePrefix><V>` where `<V>` begins with
- * an ASCII digit. Rows without `notesPath` or with any other stem return `null`.
- */
-export function extractVersionFromNotesPath(
-  notesPath: string | null | undefined,
-  releasePrefix: string
-): string | null {
-  if (!notesPath || typeof notesPath !== 'string') return null;
-  const trimmedPath = notesPath.trim();
-  if (!trimmedPath) return null;
-  const fileName = trimmedPath.replace(/\\/g, '/').split('/').pop() ?? '';
-  if (!fileName.endsWith('.md')) return null;
-  const stem = fileName.slice(0, -3);
-  if (!stem.startsWith(releasePrefix)) return null;
-  const versionPart = stem.slice(releasePrefix.length);
-  if (!/^\d/.test(versionPart)) return null;
-  return versionPart;
-}
-
 interface RawReleaseRow {
   version: string;
   released_at: string | null;
@@ -146,9 +132,9 @@ interface RawReleaseRow {
 }
 
 interface PackageReleaseRow {
-  /** Extracted `<V>` from `notes_path`, used for matching and reporting. */
+  /** Version `<V>` used for matching and reporting. */
   version: string;
-  /** Raw `releases.version` column value, used to join `changes` / `compareVersions`. */
+  /** Stored `releases.version` column value, used to join `changes` / `compareVersions`. */
   dbVersion: string;
   released_at: string | null;
   notes_path: string;
@@ -156,9 +142,46 @@ interface PackageReleaseRow {
 
 function loadPackageReleases(
   db: Database.Database,
-  product: string,
-  releasePrefix: string
+  meta: ProductMeta,
+  pkg: PackageIdentity,
+  canonicalPkgName: string,
 ): { packageReleases: PackageReleaseRow[]; missingNotesPathRows: RawReleaseRow[] } {
+  if (hasReleasesPackageColumn(db)) {
+    const pkgRows = db
+      .prepare(
+        `SELECT version, released_at, notes_path
+         FROM releases
+         WHERE product = ? AND package = ?
+         ORDER BY CASE WHEN released_at IS NULL THEN 1 ELSE 0 END ASC,
+                  released_at DESC,
+                  rowid ASC`,
+      )
+      .all(meta.name, canonicalPkgName) as RawReleaseRow[];
+    const blankPathRows = db
+      .prepare(
+        `SELECT version, released_at, notes_path
+         FROM releases
+         WHERE product = ? AND (package = ? OR package = '') AND (notes_path IS NULL OR TRIM(notes_path) = '')`,
+      )
+      .all(meta.name, canonicalPkgName) as RawReleaseRow[];
+
+    const packageReleases: PackageReleaseRow[] = [];
+    const missingNotesPathRows: RawReleaseRow[] = [...blankPathRows];
+    for (const r of pkgRows) {
+      if (!r.notes_path || typeof r.notes_path !== 'string' || !r.notes_path.trim()) {
+        continue;
+      }
+      packageReleases.push({
+        version: r.version,
+        dbVersion: r.version,
+        released_at: r.released_at,
+        notes_path: r.notes_path,
+      });
+    }
+    return { packageReleases, missingNotesPathRows };
+  }
+
+  // Unmigrated pre-v5 read-only fallback: derive package from the same single rule in products-config.ts.
   const rows = db
     .prepare(
       `SELECT version, released_at, notes_path
@@ -166,9 +189,9 @@ function loadPackageReleases(
        WHERE product = ?
        ORDER BY CASE WHEN released_at IS NULL THEN 1 ELSE 0 END ASC,
                 released_at DESC,
-                rowid ASC`
+                rowid ASC`,
     )
-    .all(product) as RawReleaseRow[];
+    .all(meta.name) as RawReleaseRow[];
 
   const packageReleases: PackageReleaseRow[] = [];
   const missingNotesPathRows: RawReleaseRow[] = [];
@@ -177,39 +200,57 @@ function loadPackageReleases(
       missingNotesPathRows.push(r);
       continue;
     }
-    const extracted = extractVersionFromNotesPath(r.notes_path, releasePrefix);
-    if (extracted !== null) {
+    const resolved = resolveReleasePackage(r.notes_path, meta);
+    if (resolved.pkg === canonicalPkgName && resolved.extractedVersion !== null) {
       packageReleases.push({
-        version: extracted,
+        version: resolved.extractedVersion,
         dbVersion: r.version,
         released_at: r.released_at,
         notes_path: r.notes_path,
       });
+    } else if (meta.packages === undefined || meta.packages.length === 0) {
+      const extracted = extractVersionFromNotesPath(r.notes_path, pkg.release_prefix);
+      if (extracted !== null) {
+        packageReleases.push({
+          version: extracted,
+          dbVersion: r.version,
+          released_at: r.released_at,
+          notes_path: r.notes_path,
+        });
+      }
     }
   }
   return { packageReleases, missingNotesPathRows };
 }
 
-function hasChangesFlagsColumnLocal(db: Database.Database): boolean {
-  const cols = db.prepare(`PRAGMA table_info(changes)`).all() as Array<{ name: string }>;
-  return cols.some((c) => c.name === 'flags');
-}
-
 function loadReleaseChanges(
   db: Database.Database,
   product: string,
+  pkgName: string,
   row: { version: string; dbVersion: string; released_at: string },
-  hasFlagsCol: boolean
+  hasFlagsCol: boolean,
 ): ChangesSinceResult {
   const flagsExpr = hasFlagsCol ? 'flags' : 'NULL';
-  const rows = db
-    .prepare(
-      `SELECT ordinal, kind, text, ${flagsExpr} AS flags_json
-       FROM changes
-       WHERE product = ? AND version = ?
-       ORDER BY ordinal ASC`
-    )
-    .all(product, row.dbVersion) as Array<{
+  const hasPkgCol = hasReleasesPackageColumn(db);
+  const rows = (
+    hasPkgCol
+      ? db
+          .prepare(
+            `SELECT ordinal, kind, text, ${flagsExpr} AS flags_json
+             FROM changes
+             WHERE product = ? AND package = ? AND version = ?
+             ORDER BY ordinal ASC`,
+          )
+          .all(product, pkgName, row.dbVersion)
+      : db
+          .prepare(
+            `SELECT ordinal, kind, text, ${flagsExpr} AS flags_json
+             FROM changes
+             WHERE product = ? AND version = ?
+             ORDER BY ordinal ASC`,
+          )
+          .all(product, row.dbVersion)
+  ) as Array<{
     ordinal: number;
     kind: string;
     text: string;
@@ -291,7 +332,8 @@ function evaluateMatchedEntry(
   hasReleasesTable: boolean,
   meta: ProductMeta,
   pkg: PackageIdentity,
-  entry: WorkspacePackageEntry
+  entry: WorkspacePackageEntry,
+  cfg: ProductsConfig | null,
 ): ProductRelevanceResult {
   const baseInstalled = {
     ecosystem: entry.ecosystem,
@@ -316,10 +358,12 @@ function evaluateMatchedEntry(
     };
   }
 
+  const canonicalPkgName = resolveCanonicalPackageName(meta, pkg);
   const { packageReleases, missingNotesPathRows } = loadPackageReleases(
     db,
-    meta.name,
-    pkg.release_prefix
+    meta,
+    pkg,
+    canonicalPkgName,
   );
   const byVersionRow = new Map<string, PackageReleaseRow>();
   for (const r of packageReleases) {
@@ -344,17 +388,50 @@ function evaluateMatchedEntry(
         ? newestDateReleases[0].version
         : newestDateReleases.map((r) => r.version).join(' / ');
 
-  if (!matchedRow || !matchedRow.released_at || !newestDate) {
+  if (!matchedRow) {
     return {
       status: 'unknown',
       product: meta.name,
       display_name: meta.display_name,
       summary: `unknown: installed ${entry.version} is not in the mirror`,
+      installed: baseInstalled,
+      latest_version: latestVersionLabel,
+      latest_released_at: newestDate,
+      releases_behind: 0,
+      breaking_changes: [],
+      releases: [],
+    };
+  }
+
+  if (!matchedRow.released_at) {
+    return {
+      status: 'unknown',
+      product: meta.name,
+      display_name: meta.display_name,
+      summary: `unknown: installed ${entry.version} in mirror has no date`,
       installed: {
         ...baseInstalled,
-        mirror_version: matchedRow?.version ?? null,
+        mirror_version: matchedRow.version,
       },
       latest_version: latestVersionLabel,
+      latest_released_at: newestDate,
+      releases_behind: 0,
+      breaking_changes: [],
+      releases: [],
+    };
+  }
+
+  if (!newestDate || packageReleases.some((r) => !r.released_at)) {
+    return {
+      status: 'unknown',
+      product: meta.name,
+      display_name: meta.display_name,
+      summary: 'unknown: release in mirror has no date',
+      installed: {
+        ...baseInstalled,
+        mirror_version: matchedRow.version,
+      },
+      latest_version: null,
       latest_released_at: newestDate,
       releases_behind: 0,
       breaking_changes: [],
@@ -384,7 +461,7 @@ function evaluateMatchedEntry(
   const sameDayRows = datedReleases.filter((r) => r.released_at === installedDate);
   const sameDaySiblingRows = sameDayRows.filter((r) => r.version !== matchedRow.version);
   const afterRows = datedReleases.filter((r) => r.released_at > installedDate);
-  const hasFlagsCol = hasChangesFlagsColumnLocal(db);
+  const hasFlagsCol = hasChangesFlagsColumn(db);
 
   if (afterRows.length === 0) {
     if (sameDaySiblingRows.length === 0) {
@@ -407,7 +484,7 @@ function evaluateMatchedEntry(
 
     const sameDayVersions = sameDayRows.map((r) => r.version);
     const sameDayResults = sameDayRows.map((r) =>
-      loadReleaseChanges(db, meta.name, r, hasFlagsCol)
+      loadReleaseChanges(db, meta.name, canonicalPkgName, r, hasFlagsCol)
     );
     const { releases, breakingChanges } = toRelevanceReleases(sameDayResults);
     return {
@@ -428,10 +505,11 @@ function evaluateMatchedEntry(
     };
   }
 
-  // Reuse `compareVersions` from src/query.ts (joining on DB `version`), then scope
-  // strictly to releases belonging to the mapped package (`afterRows`) using `<V>`.
+  // Reuse `compareVersions` from src/query.ts, scoped strictly to this canonical package.
   const diffFromCompare = compareVersions(db, {
     product: meta.name,
+    package: canonicalPkgName,
+    productsConfig: cfg,
     fromVersion: matchedRow.dbVersion,
     toVersion: newestDateReleases[0].dbVersion,
   });
@@ -452,7 +530,9 @@ function evaluateMatchedEntry(
 
   const sameDaySiblingResults =
     sameDaySiblingRows.length > 0
-      ? sameDaySiblingRows.map((r) => loadReleaseChanges(db, meta.name, r, hasFlagsCol))
+      ? sameDaySiblingRows.map((r) =>
+          loadReleaseChanges(db, meta.name, canonicalPkgName, r, hasFlagsCol)
+        )
       : [];
 
   const { releases, breakingChanges } = toRelevanceReleases([
@@ -506,7 +586,11 @@ export function evaluateWorkspaceRelevance(
   workspace: WorkspaceScanResult,
   opts: EvaluateRelevanceOptions = {}
 ): WorkspaceRelevanceReport {
-  const catalog = loadProductCatalog(db, opts);
+  const cfg =
+    opts.productsConfig !== undefined
+      ? opts.productsConfig
+      : loadProductsConfig(opts.yamlPath);
+  const catalog = loadProductCatalog(db, { ...opts, productsConfig: cfg });
   const hasReleasesTable = hasTable(db, 'releases');
 
   const entriesByPackageKey = new Map<string, WorkspacePackageEntry[]>();
@@ -524,6 +608,7 @@ export function evaluateWorkspaceRelevance(
     const packages = meta.packages ?? [];
     const matchedPairs: Array<{ pkg: PackageIdentity; entry: WorkspacePackageEntry }> = [];
     for (const pkg of packages) {
+      if (!pkg.ecosystem || !LOCKFILE_PACKAGE_ECOSYSTEMS.has(pkg.ecosystem as any)) continue;
       const key = `${pkg.ecosystem}:${normalizePackageName(pkg.ecosystem, pkg.name)}`;
       const hits = entriesByPackageKey.get(key);
       if (hits) {
@@ -539,7 +624,7 @@ export function evaluateWorkspaceRelevance(
     }
 
     const candidates = matchedPairs.map(({ pkg, entry }) =>
-      evaluateMatchedEntry(db, hasReleasesTable, meta, pkg, entry)
+      evaluateMatchedEntry(db, hasReleasesTable, meta, pkg, entry, cfg)
     );
     matchedProducts.push(pickPreferredResult(candidates));
   }

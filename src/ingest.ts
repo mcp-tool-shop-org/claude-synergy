@@ -6,7 +6,7 @@ import TurndownService from 'turndown';
 import type Database from 'better-sqlite3';
 import { AppError } from './errors.js';
 import { extractEntities } from './extract.js';
-import { loadProductsConfig } from './products-config.js';
+import { deriveReleaseIdentity, loadProductsConfig, type ProductsConfig } from './products-config.js';
 import { parseFlagsJson, screenVendorText } from './screen.js';
 
 // Turndown converts HTML release bodies (github-copilot, vscode-copilot-chat) to markdown
@@ -166,7 +166,16 @@ const PRODUCT_META: Record<string, { tier: number; strategy: string; url: string
   return out;
 })();
 
-export function ingestAll(db: Database.Database, productsRoot: string): IngestStats {
+export interface IngestOptions {
+  productsConfig?: ProductsConfig | null;
+  yamlPath?: string;
+}
+
+export function ingestAll(
+  db: Database.Database,
+  productsRoot: string,
+  opts: IngestOptions = {}
+): IngestStats {
   const stats: IngestStats = {
     productsCount: 0,
     releasesAdded: 0,
@@ -176,6 +185,25 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
     total: 0,
     errors: [],
   };
+
+  const cfg =
+    opts.productsConfig !== undefined
+      ? opts.productsConfig
+      : loadProductsConfig(opts.yamlPath);
+
+  const productMetaMap: Record<string, { tier: number; strategy: string; url: string; display: string }> = cfg
+    ? Object.fromEntries(
+        Object.entries(cfg.productMeta).map(([name, meta]) => [
+          name,
+          {
+            tier: meta.source_tier,
+            strategy: meta.fetch_strategy,
+            url: meta.source_url,
+            display: meta.display_name,
+          },
+        ])
+      )
+    : PRODUCT_META;
 
   const productDirs = readdirSync(productsRoot).filter((name) => {
     try {
@@ -203,19 +231,28 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
   `);
 
   const insertRelease = db.prepare(`
-    INSERT OR REPLACE INTO releases (product, version, released_at, notes_path, fetched_at, source_url, bundle_size_kb, notes_hash)
-    VALUES (@product, @version, @released_at, @notes_path, @fetched_at, @source_url, @bundle_size_kb, @notes_hash)
+    INSERT INTO releases (product, package, version, released_at, notes_path, fetched_at, source_url, bundle_size_kb, notes_hash)
+    VALUES (@product, @package, @version, @released_at, @notes_path, @fetched_at, @source_url, @bundle_size_kb, @notes_hash)
+    ON CONFLICT(product, package, version) DO UPDATE SET
+      released_at    = excluded.released_at,
+      notes_path     = excluded.notes_path,
+      fetched_at     = excluded.fetched_at,
+      source_url     = excluded.source_url,
+      bundle_size_kb = excluded.bundle_size_kb,
+      notes_hash     = excluded.notes_hash
   `);
 
   const insertChange = db.prepare(`
-    INSERT INTO changes (product, version, ordinal, kind, text, flags)
-    VALUES (@product, @version, @ordinal, @kind, @text, @flags)
+    INSERT INTO changes (product, package, version, ordinal, kind, text, flags)
+    VALUES (@product, @package, @version, @ordinal, @kind, @text, @flags)
   `);
 
-  const deleteChanges = db.prepare(`DELETE FROM changes WHERE product = ? AND version = ?`);
+  const deleteChanges = db.prepare(
+    `DELETE FROM changes WHERE product = ? AND package = ? AND version = ?`
+  );
 
   const selectExistingHash = db.prepare(
-    `SELECT notes_hash FROM releases WHERE product = ? AND version = ?`
+    `SELECT notes_hash FROM releases WHERE product = ? AND package = ? AND version = ?`
   );
 
   const insertEntity = db.prepare(`
@@ -244,7 +281,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
 
     stats.productsCount++;
 
-    const meta = PRODUCT_META[product] ?? {
+    const meta = productMetaMap[product] ?? {
       tier: 1,
       strategy: 'gh-releases',
       url: '',
@@ -271,13 +308,17 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
           // For multi-product feeds (anthropic-apps) compose version with sub_product
           // to keep each Help Center entry as a distinct release row
           const baseVersion = fmTyped.version ?? basename(file, '.md');
-          const version = fmTyped.sub_product
+          const rawVersion = fmTyped.sub_product
             ? `${baseVersion}-${fmTyped.sub_product}`
             : baseVersion;
+          const notesPath = relative(productsRoot, path).replace(/\\/g, '/');
+          const { pkg, version } = deriveReleaseIdentity(product, rawVersion, notesPath, cfg);
 
           // Dedup: skip re-processing if content hash has not changed
           const hash = contentHash(raw);
-          const existingRow = selectExistingHash.get(product, version) as { notes_hash: string | null } | undefined;
+          const existingRow = selectExistingHash.get(product, pkg, version) as
+            | { notes_hash: string | null }
+            | undefined;
           if (existingRow?.notes_hash === hash) {
             stats.skipped++;
             continue;
@@ -288,13 +329,14 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
           const fetched_at = fmTyped.fetched_at ?? new Date().toISOString().split('T')[0];
           const bundle_size_kb = fmTyped.bundle_size_kb_delta ?? null;
 
-          deleteChanges.run(product, version);
+          deleteChanges.run(product, pkg, version);
 
           insertRelease.run({
             product,
+            package: pkg,
             version,
             released_at,
-            notes_path: relative(productsRoot, path).replace(/\\/g, '/'),
+            notes_path: notesPath,
             fetched_at,
             source_url,
             bundle_size_kb,
@@ -308,6 +350,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
             const kind = classifyKind(screened.text);
             const result = insertChange.run({
               product,
+              package: pkg,
               version,
               ordinal: i + 1,
               kind,

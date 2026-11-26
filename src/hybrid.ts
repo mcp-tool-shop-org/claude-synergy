@@ -4,8 +4,9 @@ import { OllamaJudgeRerankProvider } from './providers/rerank/ollama-judge.js';
 import { VoyageRerankProvider } from './providers/rerank/voyage.js';
 import { CohereRerankProvider } from './providers/rerank/cohere.js';
 import type { RerankProvider, RerankCandidate } from './providers/types.js';
-import { getEmbeddingDim, hasChangesFlagsColumn } from './db.js';
-import { resolveRowScreening } from './query.js';
+import { getEmbeddingDim, hasChangesFlagsColumn, hasChunksPackageColumn } from './db.js';
+import { deriveReleaseIdentity, loadProductsConfig, type ProductsConfig } from './products-config.js';
+import { resolvePackageFilter, resolveRowScreening } from './query.js';
 import { screenVendorText } from './screen.js';
 
 /** Hard upper bound on any user-supplied row-pull parameter. */
@@ -48,6 +49,7 @@ export interface HybridResult {
   chunk_id: number;
   change_id: number;
   product: string;
+  package: string;
   version: string;
   released_at: string | null;
   kind: string;
@@ -62,6 +64,8 @@ export interface HybridResult {
 
 export interface HybridOptions {
   product?: string;
+  package?: string;
+  productsConfig?: ProductsConfig | null;
   since?: string;
   /** Inclusive date upper bound (YYYY-MM-DD). Pairs with `since` for windowed search. */
   until?: string;
@@ -109,11 +113,20 @@ export async function hybridSearch(
   const emb = makeEmbeddingProvider(embedName, { dim: dbDim });
 
   // Pre-filter SQL fragment shared by both channels
+  const cfg = opts.productsConfig !== undefined ? opts.productsConfig : loadProductsConfig();
+  const hasPkgCol = hasChunksPackageColumn(db);
+  const resolvedPkg =
+    opts.package !== undefined ? resolvePackageFilter(opts.product, opts.package, cfg) : undefined;
+
   const filters: string[] = [];
   const params: Record<string, any> = {};
   if (opts.product) {
     filters.push('ch.product = @product');
     params.product = opts.product;
+  }
+  if (resolvedPkg !== undefined && hasPkgCol) {
+    filters.push('ch.package = @package');
+    params.package = resolvedPkg;
   }
   if (opts.since) {
     filters.push('ch.released_at >= @since');
@@ -211,16 +224,28 @@ export async function hybridSearch(
   const placeholders = candidateIds.map(() => '?').join(',');
   const hasFlagsCol = hasChangesFlagsColumn(db);
   const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
+  const pkgExpr = hasPkgCol ? 'ch.package' : `'' AS package`;
   const rowsSql = `
-    SELECT ch.id AS chunk_id, ch.change_id, ch.product, ch.release_version AS version,
-           ch.released_at, c.kind, c.text, ${flagsExpr} AS flags_json, ch.contextualized
+    SELECT ch.id AS chunk_id, ch.change_id, ch.product, ${pkgExpr}, ch.release_version AS version,
+           ch.released_at, c.kind, c.text, ${flagsExpr} AS flags_json, ch.contextualized,
+           r.notes_path AS notes_path
     FROM chunks ch
     JOIN changes c ON c.id = ch.change_id
+    LEFT JOIN releases r ON r.product = c.product AND r.version = c.version${hasPkgCol ? ' AND r.package = c.package' : ''}
     WHERE ch.id IN (${placeholders})
   `;
   const rows = db.prepare(rowsSql).all(...candidateIds) as any[];
   const byId = new Map<number, any>();
-  for (const r of rows) byId.set(r.chunk_id, r);
+  for (const r of rows) {
+    if (!hasPkgCol) {
+      const derived = deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg);
+      r.package = derived.pkg;
+      r.version = derived.version;
+    }
+    if (resolvedPkg !== undefined && r.package !== resolvedPkg) continue;
+    byId.set(r.chunk_id, r);
+  }
+  if (byId.size === 0) return [];
 
   // Optional rerank step. Honor canonical `rerankProviderName` first, then
   // the looser `rerank` alias used by some callers (CLI flag mirror).
@@ -259,7 +284,7 @@ export async function hybridSearch(
     .map((entry) => {
       const r = byId.get(entry.id);
       if (!r) return null;
-      const { flags_json, text, contextualized, ...rest } = r;
+      const { flags_json, text, contextualized, notes_path: _np, ...rest } = r;
       const screened = resolveRowScreening(text, flags_json, hasFlagsCol);
       const cleanContext = hasFlagsCol ? contextualized : screenVendorText(contextualized).text;
       return {

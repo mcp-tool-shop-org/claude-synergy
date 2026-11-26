@@ -413,3 +413,75 @@ describe('ingest — vendor text screening and rescreenChanges', () => {
     expect(JSON.parse(preserved.flags)).toEqual(['pii_email']);
   });
 });
+
+describe('ingest — multi-package separation and collision preservation', () => {
+  it('stores colliding version numbers under distinct (product, package, version) keys and assigns unmatched stems to empty package', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'multipkg-ingest-'));
+    try {
+      const yamlPath = join(dir, 'products.yaml');
+      writeFileSync(
+        yamlPath,
+        `products:
+  - name: test-ts-sdk
+    display_name: Test TS SDK
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@scope/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@scope/aws-sdk"
+        release_prefix: "aws-sdk-"
+      - ecosystem: npm
+        name: "@scope/foundry-sdk"
+        release_prefix: "foundry-sdk-"
+`,
+        'utf-8'
+      );
+
+      const relDir = join(dir, 'test-ts-sdk', 'releases');
+      mkdirSync(relDir, { recursive: true });
+      const writeMd = (file: string, ver: string, bullet: string) =>
+        writeFileSync(
+          join(relDir, file),
+          `---\nproduct: test-ts-sdk\nversion: "${ver}"\nreleased_at: "2026-04-01"\n---\n\n- ${bullet}\n`,
+          'utf-8'
+        );
+
+      writeMd('sdk-0.3.0.md', 'sdk-0.3.0', 'Core SDK 0.3.0 change');
+      writeMd('aws-sdk-0.3.0.md', 'aws-sdk-v0.3.0', 'AWS SDK 0.3.0 change');
+      writeMd('foundry-sdk-0.3.0.md', 'foundry-sdk-v0.3.0', 'Foundry SDK 0.3.0 change');
+      writeMd('rogue-tag-1.0.0.md', 'rogue-tag-1.0.0', 'Unmatched stem change');
+
+      const first = ingestAll(temp.db, dir, { yamlPath });
+      expect(first.releasesAdded).toBe(4);
+      expect(first.changesAdded).toBe(4);
+
+      const rows = temp.db
+        .prepare(`SELECT package, version, notes_path FROM releases WHERE product = 'test-ts-sdk' ORDER BY package, version`)
+        .all() as Array<{ package: string; version: string; notes_path: string }>;
+      expect(rows).toEqual([
+        { package: '', version: 'rogue-tag-1.0.0', notes_path: 'test-ts-sdk/releases/rogue-tag-1.0.0.md' },
+        { package: '@scope/aws-sdk', version: '0.3.0', notes_path: 'test-ts-sdk/releases/aws-sdk-0.3.0.md' },
+        { package: '@scope/foundry-sdk', version: '0.3.0', notes_path: 'test-ts-sdk/releases/foundry-sdk-0.3.0.md' },
+        { package: '@scope/sdk', version: '0.3.0', notes_path: 'test-ts-sdk/releases/sdk-0.3.0.md' },
+      ]);
+
+      const changes = temp.db
+        .prepare(`SELECT package, version, text FROM changes WHERE product = 'test-ts-sdk' ORDER BY package, version`)
+        .all() as Array<{ package: string; version: string; text: string }>;
+      expect(changes).toHaveLength(4);
+      expect(changes.find((c) => c.package === '@scope/aws-sdk')?.text).toBe('AWS SDK 0.3.0 change');
+      expect(changes.find((c) => c.package === '@scope/foundry-sdk')?.text).toBe('Foundry SDK 0.3.0 change');
+
+      // Re-running ingestAll is idempotent when content hashes match
+      const second = ingestAll(temp.db, dir, { yamlPath });
+      expect(second.skipped).toBe(4);
+      expect(second.releasesAdded).toBe(0);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});

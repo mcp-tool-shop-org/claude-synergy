@@ -1,6 +1,6 @@
 ---
 product: anthropic-sdk-typescript
-version: "ertex-sdk-v0.20.3"
+version: "vertex-sdk-v0.20.3"
 released_at: "2026-10-07"
 source_url: "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.20.3"
 fetched_at: "2026-11-26"

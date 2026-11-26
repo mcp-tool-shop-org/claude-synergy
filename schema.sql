@@ -22,6 +22,7 @@ CREATE TABLE products (
 
 CREATE TABLE releases (
   product          TEXT NOT NULL REFERENCES products(name) ON DELETE CASCADE,
+  package          TEXT NOT NULL DEFAULT '',    -- canonical package name from products.yaml, or '' when unassigned
   version          TEXT NOT NULL,               -- "2.1.147" | "v0.2.82" | "2026-05-19" (date when no version)
   released_at      DATE,
   notes_path       TEXT NOT NULL,               -- relative path under repo, e.g. "products/claude-code/releases/2.1.147.md"
@@ -29,10 +30,11 @@ CREATE TABLE releases (
   source_url       TEXT NOT NULL,
   bundle_size_kb   REAL,                        -- delta vs prior, when available
   notes_hash       TEXT,                        -- sha256 of normalized notes body for change detection
-  PRIMARY KEY (product, version)
+  PRIMARY KEY (product, package, version)
 );
 
 CREATE INDEX idx_releases_date ON releases(released_at);
+CREATE INDEX idx_releases_prod_pkg_date ON releases(product, package, released_at);
 
 -- ============================================================================
 -- CHANGES (per release)
@@ -41,16 +43,17 @@ CREATE INDEX idx_releases_date ON releases(released_at);
 CREATE TABLE changes (
   id               INTEGER PRIMARY KEY,
   product          TEXT NOT NULL,
+  package          TEXT NOT NULL DEFAULT '',
   version          TEXT NOT NULL,
   ordinal          INTEGER NOT NULL,            -- order within release (1-based)
   kind             TEXT NOT NULL,               -- "added" | "fixed" | "renamed" | "deprecated" | "breaking" | "improved" | "removed" | "internal"
   text             TEXT NOT NULL,               -- screened bullet text
   flags            TEXT NOT NULL DEFAULT '[]',  -- JSON array of screening flag ids
-  FOREIGN KEY (product, version) REFERENCES releases(product, version) ON DELETE CASCADE,
-  UNIQUE (product, version, ordinal)
+  FOREIGN KEY (product, package, version) REFERENCES releases(product, package, version) ON DELETE CASCADE,
+  UNIQUE (product, package, version, ordinal)
 );
 
-CREATE INDEX idx_changes_pv ON changes(product, version);
+CREATE INDEX idx_changes_pv ON changes(product, package, version);
 CREATE INDEX idx_changes_kind ON changes(kind);
 
 -- ============================================================================

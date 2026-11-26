@@ -5,10 +5,10 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
-import { openDb } from '../../src/db.js';
+import { openDb, initSchema } from '../../src/db.js';
 import { ingestAll } from '../../src/ingest.js';
 import { VENDOR_TEXT_FRAME } from '../../src/screen.js';
-import { seedSampleProducts } from '../helpers/seed-corpus.js';
+import { FIXTURE_PRODUCTS_ROOT, seedSampleProducts } from '../helpers/seed-corpus.js';
 import { withMcpServer, type McpClient } from '../helpers/mcp-client.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -638,20 +638,6 @@ describe('MCP server integration', () => {
             'utf-8'
           );
 
-          const db = openDb(temp.path, { loadVec: false });
-          ingestAll(db, dir);
-          db.close();
-
-          const wsScreenDir = join(dir, 'workspace');
-          mkdirSync(wsScreenDir, { recursive: true });
-          writeFileSync(
-            join(wsScreenDir, 'package-lock.json'),
-            JSON.stringify({
-              lockfileVersion: 3,
-              packages: { 'node_modules/@test/cli': { version: '1.1.0' } },
-            }),
-            'utf-8'
-          );
           const customYamlPath = join(dir, 'products.yaml');
           writeFileSync(
             customYamlPath,
@@ -669,10 +655,32 @@ describe('MCP server integration', () => {
             'utf-8'
           );
 
+          const screenDbPath = join(dir, 'screen.db');
+          const db = openDb(screenDbPath, { loadVec: false });
+          initSchema(db);
+          ingestAll(db, FIXTURE_PRODUCTS_ROOT, { yamlPath: customYamlPath });
+          ingestAll(db, dir, { yamlPath: customYamlPath });
+          db.prepare(
+            `INSERT OR REPLACE INTO synergies (name, title, trigger, status, last_validated, notes_path)
+             VALUES ('test-synergy', 'Test synergy', 'when the test runs', 'confirmed', '2026-05-21', 'synergies/01-test-synergy.md')`
+          ).run();
+          db.close();
+
+          const wsScreenDir = join(dir, 'workspace');
+          mkdirSync(wsScreenDir, { recursive: true });
+          writeFileSync(
+            join(wsScreenDir, 'package-lock.json'),
+            JSON.stringify({
+              lockfileVersion: 3,
+              packages: { 'node_modules/@test/cli': { version: '1.1.0' } },
+            }),
+            'utf-8'
+          );
+
           const observedTokens: string[] = [];
           await withMcpServer(
             {
-              dbPath: temp.path,
+              dbPath: screenDbPath,
               synergiesDir,
               env: {
                 CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z',
@@ -757,7 +765,7 @@ describe('MCP server integration', () => {
           );
 
           // None of the per-answer MCP tokens may ever appear in DB rows.
-          const verifyDb = openDb(temp.path, { loadVec: false });
+          const verifyDb = openDb(screenDbPath, { loadVec: false });
           const allTextRows = verifyDb.prepare(`SELECT text, flags FROM changes`).all() as Array<{ text: string; flags: string }>;
           verifyDb.close();
           for (const tok of observedTokens) {
@@ -1149,7 +1157,7 @@ describe('MCP server integration', () => {
               const text = res.content[0]?.text ?? '';
               expect(text).toContain('[frame text removed]');
               expect(text).toContain('[flagged: frame_marker]');
-              expect(text).toContain('old schema (v3 < v4, read-only)');
+              expect(text).toContain('old schema (v3 < v5, read-only)');
             }
           );
         } finally {
@@ -1243,9 +1251,15 @@ describe('MCP server integration', () => {
           'utf-8'
         );
         try {
+          const relDbPath = join(tmpDir, 'rel.db');
+          const relDb = openDb(relDbPath, { loadVec: false });
+          initSchema(relDb);
+          ingestAll(relDb, FIXTURE_PRODUCTS_ROOT, { yamlPath: customYaml });
+          relDb.close();
+
           await withMcpServer(
             {
-              dbPath: temp.path,
+              dbPath: relDbPath,
               synergiesDir,
               env: {
                 CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z',
@@ -1278,6 +1292,156 @@ describe('MCP server integration', () => {
         }
       },
       25_000
+    );
+  });
+
+  describe('multi-package MCP tools', () => {
+    it(
+      'groups browsing/search per package, requires package on get_release/compare_versions, and keeps single-package responses exact',
+      async () => {
+        const tmpDir = mkdtempSync(join(tmpdir(), 'mcp-multipkg-'));
+        try {
+          const customYaml = join(tmpDir, 'products.yaml');
+          writeFileSync(
+            customYaml,
+            `products:
+  - name: ts-multi
+    display_name: TS Multi
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@scope/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@scope/aws-sdk"
+        release_prefix: "aws-sdk-"
+      - ecosystem: npm
+        name: "@scope/foundry-sdk"
+        release_prefix: "foundry-sdk-"
+  - name: test-cli
+    display_name: Test CLI
+    tier: 1
+    source_url: https://example.invalid/test-cli
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@test/cli"
+        release_prefix: ""
+`,
+            'utf-8'
+          );
+          const prodDir = join(tmpDir, 'products');
+          const relDir = join(prodDir, 'ts-multi', 'releases');
+          mkdirSync(relDir, { recursive: true });
+          const writeRel = (file: string, ver: string, date: string, body: string) =>
+            writeFileSync(
+              join(relDir, file),
+              `---\nproduct: ts-multi\nversion: "${ver}"\nreleased_at: "${date}"\nsource_url: "https://example.invalid/${file}"\n---\n\n${body}\n`,
+              'utf-8'
+            );
+          writeRel('sdk-0.98.0.md', 'sdk-0.98.0', '2026-04-10', '- Added Core feature MCP_MULTI_TOK');
+          writeRel('aws-sdk-0.3.0.md', 'aws-sdk-v0.3.0', '2026-04-02', '- Added AWS 0.3.0 init');
+          writeRel('aws-sdk-0.4.0.md', 'aws-sdk-v0.4.0', '2026-04-08', '- Breaking change: AWS 0.4.0 MCP_MULTI_TOK');
+          writeRel('foundry-sdk-0.3.0.md', 'foundry-sdk-v0.3.0', '2026-04-05', '- Added Foundry 0.3.0 init');
+
+          const db = openDb(temp.path, { loadVec: false });
+          ingestAll(db, prodDir, { yamlPath: customYaml });
+          db.close();
+
+          await withMcpServer(
+            {
+              dbPath: temp.path,
+              synergiesDir,
+              env: {
+                CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z',
+                CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+              },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+
+              // latest_releases omitted package -> grouped per package
+              const latestGrouped = await client.callTool('latest_releases', { product: 'ts-multi', limit: 10 });
+              const latestText = latestGrouped.content[0]?.text ?? '';
+              expect(latestText).toContain('### @scope/sdk');
+              expect(latestText).toContain('### @scope/aws-sdk');
+              expect(latestText).toContain('ts-multi (@scope/foundry-sdk)@0.3.0');
+
+              // get_release without package on multi-package -> PACKAGE_REQUIRED error
+              const relErr = await client.callTool('get_release', { product: 'ts-multi', version: '0.3.0' });
+              expect(relErr.isError).toBe(true);
+              expect(relErr.content[0]?.text ?? '').toContain('[PACKAGE_REQUIRED]');
+
+              // get_release with package disambiguates colliding 0.3.0
+              const awsRel = await client.callTool('get_release', {
+                product: 'ts-multi',
+                package: '@scope/aws-sdk',
+                version: '0.3.0',
+              });
+              expect(awsRel.isError).toBeUndefined();
+              expect(awsRel.content[0]?.text ?? '').toContain('# ts-multi (@scope/aws-sdk) 0.3.0');
+              expect(awsRel.content[0]?.text ?? '').toContain('Added AWS 0.3.0 init');
+
+              const foundryRel = await client.callTool('get_release', {
+                product: 'ts-multi',
+                package: '@scope/foundry-sdk',
+                version: '0.3.0',
+              });
+              expect(foundryRel.content[0]?.text ?? '').toContain('Added Foundry 0.3.0 init');
+
+              // compare_versions requires package on multi-package, works with package
+              const cmpErr = await client.callTool('compare_versions', {
+                product: 'ts-multi',
+                from_version: '0.3.0',
+                to_version: '0.4.0',
+              });
+              expect(cmpErr.isError).toBe(true);
+              expect(cmpErr.content[0]?.text ?? '').toContain('[PACKAGE_REQUIRED]');
+
+              const cmpOk = await client.callTool('compare_versions', {
+                product: 'ts-multi',
+                package: '@scope/aws-sdk',
+                from_version: '0.3.0',
+                to_version: '0.4.0',
+              });
+              expect(cmpOk.content[0]?.text ?? '').toContain('ts-multi (@scope/aws-sdk)@0.4.0');
+
+              // get_changes_since, search_breaking_changes, search grouped & filtered
+              const sinceGrouped = await client.callTool('get_changes_since', {
+                since: '2026-04-01',
+                product: 'ts-multi',
+              });
+              expect(sinceGrouped.content[0]?.text ?? '').toContain('## @scope/aws-sdk');
+
+              const brFiltered = await client.callTool('search_breaking_changes', {
+                product: 'ts-multi',
+                package: '@scope/aws-sdk',
+              });
+              expect(brFiltered.content[0]?.text ?? '').toContain('ts-multi (@scope/aws-sdk)@0.4.0');
+
+              const searchGrouped = await client.callTool('search', {
+                query: 'MCP_MULTI_TOK',
+                mode: 'fts',
+                product: 'ts-multi',
+              });
+              const sText = searchGrouped.content[0]?.text ?? '';
+              expect(sText).toContain('## @scope/sdk');
+              expect(sText).toContain('## @scope/aws-sdk');
+
+              // Single-package latest_releases stays legacy formatted without (@test/cli)
+              const soloLatest = await client.callTool('latest_releases', { product: 'test-cli', limit: 5 });
+              expect(soloLatest.content[0]?.text ?? '').toContain('test-cli@1.1.0');
+              expect(soloLatest.content[0]?.text ?? '').not.toContain('(@test/cli)');
+            }
+          );
+        } finally {
+          rmSync(tmpDir, { recursive: true, force: true });
+        }
+      },
+      30_000
     );
   });
 });

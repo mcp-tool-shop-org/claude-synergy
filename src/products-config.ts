@@ -30,19 +30,38 @@ const GH_REPO_RE = /^[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/;
 
 export const PRODUCTS_PACKAGES_CONFIG_ERROR = 'PRODUCTS_PACKAGES_CONFIG_ERROR';
 
-export type PackageEcosystem = 'npm' | 'pypi' | 'crates' | 'go';
+export const UNASSIGNED_PACKAGE = '';
+export const UNASSIGNED_PACKAGE_LABEL = 'unassigned';
 
-export const VALID_PACKAGE_ECOSYSTEMS: ReadonlySet<PackageEcosystem> = new Set([
+export type LockfilePackageEcosystem = 'npm' | 'pypi' | 'crates' | 'go';
+export type PackageEcosystem = LockfilePackageEcosystem | 'nuget';
+
+export const LOCKFILE_PACKAGE_ECOSYSTEMS: ReadonlySet<LockfilePackageEcosystem> = new Set([
   'npm',
   'pypi',
   'crates',
   'go',
 ]);
 
+export const VALID_PACKAGE_ECOSYSTEMS: ReadonlySet<PackageEcosystem> = new Set([
+  'npm',
+  'pypi',
+  'crates',
+  'go',
+  'nuget',
+]);
+
 export interface PackageIdentity {
-  ecosystem: PackageEcosystem;
+  ecosystem?: PackageEcosystem;
   name: string;
   release_prefix: string;
+}
+
+export interface CanonicalPackage {
+  name: string;
+  release_prefix: string;
+  ecosystems: PackageEcosystem[];
+  aliases: string[];
 }
 
 export interface ProductMeta {
@@ -186,38 +205,47 @@ export function loadProductsConfig(yamlPath?: string): ProductsConfig | null {
   return { productMeta, fetchTargets };
 }
 
+function stripGoMajorSuffix(name: string): string {
+  return name.replace(/\/v\d+$/, '');
+}
+
 /**
  * Validate optional `packages:` entries on a product in `products.yaml`.
  * Throws a named AppError (`PRODUCTS_PACKAGES_CONFIG_ERROR`) on unknown
- * ecosystems, empty/whitespace package names, or malformed entry shapes.
+ * ecosystems, empty/whitespace package names, duplicate release_prefix,
+ * or malformed entry shapes.
  */
 export function validateProductPackages(productName: string, rawPackages: unknown): PackageIdentity[] {
   if (!Array.isArray(rawPackages)) {
     throw new AppError({
       code: PRODUCTS_PACKAGES_CONFIG_ERROR,
       message: `[claude-synergy] products.yaml: ${productName}: 'packages' must be an array`,
-      hint: 'Use packages: [{ ecosystem: "npm", name: "@scope/pkg" }] with ecosystem in npm|pypi|crates|go.',
+      hint: 'Use packages: [{ ecosystem: "npm", name: "@scope/pkg", release_prefix: "" }].',
     });
   }
 
   const out: PackageIdentity[] = [];
+  const seenByPrefix = new Map<string, PackageIdentity[]>();
+
   for (let i = 0; i < rawPackages.length; i++) {
     const entry = rawPackages[i];
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
       throw new AppError({
         code: PRODUCTS_PACKAGES_CONFIG_ERROR,
-        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] must be an object with ecosystem and name`,
-        hint: 'Each packages entry requires { ecosystem: npm|pypi|crates|go, name: "<package>" }.',
+        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] must be an object with name and release_prefix`,
+        hint: 'Each packages entry requires { name: "<package>", release_prefix: "<prefix>", ecosystem?: npm|pypi|crates|go|nuget }.',
       });
     }
     const rec = entry as Record<string, unknown>;
     const eco = rec.ecosystem;
-    if (typeof eco !== 'string' || !VALID_PACKAGE_ECOSYSTEMS.has(eco as PackageEcosystem)) {
-      throw new AppError({
-        code: PRODUCTS_PACKAGES_CONFIG_ERROR,
-        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] has unknown ecosystem ${JSON.stringify(eco)} (expected one of: npm, pypi, crates, go)`,
-        hint: 'Supported package ecosystems are: npm, pypi, crates, go.',
-      });
+    if (eco !== undefined) {
+      if (typeof eco !== 'string' || !VALID_PACKAGE_ECOSYSTEMS.has(eco as PackageEcosystem)) {
+        throw new AppError({
+          code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+          message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] has unknown ecosystem ${JSON.stringify(eco)} (expected one of: npm, pypi, crates, go, nuget)`,
+          hint: 'Supported package ecosystems are: npm, pypi, crates, go, nuget.',
+        });
+      }
     }
     const rawName = rec.name;
     const trimmed = typeof rawName === 'string' ? rawName.trim() : '';
@@ -248,9 +276,150 @@ export function validateProductPackages(productName: string, rawPackages: unknow
         hint: 'Declare only the exact filename prefix before the version digits (e.g., "sdk-" or "").',
       });
     }
-    out.push({ ecosystem: eco as PackageEcosystem, name: trimmed, release_prefix: rawPrefix });
+
+    const identity: PackageIdentity = {
+      ...(eco !== undefined ? { ecosystem: eco as PackageEcosystem } : {}),
+      name: trimmed,
+      release_prefix: rawPrefix,
+    };
+
+    const existingForPrefix = seenByPrefix.get(rawPrefix) ?? [];
+    if (existingForPrefix.length > 0) {
+      const sameGoModule = existingForPrefix.every(
+        (prev) =>
+          prev.ecosystem === 'go' &&
+          identity.ecosystem === 'go' &&
+          stripGoMajorSuffix(prev.name) === stripGoMajorSuffix(identity.name),
+      );
+      if (!sameGoModule) {
+        throw new AppError({
+          code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+          message: `[claude-synergy] products.yaml: ${productName}: duplicate release_prefix ${JSON.stringify(rawPrefix)}`,
+          hint: 'Each package in a product must have a distinct release_prefix (except Go major-version module aliases).',
+        });
+      }
+    }
+    existingForPrefix.push(identity);
+    seenByPrefix.set(rawPrefix, existingForPrefix);
+    out.push(identity);
   }
   return out;
+}
+
+/**
+ * Extract `<V>` if and only if `notesPath` is non-empty, ends with `.md`,
+ * and its file stem is strictly `<releasePrefix><V>` where `<V>` begins with
+ * an ASCII digit. Rows without `notesPath` or with any other stem return `null`.
+ */
+export function extractVersionFromNotesPath(
+  notesPath: string | null | undefined,
+  releasePrefix: string,
+): string | null {
+  if (!notesPath || typeof notesPath !== 'string') return null;
+  const trimmedPath = notesPath.trim();
+  if (!trimmedPath) return null;
+  const fileName = trimmedPath.replace(/\\/g, '/').split('/').pop() ?? '';
+  if (!fileName.endsWith('.md')) return null;
+  const stem = fileName.slice(0, -3);
+  if (!stem.startsWith(releasePrefix)) return null;
+  const versionPart = stem.slice(releasePrefix.length);
+  if (!/^\d/.test(versionPart)) return null;
+  return versionPart;
+}
+
+/**
+ * Collapse declared `packages` entries by `release_prefix` (preserving declaration order).
+ * Go major-version pairs sharing `release_prefix` (e.g. `.../anthropic-sdk-go` and `.../v2`)
+ * collapse to one canonical package whose `aliases` includes all sharing entries.
+ */
+export function getCanonicalPackages(
+  meta: Pick<ProductMeta, 'packages'> | undefined | null,
+): CanonicalPackage[] {
+  const packages = meta?.packages;
+  if (!packages || packages.length === 0) return [];
+
+  const byPrefix = new Map<string, CanonicalPackage>();
+  for (const pkg of packages) {
+    const existing = byPrefix.get(pkg.release_prefix);
+    if (existing) {
+      if (!existing.aliases.includes(pkg.name)) existing.aliases.push(pkg.name);
+      if (pkg.ecosystem && !existing.ecosystems.includes(pkg.ecosystem)) {
+        existing.ecosystems.push(pkg.ecosystem);
+      }
+    } else {
+      byPrefix.set(pkg.release_prefix, {
+        name: pkg.name,
+        release_prefix: pkg.release_prefix,
+        ecosystems: pkg.ecosystem ? [pkg.ecosystem] : [],
+        aliases: [pkg.name],
+      });
+    }
+  }
+  return Array.from(byPrefix.values());
+}
+
+/** Return true iff the product declares more than one canonical package (by distinct `release_prefix`). */
+export function isMultiPackageProduct(
+  meta: Pick<ProductMeta, 'packages'> | undefined | null,
+): boolean {
+  return getCanonicalPackages(meta).length > 1;
+}
+
+/** Resolve the canonical package name for a declared `PackageIdentity` (collapsing Go `/v2` aliases). */
+export function resolveCanonicalPackageName(
+  meta: Pick<ProductMeta, 'packages'> | undefined | null,
+  pkg: Pick<PackageIdentity, 'name' | 'release_prefix'>,
+): string {
+  const canonical = getCanonicalPackages(meta);
+  const match = canonical.find(
+    (c) => c.release_prefix === pkg.release_prefix || c.aliases.includes(pkg.name),
+  );
+  return match ? match.name : pkg.name;
+}
+
+/**
+ * Match a release's `notes_path` exclusively against `products.yaml` `packages[].release_prefix`.
+ * Returns `UNASSIGNED_PACKAGE` (`""`) if no prefix matches. Never silently attaches to another package.
+ */
+export function resolveReleasePackage(
+  notesPath: string | null | undefined,
+  meta: Pick<ProductMeta, 'packages'> | undefined | null,
+): { pkg: string; extractedVersion: string | null; releasePrefix: string | null } {
+  const canonical = getCanonicalPackages(meta);
+  if (canonical.length === 0) {
+    return { pkg: UNASSIGNED_PACKAGE, extractedVersion: null, releasePrefix: null };
+  }
+  const ordered = [...canonical].sort((a, b) => b.release_prefix.length - a.release_prefix.length);
+  for (const cp of ordered) {
+    const extracted = extractVersionFromNotesPath(notesPath, cp.release_prefix);
+    if (extracted !== null) {
+      return { pkg: cp.name, extractedVersion: extracted, releasePrefix: cp.release_prefix };
+    }
+  }
+  return { pkg: UNASSIGNED_PACKAGE, extractedVersion: null, releasePrefix: null };
+}
+
+/**
+ * Derive the canonical `(pkg, version)` identity for a release row using `products.yaml`.
+ * Single-package bare products preserve `rawVersion` unchanged; multi-package and prefixed
+ * releases store the prefix-stripped version `<V>` alongside the canonical package name.
+ */
+export function deriveReleaseIdentity(
+  product: string,
+  rawVersion: string,
+  notesPath: string | null | undefined,
+  config: ProductsConfig | null | undefined,
+): { pkg: string; version: string } {
+  const meta = config?.productMeta[product];
+  const resolved = resolveReleasePackage(notesPath, meta);
+  if (resolved.pkg !== UNASSIGNED_PACKAGE && resolved.extractedVersion !== null) {
+    const stripPrefix = isMultiPackageProduct(meta) || resolved.releasePrefix !== '';
+    return {
+      pkg: resolved.pkg,
+      version: stripPrefix ? resolved.extractedVersion : rawVersion,
+    };
+  }
+  return { pkg: UNASSIGNED_PACKAGE, version: rawVersion };
 }
 
 function buildFetchTarget(name: string, fetch: NonNullable<RawYaml['products']>[number]['fetch']): FetchTarget | null {

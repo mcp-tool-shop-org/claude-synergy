@@ -30,8 +30,8 @@
 #
 #   OPTIONAL:
 #     notes           string   Free-text notes (e.g., platform requirements).
-#     packages        list     Package identities matched against workspace lockfiles:
-#                              each entry is { ecosystem: npm|pypi|crates|go, name: <pkg>, release_prefix: <prefix> }.
+#     packages        list     Package identities matched against workspace lockfiles and release stems:
+#                              each entry is { ecosystem?: npm|pypi|crates|go|nuget, name: <pkg>, release_prefix: <prefix> }.
 #     fetch           object   Fetcher configuration. Omit if the product's
 #                              corpus is seeded manually (no automated fetch).
 #
@@ -145,6 +145,9 @@ products:
       - ecosystem: go
         name: github.com/anthropics/anthropic-cli/v2
         release_prefix: ""
+      - ecosystem: go
+        name: github.com/anthropics/anthropic-cli/sandboxes
+        release_prefix: "sandboxes-v"
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-cli
@@ -171,6 +174,21 @@ products:
       - ecosystem: npm
         name: "@anthropic-ai/sdk"
         release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/bedrock-sdk"
+        release_prefix: "bedrock-sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/vertex-sdk"
+        release_prefix: "vertex-sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/aws-sdk"
+        release_prefix: "aws-sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/foundry-sdk"
+        release_prefix: "foundry-sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/google-cloud-sdk"
+        release_prefix: "google-cloud-sdk-"
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-typescript
@@ -215,6 +233,25 @@ products:
     tier: 1
     source_url: https://github.com/anthropics/anthropic-sdk-csharp
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: nuget
+        name: "Anthropic"
+        release_prefix: "Anthropic-"
+      - ecosystem: nuget
+        name: "Anthropic.Bedrock"
+        release_prefix: "Bedrock-"
+      - ecosystem: nuget
+        name: "Anthropic.Vertex"
+        release_prefix: "Vertex-"
+      - ecosystem: nuget
+        name: "Anthropic.Foundry"
+        release_prefix: "Foundry-"
+      - ecosystem: nuget
+        name: "Anthropic.Aws"
+        release_prefix: "Aws-"
+      - ecosystem: nuget
+        name: "Anthropic.GoogleCloud"
+        release_prefix: "GoogleCloud-"
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-csharp
@@ -295,6 +332,33 @@ products:
       - ecosystem: npm
         name: "@modelcontextprotocol/sdk"
         release_prefix: ""
+      - ecosystem: npm
+        name: "@modelcontextprotocol/client"
+        release_prefix: "modelcontextprotocol-client-"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/server"
+        release_prefix: "modelcontextprotocol-server-"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/server-legacy"
+        release_prefix: "modelcontextprotocol-server-legacy-"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/core"
+        release_prefix: "modelcontextprotocol-core-"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/codemod"
+        release_prefix: "modelcontextprotocol-codemod-"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/node"
+        release_prefix: "modelcontextprotocol-node-"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/express"
+        release_prefix: "modelcontextprotocol-express-"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/hono"
+        release_prefix: "modelcontextprotocol-hono-"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/fastify"
+        release_prefix: "modelcontextprotocol-fastify-"
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/typescript-sdk
@@ -367,6 +431,9 @@ products:
       - ecosystem: crates
         name: rmcp
         release_prefix: "rmcp-v"
+      - ecosystem: crates
+        name: rmcp-macros
+        release_prefix: "rmcp-macros-v"
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/rust-sdk
@@ -447,6 +514,28 @@ products:
     tier: 1
     source_url: https://github.com/continuedev/continue
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@continuedev/config-yaml"
+        release_prefix: "continuedev-config-yaml-"
+      - ecosystem: npm
+        name: "@continuedev/fetch"
+        release_prefix: "continuedev-fetch-"
+      - ecosystem: npm
+        name: "@continuedev/openai-adapters"
+        release_prefix: "continuedev-openai-adapters-"
+      - ecosystem: npm
+        name: "@continuedev/config-types"
+        release_prefix: "continuedev-config-types-"
+      - ecosystem: npm
+        name: "@continuedev/llm-info"
+        release_prefix: "continuedev-llm-info-"
+      - ecosystem: npm
+        name: "@continuedev/terminal-security"
+        release_prefix: "continuedev-terminal-security-"
+      - ecosystem: npm
+        name: "@continuedev/core"
+        release_prefix: "continuedev-core-"
     fetch:
       type: gh-releases
       repo: continuedev/continue
@@ -466,6 +555,11 @@ products:
     tier: 3
     source_url: https://cursor.com/changelog/rss.xml
     fetch_strategy: rss
+    packages:
+      - name: cursor
+        release_prefix: ""
+      - name: composer
+        release_prefix: "composer-"
     fetch:
       type: rss
       url: https://cursor.com/changelog/rss.xml

@@ -103,6 +103,7 @@ export function normalizePackageName(ecosystem: PackageEcosystem, name: string):
       return trimmed.toLowerCase().replace(/[-_.]+/g, '-');
     case 'npm':
     case 'crates':
+    case 'nuget':
       return trimmed.toLowerCase();
     case 'go':
       return trimmed;

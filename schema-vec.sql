@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS chunks (
   id                INTEGER PRIMARY KEY,
   change_id         INTEGER NOT NULL UNIQUE REFERENCES changes(id) ON DELETE CASCADE,
   product           TEXT NOT NULL,
+  package           TEXT NOT NULL DEFAULT '',
   release_version   TEXT NOT NULL,
   released_at       DATE,
   context_prefix    TEXT NOT NULL,
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS chunks (
 );
 
 CREATE INDEX IF NOT EXISTS idx_chunks_product ON chunks(product, released_at);
+CREATE INDEX IF NOT EXISTS idx_chunks_prod_pkg ON chunks(product, package, released_at);
 CREATE INDEX IF NOT EXISTS idx_chunks_change ON chunks(change_id);
 
 -- NOTE: `chunks_vec` is created dynamically by src/embed.ts initVecSchema()

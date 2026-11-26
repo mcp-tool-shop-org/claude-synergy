@@ -19,13 +19,26 @@
 //   - test-cli@1.1.0 has a "Breaking change: --old-flag is now removed entirely" bullet (kind: breaking)
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   searchChanges,
+  searchChangesByPackage,
   browseChanges,
+  browseChangesByPackage,
   getChangesSince,
+  getChangesSinceByPackage,
   compareVersions,
   recentReleases,
+  recentReleasesByPackage,
+  getRelease,
+  lookupEntity,
+  formatPackageName,
+  formatReleaseLabel,
 } from '../../src/query.js';
+import { ingestAll } from '../../src/ingest.js';
+import { loadProductsConfig } from '../../src/products-config.js';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
 
@@ -336,6 +349,163 @@ describe('recentReleases with since filter', () => {
     const rows = recentReleases(temp.db, undefined, 100, '2026-01-01');
     for (let i = 1; i < rows.length; i++) {
       expect(rows[i - 1].released_at).toSatisfy((d: string) => d >= rows[i].released_at);
+    }
+  });
+});
+
+describe('multi-package separation and byte-for-byte single-package invariance', () => {
+  function seedMultiPkgFixture() {
+    const dir = mkdtempSync(join(tmpdir(), 'query-multipkg-'));
+    const yamlPath = join(dir, 'products.yaml');
+    writeFileSync(
+      yamlPath,
+      `products:
+  - name: ts-multi
+    display_name: TS Multi
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@scope/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@scope/aws-sdk"
+        release_prefix: "aws-sdk-"
+      - ecosystem: npm
+        name: "@scope/foundry-sdk"
+        release_prefix: "foundry-sdk-"
+  - name: go-single
+    display_name: Go Single
+    tier: 1
+    source_url: https://example.invalid/go
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: go
+        name: example.invalid/go-single
+        release_prefix: ""
+      - ecosystem: go
+        name: example.invalid/go-single/v2
+        release_prefix: ""
+`,
+      'utf-8'
+    );
+    const prodRoot = join(dir, 'products');
+    const writeMd = (prod: string, file: string, ver: string, date: string, body: string) => {
+      const relDir = join(prodRoot, prod, 'releases');
+      mkdirSync(relDir, { recursive: true });
+      writeFileSync(
+        join(relDir, file),
+        `---\nproduct: ${prod}\nversion: "${ver}"\nreleased_at: "${date}"\nsource_url: "https://example.invalid/${prod}/${file}"\n---\n\n${body}\n`,
+        'utf-8'
+      );
+    };
+
+    writeMd('ts-multi', 'sdk-0.98.0.md', 'sdk-0.98.0', '2026-04-10', '- Added Core feature MULTI_QUERY_TOK\n- Breaking change: Core breaking change');
+    writeMd('ts-multi', 'aws-sdk-0.3.0.md', 'aws-sdk-v0.3.0', '2026-04-02', '- Added AWS 0.3.0');
+    writeMd('ts-multi', 'aws-sdk-0.4.0.md', 'aws-sdk-v0.4.0', '2026-04-08', '- Breaking change: AWS 0.4.0 MULTI_QUERY_TOK');
+    writeMd('ts-multi', 'foundry-sdk-0.3.0.md', 'foundry-sdk-v0.3.0', '2026-04-05', '- Added Foundry 0.3.0');
+    writeMd('ts-multi', 'rogue-0.1.0.md', 'rogue-0.1.0', '2026-04-03', '- Added unassigned slug');
+    writeMd('go-single', '2.0.0.md', 'v2.0.0', '2026-04-01', '- Added Go v2 init');
+    writeMd('go-single', '2.1.0.md', 'v2.1.0', '2026-04-09', '- Added Go v2.1 MULTI_QUERY_TOK');
+
+    const cfg = loadProductsConfig(yamlPath)!;
+    ingestAll(temp.db, prodRoot, { yamlPath });
+    return {
+      cfg,
+      cleanup: () => rmSync(dir, { recursive: true, force: true }),
+    };
+  }
+
+  it('groups browsing/search per package, disambiguates colliding versions, and rejects missing/unknown package cleanly', () => {
+    const fx = seedMultiPkgFixture();
+    try {
+      const cfg = fx.cfg;
+      const groups = recentReleasesByPackage(temp.db, 'ts-multi', 10, undefined, cfg);
+      expect(groups.map((g) => g.package)).toEqual(['@scope/sdk', '@scope/aws-sdk', '@scope/foundry-sdk', 'unassigned']);
+      expect(groups[1].releases.map((r) => r.version)).toEqual(['0.4.0', '0.3.0']);
+
+      // getRelease disambiguates colliding 0.3.0 by package
+      const awsRel = getRelease(temp.db, { product: 'ts-multi', package: '@scope/aws-sdk', version: '0.3.0', productsConfig: cfg });
+      const foundryRel = getRelease(temp.db, { product: 'ts-multi', package: '@scope/foundry-sdk', version: '0.3.0', productsConfig: cfg });
+      expect(awsRel?.changes[0].text).toBe('Added AWS 0.3.0');
+      expect(foundryRel?.changes[0].text).toBe('Added Foundry 0.3.0');
+      expect(getRelease(temp.db, { product: 'ts-multi', package: 'unassigned', version: 'rogue-0.1.0', productsConfig: cfg })?.package).toBe('unassigned');
+
+      // Omitting package on multi-package product throws PACKAGE_REQUIRED listing valid packages
+      expect(() => getRelease(temp.db, { product: 'ts-multi', version: '0.3.0', productsConfig: cfg })).toThrow(/has multiple packages.*specify package/i);
+      expect(() =>
+        compareVersions(temp.db, { product: 'ts-multi', fromVersion: '0.3.0', toVersion: '0.4.0', productsConfig: cfg })
+      ).toThrow(/has multiple packages.*specify package/i);
+      expect(() =>
+        recentReleases(temp.db, 'ts-multi', 10, undefined, 'no-such-pkg', cfg)
+      ).toThrow(/unknown package/i);
+
+      // compareVersions scoped to @scope/aws-sdk compares only aws-sdk releases
+      const cmp = compareVersions(temp.db, {
+        product: 'ts-multi',
+        package: '@scope/aws-sdk',
+        fromVersion: '0.3.0',
+        toVersion: '0.4.0',
+        productsConfig: cfg,
+      });
+      expect(cmp.map((c) => `${c.package}:${c.version}`)).toEqual(['@scope/aws-sdk:0.4.0']);
+
+      // getChangesSinceByPackage / browseChangesByPackage / searchChangesByPackage / lookupEntity
+      const sinceGroups = getChangesSinceByPackage(temp.db, { since: '2026-04-01', product: 'ts-multi', productsConfig: cfg });
+      expect(sinceGroups.map((g) => g.package)).toEqual(['@scope/sdk', '@scope/aws-sdk', '@scope/foundry-sdk', 'unassigned']);
+
+      const breakingGroups = browseChangesByPackage(temp.db, { product: 'ts-multi', kind: 'breaking', productsConfig: cfg });
+      expect(breakingGroups.map((g) => g.package)).toEqual(['@scope/sdk', '@scope/aws-sdk']);
+
+      const searchGroups = searchChangesByPackage(temp.db, 'MULTI_QUERY_TOK', { product: 'ts-multi', productsConfig: cfg });
+      expect(searchGroups.map((g) => g.package)).toEqual(['@scope/sdk', '@scope/aws-sdk']);
+
+      const entityHits = lookupEntity(temp.db, 'env_var', 'MULTI_QUERY_TOK', { productsConfig: cfg });
+      expect(entityHits.filter((e) => e.product === 'ts-multi').every((e) => e.package !== undefined)).toBe(true);
+      expect(formatPackageName('')).toBe('unassigned');
+      expect(formatReleaseLabel('ts-multi', '@scope/aws-sdk', '0.4.0', cfg)).toBe('ts-multi (@scope/aws-sdk)@0.4.0');
+    } finally {
+      fx.cleanup();
+    }
+  });
+
+  it('preserves single-package JSON objects and release labels byte-for-byte', () => {
+    const fx = seedMultiPkgFixture();
+    try {
+      const cfg = fx.cfg;
+      for (const singleProduct of ['test-cli', 'go-single']) {
+        const recent = recentReleases(temp.db, singleProduct, 10, undefined, undefined, cfg);
+        expect(recent.length).toBeGreaterThan(0);
+        for (const r of recent) {
+          expect(Object.hasOwn(r, 'package')).toBe(false);
+          expect(formatReleaseLabel(r.product, r.package, r.version, cfg)).toBe(`${singleProduct}@${r.version}`);
+        }
+        const detail = getRelease(temp.db, { product: singleProduct, version: recent[0].version, productsConfig: cfg })!;
+        expect(Object.hasOwn(detail, 'package')).toBe(false);
+        const since = getChangesSince(temp.db, { since: '2026-01-01', product: singleProduct, productsConfig: cfg });
+        for (const s of since) {
+          expect(Object.hasOwn(s, 'package')).toBe(false);
+        }
+        const browsed = browseChanges(temp.db, { product: singleProduct, productsConfig: cfg });
+        for (const b of browsed) {
+          expect(Object.hasOwn(b, 'package')).toBe(false);
+        }
+        const searched = searchChanges(temp.db, 'v2', { product: singleProduct, productsConfig: cfg });
+        for (const h of searched) {
+          expect(Object.hasOwn(h, 'package')).toBe(false);
+        }
+      }
+      const goCmp = compareVersions(temp.db, {
+        product: 'go-single',
+        fromVersion: '2.0.0',
+        toVersion: '2.1.0',
+        productsConfig: cfg,
+      });
+      expect(goCmp.map((c) => ({ product: c.product, version: c.version }))).toEqual([{ product: 'go-single', version: 'v2.1.0' }]);
+      expect(Object.hasOwn(goCmp[0], 'package')).toBe(false);
+    } finally {
+      fx.cleanup();
     }
   });
 });
