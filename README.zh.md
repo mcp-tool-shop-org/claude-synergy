@@ -73,8 +73,6 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**实时数据（截至 v1.2.1）：** 44 个产品 / 1,171 个发布文件 / 6,573 个更改 / 1,260 个实体 / 12 个协同 / 519 个测试 / 13 个 MCP 工具 / 17 个 CLI 命令。（数据集于 2026-05-24 通过 `sync_now` 进行刷新。）
-
 ---
 
 ## 状态——所有层级均已发布
@@ -84,7 +82,7 @@ claude-synergy/
 | **1 — 启动（markdown 语料库）** | ✅ 已发布 | 研究团队在 2026 年 1 月至 5 月期间收集了 706 个发布文件；扩展到 1,186 个，直至第 4d 层。 |
 | **2a — SQLite + FTS5 + CLI** | ✅ 已发布 | `hk` CLI；15 个子命令；sub-300ms 导入 |
 | **2b — sqlite-vec + 上下文检索** | ✅ 已发布 | 可插拔的提供程序（无/结构化/ollama/claude-haiku 上下文 × ollama/voyage 嵌入 × 无/ollama-judge/voyage/cohere 重新排序） |
-| **3 — 同步 + MCP 服务器** | ✅ 已发布 | `hk fetch / sync / seed-markers`；`claude-synergy-mcp` 通过 stdio 公开了 13 个工具（最初的第 3 层发布时为 8 个，在 v1.1 中添加了 3 个，在 v1.2 中添加了 2 个） |
+| **3 — 同步 + MCP 服务器** | ✅ 已发布 | `hk fetch / sync / seed-markers`；`claude-synergy-mcp` 通过 stdio 暴露 14 个工具（最初的第 3 层级发布时为 8 个，在 v1.1 中添加了 3 个，在 v1.2 中添加了 2 个，以及 1 个工作区相关性工具） |
 | **4a — 扩展到 Anthropic 之外** | ✅ 已发布 | +15 个 MCP SDK、Cursor（RSS）、Aider（HISTORY.md）、Continue.dev、Cody Enterprise（过滤后的 RSS） |
 | **4b — HTML 抓取提取器** | ✅ 已发布 | GitHub Copilot + VS Code Chat（Windsurf 需要 Playwright — v0.7） |
 | **4c — turndown HTML→markdown 导入** | ✅ 已发布 | HTML 内容（Copilot/VS Code/Cursor）现在为 FTS5 + 实体提取生成逐条显示的内容。 |
@@ -100,9 +98,9 @@ v1.3 之后的路线图：在 [URGENT_FINDINGS.md](URGENT_FINDINGS.md) 和问题
 
 ## 安全性和数据模型
 
-此工具在本地运行。**涉及的数据：**一个派生的 SQLite 数据库和 markdown 发布文件——所有这些都可以重新创建。**网络：**在您运行 `hk fetch`/`hk sync` 时、代理调用 MCP `sync_now` 工具时，以及首次使用时，会发出出站 HTTPS 请求：对空存储运行查询命令或 MCP 工具会自动同步（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` 可关闭此功能）。目标是 GitHub API、RSS 订阅源、变更日志页面和 MCP 注册表；只有在您选择时才会使用远程 AI 提供商：`hk embed`（Voyage 嵌入，上下文生成使用 Anthropic），或 `hk hybrid -e voyage` / `-r voyage|cohere`。否则，混合搜索（包括 MCP `search` 工具的默认模式）会调用 localhost 上的本地 Ollama 来嵌入查询。**密钥：**从环境变量 `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` 中读取——绝不会记录，绝不会存储到磁盘上。**没有遥测数据。**请参阅 [SECURITY.md](SECURITY.md) 以了解报告策略。
+此工具在本地运行。**涉及的数据：**一个派生的 SQLite 数据库和 markdown 发布文件——所有这些都可以重新创建。工作区相关性最多读取调用者命名的目录顶部的七个命名锁文件。**网络：**在您运行 `hk fetch`/`hk sync` 时，在代理调用 MCP `sync_now` 工具时，以及首次使用时：一个查询命令或 MCP 工具对空存储的运行会自行同步（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` 会关闭该功能）。目标是 GitHub API、RSS 订阅源、变更日志页面和 MCP 注册表，以及远程 AI 提供程序（仅在您选择时）：`hk embed`（Voyage 嵌入，Anthropic 用于上下文生成），或 `hk hybrid -e voyage` / `-r voyage|cohere`。否则，混合搜索，包括 MCP `search` 工具的默认模式，会在本地调用 localhost 上的 Ollama 来嵌入查询。**密钥：**从环境变量中读取 `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY`——绝不会记录，绝不会存储到磁盘。**没有遥测数据。**请参阅 [SECURITY.md](SECURITY.md) 以了解报告策略。
 
-**供应商文本：** 第三方发布说明和目录条目被严格视为引用的数据，绝不能作为指令使用。发布文本会在摄取时进行确定性筛选（去除隐藏的 Unicode 控制字符，消除图像/不安全的链接，隐去电子邮件和主目录路径，并标记类似指令的模式），然后由六个 MCP 工具将其封装在一个固定的数据框架中，这些工具会返回发布文本，并带有内联 `[flagged: …]` 标记，并且绝不会将其写入指令文件。
+**供应商文本：** 第三方发布说明和目录条目被严格视为引用的数据，绝不能作为指令使用。发布文本会在摄取时进行确定性筛选（删除隐藏的 Unicode 控制字符，消除图像/不安全的链接，删除电子邮件和家庭路径，并标记类似指令的模式），由返回发布文本的七个 MCP 工具将其封装在一个固定的数据框架中，并带有内联 `[flagged: …]` 标记，并且绝不会写入指令文件。
 
 ---
 
@@ -131,7 +129,7 @@ npm link         # makes `hk` and `claude-synergy-mcp` available globally
 
 ---
 
-## CLI 界面 — 17 个命令
+## CLI 界面 — 18 个命令
 
 ```
 # DB lifecycle
@@ -143,12 +141,12 @@ hk sync                              # combined fetch → ingest → embed (cron
 hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 keyword search (+ --until <date>)
-hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --rerank, --until)
+hk query "managed agents"            # FTS5 keyword search (+ --package, --until)
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --package, --rerank, --until)
 
 # Windowed change browsing
-hk diff [product] --since 7d         # what changed in a window, grouped by product+version
-hk breaking --since 30d              # filter-browse of breaking changes (no search term)
+hk diff [product] --since 7d         # what changed in a window (+ --package; grouped per package on multi-package products)
+hk breaking --since 30d              # filter-browse of breaking changes (+ --package; grouped per package when omitted)
 
 # Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
@@ -157,12 +155,13 @@ hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases (+ --since <date>)
+hk latest [--product X] [--limit N]  # recent releases (+ --package, --since; grouped per package when --package omitted)
 hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
                                      #  hook_event, setting_key)
+hk relevance <dir> [--all] [--json]  # check which mirrored products matter to a workspace
 ```
 
 **v1.1 中的新功能：** `hk diff` 和 `hk breaking` 可以回答“最近有什么变化？”，而无需搜索词。日期范围是统一的：每个浏览命令都接受 `--since` 和 `--until`（在 `YYYY-MM-DD` 中，或使用完整的 ISO 8601 格式），或者使用相对形式（`7d`、`2w`、`3m`、`1y`）。
@@ -237,7 +236,7 @@ $ hk breaking --since 30d --limit 5
 
 ## MCP 服务器 — 为您的代理提供访问此语料库的权限
 
-`claude-synergy-mcp` 通过 stdio 暴露 13 个工具。通过 `~/.claude/.mcp.json` 或您的项目的 `.mcp.json` 将其连接到 Claude Code（或任何 MCP 主机）：
+`claude-synergy-mcp` 通过 stdio 暴露 14 个工具。通过 `~/.claude/.mcp.json` 或您的项目的 `.mcp.json` 将其连接到 Claude Code（或任何 MCP 主机）：
 
 ```json
 {
@@ -257,19 +256,22 @@ $ hk breaking --since 30d --limit 5
 
 | 工具 | 用途 |
 |---|---|
-| `search` | 混合 FTS5 + vec；可选的重新排序。自然语言查询的默认模式。（+ `until` 日期上限） |
+| `search` | 混合 FTS5 + vec；可选的重新排序。接受 `package?`（如果省略，则对多包产品中的每个包进行分组），并使用 `product (package)@version` 标记多包结果。 |
 | `lookup_entity` | 精确的实体历史记录：环境变量、斜杠命令、模型 ID、CVE 等。 |
-| `latest_releases` | 产品（或单个产品）的最新发布。（+ `since` 日期下限） |
-| `get_release` | 单个发布的完整内容 |
+| `latest_releases` | 跨产品（或单个产品）的最新发布。接受 `package?` 和 `since?`；如果省略 `package`，则对多包产品中的每个包进行分组。 |
+| `get_release` | 单个发布（多包产品需要 `package`）的完整内容。 |
 | `list_products` | 带有计数和最新版本的枚举 |
 | `top_entities` | 按类型排序的最常提及的实体 |
 | `list_synergies` | 策划的跨产品工作流程。（+ 可选的 `product` 过滤器） |
 | `read_synergy` | 单个协同效应文件的完整文本 |
-| `get_changes_since` | **新功能。** 在时间窗口内，按产品+版本分组。输入：`since`（必需）、`until?`、`product?`、`kind?`、`limit?`。 |
-| `search_breaking_changes` | **新功能。** 破坏性变更的平面列表——无需搜索词。输入：`product?`、`since?`、`until?`、`limit?`。 |
-| `compare_versions` | **v1.1。** 单个产品两个版本之间的所有变更。输入：`product`、`from_version`、`to_version`。 |
+| `get_changes_since` | 在时间窗口内发生的变化，按发布（以及多包产品中的每个包）进行分组。输入：`since`（必需）、`until?`、`product?`、`package?`、`kind?`、`limit?`。 |
+| `search_breaking_changes` | 没有搜索词的破坏性变更。输入：`product?`、`package?`、`since?`、`until?`、`limit?`（如果省略 `package`，则对多包产品中的每个包进行分组）。 |
+| `compare_versions` | 单个包/产品的两个版本之间的所有更改。输入：`product`、`package?`（多包产品需要）、`from_version`、`to_version`。 |
 | `sync_status` | **v1.2。** 每个产品的同步新鲜度——上次提取的时间戳、距离上次提取的小时数、提取的发布数量。输入：`product?`、`stale_only?`、`stale_hours?`。在使用 `latest_releases` 之前，请使用此功能来确定语料库是否过时。 |
 | `sync_now` | **v1.2。** 按照需求进行刷新（镜像 `hk sync`）。输入：`product?`、`dry_run?`、`include_ingest?`、`include_embed?`、`timeout_ms?`。如果另一个 `sync_now` 已经开始执行，则会拒绝，并显示 `InvalidParams`。不会提交到 git。 |
+| `workspace_relevance` | 将工作区目录的顶级 lockfile 与镜像的发布进行匹配。输入：`workspace_path`（必需，绝对目录路径）、`include_all?`（布尔值，列出未使用的产品名称）。只读；首先列出需要操作的产品，然后列出破坏性变更。 |
+
+**匹配方式：** `hk relevance` 和 `workspace_relevance` 仅读取命名目录（`package-lock.json`、`pnpm-lock.yaml`、`uv.lock`、`poetry.lock`、`requirements.txt`、`Cargo.lock`、`go.mod`）顶部的精确的、已知的 lockfile 名称，不进行递归、通配符匹配或运行外部命令。“无操作”是默认答案，适用于工作区不使用或已运行最新镜像发布的产品；只有较旧的已安装版本才会返回操作列表，按最新版本优先排序，破坏性变更优先。检查是只读的（不会向数据库写入任何内容），并且是确定性的（不进行模型调用）。
 
 v1.1 工具可以模拟 `hk diff` / `hk breaking` 的功能，并实现之前需要通过编写脚本才能完成的版本比较流程。 v1.2 同步工具弥合了数据查询与数据刷新之间的差距——`sync_status` 会报告数据陈旧，`sync_now` 会运行流水线。 请参阅[手册 → MCP 服务器](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/)，以获取完整的输入模式。
 
@@ -350,7 +352,7 @@ pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 | 目录 | 它涵盖的内容 |
 |-----|----------------|
 | `test/unit/` | per-module — 提取、摄取、查询（包括 `until` / 浏览 / 自 / 比较）、数据库（包括 dim-config v3 迁移）、嵌入、混合、获取 + 每个提供程序（Ollama / Voyage / **OpenAI**）+ fetch-rss/changelog（包括 **keep-a-changelog** 解析器）/html + fetch-mcp-registry + fetch-playwright + products-config + synergy ingest/query |
-| `test/integration/` | 端到端 — 流水线、同步、MCP 服务器（stdio JSON-RPC，13 个工具，包括 `sync_status` / `sync_now`）、CLI（包括 `hk diff`、`hk breaking`） |
+| `test/integration/` | 端到端 — 流水线、同步、MCP 服务器（stdio JSON-RPC，14 个工具，包括 `sync_status` / `sync_now` / `workspace_relevance`）、CLI（包括 `hk diff`、`hk breaking`、`hk relevance`） |
 | `test/regression/` | §8.1–§8.19 — 每个部分都防止在开发过程中修复的实际错误（§8.19：ghReleases 早期退出分页可保留窗口内的项目） |
 | `test/smoke/` | 选择性地针对真实的 `products/`（1,143 个文件）进行全面测试 |
 | `test/fixtures/` | 3 个虚假产品 + 模拟 HTTP 响应（RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / 官方 MCP 注册表） |
