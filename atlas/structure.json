@@ -12352,15 +12352,15 @@
             {
               "in": "fetchDatedH3ReleaseNotes",
               "kind": "throw",
-              "line": 510
+              "line": 513
             },
             {
               "in": "fetchDatedH3ReleaseNotes",
               "kind": "throw",
-              "line": 543
+              "line": 546
             }
           ],
-          "hash": "45025102bb444b409aef13a09e3f50ae314097cc5517723662bae7a75905eeb9",
+          "hash": "cc98a44428fcd9625f0f2c8c49835f93de29b38288e151f117019ff420e01945",
           "importsFiles": [
             "src/errors.ts",
             "src/fetch-utils.ts"
@@ -15405,7 +15405,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "a0cd32b69933fc0043547d8732c2fc84376cbf7152d7ac95c0c1ec6355118040",
+          "hash": "87635579afe2387fd3df165dd753a6a9fbe7b202cb46e76e3997f83ea1f59473",
           "importOrder": [
             "src/fetch-html.ts",
             "src/errors.ts",
@@ -15455,7 +15455,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "9f55da6dff8a38e3483fcac25f477e00ec0e86459e138d427b8595e69f4259b3",
+          "hash": "aa194c4d3d20403e5e5b08ffa575f2aa0dbf17ed6ec4b0a43ddf9ea59b544ec8",
           "importsFiles": [
             "src/fetch-utils.ts"
           ],
@@ -15784,9 +15784,10 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "4ae41a7987e71cb59ad787932ad607ffe0e672a87aa8072a7601405a5fb7c65e",
+          "hash": "d867de97fd82ceba5987f030232b047aa0d8da286e7b4c0c7a800a85bfbac97f",
           "importOrder": [
             "src/store.ts",
+            "src/errors.ts",
             "src/query.ts",
             "test/helpers/temp-db.ts",
             "src/db.ts",
@@ -15794,6 +15795,7 @@
           ],
           "importsFiles": [
             "src/db.ts",
+            "src/errors.ts",
             "src/fetch.ts",
             "src/query.ts",
             "src/store.ts",
@@ -16812,7 +16814,7 @@
   ],
   "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "315ce7de3fec7cb56d78f7889d5c2a0704c12cd5",
+    "commit": "c4ec7804de19558f7a173c127a77192cbdab09d7",
     "tracked": 2914
   },
   "landings": [

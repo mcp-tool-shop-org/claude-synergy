@@ -374,13 +374,15 @@ describe('fetchAnthropicAppsReleaseNotes', () => {
     expect(narrow[1].slug).toBe('2026-04-17-claude-cowork');
   });
 
-  it('strips script, style, iframe, inline on* handlers, and javascript: links (Item 15)', async () => {
-    const dirty = `<div><script>alert(1)</script><style>body{}</style><iframe src="https://x.test"></iframe><p onclick="evil()">Keep <a href="javascript:alert(2)" onmouseover="bad()">link</a> and <a href="https://docs.example.test">safe</a></p></div>`;
+  it('strips script, style, iframe, inline on* handlers, and unsafe URL schemes while keeping safe links (Item 15)', async () => {
+    const dirty = `<div><script>alert(1)</script><style>body{}</style><iframe src="https://x.test"></iframe><p onclick="evil()">Keep <a href="javascript:alert(2)" onmouseover="bad()">js</a> <a href="data:text/html,<script>alert(3)</script>">data</a> <a href="vbscript:msgbox(4)">vbs</a> <a href="mailto:team@example.test">mail</a> <a href="/docs/overview">rel</a> and <a href="https://docs.example.test">safe</a></p></div>`;
     const clean = sanitizeScrapedHtml(dirty);
     expect(clean).not.toMatch(/<script|<style|<iframe/i);
     expect(clean).not.toMatch(/\bonclick\b|\bonmouseover\b/i);
-    expect(clean).not.toMatch(/javascript:/i);
+    expect(clean).not.toMatch(/javascript:|data:|vbscript:/i);
     expect(clean).toContain('Keep');
+    expect(clean).toContain('mailto:team@example.test');
+    expect(clean).toContain('/docs/overview');
     expect(clean).toContain('https://docs.example.test');
   });
 });

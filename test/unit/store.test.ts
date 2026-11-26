@@ -10,6 +10,7 @@ import {
   FirstUseSyncCoordinator,
   clearPartialSyncState,
   formatFirstUseNotice,
+  formatPartialNote,
   hasAnyReleases,
   isAutoSyncDisabled,
   needsAutoSync,
@@ -20,6 +21,7 @@ import {
   runFirstUseSync,
   writePartialSyncState,
 } from '../../src/store.js';
+import { AppError } from '../../src/errors.js';
 import { formatFreshnessStamp, getCorpusFreshness } from '../../src/query.js';
 import { createTempDb } from '../helpers/temp-db.js';
 import { openDb, initSchema } from '../../src/db.js';
@@ -550,4 +552,83 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
       process.env.PATH = prevPath;
     }
   }, 20_000);
+
+  it('coordinates runManualSync locks, cooldown resets, malformed partial meta, empty results, and AppError propagation', async () => {
+    const dir = makeTmpDir('store-coord-');
+    const dbPath = join(dir, 'data', 'claude-synergy.db');
+    const productsRoot = join(dir, 'products');
+    mkdirSync(join(dir, 'data'), { recursive: true });
+    mkdirSync(productsRoot, { recursive: true });
+
+    const badMetaDb = openDb(dbPath, { loadVec: false });
+    initSchema(badMetaDb);
+    badMetaDb
+      .prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`)
+      .run(FIRST_USE_PARTIAL_META_KEY, '{broken');
+    expect(readPartialSyncState(badMetaDb)).toBeNull();
+    badMetaDb
+      .prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`)
+      .run(FIRST_USE_PARTIAL_META_KEY, '{"foo":1}');
+    expect(readPartialSyncState(badMetaDb)).toBeNull();
+    badMetaDb.close();
+
+    expect(formatPartialNote({ succeeded: 1, total: 2, skipped: [] })).toBe(
+      'partial corpus: synced 1 of 2 products'
+    );
+
+    const coord = new FirstUseSyncCoordinator();
+    const emptyFetch = async (): Promise<FetchAllResult> => {
+      const arr: any = [];
+      arr.summary = { total: 0, succeeded: 0, failed: 0, skipped: 0, newChanges: 0, errors: [] };
+      return arr;
+    };
+    const rEmpty = await coord.ensureSynced({
+      dbPath,
+      productsRoot,
+      fetchRunner: emptyFetch,
+      now: new Date('2026-11-26T10:00:00Z'),
+    });
+    rEmpty.db?.close();
+    expect(coord.isCoolingDown(new Date('2026-11-26T10:01:00Z'))).toBe(true);
+    coord.resetCooldown();
+    expect(coord.isCoolingDown(new Date('2026-11-26T10:01:00Z'))).toBe(false);
+
+    const errDb = openDb(dbPath, { loadVec: false });
+    try {
+      await expect(
+        coord.ensureSynced({
+          db: errDb,
+          dbPath,
+          productsRoot,
+          fetchRunner: async () => {
+            throw new AppError({
+              code: 'MODEL_FAMILIES_CONFIG_ERROR',
+              message: 'bad yaml',
+              remediation: 'fix yaml',
+            });
+          },
+          now: new Date('2026-11-26T10:02:00Z'),
+        })
+      ).rejects.toMatchObject({ code: 'MODEL_FAMILIES_CONFIG_ERROR' });
+    } finally {
+      errDb.close();
+    }
+    expect(coord.isCoolingDown(new Date('2026-11-26T10:03:00Z'))).toBe(true);
+    coord.resetCooldown();
+
+    let releaseManual!: () => void;
+    const manualPromise = coord.runManualSync(async () => {
+      await new Promise<void>((r) => {
+        releaseManual = r;
+      });
+      return 'manual-done';
+    });
+    const waiter = coord.ensureSynced({ dbPath, productsRoot });
+    releaseManual();
+    expect(await manualPromise).toBe('manual-done');
+    const waited = await waiter;
+    waited.db?.close();
+    expect(waited.waitedForManualSync).toBe(true);
+    expect(waited.performedByThisCall).toBe(false);
+  });
 });

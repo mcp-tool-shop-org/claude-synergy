@@ -61,39 +61,31 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 1,
-      "changed": 25,
+      "added": 0,
+      "changed": 4,
       "moved": 0,
-      "parts": 5,
+      "parts": 2,
       "removed": 0
     },
     "items": [
       {
-        "kind": "landing",
-        "sentence": "test/fixtures/mock-responses/no-date-headings.html is now read by test/unit/fetch-html.test.ts.",
-        "subjects": [
-          "test/fixtures/mock-responses/no-date-headings.html",
-          "test/unit/fetch-html.test.ts"
-        ]
-      },
-      {
         "kind": "counts",
-        "sentence": "1 file added and 25 changed content, across 5 parts.",
+        "sentence": "Nothing structural changed since 2026-11-26; 4 files changed content.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "ea2170cfe8ab0c0e20c467a016a8914391b4ca5c",
-      "generatedAt": "2026-11-26T08:45:19.283Z"
+      "commit": "315ce7de3fec7cb56d78f7889d5c2a0704c12cd5",
+      "generatedAt": "2026-11-26T09:35:43.805Z"
     },
-    "unchanged": false
+    "unchanged": true
   },
   "changesTogether": [],
   "changesTogetherNote": [
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "315ce7de3fec7cb56d78f7889d5c2a0704c12cd5",
+  "commit": "c4ec7804de19558f7a173c127a77192cbdab09d7",
   "defaultBranch": "main",
   "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (89), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
@@ -437,7 +429,7 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-26T09:35:43.805Z",
+  "generatedAt": "2026-11-26T09:43:53.608Z",
   "limits": [
     "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
     "1 write and 4 reads use paths built at run time and are not named here.",

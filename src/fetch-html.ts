@@ -301,10 +301,12 @@ const MONTHS: Record<string, number> = {
   dec: 11, december: 11,
 };
 
+const SAFE_URL_SCHEMES = new Set(['http', 'https', 'mailto']);
+
 /**
  * Strip dangerous active/executable elements and attributes (`<script>`, `<style>`,
- * `<iframe>`, `on*` event handlers, `javascript:` URLs) from scraped HTML bodies
- * before storing them to markdown files.
+ * `<iframe>`, `on*` event handlers, non-HTTP(S)/mailto URLs) from scraped HTML
+ * bodies before storing them to markdown files.
  */
 export function sanitizeScrapedHtml(rawHtml: string): string {
   if (!rawHtml || !rawHtml.includes('<')) return rawHtml;
@@ -320,7 +322,8 @@ export function sanitizeScrapedHtml(rawHtml: string): string {
         $el.removeAttr(name);
       } else if (/^(?:href|src|action|formaction|xlink:href)$/i.test(trimmed)) {
         const normalized = String(val ?? '').replace(/[\x00-\x20]+/g, '').toLowerCase();
-        if (normalized.startsWith('javascript:')) {
+        const schemeMatch = /^([a-z][a-z0-9+.-]*):/.exec(normalized);
+        if (schemeMatch && !SAFE_URL_SCHEMES.has(schemeMatch[1])) {
           $el.removeAttr(name);
         }
       }
