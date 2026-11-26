@@ -7,11 +7,11 @@
 <p align="center">
   <a href="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml"><img src="https://github.com/mcp-tool-shop-org/claude-synergy/actions/workflows/test.yml/badge.svg" alt="tests"></a>
   <a href="https://www.npmjs.com/package/@mcptoolshop/claude-synergy"><img src="https://img.shields.io/npm/v/@mcptoolshop/claude-synergy" alt="npm"></a>
-  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
+  <a href="#licencia"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
   <a href="https://mcp-tool-shop-org.github.io/claude-synergy/"><img src="https://img.shields.io/badge/landing%20page-live-brightgreen" alt="landing page"></a>
 </p>
 
-Un espejo local y consultable de todos los registros de cambios de Anthropic y de las herramientas de desarrollo de IA relacionadas, además de una capa de **"Synergy"** (sinergia) que describe los flujos de trabajo entre productos, para que el agente LLM dentro del sistema sepa lo que el sistema puede hacer.
+Un espejo local y consultable de cada registro de cambios de las herramientas de desarrollo de IA de Anthropic y de productos relacionados, además de una capa **Synergy** seleccionada que describe los flujos de trabajo entre productos, para que el agente LLM dentro del sistema sepa qué puede hacer el sistema.
 
 ```bash
 $ hk query redact
@@ -24,7 +24,7 @@ $ hk query redact
 ```
 
 
-**Una única consulta FTS (búsqueda de texto completo) revela una corrección de seguridad coordinada entre diferentes SDKs que ningún registro de cambios individual identificó como una vulnerabilidad (CVE).** Esa es la demostración clave: los patrones emergen cuando todos los registros de cambios están uno al lado del otro.
+**Una única consulta FTS revela una solución de seguridad coordinada entre varios SDK que ningún registro de cambios individual identificó como una CVE.** Esa es la demostración clave: los patrones emergen cuando todos los registros de cambios se muestran uno al lado del otro.
 
 Repositorio: [github.com/mcp-tool-shop-org/claude-synergy](https://github.com/mcp-tool-shop-org/claude-synergy)
 
@@ -32,15 +32,15 @@ Repositorio: [github.com/mcp-tool-shop-org/claude-synergy](https://github.com/mc
 
 ## El problema
 
-Claude Code CLI se actualiza casi a diario. La API de Claude se actualiza con la misma frecuencia. Los SDKs se actualizan con cada nueva versión de la CLI. Claude Design, Cowork, Chat y Mobile se integran a través del Centro de Ayuda unificado. El ecosistema MCP implementa aproximadamente 200-300 nuevos servidores por semana. Además, existen 7 plataformas principales de herramientas de desarrollo de IA (Cursor, Aider, Continue, Copilot, Cody, Windsurf), cada una con sus propios registros de cambios y sus propios ciclos de lanzamiento.
+Claude Code CLI se lanza aproximadamente a diario. Claude API se lanza casi con la misma frecuencia. Los SDK se lanzan con cada versión de CLI. Claude Design, Cowork, Chat y Mobile se integran a través del Centro de ayuda unificado. El ecosistema MCP lanza aproximadamente entre 200 y 300 nuevos servidores por semana. Además, existen 7 herramientas de desarrollo de IA principales (Cursor, Aider, Continue, Copilot, Cody, Windsurf), todas las cuales lanzan sus propios registros de cambios a sus propios ritmos.
 
-El agente LLM dentro de cualquiera de estos sistemas tiene un punto de corte de entrenamiento fijo. La brecha se amplía cada día. Aparecen funciones de las que el agente no es consciente. Se corrigen errores que el agente aún intenta solucionar. Se agregan variables de entorno y banderas que el agente nunca sugiere. Los flujos de trabajo entre productos que combinan múltiples plataformas permanecen sin descubrir.
+El agente LLM dentro de cualquiera de estas herramientas tiene un punto de corte de entrenamiento fijo. La brecha se amplía cada día. Se lanzan funciones que el agente desconoce. Se corrigen errores para los que el agente aún tiene que encontrar soluciones alternativas. Se añaden variables de entorno y opciones que el agente nunca sugiere. Los flujos de trabajo entre productos que combinan varias herramientas permanecen sin descubrir.
 
-**Este repositorio cierra esa brecha.** La sección de "Synergy" lo convierte en un producto en lugar de un simple espejo.
+**Este repositorio cierra la brecha.** La sección Synergy lo convierte en un producto en lugar de en un espejo.
 
 ---
 
-## ¿Qué hay aquí?
+## Qué hay aquí
 
 ```
 claude-synergy/
@@ -73,38 +73,40 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Cifras actualizadas (a partir de la versión 1.2.1):** 44 productos / 1.171 archivos de lanzamiento / 6.573 cambios / 1.260 entidades / 12 sinergias / 519 pruebas / 13 herramientas MCP / 17 comandos de línea de comandos. (El corpus se actualizó mediante `sync_now` el 24 de mayo de 2026).
+**Datos actualizados (a fecha de v1.2.1):** 44 productos / 1.171 archivos de lanzamiento / 6.573 cambios / 1.260 entidades / 12 sinergias / 519 pruebas / 13 herramientas MCP / 17 comandos CLI. (El corpus se actualiza a través de `sync_now` el 24 de mayo de 2026).
 
 ---
 
-## Estado: todas las etapas implementadas
+## Estado: todas las capas se han lanzado
 
-| Etapa | Estado | ¿Qué hay? |
+| Capa | Estado | Qué hay |
 |------|--------|--------------|
-| **1 — corpus de Markdown (inicialización)** | ✅ implementado | Study-swarm recopiló 706 archivos de lanzamiento de enero a mayo de 2026; se ampliaron a 1186 en la etapa 4. |
-| **2a — SQLite + FTS5 + CLI** | ✅ implementado | CLI `hk`; 15 subcomandos; ingestión en menos de 300 ms. |
-| **2b — sqlite-vec + Recuperación contextual** | ✅ implementado | Proveedor adaptable (ninguno/estructurado/ollama/contexto de Claude-haiku × incrustaciones de ollama/viaje × ninguno/ollama-judge/viaje/cohere para reordenar). |
-| **3 — sincronización + servidor MCP** | ✅ implementado | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` expone 13 herramientas a través de stdio (8 en la versión inicial de la capa 3, 3 añadidas en la versión 1.1, 2 añadidas en la versión 1.2). |
-| **4a — extender más allá de Anthropic** | ✅ implementado | +15 SDKs de MCP, Cursor (RSS), Aider (HISTORY.md), Continue.dev, Cody Enterprise (RSS filtrado). |
-| **4b — rastreador de HTML** | ✅ implementado | GitHub Copilot + VS Code Chat (Windsurf necesita Playwright — v0.7). |
-| **4c — ingestión de HTML a Markdown con turndown** | ✅ implementado | Los cuerpos de HTML (Copilot/VS Code/Cursor) ahora generan filas individuales para FTS5 + extracción de entidades. |
-| **4d — Playwright + registro de MCP + configuración YAML** | ✅ implementado | Windsurf a través de Playwright; Smithery + registro oficial de MCP como catálogos de la etapa 4; productos consolidados en `products.yaml`. |
-| **5 — Navegación con ventanas en la versión 1.1 + integración de OpenAI** | ✅ implementado | `hk diff` / `hk breaking`, límites de fecha para todos los comandos de navegación, 3 nuevas herramientas MCP (un total de 11), proveedor de incrustación de OpenAI, dimensión de incrustación configurable, sincronización automática de `claude-code`, analizador genérico `keep-a-changelog`. |
-| **6 — Sincronización desde MCP en la versión 1.2** | ✅ implementado | `sync_status` (frescura por producto, detección de "obsoleto") y `sync_now` (obtención bajo demanda → ingestión → incrustación con vista previa de `dry_run` + bloqueo de concurrencia en el proceso). Elimina la brecha donde un agente podía consultar la base de datos pero no actualizarla. **También corrige:** el error de "limpieza de marcadores" donde `INSERT OR REPLACE INTO products` desencadenaba un DELETE en la clave externa `markers`, restableciendo silenciosamente el cursor `since` de cada producto en cada ingestión (regresión §8.20). |
-| **6.1 — v1.2.1: Centralización del marcador de extracción** | ✅ implementado | Se centralizó `writeMarker` en `fetchOne` para que cada extracción exitosa actualice el marcador. Las estrategias que devolvían 0 elementos con fecha dentro del período especificado (especialmente el registro de cambios "raw" de `aider`) nunca escribían un marcador y volvían a descargar `HISTORY.md` en cada sincronización. Se renombró la estrategia `webfetch` no implementada a `manual` para `claude-api` + `anthropic-apps`; ahora, `sync_status` muestra los productos manuales como "manual" en lugar de "nunca" y los excluye de `stale_only` (regresión §8.21). |
-| **7 — v1.3: Sintetizador ajustado "cs-actions:v1"** | ✅ implementado | Primer modelo derivado entrenado en el corpus. Convierte una entrada de registro de cambios en un elemento de acción estricto en formato JSON: `{kind, severity, subject, action_text, deadline, tags}`. Qwen2.5-7B + LoRA en 242 entradas de `dataset/changelog-actions/v1/`, formato GGUF q8_0, implementado con Ollama. Evaluación de la versión: **88.1% de precisión en "kind" / 79.7% de precisión en "severity" / 0.842 macro-F1** frente a la verdad fundamental en un conjunto de 59 entradas estratificadas (+10.1 puntos porcentuales / +27.2 puntos porcentuales / +0.041 sobre la base qwen3:8b). Se etiquetó como `cs-actions-v1`; el informe de evaluación está adjunto a la [versión de GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) como una descarga de un solo archivo. **Limitación de la versión 1 documentada:** sesgo anti-"desconocido" (precisión 1.000 / recuperación 0.286) — el modelo subestima la clasificación de entradas ambiguas. Consulte el [manual → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md). |
+| **1: arranque (corpus en formato markdown)** | ✅ Lanzado | El estudio-enjambre recopiló 706 archivos de lanzamiento de enero a mayo de 2026; se amplió a 1.186 en la capa 4d |
+| **2a: SQLite + FTS5 + CLI** | ✅ Lanzado | CLI `hk`; 15 subcomandos; sub-300ms ingestión |
+| **2b: sqlite-vec + Recuperación contextual** | ✅ Lanzado | Proveedor configurable (ninguno/estructurado/ollama/contexto de claude-haiku × incrustación de ollama/voyage × ninguno/ollama-judge/voyage/cohere reordenación) |
+| **3: sincronización + servidor MCP** | ✅ Lanzado | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` expone 13 herramientas a través de stdio (8 en el lanzamiento original de la capa 3, 3 añadidas en v1.1, 2 añadidas en v1.2) |
+| **4a: ampliación más allá de Anthropic** | ✅ Lanzado | +15 SDK de MCP, Cursor (RSS), Aider (HISTORY.md), Continue.dev, Cody Enterprise (RSS filtrado) |
+| **4b: extractor de HTML** | ✅ Lanzado | GitHub Copilot + VS Code Chat (Windsurf necesita Playwright — v0.7) |
+| **4c: ingestión de HTML a markdown** | ✅ Lanzado | Los cuerpos HTML (Copilot/VS Code/Cursor) ahora producen filas por viñeta para FTS5 + extracción de entidades |
+| **4d: Playwright + registro MCP + configuración YAML** | ✅ Lanzado | Windsurf a través de Playwright; Smithery + registro oficial de MCP como catálogos de la capa 4; los productos se consolidan en `products.yaml` |
+| **5: v1.1 navegación con ventana + OpenAI incrustación** | ✅ Lanzado | `hk diff` / `hk breaking`, límites de fecha en todos los comandos de navegación, 3 nuevas herramientas MCP (11 en total), OpenAI proveedor de incrustación, dimensión de incrustación configurable, `claude-code` sincronización automática, analizador genérico `keep-a-changelog` |
+| **6: v1.2 sincronización desde MCP** | ✅ Lanzado | `sync_status` (control de la frescura por producto, detección de productos obsoletos) y `sync_now` (obtención bajo demanda → ingestión → incrustación con `dry_run` vista previa + bloqueo de concurrencia en proceso). Cierra la brecha por la que un agente externo podría consultar el corpus, pero no actualizarlo. **También corrige:** el error de borrado de marcadores, en el que `INSERT OR REPLACE INTO products` desencadenaba un borrado en cascada en la clave externa `markers`, restableciendo silenciosamente el `since` cursor de cada producto en cada ingestión (regresión §8.20). |
+| **6.1: centralización del extractor-marcador v1.2.1** | ✅ Lanzado | Centralización de `writeMarker` en `fetchOne` para que cada obtención correcta actualice el marcador. Antes de la corrección, las estrategias que devolvían 0 elementos con fecha dentro del período (especialmente `aider` raw-changelog) nunca escribían un marcador y volvían a obtener `HISTORY.md` en cada sincronización. Se renombró la estrategia no implementada `webfetch` a `manual` para `claude-api` + `anthropic-apps`; `sync_status` ahora representa los productos manuales como "manuales" en lugar de "nunca" y los excluye de `stale_only` (regresión §8.21). |
+| **7: v1.3 cs-actions:v1 sintetizador afinado** | ✅ Lanzado | Primer modelo descendente entrenado en el corpus. Convierte una entrada de registro de cambios en un elemento de acción estricto en formato JSON `{kind, severity, subject, action_text, deadline, tags}`. Qwen2.5-7B + LoRA en 242 entradas de `dataset/changelog-actions/v1/`, q8_0 GGUF, implementado en Ollama. Evaluación de la puerta de lanzamiento: **88,1% de tipo / 79,7% de gravedad / 0,842 macro-F1** frente a la verdad fundamental en 59 entradas de un conjunto de pruebas estratificado (+10,1 puntos porcentuales / +27,2 puntos porcentuales / +0,041 sobre qwen3:8b base). Etiquetado `cs-actions-v1`; informe de evaluación adjunto al [lanzamiento GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) como una descarga de un solo archivo. **Limitación documentada v1:** sesgo anti-`unknown` (precisión 1,000 / recuperación 0,286): el modelo subestima las entradas ambiguas. Consulte [manual → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/) + [`dataset/README.md`](dataset/README.md) + [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) + [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md). |
 
-Hoja de ruta para la versión 0.8+: se encuentra en [URGENT_FINDINGS.md](URGENT_FINDINGS.md) y en los problemas.
+Hoja de ruta más allá de v1.3: rastreada en [URGENT_FINDINGS.md](URGENT_FINDINGS.md) y en los problemas.
 
 ---
 
 ## Seguridad y modelo de datos
 
-Esta herramienta se ejecuta localmente. **Datos utilizados:** una base de datos SQLite derivada y archivos de lanzamiento en formato Markdown, todos recreables. **Red:** solo conexiones HTTPS salientes cuando se ejecuta `hk fetch`/`hk sync` (API de GitHub, fuentes RSS, páginas de registro de cambios, registros de MCP) o `hk embed` con un proveedor remoto (Voyage, Cohere). **Credenciales:** lee las variables de entorno `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY`; nunca se registran ni se almacenan en el disco. **No se recopilan datos de telemetría.** Consulte [SECURITY.md](SECURITY.md) para obtener información sobre la política de informes.
+Esta herramienta se ejecuta localmente. **Datos afectados:** una base de datos derivada SQLite y archivos de lanzamiento en formato markdown, todos ellos recreables. **Red:** HTTPS saliente cuando ejecuta `hk fetch`/`hk sync`, cuando un agente llama a la herramienta MCP `sync_now` y en el primer uso: un comando de consulta o una herramienta MCP ejecutados contra un almacén vacío se sincronizan por sí solos (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` lo desactiva). Los destinos son la API de GitHub, los feeds RSS, las páginas de registro de cambios y los registros de MCP, además de un proveedor de IA remoto solo cuando usted lo elige: `hk embed` (embeddings de Voyage, Anthropic para generar contexto) o `hk hybrid -e voyage` / `-r voyage|cohere`. En otro caso, la búsqueda híbrida, incluido el modo predeterminado de la herramienta MCP `search`, llama a un Ollama local en localhost para incrustar la consulta. **Secretos:** lee `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` de las variables de entorno: nunca se registran, nunca se almacenan en el disco. **Sin telemetría.** Consulte [SECURITY.md](SECURITY.md) para conocer la política de informes.
+
+**Texto del proveedor:** Las notas de la versión y las entradas del catálogo de terceros se tratan estrictamente como datos citados, y nunca como instrucciones permanentes. El texto de la versión se analiza de forma determinista al ingerirse (eliminando los controles Unicode ocultos, neutralizando los enlaces de imagen/inseguros, eliminando las direcciones de correo electrónico y las rutas de inicio, y marcando los patrones similares a instrucciones), se incluye en un marco de datos fijo por las seis herramientas MCP que devuelven el texto de la versión, con marcadores `[flagged: …]` en línea, y nunca se escribe en archivos de instrucciones.
 
 ---
 
-## Instalación
+## Instalar
 
 ```bash
 git clone https://github.com/mcp-tool-shop-org/claude-synergy
@@ -114,11 +116,22 @@ pnpm build       # produces dist/cli.js + dist/mcp-server.js
 npm link         # makes `hk` and `claude-synergy-mcp` available globally
 ```
 
-Para desarrollo sin compilación, use `npx tsx src/cli.ts ...` directamente. **Una peculiaridad de pnpm 10:** `pnpm dev` ignora las banderas de la CLI después de `--`; use `npx tsx` para el desarrollo.
+O ejecutar directamente después de instalar `@mcptoolshop/claude-synergy`. Tanto `hk` como `claude-synergy-mcp` resuelven el almacén local utilizando el mismo orden de 4 pasos:
+
+1. Variable de entorno `CLAUDE_SYNERGY_DB`
+2. `--db <path>` explícito (CLI) o ruta argv posicional (MCP)
+3. `<cwd>/data/claude-synergy.db` **solo si ese archivo ya existe** (conserva el uso de la clonación del repositorio)
+4. `<home>/.claude-synergy/data/claude-synergy.db` (con productos bajo `<home>/.claude-synergy/products`)
+
+`CLAUDE_SYNERGY_PRODUCTS_ROOT` anula el directorio de productos.
+
+**Sincronización automática en el primer uso:** Cuando se ejecuta un comando de consulta o una herramienta MCP contra un almacén que falta o está vacío, inicializa el esquema y ejecuta automáticamente `fetch` → `ingest` (sin paso de incrustación, limitado por un tiempo de espera, omitiendo cualquier fuente inalcanzable) y marca cada respuesta con `data as of: …`. Establezca `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` para deshabilitar la sincronización automática en el primer uso y, en su lugar, mostrar un error/advertencia con instrucciones de corpus vacío.
+
+Para el desarrollo sin compilación, utilice `npx tsx src/cli.ts ...` directamente. **Particularidad de pnpm 10:** `pnpm dev` ignora las opciones de la CLI después de `--`; utilice `npx tsx` para el desarrollo.
 
 ---
 
-## Interfaz de la CLI: 15 comandos
+## Interfaz de línea de comandos: 17 comandos
 
 ```
 # DB lifecycle
@@ -152,13 +165,13 @@ hk top env_var                       # most-mentioned by entity type
                                      #  hook_event, setting_key)
 ```
 
-**Novedades en la versión 1.1:** `hk diff` y `hk breaking` responden a la pregunta "¿qué ha cambiado recientemente?" sin necesidad de un término de búsqueda. Los límites de fecha son uniformes: cada comando de navegación acepta `--since` y `--until` en formato `YYYY-MM-DD` (o ISO 8601 completo), o en formato relativo (`7d`, `2w`, `3m`, `1y`).
+**Novedad en v1.1:** `hk diff` y `hk breaking` responden a la pregunta "¿qué ha cambiado recientemente?" sin necesidad de un término de búsqueda. Los límites de fecha son uniformes: cada comando de búsqueda toma `--since` y `--until` en `YYYY-MM-DD` (o ISO 8601 completo), o una forma relativa (`7d`, `2w`, `3m`, `1y`).
 
 ---
 
 ## Ejemplos de flujos de trabajo
 
-**Encontrar cuándo se introdujo una variable de entorno de Claude Code:**
+**Encuentre cuándo se introdujo una variable de entorno de Claude Code:**
 ```
 $ hk env-var CLAUDE_CODE_WORKFLOWS
 env var CLAUDE_CODE_WORKFLOWS — 1 mention:
@@ -168,7 +181,7 @@ env var CLAUDE_CODE_WORKFLOWS — 1 mention:
   It is off by default — set `CLAUDE_CODE_WORKFLOWS=1` to enable
 ```
 
-**Rastrear cambios importantes entre diferentes SDK:**
+**Realice un seguimiento de un cambio importante entre SDK:**
 ```
 $ hk query TodoWrite --limit 5
 2026-05-15  claude-agent-sdk-python@0.2.82       [breaking]   Headless and SDK sessions now use Task tools...
@@ -176,7 +189,7 @@ $ hk query TodoWrite --limit 5
 2026-05-08  claude-agent-sdk-typescript@0.2.136  [deprecated] Deprecated TodoWrite tool...
 ```
 
-**Planificar una migración de modelo:**
+**Planifique una migración de modelo:**
 ```
 $ hk model claude-opus-4-20250514
 model id claude-opus-4-20250514 — 2 mentions:
@@ -186,7 +199,7 @@ model id claude-opus-4-20250514 — 2 mentions:
   with retirement on the Claude API scheduled for June 15, 2026...
 ```
 
-**Búsqueda semántica en todo el corpus:**
+**Realice una búsqueda semántica en todo el corpus:**
 ```
 $ hk hybrid "credential exfiltration" --limit 3
 2026-03-25  claude-code@2.1.83  [added]          vec#5 rrf=0.0154
@@ -194,9 +207,9 @@ $ hk hybrid "credential exfiltration" --limit 3
   cloud provider credentials from subprocess environments...
 ```
 
-La consulta nunca dice "env_scrub"; el sistema lo muestra por similitud semántica. FTS5 puro no lo encuentra en absoluto.
+La consulta nunca dice "env_scrub"; vec lo presenta por similitud semántica. FTS5 puro lo omite por completo.
 
-**Cambios realizados en claude-code esta semana:**
+**¿Qué ha cambiado en claude-code esta semana:**
 ```
 $ hk diff claude-code --since 7d
 claude-code@2.1.147  2026-05-21  (3 changes)
@@ -208,7 +221,7 @@ claude-code@2.1.146  2026-05-19  (1 change)
   [fixed]     Restored `--debug` flag accidentally removed in 2.1.144.
 ```
 
-**Explorar cambios importantes en toda la base de datos:**
+**Explore los cambios importantes en todo el corpus:**
 ```
 $ hk breaking --since 30d --limit 5
 2026-05-15  claude-agent-sdk-python@0.2.82       Headless and SDK sessions now use Task tools by default.
@@ -218,74 +231,73 @@ $ hk breaking --since 30d --limit 5
 2026-04-22  windsurf@1.10.0                      Removed `cascade.run` JSON-RPC method.
 ```
 
-No se necesita un término de búsqueda: `hk breaking` es la respuesta a la pregunta "¿ha habido algún cambio importante recientemente?".
+No se necesita ningún término de búsqueda; `hk breaking` es la respuesta a "¿ha cambiado algo importante recientemente?".
 
 ---
 
-## Servidor MCP: proporcione a sus agentes acceso a este corpus
+## Servidor MCP: dé a sus agentes acceso a este corpus
 
-`claude-synergy-mcp` expone 8 herramientas a través de stdio. Conéctese a Claude Code (o cualquier host MCP) a través de `~/.claude/.mcp.json` o el archivo `.mcp.json` de su proyecto:
+`claude-synergy-mcp` expone 13 herramientas a través de stdio. Conéctelo a Claude Code (o cualquier host MCP) a través de `~/.claude/.mcp.json` o el `.mcp.json` de su proyecto:
 
 ```json
 {
   "mcpServers": {
     "claude-synergy": {
-      "command": "claude-synergy-mcp",
-      "env": {
-        "CLAUDE_SYNERGY_DB": "/path/to/claude-synergy/data/claude-synergy.db"
-      }
+      "command": "claude-synergy-mcp"
     }
   }
 }
 ```
 
-Para el archivo `.vscode/mcp.json` de GitHub Copilot, utilice el envoltorio `servers` en lugar de `mcpServers` (consulte [synergy 12](synergies/12-mcp-config-format-gotcha.md)).
+Establezca `CLAUDE_SYNERGY_DB` en `env` si desea una ruta de almacén personalizada; de lo contrario, utiliza `./data/claude-synergy.db` si ese archivo ya existe, o si no `~/.claude-synergy/data/claude-synergy.db`, y se sincroniza automáticamente en el primer uso de la herramienta (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` deshabilita esto). Cada respuesta de la herramienta termina con una marca de tiempo de actualización `data as of:` (con el prefijo `STALE:` después de 7 días).
 
-Herramientas disponibles:
+Para GitHub Copilot's `.vscode/mcp.json`, utilice el envoltorio `servers` en lugar de `mcpServers` (consulte [sinergia 12](synergies/12-mcp-config-format-gotcha.md)).
+
+Herramientas expuestas:
 
 | Herramienta | Propósito |
 |---|---|
-| `search` | FTS5 + vec híbrido; reordenamiento opcional. Modo predeterminado para consultas en lenguaje natural. (+ límite superior de fecha `until`) |
-| `lookup_entity` | Historial exacto de entidades: variables de entorno, comandos, ID de modelos, CVE, etc. |
-| `latest_releases` | Lanzamientos recientes en productos (o en uno). (+ límite inferior de fecha `since`) |
-| `get_release` | Contenido completo de un lanzamiento. |
-| `list_products` | Enumeración con conteos + última versión. |
-| `top_entities` | Entidades más mencionadas por tipo. |
-| `list_synergies` | Flujos de trabajo entre productos. (+ filtro de producto opcional) |
-| `read_synergy` | Texto completo de un archivo de sinergia. |
-| `get_changes_since` | **Nuevo.** Cambios en un intervalo de tiempo, agrupados por producto y versión. Entradas: `since` (obligatorio), `until?`, `product?`, `kind?`, `limit?`. |
-| `search_breaking_changes` | **Nuevo.** Lista plana de cambios importantes: no se necesita un término de búsqueda. Entradas: `product?`, `since?`, `until?`, `limit?`. |
-| `compare_versions` | **Versión 1.1.** Todos los cambios entre dos versiones de un mismo producto. Entradas: `product`, `from_version`, `to_version`. |
-| `sync_status` | **Versión 1.2.** Frescura de la sincronización por producto: última marca de tiempo de obtención, horas desde la última obtención, número de lanzamientos ingeridos. Entradas: `product?`, `stale_only?`, `stale_hours?`. Utilice esto ANTES de confiar en `latest_releases` para saber si la base de datos está obsoleta. |
-| `sync_now` | **Versión 1.2.** Actualización bajo demanda (similar a `hk sync`). Entradas: `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Rechaza con `InvalidParams` si ya hay otra operación `sync_now` en curso. NO se confirma en git. |
+| `search` | Híbrido FTS5 + vec; reordenamiento opcional. Modo predeterminado para consultas en lenguaje natural. (+ límite superior de fecha `until`) |
+| `lookup_entity` | Historial exacto de entidades: variables de entorno, comandos de barra, ID de modelo, CVE, etc. |
+| `latest_releases` | Lanzamientos recientes en todos los productos (o uno). (+ límite inferior de fecha `since`) |
+| `get_release` | Contenido completo de un lanzamiento |
+| `list_products` | Enumeración con recuentos + última versión |
+| `top_entities` | Entidades más mencionadas por tipo |
+| `list_synergies` | Flujos de trabajo seleccionados entre productos. (+ filtro opcional `product`) |
+| `read_synergy` | Texto completo de un archivo de sinergia |
+| `get_changes_since` | **Novedad.** Cambios en una ventana de tiempo, agrupados por producto+versión. Entradas: `since` (obligatorio), `until?`, `product?`, `kind?`, `limit?`. |
+| `search_breaking_changes` | **Novedad.** Lista plana de cambios importantes; no se necesita ningún término de búsqueda. Entradas: `product?`, `since?`, `until?`, `limit?`. |
+| `compare_versions` | **v1.1.** Todos los cambios entre dos versiones de un producto. Entradas: `product`, `from_version`, `to_version`. |
+| `sync_status` | **v1.2.** Actualización de sincronización por producto: marca de tiempo de la última recuperación, horas desde la recuperación, recuento de lanzamientos ingeridos. Entradas: `product?`, `stale_only?`, `stale_hours?`. Utilice ANTES de confiar en `latest_releases` para saber si el corpus está desactualizado. |
+| `sync_now` | **v1.2.** Actualización a petición (refleja `hk sync`). Entradas: `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Rechaza con `InvalidParams` si ya hay otra `sync_now` en curso. NO se confirma en git. |
 
-Las herramientas de la versión 1.1 son similares a `hk diff` / `hk breaking` y al flujo de trabajo de comparación de versiones que anteriormente requería scripts. Las herramientas de sincronización de la versión 1.2 eliminan la brecha donde una sesión podía consultar la base de datos pero no actualizarla: `sync_status` informa sobre la obsolescencia, `sync_now` ejecuta el proceso. Consulte [manual → servidor MCP](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) para obtener los esquemas de entrada completos.
+Las v1.1 herramientas reflejan `hk diff` / `hk breaking` y el flujo de trabajo de comparación de versiones que antes requería scripts. Las herramientas de sincronización v1.2 cierran la brecha donde una sesión podría consultar el corpus pero no actualizarlo; `sync_status` informa sobre la desactualización, `sync_now` ejecuta la canalización. Consulte [manual → servidor MCP](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) para obtener los esquemas de entrada completos.
 
 ---
 
-## Fuentes: 5 niveles, 6 estrategias de recuperación
+## Fuentes: 5 niveles, 7 estrategias de recuperación
 
-Panorama general en [SOURCES.md](SOURCES.md).
+Panorama completo en [SOURCES.md](SOURCES.md).
 
-- **Nivel 1 (Lanzamientos de GitHub)** — `gh api repos/<owner>/<repo>/releases` para 23 productos, incluyendo los SDK de Anthropic (7 idiomas), los SDK de Agentes (2), la herramienta de línea de comandos ant, **claude-code** (ahora sincronizado automáticamente a través de gh-releases desde la versión 1.1; anteriormente, se actualizaba manualmente), claude-code-action, claude-code-security-review y 15 SDK del ecosistema MCP.
-- **Nivel 2 (Markdown sin formato)** — `Aider-AI/aider/HISTORY.md`. El analizador genérico `keep-a-changelog` (versión 1.1+) también está disponible para cualquier producto cuyo origen sea un archivo CHANGELOG.md en formato Keep-a-Changelog; se configura a través de una entrada en `products.yaml`.
-- **Nivel 3 (HTML / RSS)** — `platform.claude.com/docs/release-notes`, `support.claude.com/articles/12138966`, `cursor.com/changelog/rss.xml`, `sourcegraph.com/changelog/featured.rss` (filtrado), `github.blog/changelog/label/copilot/`, `code.visualstudio.com/updates/v1_NNN`.
-- **Nivel 4 (Catálogo)** — `anthropics/skills`, `claude-plugins-{official,community}`, `knowledge-work-plugins`.
-- **Nivel 5 (Informativo)** — Cuenta de X `@ClaudeCodeLog`; espejo de changelog de marckrenn.
+- **Nivel 1 (GitHub Lanzamientos)**: `gh api repos/<owner>/<repo>/releases` para 23 productos, incluidos los SDK de Anthropic (7 idiomas), los SDK de agentes (2), la CLI ant, **claude-code** (ahora sincronizado automáticamente a través de gh-releases a partir de v1.1; antes se introducía manualmente), claude-code-action, claude-code-security-review y 15 SDK del ecosistema MCP
+- **Nivel 2 (markdown sin procesar)**: `Aider-AI/aider/HISTORY.md`. El analizador genérico `keep-a-changelog` (v1.1+) también está disponible para cualquier producto cuya fuente sea un archivo CHANGELOG.md en formato Keep-a-Changelog; configúrelo mediante una entrada en `products.yaml`.
+- **Nivel 3 (HTML / RSS)**: `platform.claude.com/docs/release-notes`, `support.claude.com/articles/12138966`, `cursor.com/changelog/rss.xml`, `sourcegraph.com/changelog/featured.rss` (filtrado), `github.blog/changelog/label/copilot/`, `code.visualstudio.com/updates/v1_NNN`
+- **Nivel 4 (catálogo)**: `anthropics/skills`, `claude-plugins-{official,community}`, `knowledge-work-plugins`
+- **Nivel 5 (asesoramiento)**: `@ClaudeCodeLog` cuenta de X; espejo del registro de cambios de marckrenn
 
-Estrategias de recuperación: `gh-releases | rss | raw-changelog | html-scrape | catalog | playwright`. Nuevo producto = una entrada en `products.yaml`.
+Estrategias de recuperación: `gh-releases | rss | raw-changelog | keep-a-changelog | html-scrape | catalog | playwright`. Nuevo producto = una entrada en `products.yaml`.
 
 ---
 
 ## Sinergias: lo que se desbloquea
 
-12 flujos de trabajo entre productos, seleccionados. Cada uno describe un patrón de composición, el desencadenante que lo convierte en la respuesta correcta y la evidencia del changelog que lo habilita. Ejemplos:
+12 flujos de trabajo seleccionados entre productos. Cada uno describe un patrón de composición, el desencadenante que lo convierte en la respuesta correcta y la evidencia del registro de cambios que lo permite. Ejemplos:
 
-- **08 — Universal SKILL.md format** (Code + Cursor + Codex): un autor de habilidad, tres agentes lo leen.
-- **09 — MCP across seven surfaces** (Code + Cursor + Continue + Copilot + Windsurf + Cody + API): un binario, todos los agentes.
-- **10 — Anthropic BYOK across surfaces**: una clave de API habilita a Claude en 7 editores con facturación unificada.
-- **11 — Claude Code orchestrates Aider**: traslada las ediciones pesadas a un modelo económico mientras Claude planifica.
-- **12 — MCP config format gotcha**: Copilot usa `servers`; todos los demás usan `mcpServers`.
+- **08 — Formato universal SKILL.md** (Código + Cursor + Codex): un autor de la habilidad, tres agentes la leen.
+- **09 — MCP en siete superficies** (Código + Cursor + Continuar + Copilot + Windsurf + Cody + API): un binario, cada agente.
+- **10 — BYOK de Anthropic en diferentes superficies**: una clave de API potencia a Claude en 7 editores con facturación unificada.
+- **11 — Claude Code orquesta Aider**: traslada las ediciones más complejas a un modelo económico mientras Claude planifica.
+- **12 — Particularidad del formato de configuración de MCP**: Copilot usa `servers`; todos los demás usan `mcpServers`.
 
 Índice completo en [synergies/INDEX.md](synergies/INDEX.md).
 
@@ -293,38 +305,38 @@ Estrategias de recuperación: `gh-releases | rss | raw-changelog | html-scrape |
 
 ## Conjuntos de datos y modelos ajustados
 
-El corpus tiene una capa de modelos derivados: **conjuntos de datos** curados derivados de los puntos de los registros de cambios, y **modelos ajustados** entrenados en esos conjuntos de datos. El conjunto de datos es el artefacto en este repositorio; el modelo es el derivado.
+El corpus tiene una capa descendente: **conjuntos de datos** seleccionados derivados de los puntos clave de los cambios y **modelos ajustados** entrenados en esos conjuntos de datos. El conjunto de datos es el artefacto en este repositorio; el modelo es la capa descendente.
 
 ### `dataset/changelog-actions/v1` — 301 entradas
 
-Cada entrada combina un punto de cambio del corpus con un elemento de acción escrito a mano: `{kind, severity, subject, action_text, deadline, tags}`. Taxonomía de 8 elementos para `kind` (`breaking | deprecation | security | feature | fix | performance | docs | unknown`), división de entrenamiento/validación estratificada 80/20, revisado por humanos y por un juez qwen3:8b de la familia cruzada (92.4% de acuerdo). Consulte [`dataset/README.md`](dataset/README.md) para la tabla de distribución, [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) para el contrato de campo por campo y [`STYLE.md`](dataset/changelog-actions/STYLE.md) para las reglas de escritura de `action_text`.
+Cada entrada relaciona un elemento de la lista de cambios del corpus con una tarea a realizar, escrita a mano: `{kind, severity, subject, action_text, deadline, tags}`. Taxonomía 8-enum `kind` (`breaking | deprecation | security | feature | fix | performance | docs | unknown`), división estratificada 80/20 para entrenamiento/validación, A3c-reviewed realizada por un evaluador humano + evaluación cruzada entre familias qwen3:8b (92,4 % de acuerdo). Consulte [`dataset/README.md`](dataset/README.md) para ver la tabla de distribución, [`SCHEMA.md`](dataset/changelog-actions/SCHEMA.md) para ver el contrato detallado por campo y [`STYLE.md`](dataset/changelog-actions/STYLE.md) para ver las `action_text` reglas de redacción.
 
 ### `cs-actions:v1` — sintetizador ajustado
 
-Primer modelo entrenado en el conjunto de datos. Qwen2.5-7B-Instruct + LoRA (rango-256 / lineal completo, 100 pasos QLoRA en 242 entradas de entrenamiento), formato GGUF q8_0, implementado mediante un archivo de modelo Ollama de dos etapas (`cs-actions-base` + `cs-actions:v1`).
+Primer modelo entrenado en el conjunto de datos. Qwen2.5-7B-Instruct + LoRA (rango 256 / totalmente lineal, 100 pasos QLoRA en 242 entradas de entrenamiento), q8_0 GGUF, implementado a través de un archivo Modelfile de Ollama de dos etapas (`cs-actions-base` + `cs-actions:v1`).
 
-**Evaluación de la versión** (conjunto de validación estratificado de 59 entradas, tres ejecuciones, todas aprobadas, sin errores de análisis):
+**Evaluación de la puerta de lanzamiento** (prueba estratificada de 59 entradas, tres ejecuciones, todas superadas, cero errores de análisis):
 
-| Métrica | qwen3:8b base | cs-actions:v1 | Diferencia |
+| Métrica | qwen3:8b base | cs-actions:v1 | Delta |
 |---|---|---|---|
-| Precisión en "kind" vs. verdad fundamental | 78.0% | **88.1%** | +10.1pp |
-| Precisión en "severity" vs. verdad fundamental | 52.5% | **79.7%** | +27.2pp |
-| Macro-F1 (clases con buena población) | 0.801 | **0.854** | +0.053 |
-| Ejecución 3 — ablación de la sugerencia de "kind" (con sugerencia / sin sugerencia) | — | 0.842 / 0.777 | 6.5pt → zona objetivo |
+| Acuerdo de tipo frente a la verdad fundamental | 78.0% | **88.1%** | +10,1 puntos porcentuales |
+| Acuerdo de gravedad frente a la verdad fundamental | 52.5% | **79.7%** | +27,2 puntos porcentuales |
+| Macro-F1 (clases bien pobladas) | 0.801 | **0.854** | +0.053 |
+| Ejecución 3: ablación de sugerencia de tipo (con sugerencia / sin sugerencia) | — | 0.842 / 0.777 | 6,5 puntos → zona objetivo |
 
-Criterio de aprobación de la versión `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0.780 ≥ 0.780`) — APROBADO ✓. Veredictos individuales en [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json), también adjunto a la [versión de GitHub](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) como una descarga de un solo archivo.
+Criterio de aprobación de la versión `qwen3-vs-cs-actions ≥ qwen3-vs-GT` (`0.780 ≥ 0.780`) — APROBADO ✓. Resultados detallados por entrada en [`eval-report.v1.json`](dataset/changelog-actions/v1/eval-report.v1.json), también adjuntos a la [GitHub Versión](https://github.com/mcp-tool-shop-org/claude-synergy/releases/tag/cs-actions-v1) como una descarga de un solo archivo.
 
-**Limitación documentada de la versión 1: sesgo contra "desconocido".** "desconocido" es la única clase en la que cs-actions:v1 tiene un rendimiento inferior a qwen3:8b (F1 de 0.444 frente a 0.545). Precisión 1.000 / recuperación 0.286: cuando la entrada es genuinamente ambigua, el modelo se compromete con un tipo específico en lugar de abstenerse. Hereda el conocimiento previo de la familia qwen, que no se ha anulado completamente con LoRA. Los usuarios finales deben considerar una tasa de "kind: "desconocido"" inferior a la esperada como una señal para redirigir los lotes a una revisión humana. El [plan de la versión 2](dataset/README.md) aborda esto mediante la ampliación de la clase "desconocido" y la aleatorización de pistas.
+**Limitación documentada v1: sesgo anti-`unknown`.** `unknown` es la única clase en la que cs-actions:v1 tiene un rendimiento inferior a qwen3:8b (F1 0,444 frente a 0,545). Precisión 1,000 / exhaustividad 0,286: cuando la entrada es genuinamente ambigua, el modelo se compromete con un tipo específico en lugar de abstenerse. Prioridad heredada de la familia qwen, no completamente anulada por la LoRA. Los consumidores posteriores deben tratar una tasa `kind: "unknown"` inferior a la esperada como una señal para dirigir los lotes a la revisión humana. El [plan v2](dataset/README.md) aborda esto con la ampliación de la clase desconocida más la aleatorización de la sugerencia.
 
-**No se distribuye a través de este repositorio:** el formato GGUF q8_0 tiene aproximadamente 5 GB y el punto de control combinado tiene aproximadamente 15 GB. El conjunto de datos y la canalización de construcción son lo que se publica; el modelo se reconstruye localmente según [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) (cadena manual de 4 etapas, aproximadamente 88 minutos de calentamiento en una computadora portátil RTX 5080 con 16 GB de VRAM). El contrato de lanzamiento de tres ejecuciones se encuentra en [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md).
+**No se distribuye a través de este repositorio**: el q8_0 GGUF tiene aproximadamente 5 GB y el punto de control combinado tiene aproximadamente 15 GB. El conjunto de datos y la canalización de compilación son lo que se publica; el modelo se vuelve a compilar localmente según [`TRAINING.md`](dataset/changelog-actions/v1/TRAINING.md) (cadena manual de 4 etapas, ~88 minutos de calentamiento en RTX 5080 Laptop 16 GB VRAM). El contrato de la puerta de lanzamiento de tres ejecuciones se encuentra en [`EVAL.md`](dataset/changelog-actions/v1/EVAL.md).
 
-Una guía completa de uso, que incluye la invocación local de Ollama, el requisito de "format: "json"" para cada solicitud y la canalización de reconstrucción, se encuentra en la página del [manual → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/).
+Guía completa de uso, que incluye la invocación local de Ollama, el requisito de llamada `format: "json"` por solicitud y la canalización de recompilación, en la página [manual → cs-actions:v1](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cs-actions-v1/).
 
 ---
 
 ## Pruebas
 
-El conjunto de pruebas Vitest cubre los niveles de unidad / integración / regresión / pruebas básicas. **[test-spec-3.md](test-spec-3.md) es la autoridad actual** a partir de la versión v0.7.0; [test-spec.md](test-spec.md) (v1) y [test-spec-2.md](test-spec-2.md) (v2) permanecen en el repositorio como registro histórico de la línea de diseño.
+La suite Vitest cubre las capas de unidad / integración / regresión / pruebas básicas. **[test-spec-3.md](test-spec-3.md) es la autoridad actual** a partir de v0.7.0; [test-spec.md](test-spec.md) (v1) y [test-spec-2.md](test-spec-2.md) (v2) permanecen en el repositorio como registro histórico de la línea de diseño.
 
 ```bash
 pnpm test               # unit + integration + regression (~36s, 519 tests)
@@ -333,20 +345,20 @@ pnpm test:coverage      # generate coverage/index.html (thresholds: 78/75/85/78)
 pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 ```
 
-Estructura:
+Diseño:
 
-| Directorio | Lo que cubre |
+| Dir | Qué cubre |
 |-----|----------------|
-| `test/unit/` | por módulo: extracción, ingestión, consulta (incl. `until` / navegación / desde / comparación), base de datos (incl. migración de la configuración de dimensiones v3), incrustación, híbrido, obtención + cada proveedor (Ollama / Voyage / **OpenAI**) + obtención de RSS/changelog (incl. analizador **keep-a-changelog**) / HTML + obtención del registro MCP + obtención de Playwright + configuración de productos + ingestión/consulta de Synergy. |
-| `test/integration/` | de extremo a extremo: canalización, sincronización, servidor MCP (JSON-RPC estándar, 13 herramientas, incluyendo `sync_status` / `sync_now`), línea de comandos (incl. `hk diff`, `hk breaking`). |
-| `test/regression/` | §8.1–§8.19: cada uno protege contra un error real corregido durante el desarrollo (§8.19: la paginación de salida temprana de ghReleases conserva los elementos dentro del rango). |
-| `test/smoke/` | Prueba completa con todo el corpus contra productos reales (1143 archivos). |
-| `test/fixtures/` | 3 productos falsos + respuestas HTTP simuladas (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Registro oficial de MCP). |
+| `test/unit/` | por módulo: extraer, ingerir, consultar (incl. `until` / buscar / desde / comparar), base de datos (incl. migración de configuración de dimensiones v3), incrustar, híbrido, obtener + cada proveedor (Ollama / Voyage / **OpenAI**) + obtener-rss/changelog (incl. analizador **keep-a-changelog**) / html + obtener-registro-mcp + obtener-playwright + configuración de productos + ingestión/consulta de sinergias |
+| `test/integration/` | de extremo a extremo: canalización, sincronización, servidor MCP (stdio JSON-RPC, 13 herramientas incl. `sync_status` / `sync_now`), CLI (incl. `hk diff`, `hk breaking`) |
+| `test/regression/` | §8.1–§8.19: cada uno protege contra un error real corregido durante el desarrollo (§8.19: la paginación de salida temprana ghReleases conserva los elementos dentro de la ventana) |
+| `test/smoke/` | opcional, corpus completo frente a `products/` real (1143 archivos) |
+| `test/fixtures/` | 3 productos simulados + respuestas HTTP simuladas (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Registro oficial de MCP) |
 | `test/helpers/` | `temp-db.ts`, `fetch-mock.ts`, `mcp-client.ts`, `seed-corpus.ts`, `golden-vectors.ts`, `playwright-mock.ts`, `yaml-fixtures.ts` |
 
-**Por defecto, no hay conexión de red** — el proveedor HTTP se simula mediante `vi.spyOn(global, 'fetch')`. Se utiliza SQLite real en archivos temporales (no `:memory:`) porque la semántica de carga de la extensión `sqlite-vec` varía según la versión, y el almacenamiento en disco es la ruta canónica. Playwright se carga mediante importación dinámica y se simula mediante `vi.doMock('playwright', ...)` para que las pruebas se ejecuten sin instalar un navegador real.
+**Sin red en las pruebas por defecto**: el HTTP del proveedor se simula mediante `vi.spyOn(global, 'fetch')`. SQLite real en archivos temporales (no `:memory:`) porque la semántica de carga de la extensión sqlite-vec difiere entre las versiones y el disco es la ruta canónica. Playwright se carga mediante importación dinámica y se simula mediante `vi.doMock('playwright', ...)` para que las pruebas se superen sin una instalación real del navegador.
 
-CI: `.github/workflows/test.yml` ejecuta `pnpm test:coverage` al realizar un push o una solicitud de extracción.
+CI: `.github/workflows/test.yml` ejecuta `pnpm test:coverage` al hacer push y en las solicitudes de extracción.
 
 ---
 
@@ -354,58 +366,58 @@ CI: `.github/workflows/test.yml` ejecuta `pnpm test:coverage` al realizar un pus
 
 **"Base de datos bloqueada" o errores de WAL**
 
-Otro proceso de `hk` (o un servidor MCP obsoleto) mantiene la base de datos SQLite abierta. Cierre otros procesos de `hk` y luego intente de nuevo. Si el problema persiste, verifique si hay archivos `-wal` o `-shm` junto a `data/claude-synergy.db`: estos son archivos normales en modo WAL y se eliminarán cuando se cierre la última conexión. No los elimine mientras otro proceso tenga la base de datos abierta.
+Otro proceso `hk` (o un servidor MCP obsoleto) mantiene la SQLite base de datos abierta. Cierre los demás procesos `hk` y vuelva a intentarlo. Si el problema persiste, compruebe si hay un archivo `-wal` o `-shm` junto a `data/claude-synergy.db`: estos son archivos normales del modo WAL y se limpiarán cuando se cierre la última conexión. No los elimine mientras otro proceso tenga la base de datos abierta.
 
-**"No se encontró la extensión sqlite-vec" / falló la carga de sqlite-vec"**
+**"No se encontró la extensión sqlite-vec" / error al cargar sqlite-vec**
 
-La extensión nativa `sqlite-vec` no se pudo cargar. Causas comunes:
+La extensión nativa `sqlite-vec` no se pudo cargar. Las causas comunes son:
 
-1. **Versión de Node demasiado antigua** — `claude-synergy` requiere Node 22.12 o posterior en Windows, macOS o Linux (glibc o musl), x64 o arm64; ARM de 32 bits no es compatible. Verifique con `node -v`.
-2. **Módulo nativo que necesita ser reconstruido** — ejecute `npm rebuild better-sqlite3` (o `pnpm rebuild better-sqlite3`).
-3. **Incompatibilidad de plataforma** — en Windows/ARM, `better-sqlite3` necesita un conjunto de herramientas de compilación de C++. Instale [windows-build-tools](https://github.com/nicedoc/windows-build-tools) o Visual Studio Build Tools con "Desarrollo de escritorio con C++".
+1. **Versión de Node demasiado antigua**: `claude-synergy` requiere Node 22.12 o posterior en Windows, macOS o Linux (glibc o musl), x64 o arm64; no se admite ARM de 32 bits. Compruebe con `node -v`.
+2. **El módulo nativo necesita ser recompilado**: ejecute `npm rebuild better-sqlite3` (o `pnpm rebuild better-sqlite3`).
+3. **Incompatibilidad de plataforma**: en Windows/ARM, `better-sqlite3` necesita una cadena de herramientas de compilación de C++. Instale las [herramientas de compilación de Windows](https://github.com/nicedoc/windows-build-tools) o Visual Studio Build Tools con "Desarrollo de escritorio con C++".
 
 Nota: `sqlite-vec` es opcional. La búsqueda de palabras clave FTS5 (`hk query`) funciona sin ella. Solo `hk embed` y `hk hybrid` requieren la extensión vectorial.
 
-**"Error de sincronización para el producto X" / errores de fetch"**
+**"Error de sincronización para el producto X" / errores de obtención**
 
 `hk fetch` y `hk sync` llaman a API externas. Causas comunes:
 
-- **Límite de velocidad de GitHub** — la estrategia `gh-releases` llama a `gh api`, que utiliza su `GITHUB_TOKEN`. Las solicitudes no autenticadas tienen un límite de 60 solicitudes/hora; autentíquese con `gh auth login` o configure `GITHUB_TOKEN` en su entorno.
-- **Red / proxy** — los extractores de RSS y HTML utilizan `fetch()`. Verifique la conectividad y cualquier configuración de proxy corporativa (`HTTPS_PROXY`).
-- **Producto desconocido** — `hk fetch --product foo` solo funciona para los productos que se enumeran en `products.yaml`. Ejecute `hk products` para ver todos los nombres disponibles.
+- **Límite de velocidad de GitHub** — la estrategia `gh-releases` utiliza `gh api`, que usa su `GITHUB_TOKEN`. Las solicitudes no autenticadas alcanzan los 60 req/hora; autentíquese con `gh auth login` o establezca `GITHUB_TOKEN` en su entorno.
+- **Red/proxy** — los extractores de RSS y HTML utilizan `fetch()`. Verifique la conectividad y cualquier configuración de proxy corporativo (`HTTPS_PROXY`).
+- **Producto desconocido** — `hk fetch --product foo` solo funciona para los productos que figuran en `products.yaml`. Ejecute `hk products` para ver todos los nombres disponibles.
 
-La sincronización es idempotente: es seguro volver a ejecutarla después de un fallo parcial. Las versiones ya descargadas se omiten.
+La sincronización es idempotente: es seguro volver a ejecutarla después de un fallo parcial. Las versiones ya extraídas se omiten.
 
-**"El proveedor de incrustación no responde"**
+**"El proveedor de incrustaciones no responde"**
 
 `hk embed` llama a un servicio de incrustación externo:
 
-- **Ollama (predeterminado, 768 dimensiones)**: asegúrese de que Ollama esté en ejecución (`ollama serve`) y que el modelo de incrustación se haya descargado (`ollama pull nomic-embed-text`).
-- **Voyage (1024 dimensiones)**: establezca `VOYAGE_API_KEY` en su entorno. Verifique su clave de API en [dash.voyageai.com](https://dash.voyageai.com).
-- **OpenAI (1536 dimensiones por defecto, configurable)**: establezca `OPENAI_API_KEY`. El modelo predeterminado es `text-embedding-3-small`; sobrescríbalo con `OPENAI_EMBED_MODEL` (por ejemplo, `text-embedding-3-large` para 3072 dimensiones). Utilícelo a través de `hk hybrid --embed openai` o `hk embed --embed openai`.
+- **Ollama (predeterminado, 768-dim)** — asegúrese de que Ollama se esté ejecutando (`ollama serve`) y de que se haya descargado el modelo de incrustación (`ollama pull nomic-embed-text`).
+- **Voyage (1024-dim)** — establezca `VOYAGE_API_KEY` en su entorno. Verifique su clave de API en [dash.voyageai.com](https://dash.voyageai.com).
+- **OpenAI (1536-dim predeterminado, configurable)** — establezca `OPENAI_API_KEY`. El modelo predeterminado es `text-embedding-3-small`; anule con `OPENAI_EMBED_MODEL` (por ejemplo, `text-embedding-3-large` para 3072-dim). Utilice a través de `hk hybrid --embed openai` o `hk embed --embed openai`.
 
-**Incompatibilidad de dimensiones de incrustación al cambiar de proveedor**
+**Incompatibilidad de la dimensión de incrustación al cambiar de proveedor**
 
-Cada proveedor produce vectores de una dimensión fija (Ollama 768, Voyage 1024, OpenAI 1536 por defecto; OpenAI admite dimensiones configurables dentro del tamaño nativo del modelo). La base de datos almacena la dimensión activa en `schema_meta.embedding_dim`. Cambiar de proveedor a diferentes dimensiones mientras existen fragmentos genera un error `EMBEDDING_DIM_MISMATCH` (`AppError`) en lugar de corromper silenciosamente la tabla de vectores. Para cambiar:
+Cada proveedor produce vectores de una dimensión fija (Ollama 768, Voyage 1024, OpenAI 1536 por defecto; OpenAI admite dimensiones configurables dentro del tamaño nativo del modelo). La base de datos almacena la dimensión activa en `schema_meta.embedding_dim`. Cambiar de proveedor utilizando diferentes dimensiones mientras existen fragmentos genera `EMBEDDING_DIM_MISMATCH` (`AppError`) en lugar de corromper silenciosamente la tabla de vectores. Para cambiar:
 
 ```bash
 rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
-hk init
-hk ingest
-hk embed --embed openai     # new provider, new dim, fresh chunks_vec
+hk init --db data/claude-synergy.db
+hk ingest --db data/claude-synergy.db
+hk embed --db data/claude-synergy.db --embed openai     # new provider, new dim, fresh chunks_vec
 ```
 
-Para la truncación de Matryoshka de OpenAI (dimensión inferior a la nativa), establezca `OPENAI_EMBED_MODEL` y pase la dimensión deseada a través de la construcción del proveedor en `hk embed`; consulte la [sección de incrustaciones del manual](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions) para obtener más detalles.
+Para OpenAI, la truncación de Matryoshka (dimensión menor que la nativa), establezca `OPENAI_EMBED_MODEL` y pase la dimensión deseada a través de la construcción del proveedor de `hk embed`; consulte la [sección de incrustaciones del manual](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions) para obtener más detalles.
 
-**Incompatibilidad de versión de esquema / base de datos corrupta**
+**Incompatibilidad de la versión del esquema / base de datos corrupta**
 
 Si la base de datos se creó con una versión de esquema anterior y la migración falla, o si los datos parecen incorrectos después de un fallo:
 
 ```bash
 rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
-hk init
-hk ingest
-hk embed --context structured --embedding ollama   # optional, for vector search
+hk init --db data/claude-synergy.db
+hk ingest --db data/claude-synergy.db
+hk embed --db data/claude-synergy.db --context structured --embedding ollama   # optional, for vector search
 ```
 
 Esto es seguro: la base de datos es una caché derivada. Todos los datos de origen se encuentran en los archivos `products/*/releases/*.md`.
@@ -414,12 +426,12 @@ Esto es seguro: la base de datos es una caché derivada. Todos los datos de orig
 
 ## Archivos relacionados
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) — Cómo agregar productos, ejecutar pruebas y enviar solicitudes de extracción (PR).
-- [URGENT_FINDINGS.md](URGENT_FINDINGS.md) — 23 elementos que requieren atención inmediata (vulnerabilidades de seguridad, obsolescencia de modelos, cambios importantes, problemas de configuración).
-- [SOURCES.md](SOURCES.md) — Panorama de fuentes de 5 niveles con estrategias de obtención.
-- [synergies/INDEX.md](synergies/INDEX.md) — 12 flujos de trabajo seleccionados que involucran varios productos.
-- [schema.sql](schema.sql) + [schema-vec.sql](schema-vec.sql) — Esquemas de SQLite y sqlite-vec.
-- [test-spec-3.md](test-spec-3.md) (actual) + [test-spec-2.md](test-spec-2.md), [test-spec.md](test-spec.md) (histórico) — Especificaciones del conjunto de pruebas.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — cómo agregar productos, ejecutar pruebas, enviar solicitudes de incorporación de cambios
+- [URGENT_FINDINGS.md](URGENT_FINDINGS.md) — 23 elementos de acción (CVE de seguridad, eliminación de modelos, cambios importantes, problemas de configuración)
+- [SOURCES.md](SOURCES.md) — panorama de fuentes de 5 niveles con estrategias de extracción
+- [synergies/INDEX.md](synergies/INDEX.md) — 12 flujos de trabajo interproductos seleccionados
+- [schema.sql](schema.sql) + [schema-vec.sql](schema-vec.sql) — esquemas SQLite + sqlite-vec
+- [test-spec-3.md](test-spec-3.md) (actual) + [test-spec-2.md](test-spec-2.md), [test-spec.md](test-spec.md) (histórico) — especificaciones del conjunto de pruebas
 
 ---
 

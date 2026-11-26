@@ -41,11 +41,13 @@ npm link   # makes 'hk' available globally
 Initialize the database and pull all changelogs:
 
 ```bash
-hk init          # creates data/claude-synergy.db with schema
+hk init          # creates the store: ./data/claude-synergy.db if it exists, else ~/.claude-synergy/data/claude-synergy.db
 hk sync          # fetch -> ingest -> embed (all 44 products)
 ```
 
 The first sync takes 2-3 minutes — it pulls ~1,200 release files from GitHub, RSS feeds, and HTML changelogs.
+
+You can also skip both commands: the first query or MCP tool call against an empty store runs fetch and ingest once on its own (no embedding), and every answer ends with a `data as of:` line. Set `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` to turn that off, or `CLAUDE_SYNERGY_DB` to choose the store path.
 
 ### What happens during sync
 

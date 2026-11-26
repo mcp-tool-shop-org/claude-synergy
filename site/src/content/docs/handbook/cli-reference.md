@@ -14,6 +14,7 @@ The `hk` CLI provides 17 commands organized into five groups: **setup**, **searc
 | `--json` | Output results as JSON (all query commands) |
 | `--verbose` | Show verbose output (also: `HK_LOG_LEVEL=verbose`) |
 | `--debug` | Show debug output including query parameters (also: `HK_LOG_LEVEL=debug`) |
+| `--no-stamp` | Omit the trailing `data as of:` line from text output |
 | `--version` | Print version |
 | `--help` | Show help |
 
@@ -24,7 +25,7 @@ The `hk` CLI provides 17 commands organized into five groups: **setup**, **searc
 Create the database file with the current schema.
 
 ```bash
-hk init                     # default: data/claude-synergy.db
+hk init                     # default: ./data/claude-synergy.db if it exists, else ~/.claude-synergy/data/claude-synergy.db
 hk init --db /path/to/db    # custom path
 ```
 
@@ -238,6 +239,8 @@ Parse `products/*/releases/*.md` and load into DB (idempotent).
 ```bash
 hk ingest
 hk ingest --products /path/to/products
+hk ingest --reextract   # re-extract entities for existing rows, no fetch
+hk ingest --rescreen    # apply the current screening rules to stored rows
 ```
 
 ## Analysis commands
@@ -299,5 +302,8 @@ Entity types: `env_var`, `slash_command`, `cli_option`, `model_id`, `beta_header
 | `OPENAI_EMBED_MODEL` | OpenAI embedding model override (default: `text-embedding-3-small`) |
 | `OPENAI_BASE_URL` | Override OpenAI API base URL (default: `https://api.openai.com/v1`) — useful for OpenAI-compatible gateways |
 | `ANTHROPIC_API_KEY` | Claude Haiku context generation |
+| `CLAUDE_SYNERGY_DB` | Database path (overrides the default store) |
+| `CLAUDE_SYNERGY_PRODUCTS_ROOT` | Products directory (default: `products/` beside the database) |
+| `CLAUDE_SYNERGY_NO_AUTO_SYNC` | Set to `1` to stop the one-time sync on first use of an empty store |
 | `HK_LOG_LEVEL` | Log verbosity: `silent`, `normal`, `verbose`, `debug` |
 | `HK_DEBUG` | Legacy: equivalent to `HK_LOG_LEVEL=debug` |
