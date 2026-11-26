@@ -51,118 +51,62 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 1186,
-      "changed": 7,
+      "added": 21,
+      "changed": 37,
       "moved": 0,
-      "parts": 4,
+      "parts": 6,
       "removed": 0
     },
     "items": [
       {
         "kind": "landing",
-        "sentence": "LATEST.txt is now written by .github/workflows/sync.yml.",
+        "sentence": "model-families.yaml is now read by src/extract.ts.",
         "subjects": [
-          "LATEST.txt",
-          ".github/workflows/sync.yml"
+          "model-families.yaml",
+          "src/extract.ts"
         ]
       },
       {
         "kind": "landing",
-        "sentence": "PRODUCTS.txt is now written by .github/workflows/sync.yml.",
+        "sentence": "src/cli.ts is now also read by test/integration/cli-freshness.test.ts.",
         "subjects": [
-          "PRODUCTS.txt",
-          ".github/workflows/sync.yml"
+          "src/cli.ts",
+          "test/integration/cli-freshness.test.ts"
         ]
       },
       {
-        "kind": "origin",
-        "sentence": "the repository root was authored and is now mixed.",
+        "kind": "landing",
+        "sentence": "test/fixtures/mock-responses/anthropic-apps-release-notes.html is now read by test/unit/fetch-html.test.ts.",
         "subjects": [
-          "root"
+          "test/fixtures/mock-responses/anthropic-apps-release-notes.html",
+          "test/unit/fetch-html.test.ts"
         ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "And 1 more new writer or reader of a place.",
+        "subjects": []
       },
       {
         "kind": "counts",
-        "sentence": "1186 files added and 7 changed content, across 4 parts.",
+        "sentence": "21 files added and 37 changed content, across 6 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "a222e671c2f750517f49444564d3eb2c7144cd0c",
-      "generatedAt": "2026-10-01T00:10:24.841Z"
+      "commit": "4e59215fbdcca6f929717a8f80eeefeed808d41f",
+      "generatedAt": "2026-11-11T22:12:31.433Z"
     },
     "unchanged": false
   },
-  "changesTogether": [
-    {
-      "a": "src/fetch.ts",
-      "b": "src/mcp-server.ts",
-      "either": 6,
-      "partLabels": [
-        "src",
-        "src"
-      ],
-      "parts": [
-        "src",
-        "src"
-      ],
-      "relation": "inside",
-      "shared": 4
-    },
-    {
-      "a": "src/cli.ts",
-      "b": "src/fetch.ts",
-      "either": 7,
-      "partLabels": [
-        "src",
-        "src"
-      ],
-      "parts": [
-        "src",
-        "src"
-      ],
-      "relation": "inside",
-      "shared": 4
-    },
-    {
-      "a": "src/fetch.ts",
-      "b": "test/regression/bugs.test.ts",
-      "either": 7,
-      "partLabels": [
-        "src",
-        "test"
-      ],
-      "parts": [
-        "src",
-        "test"
-      ],
-      "relation": "b-imports-a",
-      "shared": 4
-    },
-    {
-      "a": "src/mcp-server.ts",
-      "b": "test/regression/bugs.test.ts",
-      "either": 7,
-      "partLabels": [
-        "src",
-        "test"
-      ],
-      "parts": [
-        "src",
-        "test"
-      ],
-      "relation": "b-imports-a",
-      "shared": 4
-    }
-  ],
+  "changesTogether": [],
   "changesTogetherNote": [
-    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "4e59215fbdcca6f929717a8f80eeefeed808d41f",
+  "commit": "46c15a0b23b6dedad366a2437041b88cba068782",
   "defaultBranch": "main",
-  "derived": "10 parts, mostly Markdown (2457 files) and JSON data (317); code in TypeScript (83), JavaScript (9), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 2 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
+  "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (88), JavaScript (9), CSS (2), HTML (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 2 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
     {
       "checks": [
@@ -179,12 +123,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 31
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 49
+          "files": 53
         }
       ],
       "runs": [
@@ -221,12 +165,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 31
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 49
+          "files": 53
         }
       ],
       "runs": [
@@ -300,7 +244,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 29
+          "files": 30
         }
       ],
       "runs": [
@@ -343,7 +287,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 29
+          "files": 30
         }
       ],
       "runs": [
@@ -374,7 +318,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 28
+          "files": 29
         }
       ],
       "runs": [
@@ -403,7 +347,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 28
+          "files": 29
         }
       ],
       "runs": [
@@ -483,11 +427,13 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-11T22:12:31.433Z",
+  "generatedAt": "2026-11-26T08:20:27.084Z",
   "limits": [
-    "9 writes and 32 reads go to a path their caller passes, not to this repository.",
-    "1 write and 8 reads go to the directory the command is run in (data/ and synergies/) or a path their caller passes, not to this repository.",
-    "8 reads go to the directory the command is run in (products.yaml, schema-vec.sql, schema.sql and 1 more place), not to this repository.",
+    "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
+    "4 reads use paths built at run time and are not named here.",
+    "10 writes and 43 reads go to a path their caller passes, not to this repository.",
+    "7 reads go to the directory the command is run in (products.yaml, schema-vec.sql and schema.sql), not to this repository.",
+    "1 read goes to the directory the command is run in (data/) or a path its caller passes, not to this repository.",
     "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/test.yml",
@@ -516,10 +462,10 @@
   "startReason": "This path follows claude-synergy-mcp (a command people run) from its entry, since Tests runs only tests and checks.",
   "summary": null,
   "summaryFrom": null,
-  "testFiles": 77,
+  "testFiles": 83,
   "testedBy": {
     "scripts": 0,
-    "src": 45
+    "src": 48
   },
   "testedCodeParts": 2,
   "unnamedWrites": 0,
@@ -561,7 +507,7 @@
       ]
     }
   ],
-  "unreadFiles": 0,
+  "unreadFiles": 1,
   "unreadNote": [],
   "untested": [
     {

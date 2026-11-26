@@ -1,17 +1,18 @@
 # claude-synergy: how it works
 
-Mapped at 2026-11-11 from commit 4e59215 by Atlas 1.26.0.
+Mapped at 2026-11-26 from commit 46c15a0 by Atlas 1.26.0.
 
 ## What this is
 
-10 parts, mostly Markdown (2457 files) and JSON data (317); code in TypeScript (83), JavaScript (9), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 2 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.
+10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (88), JavaScript (9), CSS (2), HTML (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 2 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.
 
-## What changed since 2026-10-01 (a222e67)
+## What changed since 2026-11-11 (4e59215)
 
-- LATEST.txt is now written by .github/workflows/sync.yml.
-- PRODUCTS.txt is now written by .github/workflows/sync.yml.
-- the repository root was authored and is now mixed.
-- 1186 files added and 7 changed content, across 4 parts.
+- model-families.yaml is now read by src/extract.ts.
+- src/cli.ts is now also read by test/integration/cli-freshness.test.ts.
+- test/fixtures/mock-responses/anthropic-apps-release-notes.html is now read by test/unit/fetch-html.test.ts.
+- And 1 more new writer or reader of a place.
+- 21 files added and 37 changed content, across 6 parts.
 
 ## What comes in
 
@@ -30,7 +31,7 @@ Mapped at 2026-11-11 from commit 4e59215 by Atlas 1.26.0.
 
 ## Who reads the results
 
-Tests writes nothing this map can see.
+Tests writes nothing in the files this map could read; 1 file could not be.
 
 ## The other doors
 
@@ -55,12 +56,7 @@ Tests writes nothing this map can see.
 
 ## What tends to change together
 
-- **src/fetch.ts** and **src/mcp-server.ts** changed together in 4 of 6 commits, inside the src part.
-- **src/cli.ts** and **src/fetch.ts** changed together in 4 of 7 commits, inside the src part.
-- **src/fetch.ts** and **test/regression/bugs.test.ts** changed together in 4 of 7 commits, and the test part imports the src part.
-- **src/mcp-server.ts** and **test/regression/bugs.test.ts** changed together in 4 of 7 commits, and the test part imports the src part.
-
-Confidence is low: fewer than 25 source files reach 10 revisions in the window.
+No two source files changed together often enough to name.
 
 Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do.
 
@@ -83,7 +79,7 @@ verify.sh runs in no workflow.
 
 ## Helpers that look duplicated
 
-No two parts export a helper that looks alike.
+No two parts export a helper that looks alike in the files this map could read; 1 file could not be.
 
 ## Generated, never hand-edited
 
@@ -99,7 +95,7 @@ No two parts export a helper that looks alike.
 
 ## Hand-authored
 
-People write .github/, docs/, products/, site/ and synergies/. Nothing in this repository writes to them.
+People write .github/, docs/, products/, site/ and synergies/. Nothing in the files this map could read writes to them; 1 file could not be.
 
 ## Where to start
 
@@ -109,9 +105,11 @@ Read those in order to follow one run of claude-synergy-mcp end to end. This pat
 
 ## What this map cannot see
 
-- 9 writes and 32 reads go to a path their caller passes, not to this repository.
-- 1 write and 8 reads go to the directory the command is run in (data/ and synergies/) or a path their caller passes, not to this repository.
-- 8 reads go to the directory the command is run in (products.yaml, schema-vec.sql, schema.sql and 1 more place), not to this repository.
+- 1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.
+- 4 reads use paths built at run time and are not named here.
+- 10 writes and 43 reads go to a path their caller passes, not to this repository.
+- 7 reads go to the directory the command is run in (products.yaml, schema-vec.sql and schema.sql), not to this repository.
+- 1 read goes to the directory the command is run in (data/) or a path its caller passes, not to this repository.
 - Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window.
 
 Regenerate with `npx --yes @dogfood-lab/atlas map`.

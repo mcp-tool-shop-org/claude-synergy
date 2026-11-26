@@ -13,19 +13,19 @@
           "path": ".github/dependabot.yml"
         },
         {
-          "hash": "cf1ad38464c54f14127d46750a5763f224b286cac09ac46aafc8ebbcd993f3ff",
+          "hash": "186759944a5f149676ed74fa56af1ce15d77a355c81f2bf01149174c95598e75",
           "path": ".github/workflows/pages.yml"
         },
         {
-          "hash": "87c54f204b7ce9ff7418029338497d7fa57349104c43c9f4a3c8efdf84e3694e",
+          "hash": "25a512e4b87f939da199d9ad5ca81b2b725a12d2a9e37bdc6f4a9e53471294b2",
           "path": ".github/workflows/release.yml"
         },
         {
-          "hash": "c86e3752606391be0136e5a00680ec1ef23fc311073b4e66769ae02469d7cff8",
+          "hash": "e064441c38eb3880c98866ce1c14321243767cd68370bf5397988ff8cd4c4f29",
           "path": ".github/workflows/sync.yml"
         },
         {
-          "hash": "a182fe66ecdb0d1cd7b5fac39c13fa011cc32cdc7414add533a4de33d28142b9",
+          "hash": "3674718600c72ed98d75b250881141ef53fc0008979364c210daebfbfad5d697",
           "path": ".github/workflows/test.yml"
         }
       ],
@@ -1942,6 +1942,14 @@
           "path": "products/anthropic-cli/releases/1.9.3.md"
         },
         {
+          "hash": "2e53337dec520fa4fa540d6be3b81fd2570b02b8a5dd1c3122113c8740f93bf3",
+          "path": "products/anthropic-cli/releases/2.14.0.md"
+        },
+        {
+          "hash": "49a8f7928dbc1c68076843afcfb0f4a61a27995eec04be020d3850cf4d8bc34c",
+          "path": "products/anthropic-cli/releases/sandboxes-v0.1.1.md"
+        },
+        {
           "hash": "255108d26236581a5f715f7ba036c5847b538e19062f89645d59e4f970fc577f",
           "path": "products/anthropic-sdk-csharp/INDEX.md"
         },
@@ -2184,6 +2192,10 @@
         {
           "hash": "ae6574326f8288967e1a62f2ab08d80ee64ab88a49fb324afcd47d0ca9a6fe47",
           "path": "products/anthropic-sdk-csharp/releases/Anthropic-12.9.0.md"
+        },
+        {
+          "hash": "f9253288a2f2eca99a21b45683f69733640bd98654d94ca13962cafc56aeceaf",
+          "path": "products/anthropic-sdk-csharp/releases/Anthropic-13.14.0.md"
         },
         {
           "hash": "4a77eb819e18a1e621db92301f272cbecda016b4a8c32c061d5570066817c54e",
@@ -2686,6 +2698,10 @@
           "path": "products/anthropic-sdk-go/releases/1.78.0.md"
         },
         {
+          "hash": "6d4b235c84a026894dd7859dfdb42a065d6b88f48be970a7c9dbdb3da2fb942c",
+          "path": "products/anthropic-sdk-go/releases/2.15.0.md"
+        },
+        {
           "hash": "fdd533de8c008f4727ec15bfbe27cc3e42c20e5345397257effd1dc5ac19611c",
           "path": "products/anthropic-sdk-java/INDEX.md"
         },
@@ -2946,6 +2962,10 @@
           "path": "products/anthropic-sdk-java/releases/2.68.0.md"
         },
         {
+          "hash": "d1dc24a96c423d3b3827c6c574796c5b573fb40ab9bd7f970548c5b587c66b14",
+          "path": "products/anthropic-sdk-java/releases/3.14.0.md"
+        },
+        {
           "hash": "af10ef20d3936d5b4d1f6c76d8a93455b50555581d6d8b2191c15bc278db39e9",
           "path": "products/anthropic-sdk-php/INDEX.md"
         },
@@ -3172,6 +3192,10 @@
         {
           "hash": "36b6db2f8826e46cae83ecbd32d7908ff17bf4573b6bfd5deb03c7cf1138e627",
           "path": "products/anthropic-sdk-php/releases/0.9.0.md"
+        },
+        {
+          "hash": "99f5a9e51a3ff6f2a24882d175988648bf8b87d67f8b22cec731620c88ae66ce",
+          "path": "products/anthropic-sdk-php/releases/1.14.0.md"
         },
         {
           "hash": "8e0821f0224252f5fe7f9678317d21527465cf32278f397af07e3db01cd89578",
@@ -3482,6 +3506,10 @@
           "path": "products/anthropic-sdk-python/releases/1.9.0.md"
         },
         {
+          "hash": "e23526b0974c6abc1c0f7b694accb2417efb51bb7d3db1df00065a12ebaf7eed",
+          "path": "products/anthropic-sdk-python/releases/2.14.0.md"
+        },
+        {
           "hash": "f2622b10405038eb0d30e34d57c2197621708afbdddd1b2f70a37d8dc37e5275",
           "path": "products/anthropic-sdk-ruby/INDEX.md"
         },
@@ -3752,6 +3780,10 @@
         {
           "hash": "3c45049842485717583ad5a94b229f5caa02bd1bcc15d217233eadb77fffde67",
           "path": "products/anthropic-sdk-ruby/releases/1.76.0.md"
+        },
+        {
+          "hash": "4fa2480ab0e47333033434b722cc3175b34e1c55b9d01776862f5e776264c19c",
+          "path": "products/anthropic-sdk-ruby/releases/2.14.0.md"
         },
         {
           "hash": "48657c086608a737ba37cb11090bf2fb200c129c077c6ffd709d59c65813f9ab",
@@ -4454,6 +4486,10 @@
           "path": "products/anthropic-sdk-typescript/releases/sdk-0.99.0.md"
         },
         {
+          "hash": "90d19820e38d5d2192fc51697a46b960bf6fa4ebbb27dcb1557bc5e1f21276db",
+          "path": "products/anthropic-sdk-typescript/releases/sdk-1.14.0.md"
+        },
+        {
           "hash": "8363ac54a30710ffd13c409e1e682ab1bdd4c997edc838f3bb91965163ec169e",
           "path": "products/anthropic-sdk-typescript/releases/vertex-sdk-0.14.2.md"
         },
@@ -4980,6 +5016,10 @@
         {
           "hash": "6aecf57c6feb2332767719883470b466a8656498fae7ceb6f213a3762d1ce1ce",
           "path": "products/claude-agent-sdk-python/releases/0.2.163.md"
+        },
+        {
+          "hash": "c99ce145f9007cf3de7658cd5e0c4a5380913291bf06cce8232d339b68c21966",
+          "path": "products/claude-agent-sdk-python/releases/0.2.189.md"
         },
         {
           "hash": "2efa7978042759143358387382ccd291938b2cbd212a255f4241f7006c862e8b",
@@ -5990,6 +6030,10 @@
           "path": "products/claude-agent-sdk-typescript/releases/0.3.292.md"
         },
         {
+          "hash": "15b1ae349fd7ea8f1c3b4d295f8d3540f53258c53d962d9e60522aba4f5f1aa0",
+          "path": "products/claude-agent-sdk-typescript/releases/0.3.332.md"
+        },
+        {
           "hash": "d7db94a42e1a9cde17e5871847eaf646fde9645199790a12018a8c50e3def2d5",
           "path": "products/claude-api/INDEX.md"
         },
@@ -6560,6 +6604,10 @@
         {
           "hash": "429aa4ee6c51039e368c84a76633e5ed3c2b991d4dc8787417e28eabc490156f",
           "path": "products/claude-code-action/releases/1.0.244.md"
+        },
+        {
+          "hash": "515b759a8642328ad22e2f3ca388e2fa59241c1866d6190dec77db222ba2d600",
+          "path": "products/claude-code-action/releases/1.0.290.md"
         },
         {
           "hash": "dd9669886c610cdd8b8f2b4f7381a1d7d74adf2001216eef4fc3b815d896db74",
@@ -7720,6 +7768,10 @@
         {
           "hash": "6a8c7f2d68f3be42b013ada21c08c0731788361915c7d71aa828a2d8e715f883",
           "path": "products/claude-code/releases/2.1.33.md"
+        },
+        {
+          "hash": "7f305e606685f23b7b5714aa67d29127a6e44aea7fe4fa83d213e3d806f304f9",
+          "path": "products/claude-code/releases/2.1.332.md"
         },
         {
           "hash": "dbc72a8b9af0f61985f233a82118caeb3aad9365920cc93cf7560faa1ec1a137",
@@ -9446,11 +9498,11 @@
           "path": "products/mcp-python-sdk/releases/2.3.0.md"
         },
         {
-          "hash": "89fa1400aaa959712f366e52450188a8699522fff7508c1d2137d4043664846b",
+          "hash": "355577dcaebf5daa5ec76c56dc5f66f1fde1ad1863535349b5198d9fcdb975e9",
           "path": "products/mcp-registry-official/CATALOG.md"
         },
         {
-          "hash": "8108fc78c2d670af2863ef382e8fbc28c5198c20792fd5b5fed2fd4fd220655b",
+          "hash": "8914c2bb9595cd228e9df4619b6f2c1a03c5926659d332150ec54effcc9e7d9b",
           "path": "products/mcp-registry-smithery/CATALOG.md"
         },
         {
@@ -10929,15 +10981,15 @@
           "path": ".gitignore"
         },
         {
-          "hash": "428e48998e48c0bfccc252746609f02f665acb8a5f716baf15406b922485d599",
+          "hash": "01dbc46de41dc67f97683f31d87ddc82bf9b270133d90cb0b4fdb4c1f816a31a",
           "path": "CHANGELOG.md"
         },
         {
-          "hash": "3a02c6555d61bc7105341a3b7a14f789df78568fa5df1a3b6aa839de876e2eec",
+          "hash": "7857e0579aeb038f953de9bd79d935ccb22edff8f435bac229f9b428247f4e84",
           "path": "CONTRIBUTING.md"
         },
         {
-          "hash": "976702197e64d72e1cdc97dee85a876698e4e2e2b368cfcf1318fa2343ca4ad2",
+          "hash": "a5b8b6cb1ed4d33e825cfa86848e614ee139a2f6b4daf0f1ae31ffc5559174f2",
           "path": "LATEST.txt"
         },
         {
@@ -10945,39 +10997,39 @@
           "path": "LICENSE"
         },
         {
-          "hash": "a5b9da4159faaa1185d48dedfab07ba29b0ded0bca679bdbbe92f067971220d5",
+          "hash": "37caec832e7e1516bcb145d7e9ef6ec753a4a51e2336bf1a0fb5e7cd92e55810",
           "path": "PRODUCTS.txt"
         },
         {
-          "hash": "4990a4db3f9fb68d51f1a689ee3e69fda15020506558e084106565267286a15e",
+          "hash": "f08660f8105facca3367cde8facde3685c816b37e0c27b34798992264bf29e61",
           "path": "README.es.md"
         },
         {
-          "hash": "acb98a98d632a654a63cce6ba783a50f931668d7f6a52fee1f5b2cfbd420a9dc",
+          "hash": "6e3ce5ff1bca081c21573e6438eb1044e7f3d165238a191f20c4fbfcf1411732",
           "path": "README.fr.md"
         },
         {
-          "hash": "b9e2a8301da3d29f9e7b40993cfb4fef1b3de33895c941f1ef6da5b260bde82c",
+          "hash": "987907144e0a23f83cac3ce6d690524140a6f7bcc34b608bdd2734a73c116f3f",
           "path": "README.hi.md"
         },
         {
-          "hash": "362761fd96be1466c67a51a5f818586b6bb277ee7837f39b332d8cbddb82172e",
+          "hash": "29556e25547c2b25cba52cb316c34aa8f38f9f27d81a3ae840b5a865e3989470",
           "path": "README.it.md"
         },
         {
-          "hash": "33e43574b743eebf4b7a69e488178ba02cb49e391951d206e7df60c2b82d5a5f",
+          "hash": "70917671beb80351f466b9351c93304cc6625730fa544fd31a9d747dcadd505d",
           "path": "README.ja.md"
         },
         {
-          "hash": "5ecbfeb738c8d153192bfdb1396f6cab3f5509f4cf21a374fc0a2ad7572535ac",
+          "hash": "5c4c8b952b3341f30cead4093de0ad9597e5c1d8b214443d5463ecb9182192e6",
           "path": "README.md"
         },
         {
-          "hash": "b11784cdc5f78657007745dd667942ad16ed93a0f298279ceef16cb36a809b6d",
+          "hash": "5751f27602f822629f3ad1abaa643c98e0f8b3bf69e8bbc081260cfc2a8fd0b6",
           "path": "README.pt-BR.md"
         },
         {
-          "hash": "c3028225f0c8a865b626407dbac395664c6e5217ba9ef4ae24dbc50167432d95",
+          "hash": "bec06dcd5f55c996513289bdeb64d9c2afbb42eda3bcea018449a38d413fe23c",
           "path": "README.zh.md"
         },
         {
@@ -10989,7 +11041,7 @@
           "path": "SECURITY.md"
         },
         {
-          "hash": "ff6f94275e3826febe180002fd7f022e625d9b5fad44d55f5a725f01e5add5b6",
+          "hash": "564b7bc781c746dff138bff1ebfc96ce36cfabca6a5f310dd9cc72302d588064",
           "path": "SHIP_GATE.md"
         },
         {
@@ -11009,15 +11061,19 @@
           "path": "codecov.yml"
         },
         {
-          "hash": "cb94808847ac64ed217b75a2d248ab9a0ce934191118e2bce0c67eafd7bb3c77",
+          "hash": "91312ba310bc6929f0bb68ef19ba8c85e7c8afa408321f67844999758c16a034",
+          "path": "model-families.yaml"
+        },
+        {
+          "hash": "e917efff77b176c1f85a9929313b9b249bb6a46ffaa60db3b967d11eed862afa",
           "path": "package.json"
         },
         {
-          "hash": "aab21735a7e30aff4175f337485d394f9d8683be6b37809463dbe93831db95a5",
+          "hash": "94501f00728e2cf24b52a8726028ac3285c5344afa43a37d7549c581117cded4",
           "path": "pnpm-lock.yaml"
         },
         {
-          "hash": "01929cb2e801f9505ba07b4a72f6b6ac302ae7af7ff65ba191d0cd0f0cd9ab43",
+          "hash": "fe1c092f748ec88019d0f9970a3f50f228a8d6bf0e662547c4e308f0b3fa1182",
           "path": "products.yaml"
         },
         {
@@ -11267,7 +11323,7 @@
           "path": "site/src/content/docs/handbook/cs-actions-v1.md"
         },
         {
-          "hash": "dd5b7c834c6c9d2817b1461f914e644084144554f28bc57d9ba867914a820f61",
+          "hash": "f97ed7125ea0b6b8549b2d96f8a472ffc504e5417d76fdbb89e2f427a7d0b43e",
           "path": "site/src/content/docs/handbook/getting-started.md"
         },
         {
@@ -11323,7 +11379,7 @@
       "unresolvedSites": 0
     },
     {
-      "dynamicReads": 0,
+      "dynamicReads": 4,
       "dynamicSpawns": 0,
       "dynamicSpawnsInTests": 0,
       "dynamicWrites": 0,
@@ -11343,17 +11399,12 @@
             {
               "in": "shutdown",
               "kind": "catch",
-              "line": 57
+              "line": 70
             },
             {
               "in": "parseRelativeDate",
               "kind": "throw",
-              "line": 111
-            },
-            {
-              "in": "parseRelativeDate",
-              "kind": "throw",
-              "line": 123
+              "line": 129
             },
             {
               "in": "parseRelativeDate",
@@ -11361,45 +11412,45 @@
               "line": 141
             },
             {
+              "in": "parseRelativeDate",
+              "kind": "throw",
+              "line": 159
+            },
+            {
               "in": "resolveDateOrExit",
               "kind": "catch",
-              "line": 157
-            },
-            {
-              "in": "isDbEmpty",
-              "kind": "catch",
-              "line": 183
+              "line": 175
             },
             {
               "kind": "catch",
-              "line": 319
+              "line": 455
             },
             {
               "kind": "catch",
-              "line": 542
+              "line": 704
             },
             {
               "kind": "catch",
-              "line": 612
+              "line": 783
             },
             {
               "kind": "catch",
-              "line": 706
+              "line": 890
             },
             {
               "kind": "catch",
-              "line": 808
+              "line": 1014
             },
             {
               "kind": "catch",
-              "line": 868
+              "line": 1086
             },
             {
               "kind": "catch",
-              "line": 935
+              "line": 1173
             }
           ],
-          "hash": "601a89dd3a4ee761132574e4b6fbf5ada05ad219e913661bfb61a965bdb6e139",
+          "hash": "7843108ba5e5e41c67388bffcf4f884979465cd57c5bb85e2a92ec8cdf494b18",
           "importOrder": [
             "src/db.ts",
             "src/ingest.ts",
@@ -11407,7 +11458,8 @@
             "src/embed.ts",
             "src/hybrid.ts",
             "src/fetch.ts",
-            "src/errors.ts"
+            "src/errors.ts",
+            "src/store.ts"
           ],
           "importsFiles": [
             "src/db.ts",
@@ -11416,14 +11468,37 @@
             "src/fetch.ts",
             "src/hybrid.ts",
             "src/ingest.ts",
-            "src/query.ts"
+            "src/query.ts",
+            "src/store.ts"
           ],
           "path": "src/cli.ts",
           "sequences": [
             {
               "calls": [
                 {
-                  "line": 93,
+                  "line": 82,
+                  "name": "resolveStorePaths",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 86,
+                  "name": "printStoreResolutionOnce",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "resolveCliStore"
+            },
+            {
+              "calls": [
+                {
+                  "line": 111,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
@@ -11438,7 +11513,7 @@
             {
               "calls": [
                 {
-                  "line": 162,
+                  "line": 180,
                   "name": "formatError",
                   "target": {
                     "file": "src/errors.ts"
@@ -11453,34 +11528,135 @@
             {
               "calls": [
                 {
-                  "line": 181,
-                  "name": "prepare",
-                  "target": null
+                  "line": 82,
+                  "name": "resolveStorePaths",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "resolveCliStore"
+                },
+                {
+                  "line": 86,
+                  "name": "printStoreResolutionOnce",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "resolveCliStore"
+                },
+                {
+                  "line": 111,
+                  "name": "openDb",
+                  "target": {
+                    "file": "src/db.ts"
+                  },
+                  "via": "openTrackedDb"
+                },
+                {
+                  "line": 217,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 221,
+                  "name": "isAutoSyncDisabled",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 228,
+                  "name": "runFirstUseSync",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 235,
+                  "name": "formatFirstUseNotice",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 241,
+                  "name": "formatPartialNote",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
                 }
               ],
               "exported": false,
               "invokedAtTopLevel": false,
               "isDefaultExport": false,
-              "name": "isDbEmpty"
+              "name": "openQueryDbOrFirstUse"
             },
             {
               "calls": [
                 {
-                  "line": 181,
-                  "name": "prepare",
-                  "target": null,
-                  "via": "isDbEmpty"
+                  "line": 251,
+                  "name": "getCorpusFreshness",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
                 }
               ],
               "exported": false,
               "invokedAtTopLevel": false,
               "isDefaultExport": false,
-              "name": "warnIfEmpty"
+              "name": "emitArrayJson"
             },
             {
               "calls": [
                 {
-                  "line": 202,
+                  "line": 260,
+                  "name": "getCorpusFreshness",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                },
+                {
+                  "line": 261,
+                  "name": "formatFreshnessStamp",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "emitTextStamp"
+            },
+            {
+              "calls": [
+                {
+                  "line": 251,
+                  "name": "getCorpusFreshness",
+                  "target": {
+                    "file": "src/query.ts"
+                  },
+                  "via": "emitArrayJson"
+                },
+                {
+                  "line": 261,
+                  "name": "formatFreshnessStamp",
+                  "target": {
+                    "file": "src/query.ts"
+                  },
+                  "via": "emitTextStamp"
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "emitEmptyQueryOutput"
+            },
+            {
+              "calls": [
+                {
+                  "line": 281,
                   "name": "toLocaleString",
                   "target": null
                 }
@@ -11493,7 +11669,7 @@
             {
               "calls": [
                 {
-                  "line": 202,
+                  "line": 281,
                   "name": "toLocaleString",
                   "target": null,
                   "via": "fmtNum"
@@ -11503,6 +11679,103 @@
               "invokedAtTopLevel": false,
               "isDefaultExport": false,
               "name": "printFetchSummary"
+            },
+            {
+              "calls": [
+                {
+                  "line": 82,
+                  "name": "resolveStorePaths",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "resolveCliStore"
+                },
+                {
+                  "line": 86,
+                  "name": "printStoreResolutionOnce",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "resolveCliStore"
+                },
+                {
+                  "line": 111,
+                  "name": "openDb",
+                  "target": {
+                    "file": "src/db.ts"
+                  },
+                  "via": "openTrackedDb"
+                },
+                {
+                  "line": 217,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 221,
+                  "name": "isAutoSyncDisabled",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 228,
+                  "name": "runFirstUseSync",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 235,
+                  "name": "formatFirstUseNotice",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 241,
+                  "name": "formatPartialNote",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "branch": "session.emptyOptOut || !session.db",
+                  "line": 251,
+                  "name": "getCorpusFreshness",
+                  "target": {
+                    "file": "src/query.ts"
+                  },
+                  "via": "emitArrayJson"
+                },
+                {
+                  "branch": "session.emptyOptOut || !session.db",
+                  "line": 261,
+                  "name": "formatFreshnessStamp",
+                  "target": {
+                    "file": "src/query.ts"
+                  },
+                  "via": "emitTextStamp"
+                },
+                {
+                  "line": 508,
+                  "name": "lookupEntity",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "runEntityCommand"
             }
           ]
         },
@@ -11514,51 +11787,67 @@
             "getSchemaVersion",
             "initSchema",
             "openDb",
+            "openSqlite",
             "setEmbeddingDim"
           ],
           "failurePaths": [
             {
+              "in": "openSqlite",
+              "kind": "catch",
+              "line": 60
+            },
+            {
+              "in": "openSqlite",
+              "kind": "throw",
+              "line": 63
+            },
+            {
+              "in": "openSqlite",
+              "kind": "throw",
+              "line": 70
+            },
+            {
               "in": "openDb",
               "kind": "catch",
-              "line": 33
+              "line": 83
             },
             {
               "in": "ensureSchemaVersion",
               "kind": "throw",
-              "line": 86
+              "line": 136
             },
             {
               "in": "getSchemaVersion",
               "kind": "catch",
-              "line": 136
+              "line": 186
             },
             {
               "in": "getEmbeddingDim",
               "kind": "catch",
-              "line": 155
+              "line": 205
             },
             {
               "in": "setEmbeddingDim",
               "kind": "throw",
-              "line": 167
+              "line": 217
             },
             {
               "in": "setEmbeddingDim",
               "kind": "throw",
-              "line": 193
+              "line": 243
             },
             {
               "in": "resolveSchemaPath",
               "kind": "catch",
-              "line": 216
+              "line": 266
             },
             {
               "in": "resolveSchemaPath",
               "kind": "throw",
-              "line": 220
+              "line": 270
             }
           ],
-          "hash": "60efe95fb3a4d06e031c5cc1d3183475d2c66fc413f5de5482b3f2b832995144",
+          "hash": "f5c2cbe54528c7e8cc64b4b370628fdca61a7c73f8e2bd345865d5bd3f1670af",
           "importsFiles": [
             "src/errors.ts"
           ],
@@ -11567,26 +11856,26 @@
             {
               "calls": [
                 {
-                  "line": 51,
+                  "line": 101,
                   "name": "prepare",
                   "target": null
                 },
                 {
                   "branch": "existing",
-                  "line": 72,
+                  "line": 122,
                   "name": "exec",
                   "target": null,
                   "via": "ensureSchemaVersion"
                 },
                 {
                   "branch": "existing",
-                  "line": 79,
+                  "line": 129,
                   "name": "prepare",
                   "target": null,
                   "via": "ensureSchemaVersion"
                 },
                 {
-                  "line": 61,
+                  "line": 111,
                   "name": "exec",
                   "target": null
                 }
@@ -11599,12 +11888,12 @@
             {
               "calls": [
                 {
-                  "line": 72,
+                  "line": 122,
                   "name": "exec",
                   "target": null
                 },
                 {
-                  "line": 79,
+                  "line": 129,
                   "name": "prepare",
                   "target": null
                 }
@@ -11617,7 +11906,7 @@
             {
               "calls": [
                 {
-                  "line": 115,
+                  "line": 165,
                   "name": "prepare",
                   "target": null
                 }
@@ -11630,7 +11919,7 @@
             {
               "calls": [
                 {
-                  "line": 132,
+                  "line": 182,
                   "name": "prepare",
                   "target": null
                 }
@@ -11643,7 +11932,7 @@
             {
               "calls": [
                 {
-                  "line": 149,
+                  "line": 199,
                   "name": "prepare",
                   "target": null
                 }
@@ -11656,12 +11945,12 @@
             {
               "calls": [
                 {
-                  "line": 174,
+                  "line": 224,
                   "name": "exec",
                   "target": null
                 },
                 {
-                  "line": 149,
+                  "line": 199,
                   "name": "prepare",
                   "target": null,
                   "via": "getEmbeddingDim"
@@ -11841,9 +12130,58 @@
         },
         {
           "exports": [
-            "extractEntities"
+            "buildModelIdPattern",
+            "escapeRegExp",
+            "extractEntities",
+            "loadModelFamilies",
+            "resolveModelFamiliesPath"
           ],
-          "hash": "b1297ab58967b6befb4d4431d997c86951a2a693b43585765dc92e890bbf8542",
+          "failurePaths": [
+            {
+              "in": "loadModelFamilies",
+              "kind": "catch",
+              "line": 35
+            },
+            {
+              "in": "loadModelFamilies",
+              "kind": "throw",
+              "line": 36
+            },
+            {
+              "in": "loadModelFamilies",
+              "kind": "catch",
+              "line": 47
+            },
+            {
+              "in": "loadModelFamilies",
+              "kind": "throw",
+              "line": 48
+            },
+            {
+              "in": "loadModelFamilies",
+              "kind": "throw",
+              "line": 62
+            },
+            {
+              "in": "loadModelFamilies",
+              "kind": "throw",
+              "line": 75
+            },
+            {
+              "in": "loadModelFamilies",
+              "kind": "throw",
+              "line": 83
+            },
+            {
+              "in": "loadModelFamilies",
+              "kind": "throw",
+              "line": 96
+            }
+          ],
+          "hash": "121167f2b17553c6c211da0780ea08243d6991a3b0dc4c5517273af89c7ee37d",
+          "importsFiles": [
+            "src/errors.ts"
+          ],
           "path": "src/extract.ts"
         },
         {
@@ -11877,6 +12215,8 @@
         },
         {
           "exports": [
+            "fetchAnthropicAppsReleaseNotes",
+            "fetchClaudeApiReleaseNotes",
             "fetchGithubCopilotBlog",
             "fetchHtmlReleases",
             "fetchVscodeUpdates",
@@ -11907,9 +12247,14 @@
               "in": "fetchVscodeUpdates",
               "kind": "catch",
               "line": 278
+            },
+            {
+              "in": "fetchDatedH3ReleaseNotes",
+              "kind": "throw",
+              "line": 429
             }
           ],
-          "hash": "935ad74e2a2e1ae012d66004d5ff51ca2cdfaffff8ee7badcffdfc71ee3f4f79",
+          "hash": "476a6c30fe4edf2c70ccfc8aa42c7abeaf6f4e8af64b76241e6711f48caa4a6f",
           "importsFiles": [
             "src/fetch-utils.ts"
           ],
@@ -12076,90 +12421,90 @@
             {
               "in": "fetchAll",
               "kind": "throw",
-              "line": 198
+              "line": 202
             },
             {
               "in": "fetchOne",
               "kind": "catch",
-              "line": 314
+              "line": 318
             },
             {
               "in": "fetchGhReleases",
               "kind": "throw",
-              "line": 348
+              "line": 352
             },
             {
               "in": "fetchGhReleases",
               "kind": "catch",
-              "line": 375
+              "line": 379
             },
             {
               "in": "ghReleases",
               "kind": "catch",
-              "line": 416
+              "line": 420
             },
             {
               "in": "ghReleases",
               "kind": "throw",
-              "line": 424
+              "line": 428
             },
             {
               "in": "ghReleases",
               "kind": "throw",
-              "line": 430
+              "line": 434
             },
             {
               "in": "ghReleases",
               "kind": "catch",
-              "line": 436
+              "line": 440
             },
             {
               "in": "fetchRss",
               "kind": "throw",
-              "line": 531
+              "line": 535
             },
             {
               "in": "fetchRss",
               "kind": "catch",
-              "line": 567
+              "line": 571
             },
             {
               "in": "fetchRawChangelog",
               "kind": "throw",
-              "line": 585
+              "line": 589
             },
             {
               "in": "fetchRawChangelog",
               "kind": "throw",
-              "line": 599
+              "line": 603
             },
             {
               "in": "fetchRawChangelog",
               "kind": "catch",
-              "line": 632
+              "line": 636
             },
             {
               "in": "fetchHtmlScrape",
               "kind": "throw",
-              "line": 654
+              "line": 658
             },
             {
               "in": "fetchHtmlScrape",
               "kind": "catch",
-              "line": 689
+              "line": 693
             },
             {
               "in": "fetchPlaywrightStrategy",
               "kind": "catch",
-              "line": 742
+              "line": 746
             },
             {
               "in": "fetchCatalogStrategy",
               "kind": "throw",
-              "line": 760
+              "line": 764
             }
           ],
-          "hash": "9add3f8626fe04f3d1a258c727254a28ed15c5ea0aa69e92c857a93bad807b4a",
+          "hash": "3cb8f3c816b3350deb8a718f5f12fa0ecd31b6cd1e042959a1edd0494a2363e5",
           "importsFiles": [
             "src/fetch-changelog.ts",
             "src/fetch-html.ts",
@@ -12174,14 +12519,14 @@
             {
               "calls": [
                 {
-                  "line": 207,
+                  "line": 211,
                   "name": "createFetchAllController",
                   "target": {
                     "file": "src/fetch-utils.ts"
                   }
                 },
                 {
-                  "line": 207,
+                  "line": 211,
                   "name": "DEFAULT_FETCH_ALL_TIMEOUT_MS",
                   "passed": true,
                   "target": {
@@ -12189,13 +12534,13 @@
                   }
                 },
                 {
-                  "line": 781,
+                  "line": 785,
                   "name": "prepare",
                   "target": null,
                   "via": "readMarker"
                 },
                 {
-                  "line": 533,
+                  "line": 537,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
@@ -12203,7 +12548,7 @@
                   "via": "fetchRss"
                 },
                 {
-                  "line": 593,
+                  "line": 597,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12211,7 +12556,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 596,
+                  "line": 600,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12219,7 +12564,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 656,
+                  "line": 660,
                   "name": "fetchHtmlReleases",
                   "target": {
                     "file": "src/fetch-html.ts"
@@ -12227,7 +12572,7 @@
                   "via": "fetchHtmlScrape"
                 },
                 {
-                  "line": 762,
+                  "line": 766,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12235,7 +12580,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 764,
+                  "line": 768,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12243,7 +12588,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 709,
+                  "line": 713,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
@@ -12251,7 +12596,7 @@
                   "via": "fetchPlaywrightStrategy"
                 },
                 {
-                  "line": 804,
+                  "line": 808,
                   "name": "prepare",
                   "target": null,
                   "via": "writeMarker"
@@ -12265,13 +12610,13 @@
             {
               "calls": [
                 {
-                  "line": 781,
+                  "line": 785,
                   "name": "prepare",
                   "target": null,
                   "via": "readMarker"
                 },
                 {
-                  "line": 533,
+                  "line": 537,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
@@ -12279,7 +12624,7 @@
                   "via": "fetchRss"
                 },
                 {
-                  "line": 593,
+                  "line": 597,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12287,7 +12632,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 596,
+                  "line": 600,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12295,7 +12640,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 656,
+                  "line": 660,
                   "name": "fetchHtmlReleases",
                   "target": {
                     "file": "src/fetch-html.ts"
@@ -12303,7 +12648,7 @@
                   "via": "fetchHtmlScrape"
                 },
                 {
-                  "line": 762,
+                  "line": 766,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12311,7 +12656,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 764,
+                  "line": 768,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12319,7 +12664,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 709,
+                  "line": 713,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
@@ -12327,7 +12672,7 @@
                   "via": "fetchPlaywrightStrategy"
                 },
                 {
-                  "line": 804,
+                  "line": 808,
                   "name": "prepare",
                   "target": null,
                   "via": "writeMarker"
@@ -12341,7 +12686,7 @@
             {
               "calls": [
                 {
-                  "line": 533,
+                  "line": 537,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
@@ -12356,14 +12701,14 @@
             {
               "calls": [
                 {
-                  "line": 593,
+                  "line": 597,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
                   }
                 },
                 {
-                  "line": 596,
+                  "line": 600,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12378,7 +12723,7 @@
             {
               "calls": [
                 {
-                  "line": 656,
+                  "line": 660,
                   "name": "fetchHtmlReleases",
                   "target": {
                     "file": "src/fetch-html.ts"
@@ -12393,7 +12738,7 @@
             {
               "calls": [
                 {
-                  "line": 709,
+                  "line": 713,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
@@ -12408,14 +12753,14 @@
             {
               "calls": [
                 {
-                  "line": 762,
+                  "line": 766,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
                   }
                 },
                 {
-                  "line": 764,
+                  "line": 768,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12430,7 +12775,7 @@
             {
               "calls": [
                 {
-                  "line": 781,
+                  "line": 785,
                   "name": "prepare",
                   "target": null
                 }
@@ -12443,7 +12788,7 @@
             {
               "calls": [
                 {
-                  "line": 804,
+                  "line": 808,
                   "name": "prepare",
                   "target": null
                 }
@@ -12456,7 +12801,7 @@
             {
               "calls": [
                 {
-                  "line": 821,
+                  "line": 825,
                   "name": "prepare",
                   "target": null
                 }
@@ -12554,7 +12899,8 @@
           "entryRule": 4,
           "exports": [
             "ingestAll",
-            "ingestSynergies"
+            "ingestSynergies",
+            "reextractEntities"
           ],
           "failurePaths": [
             {
@@ -12580,15 +12926,15 @@
             {
               "in": "ingestSynergies",
               "kind": "catch",
-              "line": 558
+              "line": 620
             },
             {
               "in": "ingestSynergies",
               "kind": "catch",
-              "line": 767
+              "line": 829
             }
           ],
-          "hash": "97807699609302ab58f04df26b192fb98d51da9eea180be86ae566181133b7a1",
+          "hash": "49e1aad03c6a4f6add25eed75f6386db17cac56250e9cf237d2d26136ab477dd",
           "importsFiles": [
             "src/extract.ts",
             "src/products-config.ts"
@@ -12623,12 +12969,37 @@
             {
               "calls": [
                 {
-                  "line": 564,
+                  "line": 349,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 619,
+                  "line": 363,
+                  "name": "transaction",
+                  "target": null
+                },
+                {
+                  "line": 380,
+                  "name": "extractEntities",
+                  "target": {
+                    "file": "src/extract.ts"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "reextractEntities"
+            },
+            {
+              "calls": [
+                {
+                  "line": 626,
+                  "name": "prepare",
+                  "target": null
+                },
+                {
+                  "line": 681,
                   "name": "transaction",
                   "target": null
                 }
@@ -12641,153 +13012,173 @@
           ]
         },
         {
-          "entry": "resolveSynergiesDir",
+          "entry": "getHasChunks",
           "entryRule": 1,
           "failurePaths": [
             {
+              "kind": "catch",
+              "line": 100
+            },
+            {
+              "in": "getDbOrThrow",
+              "kind": "throw",
+              "line": 109
+            },
+            {
+              "in": "getHasChunks",
+              "kind": "catch",
+              "line": 120
+            },
+            {
               "in": "asRecord",
               "kind": "throw",
-              "line": 302
+              "line": 330
             },
             {
               "in": "requireString",
               "kind": "throw",
-              "line": 310
+              "line": 338
             },
             {
               "in": "optString",
               "kind": "throw",
-              "line": 319
+              "line": 347
             },
             {
               "in": "optInt",
               "kind": "throw",
-              "line": 334
+              "line": 362
             },
             {
               "in": "optBool",
               "kind": "throw",
-              "line": 346
+              "line": 374
             },
             {
               "in": "optEnum",
               "kind": "throw",
-              "line": 360
+              "line": 388
             },
             {
+              "in": "runTool",
               "kind": "throw",
-              "line": 410
+              "line": 497
             },
             {
+              "in": "runTool",
               "kind": "throw",
-              "line": 459
+              "line": 532
             },
             {
+              "in": "runTool",
               "kind": "throw",
-              "line": 488
+              "line": 551
             },
             {
-              "kind": "throw",
-              "line": 570
-            },
-            {
-              "kind": "catch",
-              "line": 572
-            },
-            {
-              "kind": "throw",
-              "line": 573
-            },
-            {
-              "kind": "throw",
-              "line": 574
-            },
-            {
-              "in": "handleSearch",
+              "in": "runTool",
               "kind": "throw",
               "line": 603
             },
             {
+              "kind": "catch",
+              "line": 628
+            },
+            {
+              "kind": "throw",
+              "line": 629
+            },
+            {
+              "kind": "throw",
+              "line": 630
+            },
+            {
               "in": "dbSynergiesEmpty",
               "kind": "catch",
-              "line": 721
+              "line": 784
             },
             {
               "in": "handleListSynergies",
               "kind": "catch",
-              "line": 750
+              "line": 813
             },
             {
               "in": "listSynergiesFromDisk",
               "kind": "catch",
-              "line": 778
+              "line": 841
             },
             {
               "in": "handleReadSynergy",
               "kind": "catch",
-              "line": 800
+              "line": 863
             },
             {
               "in": "handleReadSynergy",
               "kind": "catch",
-              "line": 816
+              "line": 879
             },
             {
               "in": "handleGetChangesSince",
               "kind": "catch",
-              "line": 852
+              "line": 915
             },
             {
               "in": "handleGetChangesSince",
               "kind": "throw",
-              "line": 853
+              "line": 916
             },
             {
               "in": "handleSearchBreakingChanges",
               "kind": "catch",
-              "line": 868
+              "line": 931
             },
             {
               "in": "handleSearchBreakingChanges",
               "kind": "throw",
-              "line": 869
+              "line": 932
             },
             {
               "in": "handleSyncNow",
               "kind": "throw",
-              "line": 947
-            },
-            {
-              "in": "handleSyncNow",
-              "kind": "throw",
-              "line": 968
-            },
-            {
-              "in": "handleSyncNow",
-              "kind": "catch",
               "line": 1010
             },
             {
+              "in": "handleSyncNow",
+              "kind": "throw",
+              "line": 1031
+            },
+            {
+              "in": "handleSyncNow",
+              "kind": "catch",
+              "line": 1042
+            },
+            {
+              "in": "handleSyncNow",
+              "kind": "catch",
+              "line": 1088
+            },
+            {
               "in": "handleCompareVersions",
               "kind": "catch",
-              "line": 1046
+              "line": 1124
             },
             {
               "in": "handleCompareVersions",
               "kind": "throw",
-              "line": 1047
+              "line": 1125
             },
             {
               "in": "shutdownMcp",
               "kind": "catch",
-              "line": 1058
+              "line": 1137
             }
           ],
-          "hash": "c673731d4f3b8a4fc28f4af6816f358b3d66b139f9a5ba2b961d658b53fccc59",
+          "hash": "cc2a1efe1655b4b0e10a2b941ade0e84d594e9fecdd59901808525c52dee829f",
           "importOrder": [
             "src/db.ts",
+            "src/errors.ts",
             "src/query.ts",
             "src/hybrid.ts",
+            "src/store.ts",
             "src/fetch.ts",
             "src/ingest.ts",
             "src/embed.ts"
@@ -12795,25 +13186,121 @@
           "importsFiles": [
             "src/db.ts",
             "src/embed.ts",
+            "src/errors.ts",
             "src/fetch.ts",
             "src/hybrid.ts",
             "src/ingest.ts",
-            "src/query.ts"
+            "src/query.ts",
+            "src/store.ts"
           ],
           "path": "src/mcp-server.ts",
           "sequences": [
             {
               "calls": [
                 {
+                  "line": 118,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": true,
+              "isDefaultExport": false,
+              "name": "getHasChunks"
+            },
+            {
+              "calls": [
+                {
+                  "line": 422,
+                  "name": "getCorpusFreshness",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                },
+                {
+                  "line": 423,
+                  "name": "getPartialNote",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 424,
+                  "name": "formatFreshnessStamp",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                },
+                {
+                  "line": 429,
+                  "name": "formatManualFeedWarning",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "finalizeToolText"
+            },
+            {
+              "calls": [
+                {
+                  "line": 436,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 437,
+                  "name": "isAutoSyncDisabled",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 440,
+                  "name": "ensureSynced",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "branch": "res.performedByThisCall",
+                  "line": 448,
+                  "name": "formatFirstUseNotice",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "ensureCorpusReady"
+            },
+            {
+              "calls": [
+                {
                   "branch": "mode === 'fts'",
-                  "line": 583,
+                  "line": 640,
                   "name": "searchChanges",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 609,
+                  "line": 118,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "getHasChunks"
+                },
+                {
+                  "line": 668,
                   "name": "hybridSearch",
                   "target": {
                     "file": "src/hybrid.ts"
@@ -12828,7 +13315,7 @@
             {
               "calls": [
                 {
-                  "line": 643,
+                  "line": 704,
                   "name": "lookupEntity",
                   "target": {
                     "file": "src/query.ts"
@@ -12843,7 +13330,7 @@
             {
               "calls": [
                 {
-                  "line": 656,
+                  "line": 717,
                   "name": "recentReleases",
                   "target": {
                     "file": "src/query.ts"
@@ -12858,7 +13345,7 @@
             {
               "calls": [
                 {
-                  "line": 687,
+                  "line": 749,
                   "name": "listProducts",
                   "target": {
                     "file": "src/query.ts"
@@ -12873,7 +13360,7 @@
             {
               "calls": [
                 {
-                  "line": 701,
+                  "line": 763,
                   "name": "entityFrequency",
                   "target": {
                     "file": "src/query.ts"
@@ -12888,7 +13375,7 @@
             {
               "calls": [
                 {
-                  "line": 730,
+                  "line": 793,
                   "name": "listSynergies",
                   "target": {
                     "file": "src/query.ts"
@@ -12903,7 +13390,7 @@
             {
               "calls": [
                 {
-                  "line": 796,
+                  "line": 859,
                   "name": "getSynergy",
                   "target": {
                     "file": "src/query.ts"
@@ -12918,7 +13405,7 @@
             {
               "calls": [
                 {
-                  "line": 845,
+                  "line": 908,
                   "name": "getChangesSince",
                   "target": {
                     "file": "src/query.ts"
@@ -12933,7 +13420,7 @@
             {
               "calls": [
                 {
-                  "line": 861,
+                  "line": 924,
                   "name": "browseChanges",
                   "target": {
                     "file": "src/query.ts"
@@ -12949,7 +13436,7 @@
               "calls": [
                 {
                   "branch": "h < 48",
-                  "line": 893,
+                  "line": 956,
                   "name": "toFixed",
                   "target": null
                 }
@@ -12962,7 +13449,7 @@
             {
               "calls": [
                 {
-                  "line": 898,
+                  "line": 961,
                   "name": "getSyncStatus",
                   "target": {
                     "file": "src/query.ts"
@@ -12970,10 +13457,17 @@
                 },
                 {
                   "branch": "h < 48",
-                  "line": 893,
+                  "line": 956,
                   "name": "toFixed",
                   "target": null,
                   "via": "formatHours"
+                },
+                {
+                  "line": 989,
+                  "name": "formatManualFeedWarning",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
                 }
               ],
               "exported": false,
@@ -12984,32 +13478,78 @@
             {
               "calls": [
                 {
+                  "line": 1009,
+                  "name": "isSyncInProgress",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
                   "branch": "dryRun",
-                  "line": 965,
+                  "line": 1028,
                   "name": "listFetchTargets",
                   "target": {
                     "file": "src/fetch.ts"
                   }
                 },
                 {
-                  "line": 985,
+                  "line": 1051,
+                  "name": "setManualSyncActive",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 1055,
+                  "name": "openDb",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 1057,
+                  "name": "initSchema",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 1060,
                   "name": "fetchAll",
                   "target": {
                     "file": "src/fetch.ts"
                   }
                 },
                 {
-                  "line": 995,
+                  "line": 1066,
+                  "name": "clearPartialNote",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 1073,
                   "name": "ingestAll",
                   "target": {
                     "file": "src/ingest.ts"
                   }
                 },
                 {
-                  "line": 1005,
+                  "line": 1083,
                   "name": "embedAll",
                   "target": {
                     "file": "src/embed.ts"
+                  }
+                },
+                {
+                  "line": 1112,
+                  "name": "setManualSyncActive",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
                   }
                 }
               ],
@@ -13021,7 +13561,7 @@
             {
               "calls": [
                 {
-                  "line": 1041,
+                  "line": 1119,
                   "name": "compareVersions",
                   "target": {
                     "file": "src/query.ts"
@@ -13044,67 +13584,57 @@
             {
               "in": "loadProductsConfig",
               "kind": "catch",
-              "line": 103
+              "line": 108
             },
             {
               "in": "loadProductsConfig",
               "kind": "catch",
-              "line": 114
-            },
-            {
-              "in": "loadProductsConfig",
-              "kind": "throw",
-              "line": 115
-            },
-            {
-              "in": "loadProductsConfig",
-              "kind": "throw",
               "line": 119
             },
             {
               "in": "loadProductsConfig",
               "kind": "throw",
-              "line": 127
+              "line": 120
             },
             {
               "in": "loadProductsConfig",
               "kind": "throw",
-              "line": 130
+              "line": 124
             },
             {
               "in": "loadProductsConfig",
               "kind": "throw",
-              "line": 150
+              "line": 132
+            },
+            {
+              "in": "loadProductsConfig",
+              "kind": "throw",
+              "line": 135
+            },
+            {
+              "in": "loadProductsConfig",
+              "kind": "throw",
+              "line": 155
             },
             {
               "in": "buildFetchTarget",
               "kind": "throw",
-              "line": 169
+              "line": 174
             },
             {
               "in": "buildFetchTarget",
               "kind": "throw",
-              "line": 175
-            },
-            {
-              "in": "buildFetchTarget",
-              "kind": "catch",
               "line": 180
             },
             {
               "in": "buildFetchTarget",
-              "kind": "throw",
-              "line": 181
+              "kind": "catch",
+              "line": 185
             },
             {
               "in": "buildFetchTarget",
               "kind": "throw",
-              "line": 187
-            },
-            {
-              "in": "buildFetchTarget",
-              "kind": "throw",
-              "line": 188
+              "line": 186
             },
             {
               "in": "buildFetchTarget",
@@ -13114,7 +13644,12 @@
             {
               "in": "buildFetchTarget",
               "kind": "throw",
-              "line": 201
+              "line": 193
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 197
             },
             {
               "in": "buildFetchTarget",
@@ -13124,15 +13659,25 @@
             {
               "in": "buildFetchTarget",
               "kind": "throw",
-              "line": 217
+              "line": 215
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 224
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 235
             },
             {
               "in": "resolveYamlPath",
               "kind": "catch",
-              "line": 233
+              "line": 253
             }
           ],
-          "hash": "60c0b66ab8f149decaa6679ffd3d5cc80ff4dd81e0cb07814061b04cccb92784",
+          "hash": "5ff64f6c248b346cd69bf8c5e3fef8dbbd7d7be3f0993c72fa71a4c0236da66a",
           "path": "src/products-config.ts"
         },
         {
@@ -13504,14 +14049,17 @@
           "path": "src/providers/types.ts"
         },
         {
-          "entry": "searchChanges",
+          "entry": "getCorpusFreshness",
           "entryRule": 4,
           "exports": [
             "browseChanges",
             "compareVersions",
             "entityFrequency",
+            "formatFreshnessStamp",
+            "formatManualFeedWarning",
             "formatResultLine",
             "getChangesSince",
+            "getCorpusFreshness",
             "getSyncStatus",
             "getSynergy",
             "listProducts",
@@ -13520,35 +14068,139 @@
             "productColWidth",
             "recentReleases",
             "searchChanges",
-            "truncate"
+            "truncate",
+            "utcDaysSince"
           ],
           "failurePaths": [
             {
+              "in": "getCorpusFreshness",
+              "kind": "catch",
+              "line": 95
+            },
+            {
+              "in": "getCorpusFreshness",
+              "kind": "catch",
+              "line": 132
+            },
+            {
               "in": "getChangesSince",
               "kind": "throw",
-              "line": 356
+              "line": 560
             },
             {
               "in": "compareVersions",
               "kind": "throw",
-              "line": 441
+              "line": 645
             },
             {
               "in": "compareVersions",
               "kind": "throw",
-              "line": 468
+              "line": 672
             }
           ],
-          "hash": "a24e4c2dee9d3d970c087e1fff8863de6916b0ef23d104a965014b57a35fc5e7",
+          "hash": "a5f087c0926fef350dfdbbc36a69d8cf404b63f4f03a1c6871359f6f002a7a40",
           "importsFiles": [
-            "src/errors.ts"
+            "src/errors.ts",
+            "src/products-config.ts"
           ],
           "path": "src/query.ts",
           "sequences": [
             {
               "calls": [
                 {
-                  "line": 112,
+                  "line": 63,
+                  "name": "getUTCFullYear",
+                  "target": null
+                },
+                {
+                  "line": 63,
+                  "name": "getUTCMonth",
+                  "target": null
+                },
+                {
+                  "line": 63,
+                  "name": "getUTCDate",
+                  "target": null
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "utcDaysSince"
+            },
+            {
+              "calls": [
+                {
+                  "line": 90,
+                  "name": "prepare",
+                  "target": null
+                },
+                {
+                  "line": 63,
+                  "name": "getUTCFullYear",
+                  "target": null,
+                  "via": "utcDaysSince"
+                },
+                {
+                  "line": 63,
+                  "name": "getUTCMonth",
+                  "target": null,
+                  "via": "utcDaysSince"
+                },
+                {
+                  "line": 63,
+                  "name": "getUTCDate",
+                  "target": null,
+                  "via": "utcDaysSince"
+                },
+                {
+                  "line": 120,
+                  "name": "prepare",
+                  "target": null
+                },
+                {
+                  "line": 138,
+                  "name": "loadProductsConfig",
+                  "target": {
+                    "file": "src/products-config.ts"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "getCorpusFreshness"
+            },
+            {
+              "calls": [
+                {
+                  "line": 63,
+                  "name": "getUTCFullYear",
+                  "target": null,
+                  "via": "utcDaysSince"
+                },
+                {
+                  "line": 63,
+                  "name": "getUTCMonth",
+                  "target": null,
+                  "via": "utcDaysSince"
+                },
+                {
+                  "line": 63,
+                  "name": "getUTCDate",
+                  "target": null,
+                  "via": "utcDaysSince"
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "formatManualFeedWarning"
+            },
+            {
+              "calls": [
+                {
+                  "line": 316,
                   "name": "prepare",
                   "target": null
                 }
@@ -13561,7 +14213,7 @@
             {
               "calls": [
                 {
-                  "line": 130,
+                  "line": 334,
                   "name": "prepare",
                   "target": null
                 }
@@ -13574,7 +14226,7 @@
             {
               "calls": [
                 {
-                  "line": 159,
+                  "line": 363,
                   "name": "prepare",
                   "target": null
                 }
@@ -13587,7 +14239,7 @@
             {
               "calls": [
                 {
-                  "line": 175,
+                  "line": 379,
                   "name": "prepare",
                   "target": null
                 }
@@ -13600,7 +14252,7 @@
             {
               "calls": [
                 {
-                  "line": 227,
+                  "line": 431,
                   "name": "prepare",
                   "target": null
                 }
@@ -13613,7 +14265,7 @@
             {
               "calls": [
                 {
-                  "line": 259,
+                  "line": 463,
                   "name": "prepare",
                   "target": null
                 }
@@ -13626,7 +14278,7 @@
             {
               "calls": [
                 {
-                  "line": 318,
+                  "line": 522,
                   "name": "prepare",
                   "target": null
                 }
@@ -13639,7 +14291,7 @@
             {
               "calls": [
                 {
-                  "line": 387,
+                  "line": 591,
                   "name": "prepare",
                   "target": null
                 }
@@ -13652,7 +14304,7 @@
             {
               "calls": [
                 {
-                  "line": 451,
+                  "line": 655,
                   "name": "prepare",
                   "target": null
                 }
@@ -13665,7 +14317,7 @@
             {
               "calls": [
                 {
-                  "line": 576,
+                  "line": 780,
                   "name": "prepare",
                   "target": null
                 }
@@ -13678,7 +14330,7 @@
             {
               "calls": [
                 {
-                  "line": 609,
+                  "line": 813,
                   "name": "prepare",
                   "target": null
                 }
@@ -13687,6 +14339,113 @@
               "invokedAtTopLevel": false,
               "isDefaultExport": false,
               "name": "getSynergy"
+            }
+          ]
+        },
+        {
+          "entry": "runFirstUseSync",
+          "entryRule": 4,
+          "exports": [
+            "formatFirstUseNotice",
+            "formatPartialNote",
+            "hasAnyReleases",
+            "isAutoSyncDisabled",
+            "printStoreResolutionOnce",
+            "resetStoreNoticeForTests",
+            "resolveStorePaths",
+            "runFirstUseSync"
+          ],
+          "failurePaths": [
+            {
+              "in": "hasAnyReleases",
+              "kind": "catch",
+              "line": 130
+            },
+            {
+              "in": "runFirstUseSync",
+              "kind": "catch",
+              "line": 183
+            }
+          ],
+          "hash": "31b95f0983f2ff46c36408b617e24ac5f42911e997cc59007205567433a66465",
+          "importsFiles": [
+            "src/db.ts",
+            "src/fetch.ts",
+            "src/ingest.ts",
+            "src/query.ts"
+          ],
+          "path": "src/store.ts",
+          "sequences": [
+            {
+              "calls": [
+                {
+                  "line": 128,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "hasAnyReleases"
+            },
+            {
+              "calls": [
+                {
+                  "line": 171,
+                  "name": "openDb",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 172,
+                  "name": "initSchema",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 182,
+                  "name": "fetchAll",
+                  "target": {
+                    "file": "src/fetch.ts"
+                  }
+                },
+                {
+                  "line": 216,
+                  "name": "ingestAll",
+                  "target": {
+                    "file": "src/ingest.ts"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "runFirstUseSync"
+            },
+            {
+              "calls": [
+                {
+                  "line": 247,
+                  "name": "getCorpusFreshness",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                },
+                {
+                  "line": 248,
+                  "name": "formatFreshnessStamp",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "formatFirstUseNotice"
             }
           ]
         }
@@ -13702,33 +14461,17 @@
       "origin": "authored",
       "outsidePlaces": [
         {
-          "reads": 32,
+          "reads": 43,
           "where": [
             "caller"
           ],
-          "writes": 8
+          "writes": 9
         },
         {
           "reads": 1,
           "where": [
             "caller",
             "cwd:data/"
-          ],
-          "writes": 1
-        },
-        {
-          "reads": 4,
-          "where": [
-            "caller",
-            "cwd:synergies"
-          ],
-          "writes": 0
-        },
-        {
-          "reads": 3,
-          "where": [
-            "caller",
-            "cwd:synergies/"
           ],
           "writes": 0
         },
@@ -13752,22 +14495,15 @@
             "cwd:schema.sql"
           ],
           "writes": 0
-        },
-        {
-          "reads": 1,
-          "where": [
-            "cwd:synergies"
-          ],
-          "writes": 0
         }
       ],
-      "outsideReads": 48,
+      "outsideReads": 51,
       "outsideWrites": 9,
       "role": "code",
       "testRunners": [
         "vitest"
       ],
-      "testedBy": 45,
+      "testedBy": 48,
       "unresolvedSites": 0
     },
     {
@@ -13870,8 +14606,16 @@
           "path": "test/fixtures/markdown-edge-cases/unicode-in-bullets.md"
         },
         {
+          "hash": "aa7d6cb6f4ed02e21acf2e94196cfd583aedf714ba1a584d34c96ec4793708e5",
+          "path": "test/fixtures/mock-responses/anthropic-apps-release-notes.html"
+        },
+        {
           "hash": "d7d82663c505f13b044b005d7895c25c21b7f0eec623617d83b3564078f0a6f9",
           "path": "test/fixtures/mock-responses/anthropic-messages.json"
+        },
+        {
+          "hash": "e8dbb75253c667a6482d0af9eac6e840d7342b01a4f7eaa93b88981b8b5e55ac",
+          "path": "test/fixtures/mock-responses/claude-api-release-notes.html"
         },
         {
           "hash": "d3038d2ea1ffd1731de95df2e9df4422917af915769316119a556747080ee37b",
@@ -14047,6 +14791,22 @@
           "path": "test/helpers/yaml-fixtures.ts"
         },
         {
+          "hash": "9fec0324edd52d34499e719746b1598f5e6d29910adae7b9d34c9fbc82d345c7",
+          "importOrder": [
+            "test/helpers/temp-db.ts",
+            "test/helpers/seed-corpus.ts"
+          ],
+          "importsFiles": [
+            "test/helpers/seed-corpus.ts",
+            "test/helpers/temp-db.ts"
+          ],
+          "path": "test/integration/cli-freshness.test.ts",
+          "spawns": [
+            "src/cli.ts"
+          ],
+          "testFramework": "vitest"
+        },
+        {
           "hash": "5d77a2d1bdf9d18eeb6396ff7189ba49619b4824c90c49426b783e6dc68ec68f",
           "importOrder": [
             "test/helpers/temp-db.ts",
@@ -14063,7 +14823,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "836338dd6e6c337ffb4316ae7521f6aaa10b3ecbae4c540a77e9c096a7057b07",
+          "hash": "f4caa30b0f23a9c6aef8dbdad2e3db66d118f7a55b623faa80d4b9c515378ea9",
           "importOrder": [
             "test/helpers/temp-db.ts",
             "test/helpers/seed-corpus.ts"
@@ -14079,7 +14839,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "39a40262c3fb08a76175be72a05d69055be0391739c592bbbc1ad382bbe99a95",
+          "hash": "6226a19af3f8648a333ea6600e91a9b3492083ff217cb89437eb1c1a21b93f70",
           "importOrder": [
             "test/helpers/temp-db.ts",
             "test/helpers/seed-corpus.ts",
@@ -14174,6 +14934,11 @@
           "testFramework": "vitest"
         },
         {
+          "hash": "018df4db1bd34897bb24a4ee83ef9937551b7fd8fea8b17a8197ba813d781327",
+          "parseError": true,
+          "path": "test/unit/db.binding.test.ts"
+        },
+        {
           "hash": "3f3d037c705294d5bcc63c6df65c0db83b877450405b7078292a09772477b677",
           "importsFiles": [
             "src/db.ts",
@@ -14229,9 +14994,18 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "d29529b2350fc6697acd50beac62dba27bd0937c196daf4538d83fdb1c43bff3",
+          "hash": "988727b5ed4bb7651336b234005169039c01272d37dfe6ef186a71494af2327e",
+          "importOrder": [
+            "src/extract.ts",
+            "src/ingest.ts",
+            "src/errors.ts",
+            "test/helpers/temp-db.ts"
+          ],
           "importsFiles": [
-            "src/extract.ts"
+            "src/errors.ts",
+            "src/extract.ts",
+            "src/ingest.ts",
+            "test/helpers/temp-db.ts"
           ],
           "path": "test/unit/extract.test.ts",
           "testFramework": "vitest"
@@ -14254,10 +15028,18 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "870a454e67ad555ce0de7d84fdfa498d3a6b496815df0144cb96f3cc711d0594",
+          "hash": "2c8e3c25591bb810a24442c133719055ee3839ba4cee647761432b681a7f4216",
+          "importOrder": [
+            "src/fetch-html.ts",
+            "src/ingest.ts",
+            "test/helpers/temp-db.ts",
+            "test/helpers/fetch-mock.ts"
+          ],
           "importsFiles": [
             "src/fetch-html.ts",
-            "test/helpers/fetch-mock.ts"
+            "src/ingest.ts",
+            "test/helpers/fetch-mock.ts",
+            "test/helpers/temp-db.ts"
           ],
           "path": "test/unit/fetch-html.test.ts",
           "testFramework": "vitest"
@@ -14368,7 +15150,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "abdace564d623c331b06b24d57e04b8067a443af56f3e1c3b9664b8245f50385",
+          "hash": "fc80e203c6dd9fa6790f8721b717098f700c0e2f781199b69d0094b8b21c1d55",
           "importsFiles": [
             "src/products-config.ts",
             "test/helpers/yaml-fixtures.ts"
@@ -14516,6 +15298,21 @@
           "testFramework": "vitest"
         },
         {
+          "hash": "0dcb97b4befa8941e69b6155f99b8881115f30e3dc9db24b2636291108539cc7",
+          "importOrder": [
+            "src/query.ts",
+            "test/helpers/temp-db.ts",
+            "test/helpers/seed-corpus.ts"
+          ],
+          "importsFiles": [
+            "src/query.ts",
+            "test/helpers/seed-corpus.ts",
+            "test/helpers/temp-db.ts"
+          ],
+          "path": "test/unit/query.freshness.test.ts",
+          "testFramework": "vitest"
+        },
+        {
           "hash": "06439af67c04ea12dfeba8714e782ffc1d43c18584f53b3368b09deaf6f14e20",
           "importOrder": [
             "src/query.ts",
@@ -14588,6 +15385,23 @@
             "test/helpers/temp-db.ts"
           ],
           "path": "test/unit/security-validators.test.ts",
+          "testFramework": "vitest"
+        },
+        {
+          "hash": "970cda34f5c7f494cbc02a5339794c8c08cb8806800a531c00be6f19d3060c28",
+          "importOrder": [
+            "src/store.ts",
+            "test/helpers/temp-db.ts",
+            "src/db.ts",
+            "src/fetch.ts"
+          ],
+          "importsFiles": [
+            "src/db.ts",
+            "src/fetch.ts",
+            "src/store.ts",
+            "test/helpers/temp-db.ts"
+          ],
+          "path": "test/unit/store.test.ts",
           "testFramework": "vitest"
         }
       ],
@@ -14764,18 +15578,6 @@
           "job": "release",
           "programs": [
             "echo",
-            "mkdir",
-            "npm",
-            "popd",
-            "pushd"
-          ],
-          "step": "Install npm >=11.5 in sandbox for OIDC trusted-publishing auth"
-        },
-        {
-          "dir": "",
-          "job": "release",
-          "programs": [
-            "echo",
             "node"
           ],
           "step": "Verify tag matches package.json version"
@@ -14803,6 +15605,18 @@
             "pnpm"
           ],
           "step": "Build"
+        },
+        {
+          "dir": "",
+          "job": "release",
+          "programs": [
+            "echo",
+            "mkdir",
+            "npm",
+            "popd",
+            "pushd"
+          ],
+          "step": "Install npm >=11.5 in sandbox for OIDC trusted-publishing auth"
         },
         {
           "dir": "",
@@ -14879,12 +15693,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 31
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 49
+          "files": 53
         }
       ],
       "readers": [],
@@ -14953,7 +15767,7 @@
       "tests": [
         {
           "config": "vitest.config.ts",
-          "files": 41,
+          "files": 45,
           "job": "release",
           "runner": "vitest",
           "step": "Run tests",
@@ -15139,7 +15953,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 29
+          "files": 30
         }
       ],
       "readers": [],
@@ -15313,12 +16127,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 31
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 49
+          "files": 53
         }
       ],
       "readers": [],
@@ -15373,7 +16187,7 @@
         {
           "config": "vitest.config.ts",
           "coverage": true,
-          "files": 41,
+          "files": 45,
           "job": "test",
           "runner": "vitest",
           "step": "Run tests with coverage",
@@ -15424,7 +16238,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 29
+          "files": 30
         }
       ],
       "readers": [],
@@ -15474,7 +16288,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 28
+          "files": 29
         }
       ],
       "readers": [],
@@ -15519,7 +16333,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 28
+          "files": 29
         }
       ],
       "readers": [],
@@ -15562,8 +16376,8 @@
   ],
   "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "4e59215fbdcca6f929717a8f80eeefeed808d41f",
-    "tracked": 2890
+    "commit": "46c15a0b23b6dedad366a2437041b88cba068782",
+    "tracked": 2911
   },
   "landings": [
     {
@@ -15783,6 +16597,17 @@
     {
       "readers": [
         {
+          "by": "src/extract.ts",
+          "call": "readFileSync",
+          "confidence": "ast"
+        }
+      ],
+      "target": "model-families.yaml",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
           "by": ".github/workflows/release.yml",
           "confidence": "config"
         }
@@ -15874,6 +16699,12 @@
     },
     {
       "readers": [
+        {
+          "by": "test/integration/cli-freshness.test.ts",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        },
         {
           "by": "test/integration/cli-json.test.ts",
           "call": "literal",
@@ -16009,33 +16840,36 @@
     {
       "readers": [
         {
-          "by": "src/mcp-server.ts",
-          "call": "existsSync",
-          "confidence": "ast"
-        },
-        {
-          "by": "src/mcp-server.ts",
-          "call": "readFileSync",
-          "confidence": "ast"
-        },
-        {
-          "by": "src/mcp-server.ts",
-          "call": "readdirSync",
-          "confidence": "ast"
-        }
-      ],
-      "target": "synergies",
-      "writers": []
-    },
-    {
-      "readers": [
-        {
           "by": "test-spec-2.md",
           "call": ".",
           "confidence": "text"
         }
       ],
       "target": "test-spec.md",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "test/unit/fetch-html.test.ts",
+          "call": "readFileSync",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "test/fixtures/mock-responses/anthropic-apps-release-notes.html",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "test/unit/fetch-html.test.ts",
+          "call": "readFileSync",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "test/fixtures/mock-responses/claude-api-release-notes.html",
       "writers": []
     },
     {
@@ -16054,7 +16888,7 @@
   "overlaps": [],
   "submodules": [],
   "symlinks": [],
-  "testFiles": 77,
+  "testFiles": 83,
   "testsLeftOut": [
     {
       "config": "vitest.config.ts",
