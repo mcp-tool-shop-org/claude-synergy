@@ -1,0 +1,8 @@
+# Claude model family names recognized by entity extraction (src/extract.ts).
+# Matched in model IDs of the form: claude-<family>-N(-N)?(-YYYYMMDD)?
+families:
+  - opus
+  - sonnet
+  - haiku
+  - fable
+  - mythos

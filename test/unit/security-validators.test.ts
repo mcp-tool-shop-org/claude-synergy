@@ -86,8 +86,10 @@ describe('assertProductShape — product name validation (via fetchAll)', () => 
     // claude-agent-sdk-python is a real target — should not throw "unknown product"
     // Mock the gh CLI to avoid hitting the real network
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(() => '[]'),
-      execSync: vi.fn(() => '[]'),
+      execFile: vi.fn((_cmd: string, _args: any, _opts: any, cb: any) => {
+        cb(null, '[]', '');
+        return { stdin: { end: () => {} } };
+      }),
     }));
     const { fetchAll } = await import('../../src/fetch.js');
     // Should not throw (will return 0 fetched since we mocked empty results)

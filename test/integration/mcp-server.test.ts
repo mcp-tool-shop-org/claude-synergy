@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { createServer } from 'node:http';
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
+import { openDb } from '../../src/db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
 import { withMcpServer, type McpClient } from '../helpers/mcp-client.js';
 
@@ -529,6 +531,408 @@ describe('MCP server integration', () => {
         });
       },
       25_000
+    );
+  });
+
+  describe('freshness stamp & first-use behavior (Parts 1 & 3)', () => {
+    it(
+      'every registered tool in listTools() ends its text answer with the data-as-of stamp',
+      async () => {
+        const db = openDb(temp.path, { loadVec: false });
+        db.prepare(
+          `INSERT INTO markers (product, name, version, updated_at)
+           VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+        ).run();
+        db.close();
+
+        await withMcpServer(
+          {
+            dbPath: temp.path,
+            synergiesDir,
+            env: { CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z' },
+          },
+          async (client: McpClient) => {
+            await client.initialize();
+            await client.notifyInitialized();
+            const tools = await client.listTools();
+            expect(tools.length).toBe(13);
+
+            const toolArgs: Record<string, Record<string, unknown>> = {
+              search: { query: 'workflow', mode: 'fts', limit: 2 },
+              lookup_entity: { type: 'env_var', value: 'ANTHROPIC_API_KEY' },
+              latest_releases: { limit: 2 },
+              get_release: { product: 'test-cli', version: '1.0.0' },
+              list_products: {},
+              top_entities: { type: 'env_var', limit: 2 },
+              list_synergies: {},
+              read_synergy: { name: 'test-synergy' },
+              get_changes_since: { since: '2026-01-01', limit: 5 },
+              search_breaking_changes: { limit: 5 },
+              compare_versions: { product: 'test-cli', from_version: '1.0.0', to_version: '1.1.0' },
+              sync_status: { product: 'test-cli' },
+              sync_now: { dry_run: true, product: 'claude-code' },
+            };
+
+            for (const tool of tools) {
+              const args = toolArgs[tool.name];
+              expect(args, `missing test args for tool ${tool.name}`).toBeDefined();
+              const res = await client.callTool(tool.name, args);
+              const text = res.content[0]?.text ?? '';
+              const lastLine = text.trimEnd().split('\n').pop() ?? '';
+              expect(
+                lastLine,
+                `tool ${tool.name} should end with data as of stamp`
+              ).toMatch(/^data as of: synced 2026-05-21, newest release 2026-04-10 \(44 days old\)/);
+            }
+
+            // Unembedded hybrid search error also ends with the stamp line
+            const hybridErr = await client.callTool('search', { query: 'workflow', mode: 'hybrid' });
+            expect(hybridErr.isError).toBe(true);
+            const errLastLine = (hybridErr.content[0]?.text ?? '').trimEnd().split('\n').pop() ?? '';
+            expect(errLastLine).toMatch(/^data as of: synced 2026-05-21/);
+          }
+        );
+      },
+      30_000
+    );
+
+    it(
+      'prefixes stamp with STALE: and refresh hint when synced_at exceeds STALE_AFTER_DAYS',
+      async () => {
+        const db = openDb(temp.path, { loadVec: false });
+        db.prepare(
+          `INSERT OR REPLACE INTO markers (product, name, version, updated_at)
+           VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+        ).run();
+        db.close();
+
+        await withMcpServer(
+          {
+            dbPath: temp.path,
+            synergiesDir,
+            env: { CLAUDE_SYNERGY_NOW: '2026-11-26T12:00:00Z' },
+          },
+          async (client: McpClient) => {
+            await client.initialize();
+            await client.notifyInitialized();
+            const res = await client.callTool('list_products', {});
+            const lastLine = (res.content[0]?.text ?? '').trimEnd().split('\n').pop() ?? '';
+            expect(lastLine).toMatch(/^STALE: data as of: synced 2026-05-21.*sync_now.*hk sync$/);
+          }
+        );
+      },
+      25_000
+    );
+
+    it(
+      'does not exit on missing DB when CLAUDE_SYNERGY_NO_AUTO_SYNC=1 and stamps empty-corpus error',
+      async () => {
+        const missingDir = mkdtempSync(join(tmpdir(), 'mcp-missing-'));
+        const missingDb = join(missingDir, 'data', 'missing.db');
+        try {
+          await withMcpServer(
+            {
+              dbPath: missingDb,
+              synergiesDir,
+              env: { CLAUDE_SYNERGY_NO_AUTO_SYNC: '1' },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+              const res = await client.callTool('latest_releases', {});
+              expect(res.isError).toBe(true);
+              const text = res.content[0]?.text ?? '';
+              expect(text).toContain('auto-sync is disabled');
+              expect(text.trimEnd().split('\n').pop()).toMatch(/^STALE: data as of: empty corpus/);
+            }
+          );
+        } finally {
+          rmSync(missingDir, { recursive: true, force: true });
+        }
+      },
+      25_000
+    );
+
+    it(
+      'first-use auto-sync on missing DB runs fetch -> ingest and reports partial corpus when one feed fails',
+      async () => {
+        const workDir = mkdtempSync(join(tmpdir(), 'mcp-firstuse-'));
+        const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Local Feed</title>
+<item><title>Release 1.2.0</title><link>http://127.0.0.1/r/1.2.0</link><guid>r-1-2-0</guid><pubDate>Wed, 25 Nov 2026 12:00:00 GMT</pubDate><description><![CDATA[<ul><li>Added local workflow improvement</li></ul>]]></description></item>
+</channel></rss>`;
+
+        const httpServer = createServer((req, res) => {
+          if (req.url === '/ok.rss') {
+            res.writeHead(200, { 'content-type': 'application/rss+xml' });
+            res.end(rssXml);
+          } else {
+            res.writeHead(404, { 'content-type': 'text/plain' });
+            res.end('not found');
+          }
+        });
+        await new Promise<void>((resolveListen) => httpServer.listen(0, '127.0.0.1', resolveListen));
+        const addr = httpServer.address() as { port: number };
+        const base = `http://127.0.0.1:${addr.port}`;
+
+        const customYaml = join(workDir, 'products.yaml');
+        writeFileSync(
+          customYaml,
+          `products:
+  - name: local-ok
+    display_name: Local OK
+    tier: 3
+    source_url: ${base}/ok.rss
+    fetch_strategy: rss
+    fetch:
+      type: rss
+      url: ${base}/ok.rss
+  - name: local-fail
+    display_name: Local Fail
+    tier: 3
+    source_url: ${base}/missing.rss
+    fetch_strategy: rss
+    fetch:
+      type: rss
+      url: ${base}/missing.rss
+`,
+          'utf-8'
+        );
+
+        const missingDb = join(workDir, 'store', 'data', 'claude-synergy.db');
+        const productsRoot = join(workDir, 'store', 'products');
+        try {
+          await withMcpServer(
+            {
+              dbPath: missingDb,
+              synergiesDir,
+              requestTimeoutMs: 25_000,
+              env: {
+                CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+                CLAUDE_SYNERGY_PRODUCTS_ROOT: productsRoot,
+                HOME: workDir,
+                USERPROFILE: workDir,
+              },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+              const res = await client.callTool('latest_releases', { limit: 5 });
+              const text = res.content[0]?.text ?? '';
+              const lines = text.trimEnd().split('\n');
+              expect(lines[0]).toMatch(/^first use \(partial corpus\): synced 1 of 2 products/);
+              expect(lines[0]).toContain('local-fail');
+              expect(text).toContain('local-ok@');
+              expect(lines[lines.length - 1]).toMatch(/^data as of:.*partial: 1\/2 feeds/);
+            }
+          );
+        } finally {
+          httpServer.closeAllConnections?.();
+          await new Promise<void>((resolveClose) => httpServer.close(() => resolveClose()));
+          rmSync(workDir, { recursive: true, force: true });
+        }
+      },
+      35_000
+    );
+
+    it(
+      'Item 4 & Item 8: sync_now + search share lock (1 fetchAll) and broken model-families formats cleanly without raw stack',
+      async () => {
+        const workDir = mkdtempSync(join(tmpdir(), 'mcp-race-mf-'));
+        let hitCount = 0;
+        const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Lock Feed</title>
+<item><title>LockRelease 2.0.0</title><link>http://127.0.0.1/2.0.0</link><guid>lock-2-0-0</guid><pubDate>Wed, 25 Nov 2026 12:00:00 GMT</pubDate><description><![CDATA[- Added shared lock coordination feature]]></description></item>
+</channel></rss>`;
+        const srv = createServer((_req, res) => {
+          hitCount++;
+          setTimeout(() => {
+            res.writeHead(200, { 'content-type': 'application/rss+xml' });
+            res.end(rssXml);
+          }, 150);
+        });
+        await new Promise<void>((r) => srv.listen(0, '127.0.0.1', r));
+        const port = (srv.address() as { port: number }).port;
+        const customYaml = join(workDir, 'products.yaml');
+        writeFileSync(
+          customYaml,
+          `products:\n  - name: lock-prod\n    display_name: Lock Prod\n    tier: 3\n    source_url: http://127.0.0.1:${port}/feed.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${port}/feed.rss\n`,
+          'utf-8'
+        );
+
+        const raceDb = join(workDir, 'store', 'data', 'claude-synergy.db');
+        const raceProducts = join(workDir, 'store', 'products');
+        const badMf = join(workDir, 'bad-mf.yaml');
+        writeFileSync(badMf, 'families: [broken\n  invalid: :\n', 'utf-8');
+
+        try {
+          // Item 4: start sync_now on empty DB, then immediately call search -> only 1 fetchAll runs.
+          await withMcpServer(
+            {
+              dbPath: raceDb,
+              synergiesDir,
+              requestTimeoutMs: 25_000,
+              env: {
+                CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+                CLAUDE_SYNERGY_PRODUCTS_ROOT: raceProducts,
+                HOME: workDir,
+                USERPROFILE: workDir,
+              },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+              const syncPromise = client.callTool('sync_now', { include_embed: false });
+              await new Promise((r) => setTimeout(r, 40));
+              const searchPromise = client.callTool('search', { query: 'coordination', mode: 'fts' });
+              const [syncRes, searchRes] = await Promise.all([syncPromise, searchPromise]);
+              expect(syncRes.isError).not.toBe(true);
+              expect(searchRes.isError).not.toBe(true);
+              expect(searchRes.content[0]?.text).toContain('coordination');
+              expect(hitCount).toBe(1);
+
+              // FIX-2 Item 2: back-to-back sync_now rejects the second caller before any await and runs 1 fetchAll.
+              hitCount = 0;
+              const settled = await Promise.allSettled([
+                client.callTool('sync_now', { include_embed: false }),
+                client.callTool('sync_now', { include_embed: false }),
+              ]);
+              const rejected = settled.filter(
+                (r): r is PromiseRejectedResult =>
+                  r.status === 'rejected' &&
+                  String(r.reason?.message ?? r.reason).includes('another sync is already in progress')
+              );
+              const fulfilled = settled.filter(
+                (r): r is PromiseFulfilledResult<any> =>
+                  r.status === 'fulfilled' && !r.value?.isError
+              );
+              expect(rejected.length).toBe(1);
+              expect(fulfilled.length).toBe(1);
+              expect(hitCount).toBe(1);
+            }
+          );
+
+          // FIX-2 Item 6: sync_status stays usable during failed/empty cooldown and messages distinguish failed vs empty.
+          const emptyRssSrv = createServer((_req, res) => {
+            res.writeHead(200, { 'content-type': 'application/rss+xml' });
+            res.end(`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Empty</title></channel></rss>`);
+          });
+          await new Promise<void>((r) => emptyRssSrv.listen(0, '127.0.0.1', r));
+          const emptyPort = (emptyRssSrv.address() as { port: number }).port;
+          const failYaml = join(workDir, 'fail-products.yaml');
+          const emptyYaml = join(workDir, 'empty-products.yaml');
+          writeFileSync(
+            failYaml,
+            `products:\n  - name: fail-prod\n    display_name: Fail Prod\n    tier: 3\n    source_url: http://127.0.0.1:${emptyPort}/fail.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${emptyPort}/fail.rss\n`,
+            'utf-8'
+          );
+          writeFileSync(
+            emptyYaml,
+            `products:\n  - name: empty-prod\n    display_name: Empty Prod\n    tier: 3\n    source_url: http://127.0.0.1:${emptyPort}/ok.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${emptyPort}/ok.rss\n`,
+            'utf-8'
+          );
+          const failSrv = createServer((_req, res) => {
+            res.writeHead(404);
+            res.end('missing');
+          });
+          await new Promise<void>((r) => failSrv.listen(0, '127.0.0.1', r));
+          const failPort = (failSrv.address() as { port: number }).port;
+          writeFileSync(
+            failYaml,
+            `products:\n  - name: fail-prod\n    display_name: Fail Prod\n    tier: 3\n    source_url: http://127.0.0.1:${failPort}/fail.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${failPort}/fail.rss\n`,
+            'utf-8'
+          );
+
+          try {
+            const failDb = join(workDir, 'fail', 'data', 'claude-synergy.db');
+            await withMcpServer(
+              {
+                dbPath: failDb,
+                synergiesDir,
+                requestTimeoutMs: 25_000,
+                env: {
+                  CLAUDE_SYNERGY_PRODUCTS_YAML: failYaml,
+                  CLAUDE_SYNERGY_PRODUCTS_ROOT: join(workDir, 'fail', 'products'),
+                  HOME: workDir,
+                  USERPROFILE: workDir,
+                },
+              },
+              async (client: McpClient) => {
+                await client.initialize();
+                await client.notifyInitialized();
+                const res = await client.callTool('search', { query: 'anything', mode: 'fts' });
+                expect(res.isError).toBe(true);
+                expect(res.content[0]?.text).toContain('cooling down after a failed attempt');
+                const statusRes = await client.callTool('sync_status', {});
+                expect(statusRes.isError).not.toBe(true);
+              }
+            );
+
+            const zeroDb = join(workDir, 'zero', 'data', 'claude-synergy.db');
+            await withMcpServer(
+              {
+                dbPath: zeroDb,
+                synergiesDir,
+                requestTimeoutMs: 25_000,
+                env: {
+                  CLAUDE_SYNERGY_PRODUCTS_YAML: emptyYaml,
+                  CLAUDE_SYNERGY_PRODUCTS_ROOT: join(workDir, 'zero', 'products'),
+                  HOME: workDir,
+                  USERPROFILE: workDir,
+                },
+              },
+              async (client: McpClient) => {
+                await client.initialize();
+                await client.notifyInitialized();
+                const res = await client.callTool('search', { query: 'anything', mode: 'fts' });
+                expect(res.isError).toBe(true);
+                expect(res.content[0]?.text).toContain('the last attempt returned nothing');
+                const statusRes = await client.callTool('sync_status', {});
+                expect(statusRes.isError).not.toBe(true);
+              }
+            );
+          } finally {
+            emptyRssSrv.closeAllConnections?.();
+            await new Promise<void>((r) => emptyRssSrv.close(() => r()));
+            failSrv.closeAllConnections?.();
+            await new Promise<void>((r) => failSrv.close(() => r()));
+          }
+
+          // Item 8: broken model-families.yaml lets MCP start & listTools(), then formats MODEL_FAMILIES_CONFIG_ERROR without stack.
+          const mfDb = join(workDir, 'mf', 'data', 'claude-synergy.db');
+          const mfProducts = join(workDir, 'mf', 'products');
+          await withMcpServer(
+            {
+              dbPath: mfDb,
+              synergiesDir,
+              requestTimeoutMs: 25_000,
+              env: {
+                CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+                CLAUDE_SYNERGY_PRODUCTS_ROOT: mfProducts,
+                CLAUDE_SYNERGY_MODEL_FAMILIES: badMf,
+                HOME: workDir,
+                USERPROFILE: workDir,
+              },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+              const tools = await client.listTools();
+              expect(tools.length).toBe(13);
+              const errRes = await client.callTool('sync_now', { include_embed: false });
+              expect(errRes.isError).toBe(true);
+              const errText = errRes.content[0]?.text ?? '';
+              expect(errText).toContain('[MODEL_FAMILIES_CONFIG_ERROR]');
+              expect(errText).not.toMatch(/^\s+at\s+/m);
+            }
+          );
+        } finally {
+          srv.closeAllConnections?.();
+          await new Promise<void>((r) => srv.close(() => r()));
+          rmSync(workDir, { recursive: true, force: true });
+        }
+      },
+      35_000
     );
   });
 });

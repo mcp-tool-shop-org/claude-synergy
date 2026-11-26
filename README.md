@@ -114,6 +114,17 @@ pnpm build       # produces dist/cli.js + dist/mcp-server.js
 npm link         # makes `hk` and `claude-synergy-mcp` available globally
 ```
 
+Or run directly after installing `@mcptoolshop/claude-synergy`. Both `hk` and `claude-synergy-mcp` resolve the local store using the same 4-step order:
+
+1. `CLAUDE_SYNERGY_DB` environment variable
+2. Explicit `--db <path>` (CLI) or positional argv path (MCP)
+3. `<cwd>/data/claude-synergy.db` **only if that file already exists** (preserves repo-clone usage)
+4. `<home>/.claude-synergy/data/claude-synergy.db` (with products under `<home>/.claude-synergy/products`)
+
+`CLAUDE_SYNERGY_PRODUCTS_ROOT` overrides the products directory.
+
+**Automatic first-use sync:** When a query command or MCP tool runs against a missing or empty store, it initializes the schema and automatically runs `fetch` → `ingest` (no embedding step, bounded by a timeout, skipping any unreachable feed) and stamps every answer with `data as of: …`. Set `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` to disable automatic first-use sync and fail/warn with empty-corpus instructions instead.
+
 For dev without building, use `npx tsx src/cli.ts ...` directly. **pnpm 10 quirk:** `pnpm dev` swallows CLI flags after `--`; use `npx tsx` for development.
 
 ---
@@ -230,14 +241,13 @@ No search term needed — `hk breaking` is the answer to "did anything load-bear
 {
   "mcpServers": {
     "claude-synergy": {
-      "command": "claude-synergy-mcp",
-      "env": {
-        "CLAUDE_SYNERGY_DB": "/path/to/claude-synergy/data/claude-synergy.db"
-      }
+      "command": "claude-synergy-mcp"
     }
   }
 }
 ```
+
+Set `CLAUDE_SYNERGY_DB` in `env` if you want a custom store path; otherwise it uses an existing `./data/claude-synergy.db` or `~/.claude-synergy/data/claude-synergy.db` and syncs automatically on first tool use (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` disables this). Every tool response ends with a `data as of:` freshness stamp (prefixed `STALE:` after 7 days).
 
 For GitHub Copilot's `.vscode/mcp.json`, use the `servers` wrapper instead of `mcpServers` (see [synergy 12](synergies/12-mcp-config-format-gotcha.md)).
 
@@ -390,9 +400,9 @@ Each provider produces vectors of a fixed dimension (Ollama 768, Voyage 1024, Op
 
 ```bash
 rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
-hk init
-hk ingest
-hk embed --embed openai     # new provider, new dim, fresh chunks_vec
+hk init --db data/claude-synergy.db
+hk ingest --db data/claude-synergy.db
+hk embed --db data/claude-synergy.db --embed openai     # new provider, new dim, fresh chunks_vec
 ```
 
 For OpenAI Matryoshka truncation (smaller-than-native dim), set `OPENAI_EMBED_MODEL` and pass the desired dim through `hk embed`'s provider construction — see the [handbook embedding section](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions) for details.
@@ -403,9 +413,9 @@ If the DB was created with an older schema version and migration fails, or if da
 
 ```bash
 rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
-hk init
-hk ingest
-hk embed --context structured --embedding ollama   # optional, for vector search
+hk init --db data/claude-synergy.db
+hk ingest --db data/claude-synergy.db
+hk embed --db data/claude-synergy.db --context structured --embedding ollama   # optional, for vector search
 ```
 
 This is safe — the DB is a derived cache. All source data lives in `products/*/releases/*.md` files.

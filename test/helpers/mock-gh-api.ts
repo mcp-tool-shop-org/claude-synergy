@@ -1,9 +1,9 @@
 /**
  * Shared mock for the `gh api` subprocess call used by src/fetch.ts.
  *
- * src/fetch.ts uses execFileSync('gh', ['api', ...]) to fetch GitHub releases.
- * These helpers replace the child_process module with a mock that returns
- * controlled JSON, allowing tests to exercise fetch logic without network.
+ * src/fetch-utils.ts uses async execFile('gh', ['api', ...]) to fetch GitHub
+ * releases. These helpers replace node:child_process with an execFile mock
+ * that returns controlled JSON via callback, exercising fetch logic without network.
  *
  * Three flavors cover the test suite's needs:
  *
@@ -24,6 +24,29 @@ export interface MockRelease {
 }
 
 /**
+ * Wrap a synchronous responder `(file, args) => string` (or throwing an Error)
+ * into a Vitest mock matching `node:child_process.execFile`.
+ */
+export function createExecFileMock(respond: (file: string, args: string[]) => string) {
+  return vi.fn((file: string, argsOrOpts: any, optsOrCb?: any, maybeCb?: any) => {
+    const args = Array.isArray(argsOrOpts) ? argsOrOpts : [];
+    const cb =
+      typeof maybeCb === 'function'
+        ? maybeCb
+        : typeof optsOrCb === 'function'
+          ? optsOrCb
+          : argsOrOpts;
+    try {
+      const out = respond(file, args);
+      cb?.(null, out, '');
+    } catch (e: any) {
+      cb?.(e, '', e?.stderr ?? '');
+    }
+    return { stdin: { end: () => {} } };
+  });
+}
+
+/**
  * Mock `gh api` to return `releases` on the first call (page 1) and `[]`
  * on subsequent calls so the pagination loop terminates.
  *
@@ -38,8 +61,7 @@ export function mockGhApi(releases: MockRelease[]) {
       : '[]';
   };
   vi.doMock('node:child_process', () => ({
-    execFileSync: vi.fn(respond),
-    execSync: vi.fn(respond),
+    execFile: createExecFileMock(respond),
   }));
 }
 
@@ -55,8 +77,7 @@ export function mockGhApiPages(pages: MockRelease[][]) {
     return JSON.stringify(page);
   };
   vi.doMock('node:child_process', () => ({
-    execFileSync: vi.fn(respond),
-    execSync: vi.fn(respond),
+    execFile: createExecFileMock(respond),
   }));
   return { get callCount() { return callCount; } };
 }
@@ -68,7 +89,7 @@ export function mockGhApiPages(pages: MockRelease[][]) {
 export function mockGhApiTag(tag: string) {
   let callCount = 0;
   vi.doMock('node:child_process', () => ({
-    execFileSync: vi.fn(() => {
+    execFile: createExecFileMock(() => {
       callCount += 1;
       return callCount === 1
         ? JSON.stringify([
@@ -82,7 +103,6 @@ export function mockGhApiTag(tag: string) {
           ])
         : '[]';
     }),
-    execSync: vi.fn(() => '[]'),
   }));
 }
 

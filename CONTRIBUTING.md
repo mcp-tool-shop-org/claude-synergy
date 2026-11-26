@@ -40,11 +40,11 @@ Thanks for your interest in contributing. This guide covers adding new products,
 
 ```bash
 pnpm build
-hk init
-hk fetch --product my-new-tool
-hk ingest
-hk products                   # should list your product with release count
-hk query "some keyword"       # verify releases appear in search
+hk init --db data/claude-synergy.db
+hk fetch --db data/claude-synergy.db --product my-new-tool
+hk ingest --db data/claude-synergy.db
+hk products --db data/claude-synergy.db                   # should list your product with release count
+hk query "some keyword" --db data/claude-synergy.db       # verify releases appear in search
 ```
 
 ## Tier semantics
@@ -92,8 +92,8 @@ pnpm install
 pnpm build               # compiles to dist/
 
 # Run CLI without building (dev mode):
-npx tsx src/cli.ts init
-npx tsx src/cli.ts query "some term"
+npx tsx src/cli.ts init --db data/claude-synergy.db
+npx tsx src/cli.ts query "some term" --db data/claude-synergy.db
 
 # Run MCP server (dev mode):
 npx tsx src/mcp-server.ts

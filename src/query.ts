@@ -1,5 +1,345 @@
 import type Database from 'better-sqlite3';
 import { AppError } from './errors.js';
+import { loadProductsConfig } from './products-config.js';
+
+// ─── Corpus freshness (Part 1) ────────────────────────────────────────────
+
+/** Threshold (in days) after which the corpus is flagged as STALE. */
+export const STALE_AFTER_DAYS = 7;
+
+export interface ProductFreshness {
+  product: string;
+  synced_at: string | null;
+  newest_release: string | null;
+  fetch_strategy: string | null;
+}
+
+export interface CorpusFreshness {
+  synced_at: string | null;
+  newest_release: string | null;
+  age_days: number | null;
+  synced_age_days: number | null;
+  stale: boolean;
+  stale_after_days: number;
+  partial_note?: string;
+  product?: ProductFreshness;
+}
+
+export type ClockInput = Date | (() => Date);
+
+/** Metadata key in `schema_meta` storing the last partial sync state (drives stamp only). */
+export const LAST_SYNC_PARTIAL_META_KEY = 'last_sync_partial';
+
+/** Legacy metadata key migrated once to `LAST_SYNC_PARTIAL_META_KEY` on read. */
+export const LEGACY_FIRST_USE_PARTIAL_META_KEY = 'first_use_partial';
+
+export interface SkippedProductInfo {
+  product: string;
+  reason: string;
+}
+
+export interface PartialSyncState {
+  succeeded: number;
+  total: number;
+  skipped: SkippedProductInfo[];
+  recorded_at?: string;
+}
+
+/**
+ * Format the partial-sync note surfaced in the freshness stamp on every answer
+ * while `last_sync_partial` is set in `schema_meta`.
+ */
+export function formatPartialNote(
+  report: Pick<PartialSyncState, 'succeeded' | 'total' | 'skipped'>
+): string {
+  const skippedNames = report.skipped.map((s) => `${s.product} (${s.reason})`).join(', ');
+  return skippedNames
+    ? `partial: ${report.succeeded}/${report.total} feeds (skipped: ${skippedNames}) — run hk sync`
+    : `partial: ${report.succeeded}/${report.total} feeds — run hk sync`;
+}
+
+/** Persist the last partial sync state under `last_sync_partial` in `schema_meta`. */
+export function writePartialSyncState(
+  db: Database.Database,
+  state: PartialSyncState,
+  opts: { now?: ClockInput } = {}
+): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS schema_meta (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+  const payload: PartialSyncState = {
+    succeeded: state.succeeded,
+    total: state.total,
+    skipped: state.skipped,
+    recorded_at: state.recorded_at ?? resolveNow(opts.now).toISOString(),
+  };
+  db.prepare(`DELETE FROM schema_meta WHERE key = ?`).run(LEGACY_FIRST_USE_PARTIAL_META_KEY);
+  db.prepare(`
+    INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)
+  `).run(LAST_SYNC_PARTIAL_META_KEY, JSON.stringify(payload));
+}
+
+/** Remove `last_sync_partial` (and any legacy `first_use_partial`) after a clean full sync. */
+export function clearPartialSyncState(db: Database.Database | null): void {
+  if (!db) return;
+  try {
+    db.prepare(`DELETE FROM schema_meta WHERE key IN (?, ?)`).run(
+      LAST_SYNC_PARTIAL_META_KEY,
+      LEGACY_FIRST_USE_PARTIAL_META_KEY
+    );
+  } catch {
+    // schema_meta absent -> nothing to clear
+  }
+}
+
+/**
+ * Read any persisted `last_sync_partial` marker from `schema_meta`, migrating
+ * the legacy `first_use_partial` key once if present.
+ */
+export function readPartialSyncState(db: Database.Database | null): PartialSyncState | null {
+  if (!db) return null;
+  try {
+    const newRow = db
+      .prepare(`SELECT value FROM schema_meta WHERE key = ?`)
+      .get(LAST_SYNC_PARTIAL_META_KEY) as { value: string } | undefined;
+    const legacyRow = db
+      .prepare(`SELECT value FROM schema_meta WHERE key = ?`)
+      .get(LEGACY_FIRST_USE_PARTIAL_META_KEY) as { value: string } | undefined;
+
+    let rawValue = newRow?.value;
+    if (legacyRow?.value) {
+      if (!rawValue) {
+        rawValue = legacyRow.value;
+      }
+      try {
+        if (!newRow?.value && !db.readonly) {
+          db.prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`).run(
+            LAST_SYNC_PARTIAL_META_KEY,
+            legacyRow.value
+          );
+        }
+        if (!db.readonly) {
+          db.prepare(`DELETE FROM schema_meta WHERE key = ?`).run(LEGACY_FIRST_USE_PARTIAL_META_KEY);
+        }
+      } catch {
+        // Migration write failed (e.g. SQLITE_BUSY or read-only); still return read state.
+      }
+    }
+    if (!rawValue) return null;
+
+    const parsed = JSON.parse(rawValue) as Partial<PartialSyncState>;
+    if (typeof parsed.succeeded === 'number' && typeof parsed.total === 'number') {
+      return {
+        succeeded: parsed.succeeded,
+        total: parsed.total,
+        skipped: Array.isArray(parsed.skipped) ? parsed.skipped : [],
+        recorded_at: typeof parsed.recorded_at === 'string' ? parsed.recorded_at : undefined,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function resolveNow(now?: ClockInput): Date {
+  if (typeof now === 'function') return now();
+  if (now instanceof Date) return now;
+  const envNow = process.env.CLAUDE_SYNERGY_NOW?.trim();
+  if (envNow) {
+    const parsed = new Date(envNow);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return new Date();
+}
+
+/**
+ * Compute whole UTC calendar days elapsed from `dateStr` (YYYY-MM-DD or ISO)
+ * to `now`. Returns null if `dateStr` is null or unparseable.
+ */
+export function utcDaysSince(dateStr: string | null | undefined, now: Date): number | null {
+  if (!dateStr) return null;
+  const trimmed = dateStr.trim();
+  let y: number;
+  let m: number;
+  let d: number;
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})/.exec(trimmed);
+  if (ymd) {
+    y = parseInt(ymd[1], 10);
+    m = parseInt(ymd[2], 10) - 1;
+    d = parseInt(ymd[3], 10);
+  } else {
+    const parsed = new Date(trimmed);
+    if (Number.isNaN(parsed.getTime())) return null;
+    y = parsed.getUTCFullYear();
+    m = parsed.getUTCMonth();
+    d = parsed.getUTCDate();
+  }
+  const thenUtc = Date.UTC(y, m, d);
+  const nowUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.max(0, Math.floor((nowUtc - thenUtc) / 86_400_000));
+}
+
+function datePart(s: string | null | undefined): string | null {
+  if (!s) return null;
+  const m = /^(\d{4}-\d{2}-\d{2})/.exec(s.trim());
+  if (m) return m[1];
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return s;
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Query overall corpus freshness from `markers.updated_at` + `releases.released_at`
+ * (and per-product freshness + `fetch_strategy` when `opts.product` is set).
+ * Also surfaces any persisted `last_sync_partial` state from `schema_meta`.
+ */
+export function getCorpusFreshness(
+  db: Database.Database | null,
+  opts: { product?: string; now?: ClockInput } = {}
+): CorpusFreshness {
+  const nowDate = resolveNow(opts.now);
+  let syncedAt: string | null = null;
+  let newestRelease: string | null = null;
+  let partialNote: string | undefined;
+
+  if (db) {
+    try {
+      const markerRow = db
+        .prepare(`SELECT MAX(updated_at) AS synced_at FROM markers`)
+        .get() as { synced_at: string | null } | undefined;
+      syncedAt = markerRow?.synced_at ?? null;
+    } catch {
+      // Uninitialized DB (no markers table yet) -> leave null so it stamps STALE
+    }
+    try {
+      const relRow = db
+        .prepare(`SELECT MAX(released_at) AS newest_release FROM releases`)
+        .get() as { newest_release: string | null } | undefined;
+      newestRelease = relRow?.newest_release ?? null;
+    } catch {
+      // Uninitialized DB (no releases table yet) -> leave null so it stamps STALE
+    }
+    const partialState = readPartialSyncState(db);
+    if (partialState) {
+      partialNote = formatPartialNote(partialState);
+    }
+  }
+
+  const ageDays = utcDaysSince(newestRelease, nowDate);
+  const syncedAgeDays = utcDaysSince(syncedAt, nowDate);
+  const stale = syncedAt === null || (syncedAgeDays !== null && syncedAgeDays > STALE_AFTER_DAYS);
+
+  const result: CorpusFreshness = {
+    synced_at: syncedAt,
+    newest_release: newestRelease,
+    age_days: ageDays,
+    synced_age_days: syncedAgeDays,
+    stale,
+    stale_after_days: STALE_AFTER_DAYS,
+    ...(partialNote ? { partial_note: partialNote } : {}),
+  };
+
+  if (opts.product) {
+    let prodSynced: string | null = null;
+    let prodNewest: string | null = null;
+    let fetchStrategy: string | null = null;
+
+    if (db) {
+      try {
+        const prodMarker = db
+          .prepare(`SELECT MAX(updated_at) AS synced_at FROM markers WHERE product = ?`)
+          .get(opts.product) as { synced_at: string | null } | undefined;
+        prodSynced = prodMarker?.synced_at ?? null;
+
+        const prodRel = db
+          .prepare(`SELECT MAX(released_at) AS newest_release FROM releases WHERE product = ?`)
+          .get(opts.product) as { newest_release: string | null } | undefined;
+        prodNewest = prodRel?.newest_release ?? null;
+
+        const metaRow = db
+          .prepare(`SELECT fetch_strategy FROM products WHERE name = ?`)
+          .get(opts.product) as { fetch_strategy: string | null } | undefined;
+        fetchStrategy = metaRow?.fetch_strategy ?? null;
+      } catch {
+        // Ignore uninitialized schema
+      }
+    }
+
+    if (!fetchStrategy) {
+      fetchStrategy = loadProductsConfig()?.productMeta[opts.product]?.fetch_strategy ?? null;
+    }
+
+    result.product = {
+      product: opts.product,
+      synced_at: prodSynced,
+      newest_release: prodNewest,
+      fetch_strategy: fetchStrategy,
+    };
+  }
+
+  return result;
+}
+
+/**
+ * Format the single-line "data as of" stamp appended to every CLI text and MCP
+ * response. Prefixes `STALE:` and names refresh commands when `stale` is true.
+ */
+export function formatFreshnessStamp(
+  freshness: CorpusFreshness,
+  opts: { partialNote?: string } = {}
+): string {
+  const parts: string[] = [];
+
+  if (freshness.synced_at === null && freshness.newest_release === null) {
+    parts.push('data as of: empty corpus (no releases synced)');
+  } else {
+    const syncStr = datePart(freshness.synced_at) ?? 'never';
+    const relDate = datePart(freshness.newest_release);
+    const relStr = relDate
+      ? `${relDate} (${freshness.age_days ?? 0} day${freshness.age_days === 1 ? '' : 's'} old)`
+      : 'none';
+    parts.push(`data as of: synced ${syncStr}, newest release ${relStr}`);
+  }
+
+  if (freshness.product) {
+    const p = freshness.product;
+    const pSynced = datePart(p.synced_at) ?? 'never';
+    const pNewest = datePart(p.newest_release) ?? 'none';
+    const strat = p.fetch_strategy ?? 'unknown';
+    const manualTag = p.fetch_strategy === 'manual' ? ', MANUAL FEED — not refreshed by sync' : '';
+    parts.push(`${p.product}: synced ${pSynced}, newest release ${pNewest} (${strat}${manualTag})`);
+  }
+
+  const partial = opts.partialNote ?? freshness.partial_note;
+  if (partial) {
+    parts.push(partial);
+  }
+
+  const base = parts.join('; ');
+  if (freshness.stale) {
+    return `STALE: ${base} — refresh with sync_now or hk sync`;
+  }
+  return base;
+}
+
+/**
+ * Loud warning banner for any product whose `fetch_strategy` remains `manual`.
+ */
+export function formatManualFeedWarning(
+  product: string,
+  newestRelease: string | null,
+  now?: ClockInput
+): string {
+  const nowDate = resolveNow(now);
+  const days = utcDaysSince(newestRelease, nowDate);
+  const dateStr = datePart(newestRelease) ?? 'never';
+  const ageStr = days === null ? 'unknown' : String(days);
+  return `MANUAL FEED (${product}): last updated ${dateStr}, ${ageStr} days old, not refreshed by sync`;
+}
 
 // ─── CLI / MCP formatting helpers ─────────────────────────────────────────
 

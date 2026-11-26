@@ -7,6 +7,11 @@
 //   - Respects Retry-After header when present
 //   - Propagates an external AbortSignal for global cancellation (e.g., SIGINT or fetchAll timeout)
 
+import { execFile } from 'node:child_process';
+
+/** Per-call timeout for `gh api` subprocess invocations (ms). */
+export const GH_API_CALL_TIMEOUT_MS = 30_000;
+
 /** Options for fetchWithRetry */
 export interface FetchRetryOptions extends Omit<RequestInit, 'signal'> {
   /** Per-request timeout in ms (default 30_000) */
@@ -221,4 +226,72 @@ export function createFetchAllController(timeoutMs: number = DEFAULT_FETCH_ALL_T
     (timer as NodeJS.Timeout).unref();
   }
   return { controller, signal: controller.signal };
+}
+
+/**
+ * Run a `gh` CLI invocation asynchronously (non-blocking for MCP event loop)
+ * with per-call timeout capped by remaining global budget and AbortSignal propagation.
+ */
+export async function runGhApi(
+  args: string[],
+  opts: { signal?: AbortSignal; deadlineMs?: number; maxBuffer?: number } = {}
+): Promise<string> {
+  if (opts.signal?.aborted) {
+    throw Object.assign(
+      new Error(`gh api aborted: ${(opts.signal.reason as any)?.message ?? 'timeout exceeded'}`),
+      { stderr: '' }
+    );
+  }
+
+  const remaining = opts.deadlineMs !== undefined ? opts.deadlineMs - Date.now() : GH_API_CALL_TIMEOUT_MS;
+  if (remaining <= 0) {
+    throw Object.assign(new Error('gh api timed out: budget exhausted'), { stderr: '' });
+  }
+
+  const callTimeoutMs = Math.max(1, Math.min(GH_API_CALL_TIMEOUT_MS, remaining));
+  const maxBuffer = opts.maxBuffer ?? 50 * 1024 * 1024;
+
+  return new Promise<string>((resolvePromise, rejectPromise) => {
+    const child = execFile(
+      'gh',
+      args,
+      {
+        encoding: 'utf-8',
+        maxBuffer,
+        timeout: callTimeoutMs,
+        signal: opts.signal,
+        windowsHide: true,
+      },
+      (err, stdout, stderr) => {
+        if (err) {
+          const stderrStr = stderr ? String(stderr) : '';
+          const e = err as any;
+          if (e.stderr === undefined) e.stderr = stderrStr;
+          if (opts.signal?.aborted || e.code === 'ABORT_ERR' || e.name === 'AbortError') {
+            const reasonMsg = (opts.signal?.reason as any)?.message ?? err.message ?? 'aborted';
+            rejectPromise(
+              Object.assign(new Error(`gh api aborted: ${reasonMsg}`), {
+                code: e.code ?? 'ABORT_ERR',
+                stderr: stderrStr,
+              })
+            );
+            return;
+          }
+          if (e.killed || e.signal === 'SIGTERM' || e.signal === 'SIGKILL') {
+            rejectPromise(
+              Object.assign(
+                new Error(`gh api timed out after ${callTimeoutMs}ms: ${err.message}`),
+                { stderr: stderrStr }
+              )
+            );
+            return;
+          }
+          rejectPromise(err);
+          return;
+        }
+        resolvePromise(String(stdout ?? ''));
+      }
+    );
+    child.stdin?.end();
+  });
 }

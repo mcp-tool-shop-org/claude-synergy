@@ -20,6 +20,7 @@ import { OllamaJudgeRerankProvider } from '../../src/providers/rerank/ollama-jud
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { seedSampleProducts, FIXTURE_PRODUCTS_ROOT } from '../helpers/seed-corpus.js';
 import { mockFetch, jsonResponse, type FetchMockHandle } from '../helpers/fetch-mock.js';
+import { createExecFileMock } from '../helpers/mock-gh-api.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = resolve(__dirname, '..', '..', 'src', 'cli.ts');
@@ -291,8 +292,7 @@ describe('§8.10 fetch idempotency with v-prefix dual-form check', () => {
           ])
         : '[]';
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(respond),
-      execSync: vi.fn(respond),
+      execFile: createExecFileMock(respond),
     }));
     const { fetchAll } = await import('../../src/fetch.js');
     const stats = await fetchAll(temp.db, productsRoot, { product: 'claude-code-action' });
@@ -335,11 +335,7 @@ describe('§8.11 gh api JSON parsing in JS, not shell jq', () => {
         : '[]';
     };
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(recordAndRespond),
-      execSync: vi.fn((cmd: string) => {
-        capturedCmd = cmd;
-        return recordAndRespond(cmd);
-      }),
+      execFile: createExecFileMock(recordAndRespond),
     }));
     const dir = mkdtempSync(join(tmpdir(), 'jq-test-'));
     try {
@@ -375,8 +371,7 @@ describe('§8.12 Markers upsert on (product, name)', () => {
           ])
         : '[]';
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(respond1),
-      execSync: vi.fn(respond1),
+      execFile: createExecFileMock(respond1),
     }));
     const dir = mkdtempSync(join(tmpdir(), 'marker-up-'));
     try {
@@ -401,8 +396,7 @@ describe('§8.12 Markers upsert on (product, name)', () => {
             ])
           : '[]';
       vi.doMock('node:child_process', () => ({
-        execFileSync: vi.fn(respond2),
-        execSync: vi.fn(respond2),
+        execFile: createExecFileMock(respond2),
       }));
       const { fetchAll: fetchAll2 } = await import('../../src/fetch.js');
       await fetchAll2(temp.db, dir, { product: 'claude-agent-sdk-python' });
@@ -569,7 +563,7 @@ describe('§8.16 npm-scoped multiPackage tag → sanitized filename', () => {
     // Mock gh CLI returning an npm-scoped tag from a multiPackage repo
     // (mcp-typescript-sdk has multi_package: true in products.yaml).
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(() =>
+      execFile: createExecFileMock(() =>
         JSON.stringify([
           {
             tag_name: '@modelcontextprotocol/server@2.0.0-alpha.2',
@@ -607,7 +601,7 @@ describe('§8.16 npm-scoped multiPackage tag → sanitized filename', () => {
 
   it('continue-style @scope/pkg@N tag → scope-pkg-N (no @ or / in filename)', async () => {
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(() =>
+      execFile: createExecFileMock(() =>
         JSON.stringify([
           {
             tag_name: '@continuedev/config-yaml@1.42.0',
@@ -730,8 +724,7 @@ describe('§8.19 ghReleases early-exit pagination preserves in-window items', ()
       return '[]';
     };
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(respond),
-      execSync: vi.fn(respond),
+      execFile: createExecFileMock(respond),
     }));
     const dir = mkdtempSync(join(tmpdir(), 'early-exit-'));
     try {
@@ -821,8 +814,7 @@ describe('§8.21 Marker writes on empty fetch (centralized in fetchOne, v1.2.1)'
     // returns latest=null, fetched=0, errors=[]. This mirrors the real
     // raw-changelog case where every item is filtered out by sinceIso.
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(() => '[]'),
-      execSync: vi.fn(() => '[]'),
+      execFile: createExecFileMock(() => '[]'),
     }));
     const { fetchAll } = await import('../../src/fetch.js');
 
@@ -868,8 +860,7 @@ describe('§8.21 Marker writes on empty fetch (centralized in fetchOne, v1.2.1)'
       .run('claude-agent-sdk-python', '2026-04-15T12:00:00Z', oldUpdatedAt);
 
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(() => '[]'),
-      execSync: vi.fn(() => '[]'),
+      execFile: createExecFileMock(() => '[]'),
     }));
     const { fetchAll } = await import('../../src/fetch.js');
 

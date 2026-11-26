@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Corpus freshness stamp (`data as of`):** `getCorpusFreshness` and `formatFreshnessStamp` in `src/query.ts` report overall `synced_at` and `newest_release`, plus per-product freshness and `fetch_strategy` on product-scoped queries. Every MCP tool response (all 13 tools, including empty/unembedded corpus errors) and CLI text response ends with a `data as of:` line; responses older than `STALE_AFTER_DAYS` (7 days) are prefixed with `STALE:` and point to `sync_now` / `hk sync`.
+- **JSON freshness metadata:** In `--json` mode, object-shaped CLI commands (`init`, `ingest`, `fetch`, `sync`, `embed`, `seed-markers`) include a top-level `data_as_of` field, while array-shaped CLI commands (`query`, `hybrid`, `diff`, `breaking`, `env-var`, `command`, `model`, `cve`, `latest`, `products`, `top`) keep stdout arrays unchanged and write `{"data_as_of": ...}` as one JSON line to stderr.
+- **Data-driven model family extraction (`model-families.yaml`):** Moved Claude model family names (`opus`, `sonnet`, `haiku`, `fable`, `mythos`) into `model-families.yaml` (shipped in `package.json` `files`), compiled with escaped names at load time and validated with a named `MODEL_FAMILIES_CONFIG_ERROR`.
+- **Entity re-extraction (`hk ingest --reextract`):** Added `reextractEntities()` and `hk ingest --reextract` to re-extract entities across all existing `changes` rows without re-fetching or altering `changes` / `releases` rows.
+- **Shared store resolution & first-use auto-sync (`src/store.ts`):** Unified 4-step DB path resolution (`CLAUDE_SYNERGY_DB` → `--db`/argv → existing `<cwd>/data/claude-synergy.db` → `<home>/.claude-synergy/data/claude-synergy.db`), printed once to stderr. Missing or empty stores auto-initialize and run `fetch` → `ingest` (no embed) on first use with a bounded timeout (`FIRST_USE_SYNC_TIMEOUT_MS = 120_000`), in-process concurrency coordination, partial-sync reporting, and `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` opt-out.
+- **HTML scrapers for `claude-api` and `anthropic-apps`:** Added `fetchClaudeApiReleaseNotes` and `fetchAnthropicAppsReleaseNotes` in `src/fetch-html.ts` for the two server-rendered Anthropic release-notes pages.
+
+### Changed
+- **`hk fetch --json` stdout shape:** `hk fetch --json` now emits only the JSON object on stdout (`{ stats, summary, data_as_of }`) without preceding per-product text lines.
+- **`claude-api` and `anthropic-apps` fetch strategy:** Switched from `manual` to `html-scrape` in `products.yaml` (`claude-api-release-notes` and `anthropic-apps-release-notes`).
+- **MCP server startup:** `claude-synergy-mcp` no longer exits when the DB file is missing; it resolves the store path and syncs lazily on the first tool call (unless `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` is set).
+- **CLI `--no-stamp` & marker-based `synced_at`:** Added `--no-stamp` (used by `.github/workflows/sync.yml` when refreshing `PRODUCTS.txt` and `LATEST.txt`), moved `synced_at` to `markers.updated_at`, restricted user-home store fallback to `os.homedir()`, added lazy memoized `model-families.yaml` compilation with clean `MODEL_FAMILIES_CONFIG_ERROR` formatting, and bounded `gh api` subprocesses with per-call + remaining-budget async timeouts.
+
+### Fixed
+- **Disk-bounded incremental fetch window (`src/fetch.ts`):** File-backed fetch strategies clamp `since` so it never moves past the newest release file on disk (and `gh-releases` checks missing intermediate files against `oldest` on disk), preventing cached DB markers from skipping releases when a rolling sync PR has not yet merged. As known behaviour for `claude-api` and `anthropic-apps`, same-date disk matching skips dates already present on disk even under `--since` (delete the date's `.md` file to force re-fetch).
+- **Stale daily sync PR flagging (`.github/workflows/sync.yml`, `scripts/check-stale-sync-pr.mjs`):** When an open `sync/daily` PR is older than `STALE_SYNC_PR_DAYS` (3 days), the workflow preserves the original creation date in the PR title, applies `sync-stale`, comments with the failed `test` run, pushes the refreshed branch, and fails the job.
+
 ## [2.0.1] - 2026-11-26
 
 The first published release of the 2.x line: the `v2.0.0` tag exists, but its release run failed in the test step and published nothing, so 2.0.0 is not on npm. 2.0.1 ships the same package with one test fix. Read the 2.0.0 notes below for what changed since 1.2.2.
