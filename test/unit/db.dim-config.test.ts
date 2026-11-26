@@ -605,6 +605,8 @@ describe('Schema v4 → v5 migration (multi-package releases)', () => {
     db.prepare(`INSERT INTO products VALUES ('ts-sdk', 'TS SDK', 1, '', 'gh-releases', NULL), ('solo-cli', 'Solo CLI', 1, '', 'gh-releases', NULL)`).run();
     db.prepare(
       `INSERT INTO releases VALUES
+       ('ts-sdk', 'sdk-0.97.0', '2026-04-08', 'ts-sdk/releases/sdk-0.97.0.md', '2026-04-08', '', NULL, 'h0'),
+       ('ts-sdk', 'sdk-0.97.1', '2026-04-08', 'ts-sdk/releases/sdk-0.97.1.md', '2026-04-08', '', NULL, 'h0b'),
        ('ts-sdk', 'sdk-0.98.0', '2026-04-10', 'ts-sdk/releases/sdk-0.98.0.md', '2026-04-10', '', NULL, 'h1'),
        ('ts-sdk', 'aws-sdk-v0.3.0', '2026-04-05', 'ts-sdk/releases/aws-sdk-0.3.0.md', '2026-04-05', '', NULL, 'h2'),
        ('ts-sdk', 'weird-1.0.0', '2026-04-01', 'ts-sdk/releases/weird-1.0.0.md', '2026-04-01', '', NULL, 'h3'),
@@ -615,6 +617,8 @@ describe('Schema v4 → v5 migration (multi-package releases)', () => {
     insCh.run(11, 'ts-sdk', 'aws-sdk-v0.3.0', 1, 'breaking', 'AWS v5Check break');
     insCh.run(12, 'ts-sdk', 'weird-1.0.0', 1, 'fixed', 'Unassigned v5Check fix');
     insCh.run(13, 'solo-cli', '2.1.0', 1, 'added', 'Solo CLI v5Check feature');
+    insCh.run(14, 'ts-sdk', 'sdk-0.97.0', 1, 'added', 'SDK 0.97.0 v5Check');
+    insCh.run(15, 'ts-sdk', 'sdk-0.97.1', 1, 'fixed', 'SDK 0.97.1 sibling');
     db.prepare(`INSERT INTO entities (change_id, entity_type, entity_value) VALUES (11, 'env_var', 'CLAUDE_AWS_V5_TEST')`).run();
     db.prepare(
       `INSERT INTO chunks (change_id, product, release_version, released_at, context_prefix, original_text, contextualized, context_provider, embedding_model, embedded_at)
@@ -656,6 +660,8 @@ describe('Schema v4 → v5 migration (multi-package releases)', () => {
           { product: 'solo-cli', package: 'example.invalid/solo', version: '2.1.0' },
           { product: 'ts-sdk', package: '', version: 'weird-1.0.0' },
           { product: 'ts-sdk', package: '@scope/aws-sdk', version: '0.3.0' },
+          { product: 'ts-sdk', package: '@scope/sdk', version: '0.97.0' },
+          { product: 'ts-sdk', package: '@scope/sdk', version: '0.97.1' },
           { product: 'ts-sdk', package: '@scope/sdk', version: '0.98.0' },
         ]);
 
@@ -669,7 +675,7 @@ describe('Schema v4 → v5 migration (multi-package releases)', () => {
           .get() as { package: string; release_version: string };
         expect(ch).toEqual({ package: '@scope/aws-sdk', release_version: '0.3.0' });
 
-        expect(searchChanges(dbB, 'v5Check')).toHaveLength(4);
+        expect(searchChanges(dbB, 'v5Check')).toHaveLength(5);
 
         // Now ingest colliding foundry-sdk-0.3.0 into migrated v5 DB
         const prodDir = join(workdir, 'products');
@@ -742,13 +748,27 @@ describe('Schema v4 → v5 migration (multi-package releases)', () => {
           join(wsDir, 'package-lock.json'),
           JSON.stringify({
             lockfileVersion: 3,
-            packages: { 'node_modules/@scope/aws-sdk': { version: '0.3.0' } },
+            packages: {
+              'node_modules/@scope/aws-sdk': { version: '0.3.0' },
+              'node_modules/@scope/sdk': { version: '0.97.0' },
+            },
           }),
           'utf-8'
         );
+        // Install an older version so pre-v5 evaluateWorkspaceRelevance exercises compareVersions & loadReleaseChanges
         const roRelReport = evaluateWorkspaceRelevance(roDb, readWorkspace(wsDir), { productsConfig: cfg });
-        expect(roRelReport.up_to_date_count).toBe(1);
-        expect(roRelReport.products[0].latest_version).toBe('0.3.0');
+        expect(roRelReport.action_needed_count).toBe(1);
+        expect(roRelReport.up_to_date_count).toBe(0);
+        expect(roRelReport.products[0].releases.map((r) => r.version)).toEqual(['0.98.0', '0.97.1']);
+
+        const cmpPreV5 = compareVersions(roDb, {
+          product: 'ts-sdk',
+          package: '@scope/sdk',
+          fromVersion: '0.97.0',
+          toVersion: '0.98.0',
+          productsConfig: cfg,
+        });
+        expect(cmpPreV5.map((r) => r.version)).toEqual(['0.98.0']);
 
         const stamp = formatFreshnessStamp(getCorpusFreshness(roDb));
         expect(stamp).toContain('old schema (v4 < v5, read-only)');

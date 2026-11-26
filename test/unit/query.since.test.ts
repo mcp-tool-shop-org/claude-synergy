@@ -36,6 +36,8 @@ import {
   lookupEntity,
   formatPackageName,
   formatReleaseLabel,
+  formatResultLine,
+  productColWidth,
 } from '../../src/query.js';
 import { ingestAll } from '../../src/ingest.js';
 import { loadProductsConfig } from '../../src/products-config.js';
@@ -441,15 +443,42 @@ describe('multi-package separation and byte-for-byte single-package invariance',
         recentReleases(temp.db, 'ts-multi', 10, undefined, 'no-such-pkg', cfg)
       ).toThrow(/unknown package/i);
 
-      // compareVersions scoped to @scope/aws-sdk compares only aws-sdk releases
+      // compareVersions scoped to @scope/aws-sdk compares only aws-sdk releases (and tolerates v-prefixes)
       const cmp = compareVersions(temp.db, {
         product: 'ts-multi',
         package: '@scope/aws-sdk',
-        fromVersion: '0.3.0',
-        toVersion: '0.4.0',
+        fromVersion: 'v0.3.0',
+        toVersion: 'v0.4.0',
         productsConfig: cfg,
       });
       expect(cmp.map((c) => `${c.package}:${c.version}`)).toEqual(['@scope/aws-sdk:0.4.0']);
+
+      // getRelease handles v-prefixed lookup against bare version and bare lookup against v-prefixed Go version
+      expect(getRelease(temp.db, { product: 'ts-multi', package: '@scope/sdk', version: 'v0.98.0', productsConfig: cfg })?.version).toBe('0.98.0');
+      expect(getRelease(temp.db, { product: 'go-single', version: '2.1.0', productsConfig: cfg })?.version).toBe('v2.1.0');
+
+      // Filtering recentReleases by package without specifying product works across products
+      const crossProdAws = recentReleases(temp.db, undefined, 10, undefined, '@scope/aws-sdk', cfg);
+      expect(crossProdAws.map((r) => r.version)).toEqual(['0.4.0', '0.3.0']);
+      const unlistedProd = recentReleases(temp.db, 'unlisted-prod', 10, undefined, '@scope/aws-sdk', cfg);
+      expect(unlistedProd).toEqual([]);
+
+      // Missing released_at on compareVersions endpoint throws QUERY_VERSION_NO_DATE
+      temp.db
+        .prepare(
+          `INSERT INTO releases (product, package, version, released_at, notes_path, fetched_at, source_url, notes_hash)
+           VALUES ('ts-multi', '@scope/aws-sdk', '0.5.0', NULL, 'ts-multi/releases/aws-sdk-0.5.0.md', '2026-04-15', '', 'h-undated')`
+        )
+        .run();
+      expect(() =>
+        compareVersions(temp.db, {
+          product: 'ts-multi',
+          package: '@scope/aws-sdk',
+          fromVersion: '0.4.0',
+          toVersion: '0.5.0',
+          productsConfig: cfg,
+        })
+      ).toThrow(/missing a date/i);
 
       // getChangesSinceByPackage / browseChangesByPackage / searchChangesByPackage / lookupEntity
       const sinceGroups = getChangesSinceByPackage(temp.db, { since: '2026-04-01', product: 'ts-multi', productsConfig: cfg });
@@ -460,6 +489,8 @@ describe('multi-package separation and byte-for-byte single-package invariance',
 
       const searchGroups = searchChangesByPackage(temp.db, 'MULTI_QUERY_TOK', { product: 'ts-multi', productsConfig: cfg });
       expect(searchGroups.map((g) => g.package)).toEqual(['@scope/sdk', '@scope/aws-sdk']);
+      expect(productColWidth(searchGroups.flatMap((g) => g.results))).toBeGreaterThan(30);
+      expect(formatResultLine(searchGroups[0].results[0], searchGroups[0].results[0].text)).toContain('ts-multi (@scope/sdk)@0.98.0');
 
       const entityHits = lookupEntity(temp.db, 'env_var', 'MULTI_QUERY_TOK', { productsConfig: cfg });
       expect(entityHits.filter((e) => e.product === 'ts-multi').every((e) => e.package !== undefined)).toBe(true);
