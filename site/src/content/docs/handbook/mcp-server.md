@@ -195,7 +195,7 @@ Returns every change recorded across `(0.94.0, 0.95.1]` for `anthropic-sdk-types
 
 ## Safety properties
 
-- **Network only to sync** — queries read only the local SQLite database. The server goes online only for the `sync_now` tool and for the one-time sync on its first call against an empty store (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off).
+- **Network** — queries read the local SQLite database; `search` in hybrid mode (the default) also calls a local Ollama on localhost to embed the query. The server goes out to the internet only for the `sync_now` tool and for the sync on its first call against an empty store (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off).
 - **Vendor text framed** — the six tools that return release text (`search`, `lookup_entity`, `get_release`, `get_changes_since`, `search_breaking_changes`, `compare_versions`) wrap it in a frame marked as quoted data, with a fresh random token in its header and footer on every answer, and mark instruction-shaped lines `[flagged: …]`.
 - **Freshness stamp** — every answer ends with `data as of: …`, prefixed `STALE:` once the data is more than 7 days old.
 - **No code execution** — accepts JSON-RPC queries, returns structured JSON results. Never executes user input.

@@ -100,9 +100,9 @@ v1.3 之后的路线图：在 [URGENT_FINDINGS.md](URGENT_FINDINGS.md) 和问题
 
 ## 安全性和数据模型
 
-此工具在本地运行。**涉及的数据：**一个派生的 SQLite 数据库和 markdown 发布文件——所有这些都可以重新创建。**网络：**在您运行 `hk fetch`/`hk sync` 时，当代理调用 MCP `sync_now` 工具时，以及首次使用时：查询命令或 MCP 工具对空存储进行运行会自行同步（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` 会关闭此功能）。目标是 GitHub API、RSS 订阅源、变更日志页面和 MCP 注册表，以及仅用于 `hk embed` 的 Voyage 或 Cohere，前提是使用远程提供程序。**密钥：**从环境变量 `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` 中读取——绝不会记录，绝不会存储到磁盘上。**没有遥测数据。**请参阅 [SECURITY.md](SECURITY.md) 以了解报告策略。
+此工具在本地运行。**涉及的数据：**一个派生的 SQLite 数据库和 markdown 发布文件——所有这些都可以重新创建。**网络：**在您运行 `hk fetch`/`hk sync` 时、代理调用 MCP `sync_now` 工具时，以及首次使用时，会发出出站 HTTPS 请求：对空存储运行查询命令或 MCP 工具会自动同步（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` 可关闭此功能）。目标是 GitHub API、RSS 订阅源、变更日志页面和 MCP 注册表；只有在您选择时才会使用远程 AI 提供商：`hk embed`（Voyage 或 OpenAI 嵌入，上下文生成使用 Anthropic），或 `hk hybrid -e voyage|openai` / `-r voyage|cohere`。否则，混合搜索（包括 MCP `search` 工具的默认模式）会调用 localhost 上的本地 Ollama 来嵌入查询。**密钥：**从环境变量 `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` 中读取——绝不会记录，绝不会存储到磁盘上。**没有遥测数据。**请参阅 [SECURITY.md](SECURITY.md) 以了解报告策略。
 
-**供应商文本：** 第三方发布说明和目录条目被严格视为引用的数据，绝不能作为指令使用。发布文本会在摄取时进行确定性筛选（去除隐藏的 Unicode 控制字符，消除图像/不安全的链接，删除电子邮件和家庭路径，并标记类似指令的模式），然后由六个 MCP 工具将其封装在一个固定的数据框架中，这些工具会返回发布文本，并带有内联 `[flagged: …]` 标记，并且绝不会将其写入指令文件。
+**供应商文本：** 第三方发布说明和目录条目被严格视为引用的数据，绝不能作为指令使用。发布文本会在摄取时进行确定性筛选（去除隐藏的 Unicode 控制字符，消除图像/不安全的链接，隐去电子邮件和主目录路径，并标记类似指令的模式），然后由六个 MCP 工具将其封装在一个固定的数据框架中，这些工具会返回发布文本，并带有内联 `[flagged: …]` 标记，并且绝不会将其写入指令文件。
 
 ---
 
@@ -249,7 +249,7 @@ $ hk breaking --since 30d --limit 5
 }
 ```
 
-如果您希望使用自定义存储路径，请在 `env` 中设置 `CLAUDE_SYNERGY_DB`；否则，它将使用现有的 `./data/claude-synergy.db` 或 `~/.claude-synergy/data/claude-synergy.db`，并在首次使用工具时自动同步（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` 禁用此功能）。每个工具的响应都以 `data as of:` 新鲜度戳结尾（在 7 天后，前缀为 `STALE:`）。
+如果您希望使用自定义存储路径，请在 `env` 中设置 `CLAUDE_SYNERGY_DB`；否则，如果 `./data/claude-synergy.db` 已存在则使用它，否则使用 `~/.claude-synergy/data/claude-synergy.db`，并在首次使用工具时自动同步（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` 禁用此功能）。每个工具的响应都以 `data as of:` 新鲜度戳结尾（在 7 天后，前缀为 `STALE:`）。
 
 对于 GitHub Copilot 的 `.vscode/mcp.json`，请使用 `servers` 包装，而不是 `mcpServers`（参见 [synergy 12](synergies/12-mcp-config-format-gotcha.md)）。
 
@@ -372,7 +372,7 @@ CI：`.github/workflows/test.yml` 在推送和 PR 时运行 `pnpm test:coverage`
 
 `sqlite-vec` 本地扩展加载失败。常见原因：
 
-1. **Node 版本过旧** — `claude-synergy` 需要 Windows 上的 Node 22.12 或更高版本，Linux（glibc 或 musl）上的 macOS 或 x64 或 arm64；不支持 32 位 ARM。请使用 `node -v` 进行检查。
+1. **Node 版本过旧** — `claude-synergy` 需要 Node 22.12 或更高版本，可在 Windows、macOS 或 Linux（glibc 或 musl）的 x64 或 arm64 上运行；不支持 32 位 ARM。请使用 `node -v` 检查。
 2. **需要重新构建本机模块** — 运行 `npm rebuild better-sqlite3`（或 `pnpm rebuild better-sqlite3`）。
 3. **平台不匹配** — 在 Windows/ARM 上，`better-sqlite3` 需要 C++ 构建工具链。安装 [windows-build-tools](https://github.com/nicedoc/windows-build-tools) 或带有“使用 C++ 进行桌面开发”的 Visual Studio Build Tools。
 

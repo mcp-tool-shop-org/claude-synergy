@@ -100,9 +100,9 @@ v1.3以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)と課
 
 ## セキュリティとデータモデル
 
-このツールはローカルで実行されます。**アクセスするデータ:** 派生したSQLiteデータベースと、リリース用のマークダウンファイル。これらはすべて再作成可能です。**ネットワーク:** `hk fetch`/`hk sync`を実行する場合、エージェントがMCP`sync_now`ツールを呼び出す場合、および初回使用時に、アウトバウンドHTTPS通信が発生します。空のストアに対してクエリコマンドまたはMCPツールを実行すると、自動的に同期されます（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1`でこれを無効にできます）。宛先は、GitHub API、RSSフィード、変更履歴ページ、およびMCPレジストリです。さらに、リモートプロバイダーを使用する`hk embed`の場合に限り、VoyageまたはCohereも使用されます。**機密情報:** 環境変数から`GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY`を読み込みます。ログに記録したり、ディスクに保存したりすることはありません。**テレメトリーは行いません。**報告ポリシーについては、[SECURITY.md](SECURITY.md)を参照してください。
+このツールはローカルで実行されます。**アクセスするデータ:** 派生したSQLiteデータベースと、リリース用のマークダウンファイル。これらはすべて再作成可能です。**ネットワーク:** `hk fetch`/`hk sync`を実行したとき、エージェントがMCPの`sync_now`ツールを呼び出したとき、および初回使用時に、アウトバウンドHTTPS通信が発生します。空のストアに対してクエリコマンドまたはMCPツールを実行すると、自動的に同期されます（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1`で無効にできます）。宛先は、GitHub API、RSSフィード、変更履歴ページ、MCPレジストリです。リモートのAIプロバイダーは、選択した場合にのみ使用されます：`hk embed`（VoyageまたはOpenAIの埋め込み、コンテキスト生成にはAnthropic）、または`hk hybrid -e voyage|openai` / `-r voyage|cohere`。それ以外の場合、ハイブリッド検索（MCPの`search`ツールの既定モードを含む）は、クエリの埋め込みにlocalhost上のローカルOllamaを呼び出します。**機密情報:** 環境変数から`GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY`を読み込みます。ログに記録したり、ディスクに保存したりすることはありません。**テレメトリーは行いません。**報告ポリシーについては、[SECURITY.md](SECURITY.md)を参照してください。
 
-**ベンダーのテキスト:** サードパーティのリリースノートとカタログエントリは、引用されたデータとして厳密に扱われ、指示として解釈されることはありません。リリーステキストは、取り込み時に決定的にスクリーニングされます（隠された Unicode 制御文字の削除、画像/安全でないリンクの中和、メールアドレスとホームパスの削除、および指示のようなパターンにフラグを立てる）。その後、6 つの MCP ツールによって固定データフレームにラップされ、リリーステキストが返され、インラインの `[flagged: …]` マーカーが追加されます。リリーステキストは、指示ファイルには書き込まれません。
+**ベンダーのテキスト:** サードパーティのリリースノートとカタログエントリは、引用されたデータとして厳密に扱われ、指示として解釈されることはありません。リリーステキストは、取り込み時に決定的にスクリーニングされます（隠された Unicode 制御文字の削除、画像/安全でないリンクの中和、メールアドレスとホームパスの伏せ字化、および指示のようなパターンにフラグを立てる）。リリーステキストを返す 6 つの MCP ツールでは固定データフレームにラップされ、インラインの `[flagged: …]` マーカーが付きます。リリーステキストは、指示ファイルには書き込まれません。
 
 ---
 
@@ -249,7 +249,7 @@ $ hk breaking --since 30d --limit 5
 }
 ```
 
-カスタムストアパスが必要な場合は、`env` で `CLAUDE_SYNERGY_DB` を設定します。そうでない場合は、既存の `./data/claude-synergy.db` または `~/.claude-synergy/data/claude-synergy.db` を使用し、最初のツールの使用時に自動的に同期します (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` はこれを無効にします)。すべてのツールの応答の最後には、`data as of:` の鮮度スタンプが付加されます (7 日後には `STALE:` がプレフィックスとして付加されます)。
+カスタムストアパスが必要な場合は、`env` で `CLAUDE_SYNERGY_DB` を設定します。そうでない場合は、`./data/claude-synergy.db` が既に存在すればそれを、存在しなければ `~/.claude-synergy/data/claude-synergy.db` を使用し、最初のツールの使用時に自動的に同期します (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` はこれを無効にします)。すべてのツールの応答の最後には、`data as of:` の鮮度スタンプが付加されます (7 日後には `STALE:` がプレフィックスとして付加されます)。
 
 GitHub Copilotの`.vscode/mcp.json`については、`mcpServers`の代わりに`servers`ラッパーを使用してください（[synergy 12](synergies/12-mcp-config-format-gotcha.md)を参照）。
 
@@ -372,7 +372,7 @@ CI: `.github/workflows/test.yml` は、プッシュ時と PR 時には `pnpm tes
 
 `sqlite-vec` ネイティブ拡張機能のロードに失敗しました。一般的な原因:
 
-1. **Nodeのバージョンが古い** — `claude-synergy`は、WindowsではNode 22.12以降、macOSまたはLinux（glibcまたはmusl）、x64またはarm64が必要です。32ビットARMはサポートされていません。`node -v`で確認してください。
+1. **Nodeのバージョンが古い** — `claude-synergy`にはNode 22.12以降が必要です。Windows、macOS、Linux（glibcまたはmusl）のx64またはarm64で動作し、32ビットARMはサポートされていません。`node -v`で確認してください。
 2. **ネイティブモジュールを再ビルドする必要がある** — `npm rebuild better-sqlite3`（または`pnpm rebuild better-sqlite3`）を実行してください。
 3. **プラットフォームの不一致** — Windows/ARMでは、`better-sqlite3`にC++のビルドツールチェーンが必要です。[windows-build-tools](https://github.com/nicedoc/windows-build-tools)または「C++によるデスクトップ開発」を含むVisual Studio Build Toolsをインストールしてください。
 
