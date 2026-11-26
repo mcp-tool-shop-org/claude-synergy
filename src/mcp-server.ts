@@ -445,9 +445,10 @@ async function ensureCorpusReady(scopedProduct?: string): Promise<string | undef
     dbPath: DB_PATH,
     productsRoot: PRODUCTS_ROOT,
     db: db ?? undefined,
+    getDb: () => db,
     timeoutMs: FIRST_USE_SYNC_TIMEOUT_MS,
   });
-  if (res.db) {
+  if (res.db && res.db !== db) {
     db = res.db;
   }
   if (res.performedByThisCall && res.report) {
@@ -471,6 +472,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         timeoutMs: optInt(r, 'timeout_ms', 'sync_now', 1_000, 600_000),
       });
       return { text };
+    }
+
+    if (name === 'sync_status') {
+      const r = asRecord(args ?? {}, 'sync_status');
+      const params = {
+        product: optString(r, 'product', 'sync_status'),
+        staleOnly: optBool(r, 'stale_only', 'sync_status'),
+        staleHours: optInt(r, 'stale_hours', 'sync_status', 1, 100_000),
+      };
+      return { text: handleSyncStatus(params) };
     }
 
     // Validate parameters before triggering first-use sync so bad inputs reject fast.
@@ -595,16 +606,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         parsedCall = async () => ({ text: handleCompareVersions(params) });
         break;
       }
-      case 'sync_status': {
-        const r = asRecord(args ?? {}, 'sync_status');
-        const params = {
-          product: optString(r, 'product', 'sync_status'),
-          staleOnly: optBool(r, 'stale_only', 'sync_status'),
-          staleHours: optInt(r, 'stale_hours', 'sync_status', 1, 100_000),
-        };
-        parsedCall = async () => ({ text: handleSyncStatus(params) });
-        break;
-      }
       default:
         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
@@ -618,8 +619,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     const firstUseLine = await ensureCorpusReady(scopedProduct);
     if (!hasAnyReleases(db) && !syncCoordinator.isSyncInProgress()) {
+      const reason = syncCoordinator.getEmptyCorpusReason(db);
+      const detail =
+        reason === 'failed'
+          ? 'cooling down after a failed attempt (10m)'
+          : 'the last attempt returned nothing (cooling down for 10m)';
       return {
-        text: `Corpus is empty at ${DB_PATH} (first-use auto-sync cooling down for 10m after an empty or failed attempt). Run \`sync_now\` or \`hk sync\` to populate it.`,
+        text: `Corpus is empty at ${DB_PATH} (${detail}). Run \`sync_now\` or \`hk sync\` to populate it.`,
         isError: true,
         firstUseLine,
       };
@@ -977,11 +983,22 @@ function formatHours(h: number | null): string {
 }
 
 function handleSyncStatus(args: { product?: string; staleOnly?: boolean; staleHours?: number }): string {
-  const rows: SyncStatusRow[] = getSyncStatus(getDbOrThrow(), {
-    product: args.product,
-    staleOnly: args.staleOnly,
-    staleHours: args.staleHours,
-  });
+  if (!db && existsSync(DB_PATH)) {
+    db = openDb(DB_PATH);
+  }
+  if (!db) {
+    return '(no products in DB — run `sync_now` or `hk sync` first)';
+  }
+  let rows: SyncStatusRow[];
+  try {
+    rows = getSyncStatus(db, {
+      product: args.product,
+      staleOnly: args.staleOnly,
+      staleHours: args.staleHours,
+    });
+  } catch {
+    return '(no products in DB — run `sync_now` or `hk sync` first)';
+  }
   if (rows.length === 0) {
     return args.staleOnly
       ? `(no stale products — threshold ${args.staleHours ?? 24}h)`
@@ -1037,12 +1054,9 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
   const includeEmbed = args.includeEmbed ?? true;
   const timeoutMs = args.timeoutMs ?? 300_000;
 
-  // Lazy-load fetch/ingest/embed so the MCP startup stays light for sessions
-  // that never call sync_now.
-  const { fetchAll, listFetchTargets } = await import('./fetch.js');
-
   // dry_run: just enumerate targets + their current markers, no writes.
   if (dryRun) {
+    const { listFetchTargets } = await import('./fetch.js');
     const targets = args.product
       ? listFetchTargets().filter((t) => t.product === args.product)
       : listFetchTargets();
@@ -1067,7 +1081,10 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
     return lines.join('\n');
   }
 
+  // Acquire the in-progress lock synchronously BEFORE the first `await` so
+  // concurrent `sync_now` calls cannot race past the guard during module import.
   return await syncCoordinator.runManualSync(async () => {
+    const { fetchAll } = await import('./fetch.js');
     const t0 = Date.now();
     if (!db) {
       db = openDb(DB_PATH);
@@ -1139,7 +1156,7 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
     if (embedSummary) lines.push(embedSummary);
     if (embedError) lines.push(embedError);
     return lines.join('\n');
-  });
+  }, () => db);
 }
 
 function handleCompareVersions(args: { product: string; from_version: string; to_version: string }): string {

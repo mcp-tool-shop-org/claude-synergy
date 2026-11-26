@@ -587,6 +587,8 @@ function yamlQuote(s: string | null | undefined): string {
 
 function renderGhRelease(product: string, r: GhRelease): string {
   const version = (r.tag_name ?? '').replace(/^v/, '');
+  const body =
+    r.body != null ? sanitizeScrapedHtml(r.body, { preserveMarkdown: true }) : '(no body)';
   return [
     '---',
     `product: ${product}`,
@@ -598,7 +600,7 @@ function renderGhRelease(product: string, r: GhRelease): string {
     '',
     `# ${product} ${r.tag_name}`,
     '',
-    r.body ?? '(no body)',
+    body,
     '',
   ].join('\n');
 }

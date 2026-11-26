@@ -134,7 +134,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "src",
-      "qualifyingSourceCommits": 4,
+      "qualifyingSourceCommits": 5,
       "rebaseline": null
     },
     {
@@ -166,7 +166,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "test",
-      "qualifyingSourceCommits": 5,
+      "qualifyingSourceCommits": 6,
       "rebaseline": null
     }
   ],
@@ -264,8 +264,8 @@
         "path": "SHIP_GATE.md"
       },
       {
-        "commits": 11,
-        "lines": 499,
+        "commits": 12,
+        "lines": 506,
         "path": "atlas/README.md"
       },
       {
@@ -274,18 +274,18 @@
         "path": "atlas/boundaries.yaml"
       },
       {
-        "commits": 11,
-        "lines": 1936,
+        "commits": 12,
+        "lines": 1962,
         "path": "atlas/page.json"
       },
       {
-        "commits": 11,
-        "lines": 42781,
+        "commits": 12,
+        "lines": 42943,
         "path": "atlas/statistics.json"
       },
       {
-        "commits": 11,
-        "lines": 41304,
+        "commits": 12,
+        "lines": 41320,
         "path": "atlas/structure.json"
       },
       {
@@ -6469,8 +6469,8 @@
         "path": "src/fetch-changelog.ts"
       },
       {
-        "commits": 2,
-        "lines": 390,
+        "commits": 3,
+        "lines": 399,
         "path": "src/fetch-html.ts"
       },
       {
@@ -6564,9 +6564,14 @@
         "path": "test/unit/extract.test.ts"
       },
       {
-        "commits": 2,
-        "lines": 183,
+        "commits": 3,
+        "lines": 191,
         "path": "test/unit/fetch-html.test.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 56,
+        "path": "test/unit/fetch-utils.test.ts"
       },
       {
         "commits": 2,
@@ -6589,8 +6594,8 @@
         "path": "test/unit/stale-sync-pr.test.ts"
       },
       {
-        "commits": 2,
-        "lines": 561,
+        "commits": 3,
+        "lines": 642,
         "path": "test/unit/store.test.ts"
       },
       {
@@ -6604,51 +6609,51 @@
     "level": "low",
     "reason": "fewer than 25 source files reach 10 revisions in the window"
   },
-  "generatedAt": "2026-11-26T09:43:53.608Z",
+  "generatedAt": "2026-11-26T10:09:26.638Z",
   "generatedFrom": {
-    "commit": "c4ec7804de19558f7a173c127a77192cbdab09d7"
+    "commit": "10857e2e38a510a9c211a5080d899c1b3b5706b6"
   },
   "pairs": [
     {
       "a": "atlas/README.md",
       "b": "atlas/page.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/statistics.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/structure.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/statistics.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/structure.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/statistics.json",
       "b": "atlas/structure.json",
-      "either": 7,
-      "shared": 7,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
@@ -6669,16 +6674,16 @@
     "floor": "fallen",
     "floorHeld": false,
     "floorTrigger": "revision-depth",
-    "headDate": "2026-11-26T04:35:57-05:00",
+    "headDate": "2026-11-26T04:43:57-05:00",
     "inScopeFiles": 2919,
     "pinnedStart": null,
     "priorFloor": "fallen",
-    "qualifyingCommits": 34,
+    "qualifyingCommits": 35,
     "qualifyingMinimum": 30,
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-05-30T09:35:57.000Z",
+    "since": "2026-05-30T09:43:57.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",

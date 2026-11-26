@@ -56,6 +56,7 @@ export function evaluateSyncPrStaleness(input) {
     createdDate: created.date,
     todayDate: today.date,
     title,
+    commentMarker: STALE_SYNC_COMMENT_MARKER,
   };
 }
 

@@ -179,7 +179,8 @@ export interface PartialSyncState {
  */
 export function writePartialSyncState(
   db: Database.Database,
-  state: PartialSyncState
+  state: PartialSyncState,
+  opts: { now?: ClockInput } = {}
 ): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS schema_meta (
@@ -191,7 +192,7 @@ export function writePartialSyncState(
     succeeded: state.succeeded,
     total: state.total,
     skipped: state.skipped,
-    recorded_at: state.recorded_at ?? new Date().toISOString(),
+    recorded_at: state.recorded_at ?? new Date(resolveNowMs(opts.now)).toISOString(),
   };
   db.prepare(`
     INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)
@@ -231,15 +232,37 @@ export function readPartialSyncState(db: Database.Database | null): PartialSyncS
   }
 }
 
-/** True when the DB is missing/empty OR still carries an unresolved partial marker. */
-export function needsAutoSync(db: Database.Database | null): boolean {
-  return !hasAnyReleases(db) || readPartialSyncState(db) !== null;
+/**
+ * True when a persisted `first_use_partial` marker's `recorded_at` falls within
+ * `FIRST_USE_COOLDOWN_MS` of `now`, preventing every CLI query process from
+ * re-running a full sync after a partial attempt.
+ */
+export function isPartialMarkerCoolingDown(
+  partial: PartialSyncState | null,
+  now?: ClockInput
+): boolean {
+  if (!partial?.recorded_at) return false;
+  const recordedMs = Date.parse(partial.recorded_at);
+  if (Number.isNaN(recordedMs)) return false;
+  return resolveNowMs(now) - recordedMs < FIRST_USE_COOLDOWN_MS;
+}
+
+/**
+ * True when the DB is missing/empty OR carries an unresolved partial marker
+ * whose `recorded_at` cooldown has expired.
+ */
+export function needsAutoSync(db: Database.Database | null, now?: ClockInput): boolean {
+  if (!hasAnyReleases(db)) return true;
+  const partial = readPartialSyncState(db);
+  if (!partial) return false;
+  return !isPartialMarkerCoolingDown(partial, now);
 }
 
 export interface FirstUseSyncOptions {
   dbPath: string;
   productsRoot: string;
   db?: Database.Database;
+  getDb?: () => Database.Database | null;
   timeoutMs?: number;
   fetchRunner?: typeof fetchAll;
   ingestRunner?: typeof ingestAll;
@@ -306,7 +329,7 @@ export async function runFirstUseSync(
 
   const partial = skipped.length > 0 || (total > 0 && succeeded < total);
   if (partial) {
-    writePartialSyncState(db, { succeeded, total, skipped });
+    writePartialSyncState(db, { succeeded, total, skipped }, { now: opts.now });
   } else if (total > 0) {
     clearPartialSyncState(db);
   }
@@ -368,7 +391,10 @@ export class FirstUseSyncCoordinator {
   private manualSyncActive = false;
   private manualSyncPromise: Promise<unknown> | null = null;
   private manualSyncResolver: (() => void) | null = null;
+  private manualSyncDbGetter: (() => Database.Database | null) | null = null;
+  private lastManualSyncDb: Database.Database | null = null;
   private lastPartialNote: string | null = null;
+  private lastAttemptOutcome: 'failed' | 'empty' | null = null;
   private cooldownUntilMs: number | null = null;
 
   isSyncInProgress(): boolean {
@@ -383,6 +409,15 @@ export class FirstUseSyncCoordinator {
     this.lastPartialNote = null;
   }
 
+  getEmptyCorpusReason(db?: Database.Database | null): 'failed' | 'empty' {
+    if (this.lastAttemptOutcome) return this.lastAttemptOutcome;
+    const partial = readPartialSyncState(db ?? null);
+    if (partial && (partial.skipped.length > 0 || partial.succeeded < partial.total)) {
+      return 'failed';
+    }
+    return 'empty';
+  }
+
   isCoolingDown(now?: ClockInput): boolean {
     if (this.cooldownUntilMs === null) return false;
     return resolveNowMs(now) < this.cooldownUntilMs;
@@ -390,11 +425,14 @@ export class FirstUseSyncCoordinator {
 
   resetCooldown(): void {
     this.cooldownUntilMs = null;
+    this.lastAttemptOutcome = null;
   }
 
-  setManualSyncActive(active: boolean): void {
+  setManualSyncActive(active: boolean, dbGetter?: () => Database.Database | null): void {
     if (active) {
       this.manualSyncActive = true;
+      this.manualSyncDbGetter = dbGetter ?? null;
+      this.lastManualSyncDb = null;
       if (!this.manualSyncPromise) {
         this.manualSyncPromise = new Promise<void>((resolvePromise) => {
           this.manualSyncResolver = resolvePromise;
@@ -402,6 +440,8 @@ export class FirstUseSyncCoordinator {
       }
     } else {
       this.manualSyncActive = false;
+      this.lastManualSyncDb = this.manualSyncDbGetter?.() ?? null;
+      this.manualSyncDbGetter = null;
       const done = this.manualSyncResolver;
       this.manualSyncResolver = null;
       this.manualSyncPromise = null;
@@ -409,8 +449,8 @@ export class FirstUseSyncCoordinator {
     }
   }
 
-  async runManualSync<T>(fn: () => Promise<T>): Promise<T> {
-    this.setManualSyncActive(true);
+  async runManualSync<T>(fn: () => Promise<T>, getDb?: () => Database.Database | null): Promise<T> {
+    this.setManualSyncActive(true, getDb);
     try {
       return await fn();
     } finally {
@@ -425,9 +465,13 @@ export class FirstUseSyncCoordinator {
       } catch {
         // Ignore manual sync errors here; caller checks DB state below.
       }
-      const reopened = opts.db ?? (existsSync(opts.dbPath) ? openDb(opts.dbPath) : null);
+      const reused =
+        opts.getDb?.() ??
+        this.lastManualSyncDb ??
+        opts.db ??
+        (existsSync(opts.dbPath) ? openDb(opts.dbPath) : null);
       return {
-        db: reopened,
+        db: reused,
         report: null,
         performedByThisCall: false,
         cooledDown: false,
@@ -445,7 +489,8 @@ export class FirstUseSyncCoordinator {
       };
     }
 
-    if (this.isCoolingDown(opts.now)) {
+    const persistedPartial = readPartialSyncState(opts.db ?? null);
+    if (this.isCoolingDown(opts.now) || isPartialMarkerCoolingDown(persistedPartial, opts.now)) {
       return {
         db: opts.db ?? null,
         report: null,
@@ -459,12 +504,15 @@ export class FirstUseSyncCoordinator {
     const run = runFirstUseSync(opts).then((res) => {
       if (res.report.partial) {
         this.lastPartialNote = formatPartialNote(res.report);
+        this.lastAttemptOutcome = 'failed';
         this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
       } else if (!hasAnyReleases(res.db)) {
         this.lastPartialNote = null;
+        this.lastAttemptOutcome = 'empty';
         this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
       } else {
         this.lastPartialNote = null;
+        this.lastAttemptOutcome = null;
         this.cooldownUntilMs = null;
       }
       return res;
@@ -480,6 +528,7 @@ export class FirstUseSyncCoordinator {
         waitedForManualSync: false,
       };
     } catch (e) {
+      this.lastAttemptOutcome = 'failed';
       this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
       throw e;
     } finally {

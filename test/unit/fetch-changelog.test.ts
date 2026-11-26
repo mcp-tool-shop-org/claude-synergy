@@ -4,18 +4,20 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { fetchAiderHistory } from '../../src/fetch-changelog.js';
 import { mockFetch, type FetchMockHandle } from '../helpers/fetch-mock.js';
 
-// fetch-changelog uses execSync('gh api ...') to correlate version → date.
+// fetch-changelog uses async execFile('gh', ['api', ...]) via runGhApi to correlate version → date.
 // Mock the module so the gh call doesn't hit network.
 vi.mock('node:child_process', async () => {
   const actual = await vi.importActual<typeof import('node:child_process')>('node:child_process');
+  const payload = JSON.stringify([
+    { tag_name: 'v0.85.0', published_at: '2025-06-27T12:00:00Z' },
+    { tag_name: 'v0.86.0', published_at: '2025-08-09T12:00:00Z' },
+  ]);
   return {
     ...actual,
-    execSync: vi.fn(() =>
-      JSON.stringify([
-        { tag_name: 'v0.85.0', published_at: '2025-06-27T12:00:00Z' },
-        { tag_name: 'v0.86.0', published_at: '2025-08-09T12:00:00Z' },
-      ])
-    ),
+    execFile: vi.fn((_cmd: string, _args: any, _opts: any, cb: any) => {
+      cb(null, payload, '');
+      return { stdin: { end: () => {} } };
+    }),
   };
 });
 

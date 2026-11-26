@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 60
     env:
       CLAUDE_SYNERGY_DB: data/claude-synergy.db
+      CLAUDE_SYNERGY_NO_AUTO_SYNC: '1'
     # main is protected (required check "test"), so the bot never pushes to it.
     # It force-updates one rolling branch, opens or refreshes a PR, dispatches
     # the test workflow on that branch (a GITHUB_TOKEN push or PR triggers no
@@ -151,6 +152,7 @@ jobs:
           age_days=$(printf '%s' "$decision" | jq -r '.ageDays')
           created_date=$(printf '%s' "$decision" | jq -r '.createdDate')
           pr_title=$(printf '%s' "$decision" | jq -r '.title')
+          marker=$(printf '%s' "$decision" | jq -r '.commentMarker')
 
           if [ "$stale" != "true" ]; then
             gh pr edit "$num" --title "$pr_title" --body-file "$RUNNER_TEMP/body.md"
@@ -171,7 +173,6 @@ jobs:
           if ! gh api "repos/${{ github.repository }}/issues/$num/labels" --method POST -f "labels[]=sync-stale" >/dev/null; then
             echo "::warning::Could not attach sync-stale label to PR #$num." >&2
           fi
-          marker="<!-- claude-synergy:sync-stale -->"
           stale_body=$(printf '%s\nDaily sync PR #%s has been open since %s (%s days > STALE_SYNC_PR_DAYS=%s). Latest failed `test` run on `sync/daily`: %s. Refreshed `sync/daily` for %s.' \
             "$marker" "$num" "$created_date" "$age_days" "$STALE_SYNC_PR_DAYS" "$failed_run" "$day")
           existing_comment_id=$(gh api --paginate "repos/${{ github.repository }}/issues/$num/comments" \

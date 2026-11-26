@@ -7,6 +7,7 @@ import { ingestAll } from '../../src/ingest.js';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
 import { mockFetch } from '../helpers/fetch-mock.js';
+import { createExecFileMock } from '../helpers/mock-gh-api.js';
 
 function htmlResponse(body: string, status = 200): Response {
   return new Response(body, { status, headers: { 'content-type': 'text/html' } });
@@ -43,8 +44,7 @@ function mockGhApi(releases: any[]) {
       : '[]';
   };
   vi.doMock('node:child_process', () => ({
-    execFileSync: vi.fn(respond),
-    execSync: vi.fn(respond),
+    execFile: createExecFileMock(respond),
   }));
 }
 
@@ -232,8 +232,7 @@ describe('fetchAll', () => {
       throw new Error('gh: command not found');
     };
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(thrower),
-      execSync: vi.fn(thrower),
+      execFile: createExecFileMock(thrower),
     }));
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
     const stats = await fetchAllMocked(temp.db, productsRoot, {
@@ -306,8 +305,7 @@ describe('fetchAll pagination', () => {
       return '[]';
     };
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(respond),
-      execSync: vi.fn(respond),
+      execFile: createExecFileMock(respond),
     }));
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
     const stats = await fetchAllMocked(temp.db, productsRoot, {
@@ -337,8 +335,7 @@ describe('fetchAll pagination', () => {
       );
     };
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(respond),
-      execSync: vi.fn(respond),
+      execFile: createExecFileMock(respond),
     }));
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
     const stats = await fetchAllMocked(temp.db, productsRoot, {
@@ -482,8 +479,7 @@ describe('Part 6a — disk-bounded fetch window', () => {
       },
     ];
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(() => JSON.stringify(upstream)),
-      execSync: vi.fn(() => JSON.stringify(upstream)),
+      execFile: createExecFileMock(() => JSON.stringify(upstream)),
     }));
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
 
@@ -556,8 +552,7 @@ describe('Part 6a — disk-bounded fetch window', () => {
     });
 
     vi.doMock('node:child_process', () => ({
-      execFileSync: vi.fn(() => JSON.stringify(upstream)),
-      execSync: vi.fn(() => JSON.stringify(upstream)),
+      execFile: createExecFileMock(() => JSON.stringify(upstream)),
     }));
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
     const stats = await fetchAllMocked(temp.db, productsRoot, { product: 'claude-code' });
@@ -613,12 +608,7 @@ describe('Part 6a — disk-bounded fetch window', () => {
       return '[]';
     };
     vi.doMock('node:child_process', () => ({
-      execFile: vi.fn((_cmd: string, args: string[], _opts: any, cb: any) => {
-        cb(null, respond(args), '');
-        return { stdin: { end: () => {} } };
-      }),
-      execFileSync: vi.fn((_cmd: string, args: string[]) => respond(args)),
-      execSync: vi.fn(respond),
+      execFile: createExecFileMock((_file, args) => respond(args)),
     }));
 
     const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
@@ -684,5 +674,40 @@ describe('Part 6a — disk-bounded fetch window', () => {
     } finally {
       badFetchHandle.restore();
     }
+  });
+
+  it('sanitizes raw HTML in GitHub release bodies while preserving Markdown formatting (FIX-2 Item 7)', async () => {
+    const prodDir = join(productsRoot, 'claude-code');
+    const relDir = join(prodDir, 'releases');
+    mkdirSync(relDir, { recursive: true });
+    mockGhApi([
+      {
+        tag_name: 'v3.0.0',
+        published_at: '2026-11-26T10:00:00Z',
+        name: '3.0.0',
+        body: [
+          '## Highlights',
+          '> Important & helpful > details with [docs](https://example.test?a=1&b=2)',
+          '- Safe markdown bullet with `<span>code</span>`',
+          '<script>alert(1)</script><object data="https://evil.test/x"></object><img src="https://ok.test/pic.png" srcset="https://evil.test/2x.png 2x" style="background:url(https://evil.test/bg.png)">',
+          '```html',
+          '<script>fencedCodeKept()</script>',
+          '```',
+        ].join('\n'),
+        html_url: 'https://example.invalid/v3.0.0',
+      },
+    ]);
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const stats = await fetchAllMocked(temp.db, productsRoot, {
+      product: 'claude-code',
+      sinceOverride: '2026-01-01',
+    });
+    expect(stats[0].fetched).toBe(1);
+    const written = readFileSync(join(relDir, '3.0.0.md'), 'utf-8');
+    expect(written).toContain('> Important & helpful > details with [docs](https://example.test?a=1&b=2)');
+    expect(written).toContain('- Safe markdown bullet with `<span>code</span>`');
+    expect(written).toContain('<script>fencedCodeKept()</script>');
+    expect(written).not.toMatch(/<script>alert\(1\)|<object|\bsrcset\b|url\(/i);
+    expect(written).toContain('<img src="https://ok.test/pic.png">');
   });
 });

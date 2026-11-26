@@ -27,6 +27,7 @@ describe('evaluateSyncPrStaleness (Part 6b)', () => {
       createdDate: '2026-11-24',
       todayDate: '2026-11-26',
       title: 'Daily sync 2026-11-26',
+      commentMarker: STALE_SYNC_COMMENT_MARKER,
     });
 
     const threeDays = evaluateSyncPrStaleness({
@@ -41,6 +42,7 @@ describe('evaluateSyncPrStaleness (Part 6b)', () => {
       createdDate: '2026-11-23',
       todayDate: '2026-11-26',
       title: 'Daily sync 2026-11-26',
+      commentMarker: STALE_SYNC_COMMENT_MARKER,
     });
 
     const fourDays = evaluateSyncPrStaleness({
@@ -55,6 +57,7 @@ describe('evaluateSyncPrStaleness (Part 6b)', () => {
       createdDate: '2026-11-22',
       todayDate: '2026-11-26',
       title: 'Daily sync (open since 2026-11-22, refreshed 2026-11-26)',
+      commentMarker: STALE_SYNC_COMMENT_MARKER,
     });
   });
 
@@ -101,6 +104,7 @@ describe('.github/workflows/sync.yml validation', () => {
     expect(data.jobs.sync['timeout-minutes']).toBe(60);
     expect(data.jobs.sync.env).toEqual({
       CLAUDE_SYNERGY_DB: 'data/claude-synergy.db',
+      CLAUDE_SYNERGY_NO_AUTO_SYNC: '1',
     });
     expect(data.jobs.sync.permissions).toEqual({
       contents: 'write',
@@ -121,7 +125,8 @@ describe('.github/workflows/sync.yml validation', () => {
     expect(prStep?.env?.STALE_SYNC_PR_DAYS).toBe('3');
     expect(prStep?.run).toContain('check-stale-sync-pr.mjs');
     expect(prStep?.run).toContain('sync-stale');
-    expect(prStep?.run).toContain(STALE_SYNC_COMMENT_MARKER);
+    expect(prStep?.run).toContain('.commentMarker');
+    expect(prStep?.run).not.toContain(STALE_SYNC_COMMENT_MARKER);
     expect(prStep?.run).toContain('--method PATCH');
     expect(prStep?.run).toContain('exit 1');
   });

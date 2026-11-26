@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CLI `--no-stamp` & marker-based `synced_at`:** Added `--no-stamp` (used by `.github/workflows/sync.yml` when refreshing `PRODUCTS.txt` and `LATEST.txt`), moved `synced_at` to `markers.updated_at`, restricted user-home store fallback to `os.homedir()`, added lazy memoized `model-families.yaml` compilation with clean `MODEL_FAMILIES_CONFIG_ERROR` formatting, and bounded `gh api` subprocesses with per-call + remaining-budget async timeouts.
 
 ### Fixed
-- **Disk-bounded incremental fetch window (`src/fetch.ts`):** File-backed fetch strategies clamp `since` so it never moves past the newest release file on disk (and `gh-releases` checks missing intermediate files against `oldest` on disk), preventing cached DB markers from skipping releases when a rolling sync PR has not yet merged.
+- **Disk-bounded incremental fetch window (`src/fetch.ts`):** File-backed fetch strategies clamp `since` so it never moves past the newest release file on disk (and `gh-releases` checks missing intermediate files against `oldest` on disk), preventing cached DB markers from skipping releases when a rolling sync PR has not yet merged. As known behaviour for `claude-api` and `anthropic-apps`, same-date disk matching skips dates already present on disk even under `--since` (delete the date's `.md` file to force re-fetch).
 - **Stale daily sync PR flagging (`.github/workflows/sync.yml`, `scripts/check-stale-sync-pr.mjs`):** When an open `sync/daily` PR is older than `STALE_SYNC_PR_DAYS` (3 days), the workflow preserves the original creation date in the PR title, applies `sync-stale`, comments with the failed `test` run, pushes the refreshed branch, and fails the job.
 
 ## [2.0.1] - 2026-11-26

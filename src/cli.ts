@@ -245,7 +245,12 @@ async function openQueryDbOrFirstUse(
   if (synced.cooledDown) {
     if (!hasAnyReleases(synced.db)) {
       if (!program.opts().json) {
-        console.error('No data yet (first-use auto-sync cooling down for 10m). Run `hk sync` to populate.');
+        const reason = cliSyncCoordinator.getEmptyCorpusReason(synced.db);
+        const detail =
+          reason === 'failed'
+            ? 'cooling down after a failed attempt (10m)'
+            : 'the last attempt returned nothing (cooling down for 10m)';
+        console.error(`No data yet (${detail}). Run \`hk sync\` to populate.`);
       }
       return { db: synced.db, store, emptyOptOut: true };
     }

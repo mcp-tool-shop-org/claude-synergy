@@ -27,20 +27,40 @@ export async function fetchGithubCopilotBlog(sinceIso: string, signal?: AbortSig
   const entryUrls = new Set<string>();
   for (let page = 1; page <= 3; page++) {
     const url = page === 1 ? baseUrl : `${baseUrl}page/${page}/`;
+    let html: string;
     try {
       const res = await fetchWithRetry(url, { headers: UA, signal });
-      if (!res.ok) break;
-      const html = await res.text();
-      const $ = cheerio.load(html);
-      $('a[href*="/changelog/"]').each((_, el) => {
-        const href = $(el).attr('href');
-        if (!href) return;
-        // Match /changelog/YYYY-MM-DD-... permalinks
-        const m = href.match(/^(?:https:\/\/github\.blog)?(\/changelog\/20\d{2}-\d{2}-\d{2}-[^/?#]+\/?)$/);
-        if (m) entryUrls.add(`https://github.blog${m[1].startsWith('/') ? m[1] : '/' + m[1]}`);
-      });
-    } catch {
+      if (!res.ok) {
+        if (page === 1) {
+          throw new Error(`GitHub Copilot changelog returned HTTP ${res.status}`);
+        }
+        break;
+      }
+      html = await res.text();
+    } catch (e) {
+      if (page === 1) throw e;
       break;
+    }
+
+    const $ = cheerio.load(html);
+    let pageLinks = 0;
+    $('a[href*="/changelog/"]').each((_, el) => {
+      const href = $(el).attr('href');
+      if (!href) return;
+      // Match /changelog/YYYY-MM-DD-... permalinks
+      const m = href.match(/^(?:https:\/\/github\.blog)?(\/changelog\/20\d{2}-\d{2}-\d{2}-[^/?#]+\/?)$/);
+      if (m) {
+        pageLinks++;
+        entryUrls.add(`https://github.blog${m[1].startsWith('/') ? m[1] : '/' + m[1]}`);
+      }
+    });
+
+    if (page === 1 && pageLinks === 0) {
+      throw new AppError({
+        code: 'HTML_LAYOUT_CHANGED',
+        message: `no changelog entry links found on page 1 at ${baseUrl}`,
+        hint: 'Inspect the GitHub Copilot changelog listing markup and update link selectors in src/fetch-html.ts.',
+      });
     }
   }
 
@@ -102,36 +122,44 @@ export async function fetchWindsurfChangelog(sinceIso: string, signal?: AbortSig
     return [];
   }
 
+  let data: unknown;
   try {
-    const data = JSON.parse(nextDataScript);
-    // Recursively walk to find an array of changelog entries.
-    // Common shapes: data.props.pageProps.entries[] or data.props.pageProps.changelog[]
-    const entries = findChangelogEntries(data);
-    if (!entries || entries.length === 0) {
-      console.error('[fetch-html] windsurf: __NEXT_DATA__ present but no entry array found. 0 entries.');
-      return [];
-    }
-
-    const items: HtmlItem[] = [];
-    for (const e of entries) {
-      const title = (e.title ?? e.heading ?? e.name ?? '').toString().trim();
-      const dateRaw = (e.date ?? e.publishedAt ?? e.published_at ?? '').toString();
-      if (!title || !dateRaw) continue;
-      const d = new Date(dateRaw);
-      if (Number.isNaN(d.getTime())) continue;
-      const pubDate = d.toISOString();
-      if (pubDate <= sinceIso) continue;
-
-      const body = (e.body ?? e.content ?? e.description ?? '').toString();
-      const titleSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
-      const slug = `${pubDate.split('T')[0]}-${titleSlug || 'entry'}`;
-      items.push({ slug, title, pubDate, link: `${url}#${titleSlug}`, body });
-    }
-    return items;
+    data = JSON.parse(nextDataScript);
   } catch (e: any) {
-    console.error(`[fetch-html] windsurf: __NEXT_DATA__ parse failed: ${e.message}`);
-    return [];
+    throw new AppError({
+      code: 'HTML_LAYOUT_CHANGED',
+      message: `windsurf __NEXT_DATA__ parse failed at ${url}: ${e.message}`,
+      hint: 'Inspect Windsurf changelog page markup or use the playwright strategy in products.yaml.',
+    });
   }
+
+  // Recursively walk to find an array of changelog entries.
+  // Common shapes: data.props.pageProps.entries[] or data.props.pageProps.changelog[]
+  const entries = findChangelogEntries(data);
+  if (!entries || entries.length === 0) {
+    throw new AppError({
+      code: 'HTML_LAYOUT_CHANGED',
+      message: `windsurf __NEXT_DATA__ present at ${url} but contained no entry array`,
+      hint: 'Inspect Windsurf __NEXT_DATA__ schema in src/fetch-html.ts or switch to playwright.',
+    });
+  }
+
+  const items: HtmlItem[] = [];
+  for (const e of entries) {
+    const title = (e.title ?? e.heading ?? e.name ?? '').toString().trim();
+    const dateRaw = (e.date ?? e.publishedAt ?? e.published_at ?? '').toString();
+    if (!title || !dateRaw) continue;
+    const d = new Date(dateRaw);
+    if (Number.isNaN(d.getTime())) continue;
+    const pubDate = d.toISOString();
+    if (pubDate <= sinceIso) continue;
+
+    const body = (e.body ?? e.content ?? e.description ?? '').toString();
+    const titleSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+    const slug = `${pubDate.split('T')[0]}-${titleSlug || 'entry'}`;
+    items.push({ slug, title, pubDate, link: `${url}#${titleSlug}`, body });
+  }
+  return items;
 }
 
 function findChangelogEntries(obj: unknown, depth = 0): any[] | null {
@@ -303,23 +331,28 @@ const MONTHS: Record<string, number> = {
 
 const SAFE_URL_SCHEMES = new Set(['http', 'https', 'mailto']);
 
-/**
- * Strip dangerous active/executable elements and attributes (`<script>`, `<style>`,
- * `<iframe>`, `on*` event handlers, non-HTTP(S)/mailto URLs) from scraped HTML
- * bodies before storing them to markdown files.
- */
-export function sanitizeScrapedHtml(rawHtml: string): string {
-  if (!rawHtml || !rawHtml.includes('<')) return rawHtml;
-  const $ = cheerio.load(rawHtml, null, false);
-  $('script, style, iframe').remove();
+function sanitizeCheerioDom($: cheerio.CheerioAPI): void {
+  $('script, style, iframe, object, embed, link, base, animate, set').remove();
+  $('meta').each((_, el) => {
+    const attribs = (el as any).attribs as Record<string, string> | undefined;
+    if (attribs && Object.keys(attribs).some((k) => k.trim().toLowerCase() === 'http-equiv')) {
+      $(el).remove();
+    }
+  });
   $('*').each((_, el) => {
     const attribs = (el as any).attribs as Record<string, string> | undefined;
     if (!attribs) return;
     const $el = $(el);
     for (const [name, val] of Object.entries(attribs)) {
       const trimmed = name.trim().toLowerCase();
-      if (/^on[a-z]/i.test(trimmed)) {
+      if (/^on[a-z]/i.test(trimmed) || trimmed === 'srcset') {
         $el.removeAttr(name);
+      } else if (trimmed === 'style') {
+        const rawStyle = String(val ?? '');
+        const normStyle = rawStyle.replace(/[\x00-\x20]+/g, '').toLowerCase();
+        if (normStyle.includes('url(') || /url\s*\(/i.test(rawStyle)) {
+          $el.removeAttr(name);
+        }
       } else if (/^(?:href|src|action|formaction|xlink:href)$/i.test(trimmed)) {
         const normalized = String(val ?? '').replace(/[\x00-\x20]+/g, '').toLowerCase();
         const schemeMatch = /^([a-z][a-z0-9+.-]*):/.exec(normalized);
@@ -329,6 +362,48 @@ export function sanitizeScrapedHtml(rawHtml: string): string {
       }
     }
   });
+}
+
+/**
+ * Strip dangerous active/executable elements (`<script>`, `<style>`, `<iframe>`,
+ * `<object>`, `<embed>`, `<meta http-equiv>`, `<link>`, `<base>`, SVG `<animate>`/`<set>`)
+ * and attributes (`on*`, `srcset`, `style` containing `url(...)`, non-HTTP(S)/mailto URLs).
+ * When `preserveMarkdown` is true (e.g. GitHub release bodies), fenced/inline code blocks,
+ * autolinks, and plain Markdown punctuation are left untouched.
+ */
+export function sanitizeScrapedHtml(
+  rawHtml: string,
+  opts: { preserveMarkdown?: boolean } = {}
+): string {
+  if (!rawHtml || !rawHtml.includes('<')) return rawHtml;
+
+  if (opts.preserveMarkdown) {
+    const stash: string[] = [];
+    const stashToken = (s: string) => {
+      const idx = stash.push(s) - 1;
+      return `@@CS_MD_STASH_${idx}@@`;
+    };
+    const protectedText = rawHtml
+      .replace(/^ {0,3}(`{3,}|~{3,})[\s\S]*?^ {0,3}\1[ \t]*$/gm, stashToken)
+      .replace(/(`+)[^\n]*?\1/g, stashToken)
+      .replace(/<(?:https?|mailto):[^>\s]+>/gi, stashToken);
+
+    if (!/<\/?[a-zA-Z][a-zA-Z0-9-]*(?=[\s/>])/.test(protectedText)) {
+      return rawHtml;
+    }
+
+    const $ = cheerio.load(protectedText, null, false);
+    sanitizeCheerioDom($);
+    const serialized = $.root()
+      .contents()
+      .toArray()
+      .map((n: any) => (n.type === 'text' ? n.data : $.html(n)))
+      .join('');
+    return serialized.replace(/@@CS_MD_STASH_(\d+)@@/g, (_, idx) => stash[Number(idx)] ?? '');
+  }
+
+  const $ = cheerio.load(rawHtml, null, false);
+  sanitizeCheerioDom($);
   return ($.html() ?? '').trim();
 }
 

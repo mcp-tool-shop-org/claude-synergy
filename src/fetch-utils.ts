@@ -7,7 +7,7 @@
 //   - Respects Retry-After header when present
 //   - Propagates an external AbortSignal for global cancellation (e.g., SIGINT or fetchAll timeout)
 
-import * as childProcess from 'node:child_process';
+import { execFile } from 'node:child_process';
 
 /** Per-call timeout for `gh api` subprocess invocations (ms). */
 export const GH_API_CALL_TIMEOUT_MS = 30_000;
@@ -231,8 +231,6 @@ export function createFetchAllController(timeoutMs: number = DEFAULT_FETCH_ALL_T
 /**
  * Run a `gh` CLI invocation asynchronously (non-blocking for MCP event loop)
  * with per-call timeout capped by remaining global budget and AbortSignal propagation.
- * Falls back to bounded `execFileSync` / `execSync` only when a test mocks
- * `node:child_process` without `execFile`.
  */
 export async function runGhApi(
   args: string[],
@@ -253,43 +251,8 @@ export async function runGhApi(
   const callTimeoutMs = Math.max(1, Math.min(GH_API_CALL_TIMEOUT_MS, remaining));
   const maxBuffer = opts.maxBuffer ?? 50 * 1024 * 1024;
 
-  // Avoid touching missing properties on partial Vitest vi.doMock('node:child_process') proxies,
-  // because Vitest throws if an unmocked export name is accessed via dot lookup.
-  const exportedKeys = new Set(Object.keys(childProcess));
-  const hasExecFileMock =
-    exportedKeys.has('execFile') && typeof (childProcess.execFile as any)?.mock === 'object';
-  const hasExecFileSyncMock =
-    exportedKeys.has('execFileSync') && typeof (childProcess.execFileSync as any)?.mock === 'object';
-  const hasExecSyncMock =
-    exportedKeys.has('execSync') && typeof (childProcess.execSync as any)?.mock === 'object';
-
-  if (!hasExecFileMock) {
-    if (hasExecFileSyncMock || !exportedKeys.has('execFile')) {
-      if (exportedKeys.has('execFileSync') && typeof childProcess.execFileSync === 'function') {
-        return String(
-          childProcess.execFileSync('gh', args, {
-            encoding: 'utf-8',
-            maxBuffer,
-            timeout: callTimeoutMs,
-            stdio: ['ignore', 'pipe', 'pipe'],
-          })
-        );
-      }
-    }
-    if (hasExecSyncMock) {
-      return String(
-        childProcess.execSync(`gh ${args.map((a) => `"${a}"`).join(' ')}`, {
-          encoding: 'utf-8',
-          maxBuffer,
-          timeout: callTimeoutMs,
-          stdio: ['ignore', 'pipe', 'pipe'],
-        })
-      );
-    }
-  }
-
   return new Promise<string>((resolvePromise, rejectPromise) => {
-    const child = childProcess.execFile(
+    const child = execFile(
       'gh',
       args,
       {

@@ -7,6 +7,8 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
+import { initSchema, openDb } from '../../src/db.js';
+import { ingestAll } from '../../src/ingest.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..', '..');
@@ -375,4 +377,107 @@ describe('CLI FIX-1 regressions (Items 1, 8, 10)', () => {
     expect(lDay1.stdout).toBe(lDay2.stdout);
     expect(lDay1.stdout).not.toContain('data as of:');
   }, 35_000);
+
+  it('FIX-2 Item 1: two CLI query processes honour persisted first_use_partial cooldown then auto-sync after expiry', async () => {
+    const dir = makeDir('cli-partial-cd-');
+    const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Cooldown Feed</title>
+<item><title>Release 2.0.0</title><link>http://127.0.0.1/2.0.0</link><guid>cd-2</guid><pubDate>Wed, 25 Nov 2026 12:00:00 GMT</pubDate><description><![CDATA[- Added persisted cooldown item]]></description></item>
+</channel></rss>`;
+    let hits = 0;
+    const srv = createServer((req, res) => {
+      hits++;
+      if (req.url === '/ok.rss') {
+        res.writeHead(200, { 'content-type': 'application/rss+xml' });
+        res.end(rssXml);
+      } else {
+        res.writeHead(404);
+        res.end('not found');
+      }
+    });
+    await new Promise<void>((r) => srv.listen(0, '127.0.0.1', r));
+    const port = (srv.address() as { port: number }).port;
+    const base = `http://127.0.0.1:${port}`;
+    const customYaml = join(dir, 'products.yaml');
+    writeFileSync(
+      customYaml,
+      `products:
+  - name: cd-ok
+    display_name: Cooldown OK
+    tier: 3
+    source_url: ${base}/ok.rss
+    fetch_strategy: rss
+    fetch:
+      type: rss
+      url: ${base}/ok.rss
+  - name: cd-bad
+    display_name: Cooldown Bad
+    tier: 3
+    source_url: ${base}/missing.rss
+    fetch_strategy: rss
+    fetch:
+      type: rss
+      url: ${base}/missing.rss
+`,
+      'utf-8'
+    );
+
+    try {
+      const dbPath = join(dir, 'store', 'data', 'claude-synergy.db');
+      const productsRoot = join(dir, 'store', 'products');
+      const relDir = join(productsRoot, 'cd-ok', 'releases');
+      mkdirSync(relDir, { recursive: true });
+      writeFileSync(
+        join(relDir, '1.0.0.md'),
+        `---\nproduct: cd-ok\nversion: "1.0.0"\nreleased_at: "2026-11-24"\nfetched_at: "2026-11-26"\n---\n\n- Baseline release\n`,
+        'utf-8'
+      );
+
+      // Seed DB with 1 release + a fresh first_use_partial marker recorded at 10:00:00Z.
+      const db = openDb(dbPath, { loadVec: false });
+      initSchema(db);
+      ingestAll(db, productsRoot);
+      db.prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`).run(
+        'first_use_partial',
+        JSON.stringify({
+          succeeded: 1,
+          total: 2,
+          skipped: [{ product: 'cd-bad', reason: 'HTTP 404' }],
+          recorded_at: '2026-11-26T10:00:00.000Z',
+        })
+      );
+      db.close();
+
+      const sharedEnv = {
+        CLAUDE_SYNERGY_DB: dbPath,
+        CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+        CLAUDE_SYNERGY_PRODUCTS_ROOT: productsRoot,
+        HOME: dir,
+        USERPROFILE: dir,
+      };
+
+      // Two separate CLI processes within 10m -> zero fetches, partial stamp still shown.
+      for (const clockIso of ['2026-11-26T10:02:00Z', '2026-11-26T10:05:00Z']) {
+        const res = await runCliAsync(['latest'], {
+          cwd: dir,
+          env: { ...sharedEnv, CLAUDE_SYNERGY_NOW: clockIso },
+        });
+        expect(res.code).toBe(0);
+        expect(res.stdout).toContain('partial corpus: synced 1 of 2 products');
+        expect(hits).toBe(0);
+      }
+
+      // Third CLI process after 10m cooldown expiry -> runs one auto-sync.
+      const resAfter = await runCliAsync(['latest'], {
+        cwd: dir,
+        env: { ...sharedEnv, CLAUDE_SYNERGY_NOW: '2026-11-26T10:11:00Z' },
+      });
+      expect(resAfter.code).toBe(0);
+      expect(hits).toBeGreaterThanOrEqual(2);
+      expect(resAfter.stderr).toContain('first use (partial corpus)');
+    } finally {
+      srv.closeAllConnections?.();
+      await new Promise<void>((r) => srv.close(() => r()));
+    }
+  }, 45_000);
 });

@@ -790,8 +790,113 @@ describe('MCP server integration', () => {
               expect(searchRes.isError).not.toBe(true);
               expect(searchRes.content[0]?.text).toContain('coordination');
               expect(hitCount).toBe(1);
+
+              // FIX-2 Item 2: back-to-back sync_now rejects the second caller before any await and runs 1 fetchAll.
+              hitCount = 0;
+              const settled = await Promise.allSettled([
+                client.callTool('sync_now', { include_embed: false }),
+                client.callTool('sync_now', { include_embed: false }),
+              ]);
+              const rejected = settled.filter(
+                (r): r is PromiseRejectedResult =>
+                  r.status === 'rejected' &&
+                  String(r.reason?.message ?? r.reason).includes('another sync is already in progress')
+              );
+              const fulfilled = settled.filter(
+                (r): r is PromiseFulfilledResult<any> =>
+                  r.status === 'fulfilled' && !r.value?.isError
+              );
+              expect(rejected.length).toBe(1);
+              expect(fulfilled.length).toBe(1);
+              expect(hitCount).toBe(1);
             }
           );
+
+          // FIX-2 Item 6: sync_status stays usable during failed/empty cooldown and messages distinguish failed vs empty.
+          const emptyRssSrv = createServer((_req, res) => {
+            res.writeHead(200, { 'content-type': 'application/rss+xml' });
+            res.end(`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Empty</title></channel></rss>`);
+          });
+          await new Promise<void>((r) => emptyRssSrv.listen(0, '127.0.0.1', r));
+          const emptyPort = (emptyRssSrv.address() as { port: number }).port;
+          const failYaml = join(workDir, 'fail-products.yaml');
+          const emptyYaml = join(workDir, 'empty-products.yaml');
+          writeFileSync(
+            failYaml,
+            `products:\n  - name: fail-prod\n    display_name: Fail Prod\n    tier: 3\n    source_url: http://127.0.0.1:${emptyPort}/fail.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${emptyPort}/fail.rss\n`,
+            'utf-8'
+          );
+          writeFileSync(
+            emptyYaml,
+            `products:\n  - name: empty-prod\n    display_name: Empty Prod\n    tier: 3\n    source_url: http://127.0.0.1:${emptyPort}/ok.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${emptyPort}/ok.rss\n`,
+            'utf-8'
+          );
+          const failSrv = createServer((_req, res) => {
+            res.writeHead(404);
+            res.end('missing');
+          });
+          await new Promise<void>((r) => failSrv.listen(0, '127.0.0.1', r));
+          const failPort = (failSrv.address() as { port: number }).port;
+          writeFileSync(
+            failYaml,
+            `products:\n  - name: fail-prod\n    display_name: Fail Prod\n    tier: 3\n    source_url: http://127.0.0.1:${failPort}/fail.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${failPort}/fail.rss\n`,
+            'utf-8'
+          );
+
+          try {
+            const failDb = join(workDir, 'fail', 'data', 'claude-synergy.db');
+            await withMcpServer(
+              {
+                dbPath: failDb,
+                synergiesDir,
+                requestTimeoutMs: 25_000,
+                env: {
+                  CLAUDE_SYNERGY_PRODUCTS_YAML: failYaml,
+                  CLAUDE_SYNERGY_PRODUCTS_ROOT: join(workDir, 'fail', 'products'),
+                  HOME: workDir,
+                  USERPROFILE: workDir,
+                },
+              },
+              async (client: McpClient) => {
+                await client.initialize();
+                await client.notifyInitialized();
+                const res = await client.callTool('search', { query: 'anything', mode: 'fts' });
+                expect(res.isError).toBe(true);
+                expect(res.content[0]?.text).toContain('cooling down after a failed attempt');
+                const statusRes = await client.callTool('sync_status', {});
+                expect(statusRes.isError).not.toBe(true);
+              }
+            );
+
+            const zeroDb = join(workDir, 'zero', 'data', 'claude-synergy.db');
+            await withMcpServer(
+              {
+                dbPath: zeroDb,
+                synergiesDir,
+                requestTimeoutMs: 25_000,
+                env: {
+                  CLAUDE_SYNERGY_PRODUCTS_YAML: emptyYaml,
+                  CLAUDE_SYNERGY_PRODUCTS_ROOT: join(workDir, 'zero', 'products'),
+                  HOME: workDir,
+                  USERPROFILE: workDir,
+                },
+              },
+              async (client: McpClient) => {
+                await client.initialize();
+                await client.notifyInitialized();
+                const res = await client.callTool('search', { query: 'anything', mode: 'fts' });
+                expect(res.isError).toBe(true);
+                expect(res.content[0]?.text).toContain('the last attempt returned nothing');
+                const statusRes = await client.callTool('sync_status', {});
+                expect(statusRes.isError).not.toBe(true);
+              }
+            );
+          } finally {
+            emptyRssSrv.closeAllConnections?.();
+            await new Promise<void>((r) => emptyRssSrv.close(() => r()));
+            failSrv.closeAllConnections?.();
+            await new Promise<void>((r) => failSrv.close(() => r()));
+          }
 
           // Item 8: broken model-families.yaml lets MCP start & listTools(), then formats MODEL_FAMILIES_CONFIG_ERROR without stack.
           const mfDb = join(workDir, 'mf', 'data', 'claude-synergy.db');

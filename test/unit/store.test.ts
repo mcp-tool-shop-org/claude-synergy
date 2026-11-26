@@ -13,6 +13,7 @@ import {
   formatPartialNote,
   hasAnyReleases,
   isAutoSyncDisabled,
+  isPartialMarkerCoolingDown,
   needsAutoSync,
   printStoreResolutionOnce,
   readPartialSyncState,
@@ -407,6 +408,7 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
     const res1 = await runFirstUseSync({
       dbPath,
       productsRoot,
+      now: new Date('2026-11-26T10:00:00Z'),
       fetchRunner: async (_db: any, root: string): Promise<FetchAllResult> => {
         const relDir = join(root, 'p-ok', 'releases');
         mkdirSync(relDir, { recursive: true });
@@ -425,25 +427,33 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
     });
     res1.db.close();
 
-    // Fresh DB connection sees persisted first_use_partial in schema_meta & stamp & needsAutoSync.
+    // Fresh DB connection sees persisted first_use_partial in schema_meta & stamp;
+    // needsAutoSync stays false during the persisted 10m cooldown and becomes true after.
+    const tFresh = new Date('2026-11-26T10:02:00Z');
+    const tExpired = new Date('2026-11-26T10:11:00Z');
     const reopened = openDb(dbPath, { loadVec: false });
     try {
       const persisted = readPartialSyncState(reopened);
       expect(persisted?.succeeded).toBe(1);
       expect(persisted?.total).toBe(2);
       expect(persisted?.skipped).toEqual([{ product: 'p-skip', reason: 'timeout' }]);
-      expect(needsAutoSync(reopened)).toBe(true);
-      expect(formatFreshnessStamp(getCorpusFreshness(reopened))).toContain('p-skip (timeout)');
+      expect(persisted?.recorded_at).toBe('2026-11-26T10:00:00.000Z');
+      expect(isPartialMarkerCoolingDown(persisted, tFresh)).toBe(true);
+      expect(isPartialMarkerCoolingDown(persisted, tExpired)).toBe(false);
+      expect(needsAutoSync(reopened, tFresh)).toBe(false);
+      expect(needsAutoSync(reopened, tExpired)).toBe(true);
+      expect(formatFreshnessStamp(getCorpusFreshness(reopened, { now: tFresh }))).toContain('p-skip (timeout)');
       expect(FIRST_USE_PARTIAL_META_KEY).toBe('first_use_partial');
     } finally {
       reopened.close();
     }
 
-    // Re-running first-use sync where all products succeed clears first_use_partial.
+    // Re-running first-use sync after cooldown where all products succeed clears first_use_partial.
     const coord = new FirstUseSyncCoordinator();
     const res2 = await coord.ensureSynced({
       dbPath,
       productsRoot,
+      now: tExpired,
       fetchRunner: async (): Promise<FetchAllResult> => {
         const arr: any = [
           { product: 'p-ok', fetched: 0, newSince: '2026-11-25', latest: null, errors: [] },
@@ -590,6 +600,7 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
     });
     rEmpty.db?.close();
     expect(coord.isCoolingDown(new Date('2026-11-26T10:01:00Z'))).toBe(true);
+    expect(coord.getEmptyCorpusReason()).toBe('empty');
     coord.resetCooldown();
     expect(coord.isCoolingDown(new Date('2026-11-26T10:01:00Z'))).toBe(false);
 
@@ -604,7 +615,7 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
             throw new AppError({
               code: 'MODEL_FAMILIES_CONFIG_ERROR',
               message: 'bad yaml',
-              remediation: 'fix yaml',
+              hint: 'fix yaml',
             });
           },
           now: new Date('2026-11-26T10:02:00Z'),
@@ -614,21 +625,27 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
       errDb.close();
     }
     expect(coord.isCoolingDown(new Date('2026-11-26T10:03:00Z'))).toBe(true);
+    expect(coord.getEmptyCorpusReason()).toBe('failed');
     coord.resetCooldown();
 
-    let releaseManual!: () => void;
-    const manualPromise = coord.runManualSync(async () => {
-      await new Promise<void>((r) => {
-        releaseManual = r;
-      });
-      return 'manual-done';
-    });
-    const waiter = coord.ensureSynced({ dbPath, productsRoot });
-    releaseManual();
-    expect(await manualPromise).toBe('manual-done');
-    const waited = await waiter;
-    waited.db?.close();
-    expect(waited.waitedForManualSync).toBe(true);
-    expect(waited.performedByThisCall).toBe(false);
+    let manualDb = openDb(dbPath, { loadVec: false });
+    try {
+      let releaseManual!: () => void;
+      const manualPromise = coord.runManualSync(async () => {
+        await new Promise<void>((r) => {
+          releaseManual = r;
+        });
+        return 'manual-done';
+      }, () => manualDb);
+      const waiter = coord.ensureSynced({ dbPath, productsRoot, getDb: () => manualDb });
+      releaseManual();
+      expect(await manualPromise).toBe('manual-done');
+      const waited = await waiter;
+      expect(waited.db).toBe(manualDb);
+      expect(waited.waitedForManualSync).toBe(true);
+      expect(waited.performedByThisCall).toBe(false);
+    } finally {
+      manualDb.close();
+    }
   });
 });
