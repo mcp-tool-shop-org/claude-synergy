@@ -62,7 +62,7 @@
   "changes": {
     "fileCounts": {
       "added": 0,
-      "changed": 7,
+      "changed": 4,
       "moved": 0,
       "parts": 3,
       "removed": 0
@@ -70,13 +70,13 @@
     "items": [
       {
         "kind": "counts",
-        "sentence": "Nothing structural changed since 2026-11-26; 7 files changed content.",
+        "sentence": "Nothing structural changed since 2026-11-26; 4 files changed content.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "6576cd6c81a08f4be64835f7b4ee17f5913b5208",
-      "generatedAt": "2026-11-26T11:55:53.292Z"
+      "commit": "4f63048dee1d42cd1025735809ba538971a58079",
+      "generatedAt": "2026-11-26T12:22:25.731Z"
     },
     "unchanged": true
   },
@@ -85,7 +85,7 @@
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "4f63048dee1d42cd1025735809ba538971a58079",
+  "commit": "99831f620c012fa027714334866c7e6b63cc6773",
   "defaultBranch": "main",
   "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (91), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
@@ -429,7 +429,7 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-26T12:22:25.731Z",
+  "generatedAt": "2026-11-26T12:37:54.715Z",
   "limits": [
     "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
     "1 write and 5 reads use paths built at run time and are not named here.",

@@ -645,16 +645,27 @@ describe('MCP server integration', () => {
               const relRes2 = await client.callTool('get_release', { product: 'test-cli', version: '1.2.0' });
               const relText1 = relRes1.content[0]?.text ?? '';
               const relText2 = relRes2.content[0]?.text ?? '';
-              const tok1 = VENDOR_TEXT_FRAME.headerPattern.exec(relText1)?.[1];
-              const tok2 = VENDOR_TEXT_FRAME.headerPattern.exec(relText2)?.[1];
+              const headerRe = new RegExp(VENDOR_TEXT_FRAME.headerPattern.source, 'gm');
+              const footerRe = new RegExp(VENDOR_TEXT_FRAME.footerPattern.source, 'gm');
+              const hMatches1 = [...relText1.matchAll(headerRe)];
+              const fMatches1 = [...relText1.matchAll(footerRe)];
+              const hMatches2 = [...relText2.matchAll(headerRe)];
+              const fMatches2 = [...relText2.matchAll(footerRe)];
+              expect(hMatches1).toHaveLength(1);
+              expect(fMatches1).toHaveLength(1);
+              expect(hMatches2).toHaveLength(1);
+              expect(fMatches2).toHaveLength(1);
+              const tok1 = hMatches1[0][1];
+              const tok2 = hMatches2[0][1];
+              expect(fMatches1[0][1]).toBe(tok1);
+              expect(fMatches2[0][1]).toBe(tok2);
               expect(tok1).toMatch(/^[0-9a-f]{16}$/);
               expect(tok2).toMatch(/^[0-9a-f]{16}$/);
               expect(tok1).not.toBe(tok2);
-              observedTokens.push(tok1!, tok2!);
-              expect(relText1.split(VENDOR_TEXT_FRAME.header(tok1!)).length - 1).toBe(1);
-              expect(relText1.split(VENDOR_TEXT_FRAME.footer(tok1!)).length - 1).toBe(1);
+              observedTokens.push(tok1, tok2);
               expect(relText1).toContain('[frame text removed]');
               expect(relText1).toContain('[flagged: frame_marker]');
+              expect(relText1).not.toContain('1111222233334444');
 
               const tools = await client.listTools();
               const vendorCalls: Record<string, Record<string, unknown>> = {
@@ -679,11 +690,14 @@ describe('MCP server integration', () => {
                 if (tool.name in vendorCalls) {
                   const res = await client.callTool(tool.name, vendorCalls[tool.name]);
                   const text = res.content[0]?.text ?? '';
-                  const tok = VENDOR_TEXT_FRAME.headerPattern.exec(text)?.[1];
-                  expect(tok, `${tool.name} must include random-nonce opening frame`).toMatch(/^[0-9a-f]{16}$/);
-                  observedTokens.push(tok!);
-                  expect(text.split(VENDOR_TEXT_FRAME.header(tok!)).length - 1, `${tool.name} single header`).toBe(1);
-                  expect(text.split(VENDOR_TEXT_FRAME.footer(tok!)).length - 1, `${tool.name} single footer`).toBe(1);
+                  const hMatches = [...text.matchAll(headerRe)];
+                  const fMatches = [...text.matchAll(footerRe)];
+                  expect(hMatches, `${tool.name} single header`).toHaveLength(1);
+                  expect(fMatches, `${tool.name} single footer`).toHaveLength(1);
+                  const tok = hMatches[0][1];
+                  expect(fMatches[0][1], `${tool.name} matching token`).toBe(tok);
+                  expect(tok, `${tool.name} hex nonce`).toMatch(/^[0-9a-f]{16}$/);
+                  observedTokens.push(tok);
                   expect(text, `${tool.name} must show inline flag marker`).toContain('[flagged: ignore_instructions, pii_email]');
                   expect(text, `${tool.name} must show redacted email`).toContain('<email>');
                   expect(text, `${tool.name} must not leak raw email`).not.toContain(email);
@@ -693,6 +707,7 @@ describe('MCP server integration', () => {
                   const res = await client.callTool(tool.name, args);
                   const text = res.content[0]?.text ?? '';
                   expect(text, `${tool.name} must not be framed as vendor text`).not.toMatch(VENDOR_TEXT_FRAME.headerPattern);
+                  expect(text, `${tool.name} must not emit frame footer`).not.toMatch(VENDOR_TEXT_FRAME.footerPattern);
                 }
               }
             }
