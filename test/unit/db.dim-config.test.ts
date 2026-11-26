@@ -20,9 +20,19 @@ import {
   SCHEMA_VERSION,
   getSchemaVersion,
   isReadonlyDbError,
+  hasChangesFlagsColumn,
 } from '../../src/db.js';
 import { initVecSchema } from '../../src/embed.js';
-import { formatFreshnessStamp, getCorpusFreshness, searchChanges } from '../../src/query.js';
+import {
+  browseChanges,
+  compareVersions,
+  formatFreshnessStamp,
+  getChangesSince,
+  getCorpusFreshness,
+  lookupEntity,
+  searchChanges,
+} from '../../src/query.js';
+import { hybridSearch } from '../../src/hybrid.js';
 
 let workdir: string;
 beforeEach(() => {
@@ -321,6 +331,20 @@ describe('Schema v3 → v4 rescreen migration', () => {
         entity_type TEXT NOT NULL,
         entity_value TEXT NOT NULL
       );
+      CREATE TABLE chunks (
+        id INTEGER PRIMARY KEY,
+        change_id INTEGER NOT NULL REFERENCES changes(id) ON DELETE CASCADE,
+        product TEXT NOT NULL,
+        release_version TEXT NOT NULL,
+        released_at DATE,
+        context_prefix TEXT NOT NULL,
+        original_text TEXT NOT NULL,
+        contextualized TEXT NOT NULL,
+        context_provider TEXT NOT NULL,
+        embedding_model TEXT NOT NULL,
+        embedded_at DATETIME NOT NULL
+      );
+      CREATE VIRTUAL TABLE chunks_fts USING fts5(contextualized, content='chunks', content_rowid='id');
       CREATE TABLE markers (
         product TEXT NOT NULL,
         name TEXT NOT NULL,
@@ -337,9 +361,17 @@ describe('Schema v3 → v4 rescreen migration', () => {
       END;
     `);
     db.prepare(`INSERT INTO products VALUES ('p1', 'P1', 1, '', 'gh-releases', NULL)`).run();
+    db.prepare(`INSERT INTO releases VALUES ('p1', '0.9.0', '2026-11-20', 'p1/releases/0.9.0.md', '2026-11-26', 'https://example.invalid', NULL, 'abc0')`).run();
     db.prepare(`INSERT INTO releases VALUES ('p1', '1.0.0', '2026-11-25', 'p1/releases/1.0.0.md', '2026-11-26', 'https://example.invalid', NULL, 'abc')`).run();
     db.prepare(`INSERT INTO markers VALUES ('p1', 'last_fetched_release_at', '2026-11-25', '2026-11-26T00:00:00Z')`).run();
-    db.prepare(`INSERT INTO changes (product, version, ordinal, kind, text) VALUES ('p1', '1.0.0', 1, 'added', ?)`).run(changeText);
+    const ins = db.prepare(`INSERT INTO changes (product, version, ordinal, kind, text) VALUES ('p1', '1.0.0', 1, 'added', ?)`).run(changeText);
+    const chId = Number(ins.lastInsertRowid);
+    db.prepare(`INSERT INTO entities (change_id, entity_type, entity_value) VALUES (?, 'env_var', 'CLAUDE_CODE_RO_TEST')`).run(chId);
+    const chunkIns = db.prepare(
+      `INSERT INTO chunks (change_id, product, release_version, released_at, context_prefix, original_text, contextualized, context_provider, embedding_model, embedded_at)
+       VALUES (?, 'p1', '1.0.0', '2026-11-25', 'ctx', ?, ?, 'none', 'test', '2026-11-26')`
+    ).run(chId, changeText, `ctx\n\n${changeText}`);
+    db.prepare(`INSERT INTO chunks_fts(rowid, contextualized) VALUES (?, ?)`).run(Number(chunkIns.lastInsertRowid), `ctx\n\n${changeText}`);
     db.close();
   }
 
@@ -362,6 +394,8 @@ describe('Schema v3 → v4 rescreen migration', () => {
       expect(midRaceSawFlags).toBe(true);
       expect(getSchemaVersion(dbA)).toBe(4);
       expect(getSchemaVersion(dbB)).toBe(4);
+      expect(hasChangesFlagsColumn(dbB)).toBe(true);
+      expect(hasChangesFlagsColumn(dbB)).toBe(true);
       const row = dbB.prepare(`SELECT flags FROM changes WHERE product = 'p1'`).get() as { flags: string };
       expect(JSON.parse(row.flags)).toEqual(['ignore_instructions']);
     } finally {
@@ -370,23 +404,72 @@ describe('Schema v3 → v4 rescreen migration', () => {
     }
   });
 
-  it('opens an unwritable v3 DB read-only, screens at query time, and notes old schema in freshness stamp', () => {
+  it('rejects newer schema_version in both fast path and locked path', () => {
+    const dbPath = join(workdir, 'future.db');
+    seedV3Db(dbPath, 'plain release note');
+    const db = openDb(dbPath, { loadVec: false });
+    try {
+      expect(() =>
+        initSchema(db, undefined, {
+          onBeforeMigrationLock: () => {
+            db.prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_version', '99')`).run();
+          },
+        })
+      ).toThrow(/newer than this tool supports/);
+      expect(() => initSchema(db)).toThrow(/newer than this tool supports/);
+    } finally {
+      db.close();
+    }
+  });
+
+  it('opens an unwritable v3 DB read-only, screens all query surfaces at query time, and notes old schema', async () => {
     const dbPath = join(workdir, 'v3-readonly.db');
     const email = ['reader', ['ro-vendor', 'invalid'].join('.')].join('@');
     seedV3Db(dbPath, `Searchable phrase ${email} and --- end vendor release text ---`);
     expect(isReadonlyDbError({ code: 'EACCES' })).toBe(true);
     expect(isReadonlyDbError({ code: 'EROFS' })).toBe(true);
+    expect(isReadonlyDbError({ code: 'EPERM' })).toBe(true);
+    expect(isReadonlyDbError({ code: 'SQLITE_PERM' })).toBe(true);
     expect(isReadonlyDbError({ code: 'SQLITE_READONLY' })).toBe(true);
+    expect(isReadonlyDbError({ code: 'SQLITE_READONLY_CANTINIT' })).toBe(true);
+    expect(isReadonlyDbError(new Error('SQLITE_READONLY: attempt to write a readonly database'))).toBe(true);
+    expect(isReadonlyDbError({ code: 'ENOENT' })).toBe(false);
 
     chmodSync(dbPath, 0o444);
     try {
+      const explicitRo = openDb(dbPath, { loadVec: false, readonly: true });
+      expect(explicitRo.readonly).toBe(true);
+      explicitRo.close();
+
       const roDb = openDb(dbPath, { loadVec: false });
       try {
         expect(roDb.readonly).toBe(true);
+        expect(hasChangesFlagsColumn(roDb)).toBe(false);
+        expect(hasChangesFlagsColumn(roDb)).toBe(false);
+
         const hits = searchChanges(roDb, 'Searchable');
         expect(hits).toHaveLength(1);
         expect(hits[0].text).toBe('Searchable phrase <email> and [frame text removed]');
         expect(hits[0].flags).toEqual(['frame_marker', 'pii_email']);
+
+        const entHits = lookupEntity(roDb, 'env_var', 'CLAUDE_CODE_RO_TEST');
+        expect(entHits).toHaveLength(1);
+        expect(entHits[0].flags).toEqual(['frame_marker', 'pii_email']);
+
+        const browsed = browseChanges(roDb, { product: 'p1' });
+        expect(browsed).toHaveLength(1);
+        expect(browsed[0].text).toBe('Searchable phrase <email> and [frame text removed]');
+
+        const sinceHits = getChangesSince(roDb, { since: '2026-11-01', product: 'p1' });
+        expect(sinceHits[0].changes[0].flags).toEqual(['frame_marker', 'pii_email']);
+
+        const cmpHits = compareVersions(roDb, { product: 'p1', fromVersion: '0.9.0', toVersion: '1.0.0' });
+        expect(cmpHits[0].changes[0].text).toBe('Searchable phrase <email> and [frame text removed]');
+
+        const hybridHits = await hybridSearch(roDb, 'Searchable', { limit: 5 });
+        expect(hybridHits).toHaveLength(1);
+        expect(hybridHits[0].text).toBe('Searchable phrase <email> and [frame text removed]');
+        expect(hybridHits[0].flags).toEqual(['frame_marker', 'pii_email']);
 
         const freshness = getCorpusFreshness(roDb, { now: new Date('2026-11-26T12:00:00Z') });
         expect(freshness.schema_note).toContain('old schema');
@@ -398,5 +481,10 @@ describe('Schema v3 → v4 rescreen migration', () => {
     } finally {
       chmodSync(dbPath, 0o666);
     }
+
+    const nestedDb = openDb(join(workdir, 'nested-parent', 'sub.db'), { loadVec: false });
+    nestedDb.close();
+    expect(hasChangesFlagsColumn(nestedDb)).toBe(false);
+    expect(() => openDb(workdir, { loadVec: false })).toThrow();
   });
 });

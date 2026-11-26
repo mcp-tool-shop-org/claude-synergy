@@ -782,5 +782,52 @@ describe('Part 6a — disk-bounded fetch window', () => {
     const catMd = readFileSync(cat.catalogPath, 'utf-8');
     expect(catMd).toContain('<email>');
     expect(catMd).not.toContain(email);
+
+    // Also cover RSS, raw-changelog, and HTML-scrape fetch-time PII redaction
+    const { fetchAll: fetchMockedStrategies } = await import('../../src/fetch.js');
+    const fh = mockFetch([
+      {
+        urlPattern: 'cursor.com',
+        response: () =>
+          new Response(
+            `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Cursor</title><item><title>Update for ${email}</title><link>https://cursor.com/changelog/1</link><guid>c-1</guid><pubDate>Wed, 26 Nov 2026 12:00:00 GMT</pubDate><description><![CDATA[<p>Fixed path ${winHome} in settings</p>]]></description></item></channel></rss>`,
+            { status: 200, headers: { 'content-type': 'application/rss+xml' } }
+          ),
+      },
+      {
+        urlPattern: 'Aider-AI',
+        response: () =>
+          new Response(
+            `# Release history\n\n### Aider v0.99.0\n\n- Fixed ${unixHome} and ${email}\n`,
+            { status: 200, headers: { 'content-type': 'text/plain' } }
+          ),
+      },
+      {
+        urlPattern: 'platform.claude.com',
+        response: () =>
+          htmlResponse(
+            `<html><body><main><h3>November 26, 2026</h3><ul><li>Contact ${email} for ${unixHome}</li></ul></main></body></html>`
+          ),
+      },
+    ]);
+    try {
+      const rssStats = await fetchMockedStrategies(temp.db, productsRoot, {
+        product: 'cursor',
+        sinceOverride: '2026-11-01',
+      });
+      expect(rssStats[0].fetched).toBe(1);
+      const rawStats = await fetchMockedStrategies(temp.db, productsRoot, {
+        product: 'aider',
+        sinceOverride: '2026-11-01',
+      });
+      expect(rawStats[0].fetched).toBe(1);
+      const htmlStats = await fetchMockedStrategies(temp.db, productsRoot, {
+        product: 'claude-api',
+        sinceOverride: '2026-11-01',
+      });
+      expect(htmlStats[0].fetched).toBe(1);
+    } finally {
+      fh.restore();
+    }
   });
 });
