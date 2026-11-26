@@ -33,11 +33,9 @@ function runCli(args: string[]) {
     // npx itself prints 'npm warn ...' lines (for example about pnpm's npm_config_* variables
     // under a newer npm); those are not the CLI's output, so they are dropped here.
     stderr: (result.stderr ?? '')
-      .split(/?
-/)
+      .split(/\r?\n/)
       .filter((line) => !/^npm warn /i.test(line))
-      .join('
-'),
+      .join('\n'),
   };
 }
 
