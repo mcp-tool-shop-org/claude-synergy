@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import * as sqliteVec from 'sqlite-vec';
 import { AppError } from './errors.js';
-import { rescreenChanges } from './ingest.js';
+import { deleteChangeChildren, rescreenChanges } from './ingest.js';
 import { deriveReleaseIdentity, loadProductsConfig } from './products-config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -367,13 +367,7 @@ function migrateToV5PackageSchema(db: Database.Database): void {
 
   if (releasesNeedsRebuild) {
     const cfg = loadProductsConfig();
-    const oldReleases = db
-      .prepare(
-        `SELECT rowid, product, version, released_at, notes_path, fetched_at, source_url, bundle_size_kb, notes_hash
-         FROM releases
-         ORDER BY rowid ASC`,
-      )
-      .all() as Array<{
+    type OldReleaseRow = {
       rowid: number;
       product: string;
       version: string;
@@ -383,17 +377,42 @@ function migrateToV5PackageSchema(db: Database.Database): void {
       source_url: string;
       bundle_size_kb: number | null;
       notes_hash: string | null;
-    }>;
+    };
+    const oldReleases = db
+      .prepare(
+        `SELECT rowid, product, version, released_at, notes_path, fetched_at, source_url, bundle_size_kb, notes_hash
+         FROM releases
+         ORDER BY rowid ASC`,
+      )
+      .all() as OldReleaseRow[];
 
-    // Derive target (package, version) per legacy row, deduplicating any collision
-    // on the new primary key by keeping the latest rowid.
+    const isNewerRelease = (candidate: OldReleaseRow, incumbent: OldReleaseRow): boolean => {
+      const cFetched = candidate.fetched_at ?? '';
+      const iFetched = incumbent.fetched_at ?? '';
+      if (cFetched !== iFetched) return cFetched > iFetched;
+      const cHash = candidate.notes_hash ?? '';
+      const iHash = incumbent.notes_hash ?? '';
+      if (cHash !== iHash) return cHash > iHash;
+      return candidate.rowid > incumbent.rowid;
+    };
+
+    // Derive target (package, version) per legacy row, picking a deterministic
+    // collision winner by newer fetched_at, then notes_hash, then rowid.
     const identityByLegacyKey = new Map<string, { pkg: string; version: string }>();
-    const winningLegacyKeyByTarget = new Map<string, string>();
+    const winnerRowByTarget = new Map<string, { legacyKey: string; row: OldReleaseRow }>();
     for (const r of oldReleases) {
       const legacyKey = `${r.product}\0${r.version}`;
-      const derived = deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg);
+      const derived = deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg, r.source_url);
       identityByLegacyKey.set(legacyKey, derived);
-      winningLegacyKeyByTarget.set(`${r.product}\0${derived.pkg}\0${derived.version}`, legacyKey);
+      const targetKey = `${r.product}\0${derived.pkg}\0${derived.version}`;
+      const incumbent = winnerRowByTarget.get(targetKey);
+      if (!incumbent || isNewerRelease(r, incumbent.row)) {
+        winnerRowByTarget.set(targetKey, { legacyKey, row: r });
+      }
+    }
+    const winningLegacyKeyByTarget = new Map<string, string>();
+    for (const [targetKey, entry] of winnerRowByTarget) {
+      winningLegacyKeyByTarget.set(targetKey, entry.legacyKey);
     }
 
     const hasChanges = db
@@ -402,6 +421,7 @@ function migrateToV5PackageSchema(db: Database.Database): void {
     const hasChangesFts = db
       .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='changes_fts'`)
       .get();
+    let droppedChangeCount = 0;
 
     db.pragma('legacy_alter_table = ON');
     try {
@@ -483,12 +503,21 @@ function migrateToV5PackageSchema(db: Database.Database): void {
           INSERT INTO changes_v5 (id, product, package, version, ordinal, kind, text, flags)
           VALUES (@id, @product, @package, @version, @ordinal, @kind, @text, @flags)
         `);
+        const winningChangeIdByTargetOrdinal = new Map<string, number>();
+        const losingChanges: Array<{ id: number; targetOrdinalKey: string | null }> = [];
         for (const ch of oldChanges) {
           const legacyKey = `${ch.product}\0${ch.version}`;
           const derived = identityByLegacyKey.get(legacyKey);
-          if (!derived) continue;
+          if (!derived) {
+            losingChanges.push({ id: ch.id, targetOrdinalKey: null });
+            continue;
+          }
           const targetKey = `${ch.product}\0${derived.pkg}\0${derived.version}`;
-          if (winningLegacyKeyByTarget.get(targetKey) !== legacyKey) continue;
+          if (winningLegacyKeyByTarget.get(targetKey) !== legacyKey) {
+            losingChanges.push({ id: ch.id, targetOrdinalKey: `${targetKey}\0${ch.ordinal}` });
+            continue;
+          }
+          winningChangeIdByTargetOrdinal.set(`${targetKey}\0${ch.ordinal}`, ch.id);
           insertChV5.run({
             id: ch.id,
             product: ch.product,
@@ -501,6 +530,22 @@ function migrateToV5PackageSchema(db: Database.Database): void {
           });
         }
 
+        if (losingChanges.length > 0) {
+          droppedChangeCount = losingChanges.length;
+          const rePointByChangeId = new Map<number, number>();
+          const losingIds: number[] = [];
+          for (const lc of losingChanges) {
+            losingIds.push(lc.id);
+            if (lc.targetOrdinalKey) {
+              const winId = winningChangeIdByTargetOrdinal.get(lc.targetOrdinalKey);
+              if (winId !== undefined) {
+                rePointByChangeId.set(lc.id, winId);
+              }
+            }
+          }
+          deleteChangeChildren(db, losingIds, rePointByChangeId);
+        }
+
         db.exec(`DROP TABLE changes;`);
       }
 
@@ -509,6 +554,7 @@ function migrateToV5PackageSchema(db: Database.Database): void {
       db.exec(`
         CREATE INDEX idx_releases_date ON releases(released_at);
         CREATE INDEX idx_releases_prod_pkg_date ON releases(product, package, released_at);
+        CREATE INDEX idx_releases_prod_path ON releases(product, notes_path);
       `);
 
       if (hasChanges) {
@@ -530,6 +576,9 @@ function migrateToV5PackageSchema(db: Database.Database): void {
               INSERT INTO changes_fts(rowid, text) VALUES (new.id, new.text);
             END;
           `);
+          if (droppedChangeCount > 0) {
+            db.exec(`INSERT INTO changes_fts(changes_fts) VALUES('rebuild');`);
+          }
         }
       }
     } finally {
@@ -555,7 +604,12 @@ function migrateToV5PackageSchema(db: Database.Database): void {
 
   const fkErrors = db.pragma('foreign_key_check') as unknown[];
   if (fkErrors.length > 0) {
-    throw new Error(`v4 -> v5 migration failed foreign_key_check: ${JSON.stringify(fkErrors[0])}`);
+    throw new AppError({
+      code: 'SCHEMA_MIGRATION_FK_ERROR',
+      message: `Database migration to schema v${SCHEMA_VERSION} failed foreign key integrity check.`,
+      hint: 'Delete the local database file (e.g. ~/.claude-synergy/data/claude-synergy.db or CLAUDE_SYNERGY_DB) and run `hk sync` to rebuild the store from release notes.',
+      cause: JSON.stringify(fkErrors[0]),
+    });
   }
 
   const tagged = db as Database.Database & {

@@ -171,8 +171,11 @@ function loadPackageReleases(
       if (!r.notes_path || typeof r.notes_path !== 'string' || !r.notes_path.trim()) {
         continue;
       }
+      const cleanVer = pkg.release_prefix
+        ? (extractVersionFromNotesPath(r.notes_path, pkg.release_prefix) ?? r.version)
+        : r.version;
       packageReleases.push({
-        version: r.version,
+        version: cleanVer,
         dbVersion: r.version,
         released_at: r.released_at,
         notes_path: r.notes_path,

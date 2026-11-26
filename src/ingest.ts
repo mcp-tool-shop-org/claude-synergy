@@ -171,6 +171,97 @@ export interface IngestOptions {
   yamlPath?: string;
 }
 
+/**
+ * Remove or re-point all child rows referencing `changeIds` across
+ * `entities`, `chunks` (including `chunks_vec` and `chunks_fts`),
+ * `relevance`, and `synergy_change_refs`. Safe on partial schemas and when
+ * `sqlite-vec` (`vec0`) is not loaded in the current connection.
+ */
+export function deleteChangeChildren(
+  db: Database.Database,
+  changeIds: number[],
+  rePointByChangeId?: ReadonlyMap<number, number>,
+): void {
+  if (changeIds.length === 0) return;
+
+  const hasTable = (name: string): boolean =>
+    db.prepare(`SELECT 1 FROM sqlite_master WHERE type='table' AND name = ?`).get(name) !== undefined;
+
+  if (hasTable('relevance')) {
+    const updateRel = rePointByChangeId
+      ? db.prepare(`UPDATE relevance SET change_id = ? WHERE change_id = ?`)
+      : null;
+    const deleteRel = db.prepare(`DELETE FROM relevance WHERE change_id = ?`);
+    for (const oldId of changeIds) {
+      const winId = rePointByChangeId?.get(oldId);
+      if (winId !== undefined && winId !== oldId && updateRel) {
+        updateRel.run(winId, oldId);
+      }
+      deleteRel.run(oldId);
+    }
+  }
+
+  if (hasTable('synergy_change_refs')) {
+    const copyRef = rePointByChangeId
+      ? db.prepare(
+          `INSERT OR IGNORE INTO synergy_change_refs (synergy_id, change_id)
+           SELECT synergy_id, ? FROM synergy_change_refs WHERE change_id = ?`,
+        )
+      : null;
+    const deleteRef = db.prepare(`DELETE FROM synergy_change_refs WHERE change_id = ?`);
+    for (const oldId of changeIds) {
+      const winId = rePointByChangeId?.get(oldId);
+      if (winId !== undefined && winId !== oldId && copyRef) {
+        copyRef.run(winId, oldId);
+      }
+      deleteRef.run(oldId);
+    }
+  }
+
+  if (hasTable('entities')) {
+    const deleteEnt = db.prepare(`DELETE FROM entities WHERE change_id = ?`);
+    for (const oldId of changeIds) {
+      deleteEnt.run(oldId);
+    }
+  }
+
+  if (hasTable('chunks')) {
+    const selectChunks = db.prepare(`SELECT id, contextualized FROM chunks WHERE change_id = ?`);
+    const deleteChunk = db.prepare(`DELETE FROM chunks WHERE id = ?`);
+    const hasChunksVec = hasTable('chunks_vec');
+    const hasChunksFts = hasTable('chunks_fts');
+    const hasChunksFtsDeleteTrigger =
+      db.prepare(`SELECT 1 FROM sqlite_master WHERE type='trigger' AND name='chunks_fts_delete'`).get() !==
+      undefined;
+
+    let deleteVec: Database.Statement | null = null;
+    if (hasChunksVec) {
+      try {
+        deleteVec = db.prepare(`DELETE FROM chunks_vec WHERE rowid = ?`);
+      } catch (err) {
+        if (!/no such module:\s*vec0/i.test(String(err))) throw err;
+      }
+    }
+    const deleteChunkFts =
+      hasChunksFts && !hasChunksFtsDeleteTrigger
+        ? db.prepare(`INSERT INTO chunks_fts(chunks_fts, rowid, contextualized) VALUES('delete', ?, ?)`)
+        : null;
+
+    for (const oldId of changeIds) {
+      const chunkRows = selectChunks.all(oldId) as Array<{ id: number; contextualized: string }>;
+      for (const ch of chunkRows) {
+        if (deleteVec) {
+          deleteVec.run(ch.id);
+        }
+        if (deleteChunkFts) {
+          deleteChunkFts.run(ch.id, ch.contextualized);
+        }
+        deleteChunk.run(ch.id);
+      }
+    }
+  }
+}
+
 export function ingestAll(
   db: Database.Database,
   productsRoot: string,
@@ -255,6 +346,18 @@ export function ingestAll(
     `SELECT notes_hash FROM releases WHERE product = ? AND package = ? AND version = ?`
   );
 
+  const selectStaleByNotesPath = db.prepare(
+    `SELECT package, version FROM releases WHERE product = ? AND notes_path = ? AND (package != ? OR version != ?)`
+  );
+
+  const selectChangeIdsForRelease = db.prepare(
+    `SELECT id FROM changes WHERE product = ? AND package = ? AND version = ?`
+  );
+
+  const deleteReleaseByKey = db.prepare(
+    `DELETE FROM releases WHERE product = ? AND package = ? AND version = ?`
+  );
+
   const insertEntity = db.prepare(`
     INSERT INTO entities (change_id, entity_type, entity_value)
     VALUES (?, ?, ?)
@@ -312,7 +415,24 @@ export function ingestAll(
             ? `${baseVersion}-${fmTyped.sub_product}`
             : baseVersion;
           const notesPath = relative(productsRoot, path).replace(/\\/g, '/');
-          const { pkg, version } = deriveReleaseIdentity(product, rawVersion, notesPath, cfg);
+          const source_url = fmTyped.source_url ?? '';
+          const { pkg, version } = deriveReleaseIdentity(product, rawVersion, notesPath, cfg, source_url);
+
+          // Evict any prior release row stored for the same (product, notes_path) under a
+          // different (package, version) (e.g. after products.yaml adds/renames a release_prefix)
+          // BEFORE checking notes_hash so a release is never stored twice.
+          const staleRows = selectStaleByNotesPath.all(product, notesPath, pkg, version) as Array<{
+            package: string;
+            version: string;
+          }>;
+          for (const stale of staleRows) {
+            const staleChangeIds = (
+              selectChangeIdsForRelease.all(product, stale.package, stale.version) as Array<{ id: number }>
+            ).map((r) => r.id);
+            deleteChangeChildren(db, staleChangeIds);
+            deleteChanges.run(product, stale.package, stale.version);
+            deleteReleaseByKey.run(product, stale.package, stale.version);
+          }
 
           // Dedup: skip re-processing if content hash has not changed
           const hash = contentHash(raw);
@@ -325,10 +445,15 @@ export function ingestAll(
           }
 
           const released_at = fmTyped.released_at ?? null;
-          const source_url = fmTyped.source_url ?? '';
           const fetched_at = fmTyped.fetched_at ?? new Date().toISOString().split('T')[0];
           const bundle_size_kb = fmTyped.bundle_size_kb_delta ?? null;
 
+          if (existingRow) {
+            const existingChangeIds = (
+              selectChangeIdsForRelease.all(product, pkg, version) as Array<{ id: number }>
+            ).map((r) => r.id);
+            deleteChangeChildren(db, existingChangeIds);
+          }
           deleteChanges.run(product, pkg, version);
 
           insertRelease.run({

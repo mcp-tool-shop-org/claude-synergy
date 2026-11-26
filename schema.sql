@@ -35,6 +35,7 @@ CREATE TABLE releases (
 
 CREATE INDEX idx_releases_date ON releases(released_at);
 CREATE INDEX idx_releases_prod_pkg_date ON releases(product, package, released_at);
+CREATE INDEX idx_releases_prod_path ON releases(product, notes_path);
 
 -- ============================================================================
 -- CHANGES (per release)

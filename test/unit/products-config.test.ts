@@ -441,6 +441,37 @@ describe('loadProductsConfig — repo products.yaml', () => {
       pkg: 'github.com/anthropics/anthropic-sdk-go',
       version: 'v2.1.0',
     });
+    // Single-package prefixed product keeps rawVersion unchanged for byte-identity
+    const soloPrefixedCfg = loadProductsConfig(
+      writeYaml(`products:
+  - name: solo-prefixed
+    display_name: Solo Prefixed
+    tier: 1
+    source_url: https://example.invalid/solo
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: crates
+        name: solo-crate
+        release_prefix: "solo-v"
+`),
+    )!;
+    expect(deriveReleaseIdentity('solo-prefixed', 'solo-v1.2.0', 'solo-prefixed/releases/solo-v1.2.0.md', soloPrefixedCfg)).toEqual({
+      pkg: 'solo-crate',
+      version: 'solo-v1.2.0',
+    });
+    // 2.1.0 ertex-sdk-<V>.md maps to @anthropic-ai/vertex-sdk only when source_url tag starts with vertex-sdk-v
+    expect(
+      deriveReleaseIdentity(
+        'anthropic-sdk-typescript',
+        'ertex-sdk-v0.17.0',
+        'anthropic-sdk-typescript/releases/ertex-sdk-0.17.0.md',
+        cfg,
+        'https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.17.0',
+      ),
+    ).toEqual({
+      pkg: '@anthropic-ai/vertex-sdk',
+      version: '0.17.0',
+    });
     expect(resolveReleasePackage('anthropic-cli/releases/sandboxes-v0.1.0.md', cfg.productMeta['anthropic-cli']).pkg).toBe(
       'github.com/anthropics/anthropic-cli/sandboxes'
     );

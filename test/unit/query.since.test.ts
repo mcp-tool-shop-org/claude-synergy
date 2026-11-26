@@ -389,6 +389,15 @@ describe('multi-package separation and byte-for-byte single-package invariance',
       - ecosystem: go
         name: example.invalid/go-single/v2
         release_prefix: ""
+  - name: prefixed-solo
+    display_name: Prefixed Solo
+    tier: 1
+    source_url: https://example.invalid/prefixed-solo
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: crates
+        name: solo-crate
+        release_prefix: "solo-v"
 `,
       'utf-8'
     );
@@ -410,11 +419,14 @@ describe('multi-package separation and byte-for-byte single-package invariance',
     writeMd('ts-multi', 'rogue-0.1.0.md', 'rogue-0.1.0', '2026-04-03', '- Added unassigned slug');
     writeMd('go-single', '2.0.0.md', 'v2.0.0', '2026-04-01', '- Added Go v2 init');
     writeMd('go-single', '2.1.0.md', 'v2.1.0', '2026-04-09', '- Added Go v2.1 MULTI_QUERY_TOK');
+    writeMd('prefixed-solo', 'solo-v1.0.0.md', 'solo-v1.0.0', '2026-04-04', '- Added `CLAUDE_SOLO_TOK` init');
+    writeMd('prefixed-solo', 'solo-v1.1.0.md', 'solo-v1.1.0', '2026-04-11', '- Added `CLAUDE_SOLO_TOK` solo prefixed feature');
 
     const cfg = loadProductsConfig(yamlPath)!;
     ingestAll(temp.db, prodRoot, { yamlPath });
     return {
       cfg,
+      prodRoot,
       cleanup: () => rmSync(dir, { recursive: true, force: true }),
     };
   }
@@ -501,41 +513,83 @@ describe('multi-package separation and byte-for-byte single-package invariance',
     }
   });
 
-  it('preserves single-package JSON objects and release labels byte-for-byte', () => {
+  it('preserves single-package JSON objects and release labels byte-for-byte (including prefixed single-package products)', () => {
     const fx = seedMultiPkgFixture();
+    const baseline = createTempDb();
     try {
       const cfg = fx.cfg;
-      for (const singleProduct of ['test-cli', 'go-single']) {
+      // Baseline DB has no packages declared -> legacy pre-PR storage & output for every single-package product
+      ingestAll(baseline.db, fx.prodRoot, { productsConfig: null });
+
+      for (const singleProduct of ['go-single', 'prefixed-solo']) {
         const recent = recentReleases(temp.db, singleProduct, 10, undefined, undefined, cfg);
+        const baseRecent = recentReleases(baseline.db, singleProduct, 10, undefined, undefined, null);
+        expect(JSON.stringify(recent)).toBe(JSON.stringify(baseRecent));
         expect(recent.length).toBeGreaterThan(0);
         for (const r of recent) {
           expect(Object.hasOwn(r, 'package')).toBe(false);
           expect(formatReleaseLabel(r.product, r.package, r.version, cfg)).toBe(`${singleProduct}@${r.version}`);
         }
         const detail = getRelease(temp.db, { product: singleProduct, version: recent[0].version, productsConfig: cfg })!;
+        const baseDetail = getRelease(baseline.db, { product: singleProduct, version: recent[0].version, productsConfig: null })!;
+        expect(JSON.stringify(detail)).toBe(JSON.stringify(baseDetail));
         expect(Object.hasOwn(detail, 'package')).toBe(false);
+
         const since = getChangesSince(temp.db, { since: '2026-01-01', product: singleProduct, productsConfig: cfg });
-        for (const s of since) {
-          expect(Object.hasOwn(s, 'package')).toBe(false);
-        }
+        const baseSince = getChangesSince(baseline.db, { since: '2026-01-01', product: singleProduct, productsConfig: null });
+        expect(JSON.stringify(since)).toBe(JSON.stringify(baseSince));
+
         const browsed = browseChanges(temp.db, { product: singleProduct, productsConfig: cfg });
-        for (const b of browsed) {
-          expect(Object.hasOwn(b, 'package')).toBe(false);
-        }
-        const searched = searchChanges(temp.db, 'v2', { product: singleProduct, productsConfig: cfg });
-        for (const h of searched) {
-          expect(Object.hasOwn(h, 'package')).toBe(false);
-        }
+        const baseBrowsed = browseChanges(baseline.db, { product: singleProduct, productsConfig: null });
+        expect(JSON.stringify(browsed)).toBe(JSON.stringify(baseBrowsed));
+
+        const searched = searchChanges(temp.db, 'Added', { product: singleProduct, productsConfig: cfg });
+        const baseSearched = searchChanges(baseline.db, 'Added', { product: singleProduct, productsConfig: null });
+        expect(JSON.stringify(searched)).toBe(JSON.stringify(baseSearched));
       }
+
+      // test-cli (already in temp.db from seedSampleProducts) stays package-free too
+      for (const r of recentReleases(temp.db, 'test-cli', 10, undefined, undefined, cfg)) {
+        expect(Object.hasOwn(r, 'package')).toBe(false);
+        expect(formatReleaseLabel(r.product, r.package, r.version, cfg)).toBe(`test-cli@${r.version}`);
+      }
+      expect(JSON.stringify(lookupEntity(temp.db, 'env_var', 'CLAUDE_SOLO_TOK', { productsConfig: cfg }))).toBe(
+        JSON.stringify(lookupEntity(baseline.db, 'env_var', 'CLAUDE_SOLO_TOK', { productsConfig: null })),
+      );
+      expect(getRelease(temp.db, { product: 'prefixed-solo', version: 'solo-v1.1.0', productsConfig: cfg })?.version).toBe('solo-v1.1.0');
+
       const goCmp = compareVersions(temp.db, {
         product: 'go-single',
         fromVersion: '2.0.0',
         toVersion: '2.1.0',
         productsConfig: cfg,
       });
+      const baseGoCmp = compareVersions(baseline.db, {
+        product: 'go-single',
+        fromVersion: '2.0.0',
+        toVersion: '2.1.0',
+        productsConfig: null,
+      });
+      expect(JSON.stringify(goCmp)).toBe(JSON.stringify(baseGoCmp));
       expect(goCmp.map((c) => ({ product: c.product, version: c.version }))).toEqual([{ product: 'go-single', version: 'v2.1.0' }]);
       expect(Object.hasOwn(goCmp[0], 'package')).toBe(false);
+
+      const soloCmp = compareVersions(temp.db, {
+        product: 'prefixed-solo',
+        fromVersion: 'solo-v1.0.0',
+        toVersion: 'solo-v1.1.0',
+        productsConfig: cfg,
+      });
+      const baseSoloCmp = compareVersions(baseline.db, {
+        product: 'prefixed-solo',
+        fromVersion: 'solo-v1.0.0',
+        toVersion: 'solo-v1.1.0',
+        productsConfig: null,
+      });
+      expect(JSON.stringify(soloCmp)).toBe(JSON.stringify(baseSoloCmp));
+      expect(Object.hasOwn(soloCmp[0], 'package')).toBe(false);
     } finally {
+      baseline.cleanup();
       fx.cleanup();
     }
   });

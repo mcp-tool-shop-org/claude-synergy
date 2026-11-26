@@ -401,23 +401,38 @@ export function resolveReleasePackage(
 
 /**
  * Derive the canonical `(pkg, version)` identity for a release row using `products.yaml`.
- * Single-package bare products preserve `rawVersion` unchanged; multi-package and prefixed
- * releases store the prefix-stripped version `<V>` alongside the canonical package name.
+ * Single-package products preserve `rawVersion` unchanged (even when `release_prefix` is
+ * non-empty, keeping single-package output byte-for-byte invariant); multi-package releases
+ * strip only the exact declared `release_prefix` (where any leading `v` is part of the
+ * declared prefix, e.g. `rmcp-v` or `sandboxes-v`) to store `<V>` alongside the canonical
+ * package name. When `sourceUrl` carries a `vertex-sdk-v<digit>` GitHub release tag,
+ * `ertex-sdk-<V>.md` files are mapped to the canonical `vertex-sdk-` package.
  */
 export function deriveReleaseIdentity(
   product: string,
   rawVersion: string,
   notesPath: string | null | undefined,
   config: ProductsConfig | null | undefined,
+  sourceUrl?: string | null,
 ): { pkg: string; version: string } {
   const meta = config?.productMeta[product];
   const resolved = resolveReleasePackage(notesPath, meta);
   if (resolved.pkg !== UNASSIGNED_PACKAGE && resolved.extractedVersion !== null) {
-    const stripPrefix = isMultiPackageProduct(meta) || resolved.releasePrefix !== '';
+    const stripPrefix = isMultiPackageProduct(meta);
     return {
       pkg: resolved.pkg,
       version: stripPrefix ? resolved.extractedVersion : rawVersion,
     };
+  }
+  if (sourceUrl && /\/releases\/tag\/vertex-sdk-v\d/i.test(sourceUrl)) {
+    const ertexVersion = extractVersionFromNotesPath(notesPath, 'ertex-sdk-');
+    const vertexPkg = getCanonicalPackages(meta).find((c) => c.release_prefix === 'vertex-sdk-');
+    if (ertexVersion !== null && vertexPkg) {
+      return {
+        pkg: vertexPkg.name,
+        version: isMultiPackageProduct(meta) ? ertexVersion : rawVersion,
+      };
+    }
   }
   return { pkg: UNASSIGNED_PACKAGE, version: rawVersion };
 }
