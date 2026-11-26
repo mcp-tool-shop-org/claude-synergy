@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`claude-api` and `anthropic-apps` fetch strategy:** Switched from `manual` to `html-scrape` in `products.yaml` (`claude-api-release-notes` and `anthropic-apps-release-notes`).
 - **MCP server startup:** `claude-synergy-mcp` no longer exits when the DB file is missing; it resolves the store path and syncs lazily on the first tool call (unless `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` is set).
 
+### Fixed
+- **Disk-bounded incremental fetch window (`src/fetch.ts`):** File-backed fetch strategies clamp `since` so it never moves past the newest release file on disk (and `gh-releases` checks missing intermediate files against `oldest` on disk), preventing cached DB markers from skipping releases when a rolling sync PR has not yet merged.
+- **Stale daily sync PR flagging (`.github/workflows/sync.yml`, `scripts/check-stale-sync-pr.mjs`):** When an open `sync/daily` PR is older than `STALE_SYNC_PR_DAYS` (3 days), the workflow preserves the original creation date in the PR title, applies `sync-stale`, comments with the failed `test` run, pushes the refreshed branch, and fails the job.
+
 ## [2.0.1] - 2026-11-26
 
 The first published release of the 2.x line: the `v2.0.0` tag exists, but its release run failed in the test step and published nothing, so 2.0.0 is not on npm. 2.0.1 ships the same package with one test fix. Read the 2.0.0 notes below for what changed since 1.2.2.

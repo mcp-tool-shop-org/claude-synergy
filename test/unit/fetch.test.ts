@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fetchAll, seedMarkersFromDb, listFetchTargets } from '../../src/fetch.js';
+import { fetchAll, seedMarkersFromDb, listFetchTargets, resolveEffectiveSince, scanDiskReleaseBounds } from '../../src/fetch.js';
+import { ingestAll } from '../../src/ingest.js';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
 
@@ -370,5 +371,193 @@ describe('seedMarkersFromDb', () => {
     const results = seedMarkersFromDb(temp.db);
     const py = results.find((r) => r.product === 'claude-agent-sdk-python');
     expect(py?.seededTo).toMatch(/^2026-04-01T23:59:59Z$/);
+  });
+});
+
+describe('Part 6a — disk-bounded fetch window', () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  it('bounds file-backed strategies by diskNewest and exempts catalog snapshots', () => {
+    for (const strategy of ['gh-releases', 'rss', 'raw-changelog', 'html-scrape', 'playwright'] as const) {
+      expect(resolveEffectiveSince(strategy, '2026-11-25T10:00:00Z', '2026-10-06')).toBe('2026-10-06');
+      expect(resolveEffectiveSince(strategy, '2026-09-01T00:00:00Z', '2026-10-06')).toBe('2026-09-01T00:00:00Z');
+      expect(resolveEffectiveSince(strategy, '2026-11-25T10:00:00Z', null)).toBe('2026-01-01');
+      expect(resolveEffectiveSince(strategy, '2026-11-25T10:00:00Z', '2026-10-06', '2026-05-01')).toBe('2026-05-01');
+    }
+    expect(resolveEffectiveSince('catalog', '2026-11-25T10:00:00Z', null)).toBe('2026-11-25T10:00:00Z');
+    expect(resolveEffectiveSince('catalog', null, null)).toBe('2026-01-01');
+  });
+
+  it('scans oldest/newest released_at and published_at dates and ignores non-md/undated files', () => {
+    const empty = join(productsRoot, 'missing-dir');
+    expect(scanDiskReleaseBounds(empty)).toEqual({ oldest: null, newest: null });
+
+    const relDir = join(productsRoot, 'demo', 'releases');
+    mkdirSync(relDir, { recursive: true });
+    writeFileSync(join(relDir, 'notes.txt'), 'ignored');
+    writeFileSync(join(relDir, 'no-fm.md'), '# no frontmatter');
+    writeFileSync(join(relDir, 'undated.md'), '---\nproduct: demo\nreleased_at: null\n---\n');
+    writeFileSync(join(relDir, 'a.md'), '---\nreleased_at: "2026-03-10"\n---\n');
+    writeFileSync(join(relDir, 'b.md'), '---\npublished_at: "2026-05-12"\n---\n');
+    expect(scanDiskReleaseBounds(relDir)).toEqual({ oldest: '2026-03-10', newest: '2026-05-12' });
+  });
+
+  it('(a) two-version jump writes and ingests X+1 and X+2 when marker is already at X+2; (b) second sync is idempotent', async () => {
+    const prodDir = join(productsRoot, 'claude-code');
+    const relDir = join(prodDir, 'releases');
+    mkdirSync(relDir, { recursive: true });
+    writeFileSync(
+      join(prodDir, 'PRODUCT.md'),
+      [
+        '---',
+        'product: claude-code',
+        'display_name: Claude Code',
+        'source_tier: 1',
+        'source_url: https://github.com/anthropics/claude-code/releases',
+        'fetch_strategy: gh-releases',
+        '---',
+        '',
+      ].join('\n')
+    );
+    writeFileSync(
+      join(relDir, '1.0.0.md'),
+      [
+        '---',
+        'product: claude-code',
+        'version: "1.0.0"',
+        'released_at: "2026-10-06"',
+        'source_url: "https://example.invalid/v1.0.0"',
+        'fetched_at: "2026-10-06"',
+        '---',
+        '',
+        '# claude-code v1.0.0',
+        '',
+        '- Initial X baseline',
+        '',
+      ].join('\n')
+    );
+
+    // Seed cached marker already past X+2 while files on disk stop at X (1.0.0).
+    temp.db
+      .prepare(
+        `INSERT INTO products (name, display_name, source_tier, source_url, fetch_strategy)
+         VALUES ('claude-code', 'Claude Code', 1, '', 'gh-releases')`
+      )
+      .run();
+    temp.db
+      .prepare(
+        `INSERT INTO markers (product, name, version, updated_at)
+         VALUES ('claude-code', 'last_fetched_release_at', '2026-10-08T10:00:00Z', '2026-10-08T10:00:00Z')`
+      )
+      .run();
+
+    const upstream = [
+      {
+        tag_name: 'v1.0.2',
+        published_at: '2026-10-08T10:00:00Z',
+        name: '1.0.2',
+        body: '- Added feature X+2',
+        html_url: 'https://example.invalid/v1.0.2',
+      },
+      {
+        tag_name: 'v1.0.1',
+        published_at: '2026-10-07T10:00:00Z',
+        name: '1.0.1',
+        body: '- Added feature X+1',
+        html_url: 'https://example.invalid/v1.0.1',
+      },
+      {
+        tag_name: 'v1.0.0',
+        published_at: '2026-10-06T10:00:00Z',
+        name: '1.0.0',
+        body: '- Initial X baseline',
+        html_url: 'https://example.invalid/v1.0.0',
+      },
+    ];
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(() => JSON.stringify(upstream)),
+      execSync: vi.fn(() => JSON.stringify(upstream)),
+    }));
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+
+    // (a) First sync writes both missing versions X+1 and X+2 and ingests them.
+    const firstFetch = await fetchAllMocked(temp.db, productsRoot, { product: 'claude-code' });
+    expect(firstFetch[0].fetched).toBe(2);
+    expect(firstFetch[0].newSince).toBe('2026-10-06');
+    expect(existsSync(join(relDir, '1.0.1.md'))).toBe(true);
+    expect(existsSync(join(relDir, '1.0.2.md'))).toBe(true);
+
+    const firstIngest = ingestAll(temp.db, productsRoot);
+    expect(firstIngest.releasesAdded).toBe(3); // 1.0.0, 1.0.1, 1.0.2
+    const versions = (
+      temp.db.prepare(`SELECT version FROM releases WHERE product = 'claude-code' ORDER BY version`).all() as Array<{
+        version: string;
+      }>
+    ).map((r) => r.version);
+    expect(versions).toEqual(['1.0.0', '1.0.1', '1.0.2']);
+
+    // (b) Second sync with same upstream is idempotent and writes nothing.
+    const secondFetch = await fetchAllMocked(temp.db, productsRoot, { product: 'claude-code' });
+    expect(secondFetch[0].fetched).toBe(0);
+    const secondIngest = ingestAll(temp.db, productsRoot);
+    expect(secondIngest.releasesAdded).toBe(0);
+  });
+
+  it('(c) with no files and no marker, the default 2026-01-01 window is unchanged', async () => {
+    mockGhApi([
+      {
+        tag_name: 'v0.9.0',
+        published_at: '2025-12-20T10:00:00Z',
+        name: 'old',
+        body: '- pre-default',
+        html_url: 'u-old',
+      },
+      {
+        tag_name: 'v1.0.0',
+        published_at: '2026-02-01T10:00:00Z',
+        name: 'new',
+        body: '- post-default',
+        html_url: 'u-new',
+      },
+    ]);
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const stats = await fetchAllMocked(temp.db, productsRoot, { product: 'claude-code' });
+    expect(stats[0].newSince).toBe('2026-01-01');
+    expect(stats[0].fetched).toBe(1);
+    expect(existsSync(join(productsRoot, 'claude-code', 'releases', '0.9.0.md'))).toBe(false);
+    expect(existsSync(join(productsRoot, 'claude-code', 'releases', '1.0.0.md'))).toBe(true);
+  });
+
+  it('fills interior gap when 2.1.292 and 2.1.332 exist on disk without 2.1.293..2.1.331', async () => {
+    const relDir = join(productsRoot, 'claude-code', 'releases');
+    mkdirSync(relDir, { recursive: true });
+    writeFileSync(join(relDir, '2.1.292.md'), '---\nreleased_at: "2026-10-06"\n---\n- old\n');
+    writeFileSync(join(relDir, '2.1.332.md'), '---\nreleased_at: "2026-11-25"\n---\n- island\n');
+
+    const upstream = Array.from({ length: 41 }, (_, idx) => {
+      const patch = 332 - idx;
+      const dayNum = patch === 292 ? 6 : 7 + Math.floor((patch - 293) / 2);
+      const day = String(Math.min(28, dayNum)).padStart(2, '0');
+      const month = patch === 332 ? '11' : '10';
+      return {
+        tag_name: `v2.1.${patch}`,
+        published_at: `2026-${month}-${day}T12:00:00Z`,
+        name: `2.1.${patch}`,
+        body: `- Change ${patch}`,
+        html_url: `https://example.invalid/v2.1.${patch}`,
+      };
+    });
+
+    vi.doMock('node:child_process', () => ({
+      execFileSync: vi.fn(() => JSON.stringify(upstream)),
+      execSync: vi.fn(() => JSON.stringify(upstream)),
+    }));
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const stats = await fetchAllMocked(temp.db, productsRoot, { product: 'claude-code' });
+    expect(stats[0].fetched).toBe(39);
+    expect(existsSync(join(relDir, '2.1.293.md'))).toBe(true);
+    expect(existsSync(join(relDir, '2.1.331.md'))).toBe(true);
   });
 });

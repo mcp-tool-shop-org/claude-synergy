@@ -1,25 +1,25 @@
 # claude-synergy: how it works
 
-Mapped at 2026-11-26 from commit 46c15a0 by Atlas 1.26.0.
+Mapped at 2026-11-26 from commit ea2170c by Atlas 1.26.0.
 
 ## What this is
 
-10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (88), JavaScript (9), CSS (2), HTML (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 2 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.
+10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (89), JavaScript (10), CSS (2), HTML (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.
 
-## What changed since 2026-11-11 (4e59215)
+## What changed since 2026-11-26 (46c15a0)
 
-- model-families.yaml is now read by src/extract.ts.
-- src/cli.ts is now also read by test/integration/cli-freshness.test.ts.
-- test/fixtures/mock-responses/anthropic-apps-release-notes.html is now read by test/unit/fetch-html.test.ts.
-- And 1 more new writer or reader of a place.
-- 21 files added and 37 changed content, across 6 parts.
+- test now imports scripts.
+- Daily sync now also runs scripts/check-stale-sync-pr.mjs.
+- .github/workflows/sync.yml is now read by test/unit/stale-sync-pr.test.ts.
+- scripts/check-stale-sync-pr.mjs is now read by test/unit/stale-sync-pr.test.ts.
+- 2 files added and 4 changed content, across 5 parts.
 
 ## What comes in
 
 1. **Tests.** On a pull request to main; on a push to main; or by hand. Runs test/integration/, test/regression/ and test/unit/; checks src/.
 2. **Release.** When a tag matching `v*` is pushed; or by hand. Runs test/integration/, test/regression/ and test/unit/; builds src/cli.ts and src/mcp-server.ts.
-3. **Deploy site to GitHub Pages.** On a push to main touching 2 paths; or by hand. Runs site/astro.config.mjs and site/src/.
-4. **Daily sync.** On a schedule (`0 12 * * *`); or by hand. Runs src/cli.ts; builds src/mcp-server.ts.
+3. **Daily sync.** On a schedule (`0 12 * * *`); or by hand. Runs scripts/check-stale-sync-pr.mjs and src/cli.ts; builds src/mcp-server.ts.
+4. **Deploy site to GitHub Pages.** On a push to main touching 2 paths; or by hand. Runs site/astro.config.mjs and site/src/.
 5. **@mcptoolshop/claude-synergy** (the package's entry, which runs the command hk; it is not a library). Loads src/cli.ts and src/mcp-server.ts.
 6. **claude-synergy-mcp** (a command people run). Runs src/mcp-server.ts.
 7. **hk** (a command people run). Runs src/cli.ts.
@@ -27,7 +27,8 @@ Mapped at 2026-11-26 from commit 46c15a0 by Atlas 1.26.0.
 ## What happens through Tests
 
 1. The workflow runs test/integration/, test/regression/ and test/unit/ in test; it checks src/ in src.
-2. It uploads coverage to Codecov.
+2. That reaches scripts (1 file).
+3. It uploads coverage to Codecov.
 
 ## Who reads the results
 
@@ -35,11 +36,11 @@ Tests writes nothing in the files this map could read; 1 file could not be.
 
 ## The other doors
 
-**Release** runs test/integration/, test/regression/ and test/unit/, builds src/cli.ts and src/mcp-server.ts, publishes to npm, and creates a GitHub release.
+**Release** runs test/integration/, test/regression/ and test/unit/, builds src/cli.ts and src/mcp-server.ts, reaches scripts, publishes to npm, and creates a GitHub release.
+
+**Daily sync** runs scripts/check-stale-sync-pr.mjs and src/cli.ts, builds src/mcp-server.ts, writes to LATEST.txt and PRODUCTS.txt, commits LATEST.txt, PRODUCTS.txt, SOURCES.md (written by people), URGENT_FINDINGS.md (written by people), data/ and products/ (written by people), then pushes to a branch for review, never to main, runs gh, and opens a pull request.
 
 **Deploy site to GitHub Pages** runs site/astro.config.mjs and site/src/, and deploys the site.
-
-**Daily sync** runs src/cli.ts, builds src/mcp-server.ts, writes to LATEST.txt and PRODUCTS.txt, commits LATEST.txt, PRODUCTS.txt, SOURCES.md (written by people), URGENT_FINDINGS.md (written by people), data/ and products/ (written by people), then pushes to a branch for review, never to main, runs gh, and opens a pull request.
 
 **@mcptoolshop/claude-synergy** (the package's entry, which runs the command hk; it is not a library) loads src/cli.ts and src/mcp-server.ts.
 
@@ -50,6 +51,7 @@ Tests writes nothing in the files this map could read; 1 file could not be.
 ## What breaks what
 
 - **src** is run as a child process by 1 part (scripts) and sits on the path of 6 doors.
+- **scripts** is imported only from tests, by 1 part (test), and sits on the path of 3 doors.
 - **test** is imported by no other part and sits on the path of 2 doors.
 - **dataset/changelog-actions/v1/entries/** is written by scripts and read by scripts; a hand edit reaches every reader.
 - **dataset/changelog-actions/v1/holdout.jsonl** is written by scripts and read by scripts; a hand edit reaches every reader.
@@ -62,7 +64,7 @@ Window: 180 days; a pair counts from 3 shared commits, since 0 source files reac
 
 ## What no test touches
 
-- **scripts** is imported by no test.
+Every code part is imported by at least one test.
 
 test/smoke/full-corpus.test.ts runs in no workflow.
 
@@ -95,7 +97,7 @@ No two parts export a helper that looks alike in the files this map could read; 
 
 ## Hand-authored
 
-People write .github/, docs/, products/, site/ and synergies/. Nothing in the files this map could read writes to them; 1 file could not be.
+People write .github/, docs/, products/, site/ and synergies/; 1 write with a path built at run time may land here.
 
 ## Where to start
 
@@ -106,8 +108,8 @@ Read those in order to follow one run of claude-synergy-mcp end to end. This pat
 ## What this map cannot see
 
 - 1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.
-- 4 reads use paths built at run time and are not named here.
-- 10 writes and 43 reads go to a path their caller passes, not to this repository.
+- 1 write and 4 reads use paths built at run time and are not named here.
+- 9 writes and 46 reads go to a path their caller passes, not to this repository.
 - 7 reads go to the directory the command is run in (products.yaml, schema-vec.sql and schema.sql), not to this repository.
 - 1 read goes to the directory the command is run in (data/) or a path its caller passes, not to this repository.
 - Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window.

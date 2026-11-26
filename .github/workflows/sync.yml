@@ -113,6 +113,7 @@ jobs:
       - name: Open or refresh the sync pull request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STALE_SYNC_PR_DAYS: '3'
         run: |
           git config user.name "claude-synergy-bot"
           git config user.email "bot@mcp-tool-shop.dev"
@@ -133,11 +134,43 @@ jobs:
             echo "Merges itself when the required \`test\` check passes. If it is still open, \`test\` failed: read that run before tomorrow's sync replaces this branch."
           } > "$RUNNER_TEMP/body.md"
 
-          num=$(gh pr list --head sync/daily --base main --state open --json number -q '.[0].number')
-          if [ -z "$num" ]; then
+          pr_info=$(gh pr list --head sync/daily --base main --state open --json number,createdAt -q '.[0]')
+          if [ -z "$pr_info" ] || [ "$pr_info" = "null" ]; then
             gh pr create --base main --head sync/daily --title "Daily sync $day" --body-file "$RUNNER_TEMP/body.md"
-          else
-            gh pr edit "$num" --title "Daily sync $day" --body-file "$RUNNER_TEMP/body.md"
+            gh workflow run test.yml --ref sync/daily
+            gh pr merge sync/daily --auto --squash
+            exit 0
           fi
+
+          num=$(printf '%s' "$pr_info" | jq -r '.number')
+          created_at=$(printf '%s' "$pr_info" | jq -r '.createdAt')
+          decision=$(node scripts/check-stale-sync-pr.mjs --created-at "$created_at" --today "$day" --max-days "$STALE_SYNC_PR_DAYS")
+          stale=$(printf '%s' "$decision" | jq -r '.stale')
+          age_days=$(printf '%s' "$decision" | jq -r '.ageDays')
+          created_date=$(printf '%s' "$decision" | jq -r '.createdDate')
+          pr_title=$(printf '%s' "$decision" | jq -r '.title')
+
+          if [ "$stale" != "true" ]; then
+            gh pr edit "$num" --title "$pr_title" --body-file "$RUNNER_TEMP/body.md"
+            gh workflow run test.yml --ref sync/daily
+            gh pr merge sync/daily --auto --squash
+            exit 0
+          fi
+
+          failed_run=$(gh run list --workflow test.yml --branch sync/daily --status failure --limit 1 --json databaseId,url -q 'if length > 0 then "run #\(.[0].databaseId) (\(.[0].url))" else "" end' || true)
+          if [ -z "$failed_run" ]; then
+            failed_run=$(gh run list --workflow test.yml --branch sync/daily --limit 5 --json databaseId,url,conclusion -q '[.[] | select(.conclusion != "success" and .conclusion != null)][0] | if . then "run #\(.databaseId) (\(.url), conclusion=\(.conclusion))" else "no completed failed test.yml run found on sync/daily" end' || echo "no completed failed test.yml run found on sync/daily")
+          fi
+
+          gh pr edit "$num" --title "$pr_title" --body-file "$RUNNER_TEMP/body.md"
+          if ! gh label create sync-stale --color d93f0b --description "Daily sync PR stuck open past STALE_SYNC_PR_DAYS" --force; then
+            echo "::warning::Could not create or update sync-stale label (pull-requests: write may not grant repo label creation)." >&2
+          fi
+          if ! gh api "repos/${{ github.repository }}/issues/$num/labels" --method POST -f "labels[]=sync-stale" >/dev/null; then
+            echo "::warning::Could not attach sync-stale label to PR #$num." >&2
+          fi
+          gh api "repos/${{ github.repository }}/issues/$num/comments" --method POST -f body="Daily sync PR #$num has been open since $created_date ($age_days days > STALE_SYNC_PR_DAYS=$STALE_SYNC_PR_DAYS). Latest failed \`test\` run on \`sync/daily\`: $failed_run. Refreshed \`sync/daily\` for $day." >/dev/null
           gh workflow run test.yml --ref sync/daily
-          gh pr merge sync/daily --auto --squash
+          gh pr merge sync/daily --auto --squash || true
+          echo "::error::Daily sync PR #$num has been open since $created_date ($age_days days > STALE_SYNC_PR_DAYS=$STALE_SYNC_PR_DAYS). Latest failed test run: $failed_run" >&2
+          exit 1

@@ -21,7 +21,7 @@
           "path": ".github/workflows/release.yml"
         },
         {
-          "hash": "e064441c38eb3880c98866ce1c14321243767cd68370bf5397988ff8cd4c4f29",
+          "hash": "ec43f23d427239753a8bf5d7639bf4c866a72cab2a94e28fcf74b0b4dfb19458",
           "path": ".github/workflows/sync.yml"
         },
         {
@@ -10981,7 +10981,7 @@
           "path": ".gitignore"
         },
         {
-          "hash": "01dbc46de41dc67f97683f31d87ddc82bf9b270133d90cb0b4fdb4c1f816a31a",
+          "hash": "79118742600b71f74f99519733e14d64c25d09e6587b59a9cbd4f666f42d8979",
           "path": "CHANGELOG.md"
         },
         {
@@ -11141,6 +11141,47 @@
           "path": "scripts/build-dataset.mjs"
         },
         {
+          "entry": "evaluateSyncPrStaleness",
+          "entryRule": 1,
+          "exports": [
+            "evaluateSyncPrStaleness"
+          ],
+          "failurePaths": [
+            {
+              "in": "parseUtcDateMs",
+              "kind": "throw",
+              "line": 13
+            },
+            {
+              "in": "parseUtcDateMs",
+              "kind": "throw",
+              "line": 17
+            },
+            {
+              "in": "parseUtcDateMs",
+              "kind": "throw",
+              "line": 27
+            },
+            {
+              "in": "evaluateSyncPrStaleness",
+              "kind": "throw",
+              "line": 41
+            },
+            {
+              "in": "parseCliArgs",
+              "kind": "throw",
+              "line": 75
+            },
+            {
+              "kind": "catch",
+              "line": 88
+            }
+          ],
+          "hash": "192ec105ec2e1bad57cde12207f6017bf27ddf7b3588b7dfe522309beebbb6fe",
+          "path": "scripts/check-stale-sync-pr.mjs",
+          "sequences": []
+        },
+        {
           "failurePaths": [
             {
               "kind": "catch",
@@ -11278,7 +11319,10 @@
       ],
       "outsideWrites": 1,
       "role": "code",
-      "testedBy": 0,
+      "testRunners": [
+        "vitest"
+      ],
+      "testedBy": 1,
       "unresolvedSites": 0
     },
     {
@@ -11382,7 +11426,7 @@
       "dynamicReads": 4,
       "dynamicSpawns": 0,
       "dynamicSpawnsInTests": 0,
-      "dynamicWrites": 0,
+      "dynamicWrites": 1,
       "entryPoints": [
         "src/cli.ts",
         "src/mcp-server.ts"
@@ -12395,6 +12439,8 @@
           "exports": [
             "fetchAll",
             "listFetchTargets",
+            "resolveEffectiveSince",
+            "scanDiskReleaseBounds",
             "seedMarkersFromDb"
           ],
           "failurePaths": [
@@ -12426,85 +12472,85 @@
             {
               "in": "fetchOne",
               "kind": "catch",
-              "line": 318
+              "line": 371
             },
             {
               "in": "fetchGhReleases",
               "kind": "throw",
-              "line": 352
+              "line": 425
             },
             {
               "in": "fetchGhReleases",
               "kind": "catch",
-              "line": 379
+              "line": 442
             },
             {
               "in": "ghReleases",
               "kind": "catch",
-              "line": 420
+              "line": 478
             },
             {
               "in": "ghReleases",
               "kind": "throw",
-              "line": 428
+              "line": 486
             },
             {
               "in": "ghReleases",
               "kind": "throw",
-              "line": 434
+              "line": 492
             },
             {
               "in": "ghReleases",
               "kind": "catch",
-              "line": 440
+              "line": 498
             },
             {
               "in": "fetchRss",
               "kind": "throw",
-              "line": 535
+              "line": 606
             },
             {
               "in": "fetchRss",
               "kind": "catch",
-              "line": 571
+              "line": 642
             },
             {
               "in": "fetchRawChangelog",
               "kind": "throw",
-              "line": 589
+              "line": 660
             },
             {
               "in": "fetchRawChangelog",
               "kind": "throw",
-              "line": 603
+              "line": 674
             },
             {
               "in": "fetchRawChangelog",
               "kind": "catch",
-              "line": 636
+              "line": 707
             },
             {
               "in": "fetchHtmlScrape",
               "kind": "throw",
-              "line": 658
+              "line": 729
             },
             {
               "in": "fetchHtmlScrape",
               "kind": "catch",
-              "line": 693
+              "line": 764
             },
             {
               "in": "fetchPlaywrightStrategy",
               "kind": "catch",
-              "line": 746
+              "line": 817
             },
             {
               "in": "fetchCatalogStrategy",
               "kind": "throw",
-              "line": 764
+              "line": 835
             }
           ],
-          "hash": "3cb8f3c816b3350deb8a718f5f12fa0ecd31b6cd1e042959a1edd0494a2363e5",
+          "hash": "06f4f9d1e244c1def866688a2326d124855fbfefb1c1e6e67959cbb2b6e62839",
           "importsFiles": [
             "src/fetch-changelog.ts",
             "src/fetch-html.ts",
@@ -12534,13 +12580,13 @@
                   }
                 },
                 {
-                  "line": 785,
+                  "line": 856,
                   "name": "prepare",
                   "target": null,
                   "via": "readMarker"
                 },
                 {
-                  "line": 537,
+                  "line": 608,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
@@ -12548,7 +12594,7 @@
                   "via": "fetchRss"
                 },
                 {
-                  "line": 597,
+                  "line": 668,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12556,7 +12602,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 600,
+                  "line": 671,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12564,7 +12610,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 660,
+                  "line": 731,
                   "name": "fetchHtmlReleases",
                   "target": {
                     "file": "src/fetch-html.ts"
@@ -12572,7 +12618,7 @@
                   "via": "fetchHtmlScrape"
                 },
                 {
-                  "line": 766,
+                  "line": 837,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12580,7 +12626,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 768,
+                  "line": 839,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12588,7 +12634,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 713,
+                  "line": 784,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
@@ -12596,7 +12642,7 @@
                   "via": "fetchPlaywrightStrategy"
                 },
                 {
-                  "line": 808,
+                  "line": 879,
                   "name": "prepare",
                   "target": null,
                   "via": "writeMarker"
@@ -12610,13 +12656,13 @@
             {
               "calls": [
                 {
-                  "line": 785,
+                  "line": 856,
                   "name": "prepare",
                   "target": null,
                   "via": "readMarker"
                 },
                 {
-                  "line": 537,
+                  "line": 608,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
@@ -12624,7 +12670,7 @@
                   "via": "fetchRss"
                 },
                 {
-                  "line": 597,
+                  "line": 668,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12632,7 +12678,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 600,
+                  "line": 671,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12640,7 +12686,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 660,
+                  "line": 731,
                   "name": "fetchHtmlReleases",
                   "target": {
                     "file": "src/fetch-html.ts"
@@ -12648,7 +12694,7 @@
                   "via": "fetchHtmlScrape"
                 },
                 {
-                  "line": 766,
+                  "line": 837,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12656,7 +12702,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 768,
+                  "line": 839,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12664,7 +12710,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 713,
+                  "line": 784,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
@@ -12672,7 +12718,7 @@
                   "via": "fetchPlaywrightStrategy"
                 },
                 {
-                  "line": 808,
+                  "line": 879,
                   "name": "prepare",
                   "target": null,
                   "via": "writeMarker"
@@ -12686,7 +12732,7 @@
             {
               "calls": [
                 {
-                  "line": 537,
+                  "line": 608,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
@@ -12701,14 +12747,14 @@
             {
               "calls": [
                 {
-                  "line": 597,
+                  "line": 668,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
                   }
                 },
                 {
-                  "line": 600,
+                  "line": 671,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12723,7 +12769,7 @@
             {
               "calls": [
                 {
-                  "line": 660,
+                  "line": 731,
                   "name": "fetchHtmlReleases",
                   "target": {
                     "file": "src/fetch-html.ts"
@@ -12738,7 +12784,7 @@
             {
               "calls": [
                 {
-                  "line": 713,
+                  "line": 784,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
@@ -12753,14 +12799,14 @@
             {
               "calls": [
                 {
-                  "line": 766,
+                  "line": 837,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
                   }
                 },
                 {
-                  "line": 768,
+                  "line": 839,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12775,7 +12821,7 @@
             {
               "calls": [
                 {
-                  "line": 785,
+                  "line": 856,
                   "name": "prepare",
                   "target": null
                 }
@@ -12788,7 +12834,7 @@
             {
               "calls": [
                 {
-                  "line": 808,
+                  "line": 879,
                   "name": "prepare",
                   "target": null
                 }
@@ -12801,7 +12847,7 @@
             {
               "calls": [
                 {
-                  "line": 825,
+                  "line": 896,
                   "name": "prepare",
                   "target": null
                 }
@@ -14461,11 +14507,11 @@
       "origin": "authored",
       "outsidePlaces": [
         {
-          "reads": 43,
+          "reads": 46,
           "where": [
             "caller"
           ],
-          "writes": 9
+          "writes": 8
         },
         {
           "reads": 1,
@@ -14497,8 +14543,8 @@
           "writes": 0
         }
       ],
-      "outsideReads": 51,
-      "outsideWrites": 9,
+      "outsideReads": 54,
+      "outsideWrites": 8,
       "role": "code",
       "testRunners": [
         "vitest"
@@ -15084,14 +15130,16 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "40acfd63b203a5caa73e7bc78393051f45b5d43698d13b68b344cce7d532bb32",
+          "hash": "f61911948b0fa3925f9256d5b430aba75ce074b1de386e4800bec5b248244834",
           "importOrder": [
             "src/fetch.ts",
+            "src/ingest.ts",
             "test/helpers/temp-db.ts",
             "test/helpers/seed-corpus.ts"
           ],
           "importsFiles": [
             "src/fetch.ts",
+            "src/ingest.ts",
             "test/helpers/seed-corpus.ts",
             "test/helpers/temp-db.ts"
           ],
@@ -15385,6 +15433,17 @@
             "test/helpers/temp-db.ts"
           ],
           "path": "test/unit/security-validators.test.ts",
+          "testFramework": "vitest"
+        },
+        {
+          "hash": "54a3b5029ee895d962a5e11b11f25e5621df191358446a25b2982965617fd451",
+          "importsFiles": [
+            "scripts/check-stale-sync-pr.mjs"
+          ],
+          "path": "test/unit/stale-sync-pr.test.ts",
+          "spawns": [
+            "scripts/check-stale-sync-pr.mjs"
+          ],
           "testFramework": "vitest"
         },
         {
@@ -15698,7 +15757,16 @@
         {
           "boundary": "test",
           "depth": 0,
-          "files": 53
+          "files": 54
+        },
+        {
+          "boundary": "scripts",
+          "depth": 1,
+          "enters": {
+            "file": "scripts/check-stale-sync-pr.mjs",
+            "from": "test/unit/stale-sync-pr.test.ts"
+          },
+          "files": 1
         }
       ],
       "readers": [],
@@ -15767,7 +15835,7 @@
       "tests": [
         {
           "config": "vitest.config.ts",
-          "files": 45,
+          "files": 46,
           "job": "release",
           "runner": "vitest",
           "step": "Run tests",
@@ -15881,11 +15949,15 @@
           "dir": "",
           "job": "sync",
           "programs": [
+            "2",
             "date",
             "echo",
             "gh",
             "git",
-            "grep"
+            "grep",
+            "jq",
+            "node",
+            "printf"
           ],
           "step": "Open or refresh the sync pull request"
         }
@@ -15951,6 +16023,11 @@
       "pushesForReview": true,
       "reach": [
         {
+          "boundary": "scripts",
+          "depth": 0,
+          "files": 1
+        },
+        {
           "boundary": "src",
           "depth": 0,
           "files": 30
@@ -15958,6 +16035,11 @@
       ],
       "readers": [],
       "runs": [
+        {
+          "job": "sync",
+          "path": "scripts/check-stale-sync-pr.mjs",
+          "runKind": "executes"
+        },
         {
           "job": "sync",
           "path": "src/cli.ts",
@@ -15970,7 +16052,7 @@
           "runKind": "executes"
         }
       ],
-      "runsCount": 2,
+      "runsCount": 3,
       "secrets": [
         "GITHUB_TOKEN"
       ],
@@ -16132,7 +16214,16 @@
         {
           "boundary": "test",
           "depth": 0,
-          "files": 53
+          "files": 54
+        },
+        {
+          "boundary": "scripts",
+          "depth": 1,
+          "enters": {
+            "file": "scripts/check-stale-sync-pr.mjs",
+            "from": "test/unit/stale-sync-pr.test.ts"
+          },
+          "files": 1
         }
       ],
       "readers": [],
@@ -16187,7 +16278,7 @@
         {
           "config": "vitest.config.ts",
           "coverage": true,
-          "files": 45,
+          "files": 46,
           "job": "test",
           "runner": "vitest",
           "step": "Run tests with coverage",
@@ -16371,15 +16462,33 @@
       "from": "test",
       "fromTests": true,
       "kind": "file",
+      "to": "scripts"
+    },
+    {
+      "from": "test",
+      "fromTests": true,
+      "kind": "file",
       "to": "src"
     }
   ],
   "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "46c15a0b23b6dedad366a2437041b88cba068782",
-    "tracked": 2911
+    "commit": "ea2170cfe8ab0c0e20c467a016a8914391b4ca5c",
+    "tracked": 2913
   },
   "landings": [
+    {
+      "readers": [
+        {
+          "by": "test/unit/stale-sync-pr.test.ts",
+          "call": "readFileSync",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": ".github/workflows/sync.yml",
+      "writers": []
+    },
     {
       "readers": [],
       "target": "LATEST.txt",
@@ -16678,6 +16787,18 @@
     {
       "readers": [
         {
+          "by": "test/unit/stale-sync-pr.test.ts",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "scripts/check-stale-sync-pr.mjs",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
           "by": "site/astro.config.mjs",
           "call": "content-collection",
           "confidence": "ast"
@@ -16888,7 +17009,7 @@
   "overlaps": [],
   "submodules": [],
   "symlinks": [],
-  "testFiles": 83,
+  "testFiles": 84,
   "testsLeftOut": [
     {
       "config": "vitest.config.ts",

@@ -9,7 +9,7 @@
 //   - catalog:       MCP registry snapshots (Official + Smithery)
 
 import { execFileSync } from 'node:child_process';
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import type Database from 'better-sqlite3';
 import { fetchRssReleases } from './fetch-rss.js';
@@ -277,6 +277,53 @@ function buildSummary(results: FetchStats[]): FetchAllSummary {
   return { total: results.length, succeeded, failed, skipped, newChanges, errors };
 }
 
+const DEFAULT_SINCE = '2026-01-01';
+const FRONTMATTER_BLOCK_RE = /^---\r?\n([\s\S]*?)\r?\n---/;
+const DISK_RELEASE_DATE_RE = /^(?:released_at|published_at):\s*"?(\d{4}-\d{2}-\d{2}(?:T[^"\r\n]+)?)"?\s*$/m;
+
+/**
+ * Scan `<productsRoot>/<product>/releases/*.md` for front-matter release dates.
+ * Returns the lexicographical oldest and newest `YYYY-MM-DD` / ISO date strings
+ * found on disk, or `{ oldest: null, newest: null }` when no dated files exist.
+ */
+export function scanDiskReleaseBounds(outDir: string): { oldest: string | null; newest: string | null } {
+  if (!existsSync(outDir)) return { oldest: null, newest: null };
+  let oldest: string | null = null;
+  let newest: string | null = null;
+
+  for (const entry of readdirSync(outDir)) {
+    if (!entry.endsWith('.md')) continue;
+    const raw = readFileSync(join(outDir, entry), 'utf-8');
+    const fmMatch = raw.match(FRONTMATTER_BLOCK_RE);
+    if (!fmMatch) continue;
+    const dateMatch = fmMatch[1].match(DISK_RELEASE_DATE_RE);
+    if (!dateMatch) continue;
+    const date = dateMatch[1];
+    if (!oldest || date < oldest) oldest = date;
+    if (!newest || date > newest) newest = date;
+  }
+
+  return { oldest, newest };
+}
+
+/**
+ * Resolve the effective `since` cursor for a fetch target.
+ * File-backed strategies clamp `since` so it never exceeds `diskNewest` on disk
+ * (falling back to DEFAULT_SINCE when no dated files exist on disk).
+ * Catalog snapshot strategies remain marker-driven because they overwrite `CATALOG.md`.
+ */
+export function resolveEffectiveSince(
+  strategy: FetchTarget['strategy'],
+  existingMarker: string | null,
+  diskNewest: string | null,
+  sinceOverride?: string
+): string {
+  if (sinceOverride) return sinceOverride;
+  if (strategy === 'catalog') return existingMarker ?? DEFAULT_SINCE;
+  if (diskNewest === null) return DEFAULT_SINCE;
+  return existingMarker && existingMarker < diskNewest ? existingMarker : diskNewest;
+}
+
 async function fetchOne(
   db: Database.Database,
   productsRoot: string,
@@ -289,15 +336,21 @@ async function fetchOne(
   assertProductShape(target.product);
 
   const existingMarker = readMarker(db, target.product);
-  const since = sinceOverride ?? existingMarker ?? '2026-01-01';
   const outDir = resolve(productsRoot, target.product, 'releases');
-  mkdirSync(outDir, { recursive: true });
+  if (target.strategy !== 'catalog') {
+    mkdirSync(outDir, { recursive: true });
+  }
+  const diskBounds = target.strategy === 'catalog'
+    ? { oldest: null, newest: null }
+    : scanDiskReleaseBounds(outDir);
+  const since = resolveEffectiveSince(target.strategy, existingMarker, diskBounds.newest, sinceOverride);
+  const floorSince = sinceOverride ?? (diskBounds.oldest && diskBounds.oldest < since ? diskBounds.oldest : since);
 
   let stats: FetchStats;
   try {
     switch (target.strategy) {
       case 'gh-releases':
-        stats = await fetchGhReleases(db, outDir, target, since);
+        stats = await fetchGhReleases(db, outDir, target, since, floorSince);
         break;
       case 'rss':
         stats = await fetchRss(db, outDir, target, since, signal);
@@ -343,33 +396,43 @@ async function fetchOne(
 
 // ─── Strategy: gh-releases ───────────────────────────────────────────────────
 
+function resolveGhReleasePaths(
+  outDir: string,
+  target: FetchTarget,
+  tagName: string
+): { path: string; exists: boolean } {
+  // F-002: both filename and vPath must derive from sanitized output, never from
+  // a raw tag_name (which can contain `/`, `@`, `..`). The v-prefixed dual-form
+  // existsSync check preserves idempotency against legacy v-prefixed files (see
+  // regression test §8.10): if disk has `v1.0.29.md` we treat it as already-fetched.
+  const baseName = filenameFor(target, tagName);
+  const filename = sanitizeFilename(baseName);
+  assertSafeFilename(filename, `gh-releases filename for tag ${JSON.stringify(tagName)}`);
+  const vName = sanitizeFilename(`v${baseName}`);
+  assertSafeFilename(vName, `gh-releases vName for tag ${JSON.stringify(tagName)}`);
+  const path = join(outDir, `${filename}.md`);
+  const vPath = join(outDir, `${vName}.md`);
+  return { path, exists: existsSync(path) || existsSync(vPath) };
+}
+
 async function fetchGhReleases(
   db: Database.Database,
   outDir: string,
   target: FetchTarget,
-  since: string
+  since: string,
+  floorSince: string = since
 ): Promise<FetchStats> {
   if (!target.repo) throw new Error(`${target.product}: gh-releases strategy requires repo`);
 
-  const releases = ghReleases(target.repo, since);
+  const releases = ghReleases(target.repo, since, floorSince, (tag) => resolveGhReleasePaths(outDir, target, tag).exists);
   let latest: string | null = null;
   let fetched = 0;
   const errors: string[] = [];
 
   for (const r of releases) {
     try {
-      // F-002: both filename and vPath must derive from sanitized output, never from
-      // a raw tag_name (which can contain `/`, `@`, `..`). The v-prefixed dual-form
-      // existsSync check preserves idempotency against legacy v-prefixed files (see
-      // regression test §8.10): if disk has `v1.0.29.md` we treat it as already-fetched.
-      const baseName = filenameFor(target, r.tag_name);
-      const filename = sanitizeFilename(baseName);
-      assertSafeFilename(filename, `gh-releases filename for tag ${JSON.stringify(r.tag_name)}`);
-      const vName = sanitizeFilename(`v${baseName}`);
-      assertSafeFilename(vName, `gh-releases vName for tag ${JSON.stringify(r.tag_name)}`);
-      const path = join(outDir, `${filename}.md`);
-      const vPath = join(outDir, `${vName}.md`);
-      if (existsSync(path) || existsSync(vPath)) {
+      const { path, exists } = resolveGhReleasePaths(outDir, target, r.tag_name);
+      if (exists) {
         if (!latest || r.published_at > latest) latest = r.published_at;
         continue;
       }
@@ -385,7 +448,12 @@ async function fetchGhReleases(
   return { product: target.product, fetched, newSince: since, latest, errors };
 }
 
-function ghReleases(repo: string, sinceIso: string): GhRelease[] {
+function ghReleases(
+  repo: string,
+  sinceIso: string,
+  floorSince: string = sinceIso,
+  isSavedOnDisk: (tag: string) => boolean = () => false
+): GhRelease[] {
   // F-001: validate repo shape before passing to a subprocess. Belt-and-suspenders:
   // assertRepoShape() guards against command injection even though execFileSync's
   // argv path already prevents shell parsing of `repo`.
@@ -396,17 +464,7 @@ function ghReleases(repo: string, sinceIso: string): GhRelease[] {
   // multiple pages. Hard ceiling at 50 pages = 5,000 releases as a sanity cap.
   //
   // FE-3: short-circuit pagination once we see a full page whose LAST release is
-  // older than sinceIso. GitHub returns releases in `created_at` DESC order by
-  // default, which for the overwhelming majority of repos matches `published_at`
-  // ordering. We filter on `published_at` (it's the production-visible timestamp)
-  // and accept the tiny risk that a release was drafted long before publish — the
-  // user can always force a full re-sync with `--since 2024-01-01`.
-  //
-  // Correctness contract: we only early-exit when EVERY release on the current
-  // page is <= sinceIso. That guarantees no in-window release on a later page
-  // (since the API order is monotonic-ish DESC). This trades a small chance of
-  // missing a backdated release for huge API-quota savings on high-velocity
-  // repos (continue-dev publishes 100+/month).
+  // older than sinceIso (and saved on disk when interior gap filling is active).
   const all: GhRelease[] = [];
   const MAX_PAGES = 50;
   for (let page = 1; page <= MAX_PAGES; page++) {
@@ -422,7 +480,7 @@ function ghReleases(repo: string, sinceIso: string): GhRelease[] {
       // First-page 404 = repo unreachable; later-page 404 should not normally happen,
       // but if it does we stop pagination and return what we have.
       const stderr = (e.stderr ?? '').toString();
-      if (stderr.includes('404')) return page === 1 ? [] : filterAndShape(all, sinceIso);
+      if (stderr.includes('404')) return page === 1 ? [] : filterAndShape(all, sinceIso, floorSince, isSavedOnDisk);
       // Enrich rate-limit errors with GITHUB_TOKEN guidance
       if (stderr.includes('403') || stderr.includes('429') || stderr.includes('rate limit')) {
         throw new Error(
@@ -439,32 +497,45 @@ function ghReleases(repo: string, sinceIso: string): GhRelease[] {
       batch = JSON.parse(out) as GhRelease[];
     } catch {
       // Malformed JSON on first page = bail entirely; later pages = stop pagination.
-      return page === 1 ? [] : filterAndShape(all, sinceIso);
+      return page === 1 ? [] : filterAndShape(all, sinceIso, floorSince, isSavedOnDisk);
     }
     if (!Array.isArray(batch) || batch.length === 0) break;
     all.push(...batch);
 
-    // FE-3 early exit — if the LAST release on this full page is already <= sinceIso,
-    // every release on later pages will be too (DESC order). Save the next API call.
-    // Skip this check for partial pages — we already know there's no next page.
+    // FE-3 early exit — stop when the LAST release on this full page is at/before
+    // `floorSince`, or at/before `sinceIso` and already present on disk.
     if (batch.length === 100) {
-      const lastPubAt = batch[batch.length - 1]?.published_at;
-      if (lastPubAt && lastPubAt <= sinceIso) break;
+      const last = batch[batch.length - 1];
+      if (
+        last?.published_at &&
+        (last.published_at <= floorSince || (last.published_at <= sinceIso && isSavedOnDisk(last.tag_name)))
+      ) {
+        break;
+      }
     }
 
     if (batch.length < 100) break; // last page (partial)
   }
 
-  return filterAndShape(all, sinceIso);
+  return filterAndShape(all, sinceIso, floorSince, isSavedOnDisk);
 }
 
 /**
- * Filter releases newer than sinceIso and project to the minimal shape downstream consumers expect.
- * Extracted so the early-exit code paths in ghReleases() can short-circuit cleanly.
+ * Filter releases newer than sinceIso (or newer than floorSince when missing on disk)
+ * and project to the minimal shape downstream consumers expect.
  */
-function filterAndShape(all: GhRelease[], sinceIso: string): GhRelease[] {
+function filterAndShape(
+  all: GhRelease[],
+  sinceIso: string,
+  floorSince: string = sinceIso,
+  isSavedOnDisk: (tag: string) => boolean = () => false
+): GhRelease[] {
   return all
-    .filter((r) => r.published_at && r.published_at > sinceIso)
+    .filter(
+      (r) =>
+        Boolean(r.published_at) &&
+        (r.published_at > sinceIso || (r.published_at > floorSince && !isSavedOnDisk(r.tag_name)))
+    )
     .map((r) => ({
       tag_name: r.tag_name,
       published_at: r.published_at,
