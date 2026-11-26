@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-11-25
+
+**Current runtime dependencies, and Node 22.12 or newer.** The published package now depends on better-sqlite3 13, commander 15 and fast-xml-parser 5; commander 15 needs Node 22.12, so `engines.node` is now `>=22.12.0`. No CLI command, MCP tool or schema changes.
+
+### Changed
+- **Runtime dependencies:** `better-sqlite3` `^11.5.0` → `^13.0.3`, `commander` `^12.1.0` → `^15.0.0`, `fast-xml-parser` `^4.5.0` → `^5.11.1`.
+- **Node floor:** `engines.node` `>=22.0.0` → `>=22.12.0` (commander 15's requirement); README (8 languages) and the handbook say 22.12.
+- **Synergies:** a local home path removed from `synergies/03`, `04` and `05`.
+
+### Security
+- **Production advisories cleared** in the lockfile, including `devalue` 5.9.3+ (GHSA-j22f-vq7h-c4qm, GHSA-mcm9-63f2-9j32).
+
+### Repository (not in the npm package)
+- A `typecheck` gate in CI; coverage and test results upload to Codecov through OIDC; the Atlas map is checked in CI (Atlas 1.26.0).
+- The site moved to Astro 7, which carries the sharp patch.
+- The daily changelog sync opens a pull request on `sync/daily` instead of pushing to the protected `main`.
+
 ## [1.2.2] - 2026-05-25
 
 Docs-only patch. No code, schema, or behavior change. The `dist/` tarball is byte-identical to 1.2.1.

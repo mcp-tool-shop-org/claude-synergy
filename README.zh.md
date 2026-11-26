@@ -360,7 +360,7 @@ CI：`.github/workflows/test.yml` 在代码提交和拉取请求时运行 `pnpm 
 
 `sqlite-vec` 原生扩展加载失败。 常见原因：
 
-1. **Node 版本过旧** — `claude-synergy` 需要 Node 22+。 使用 `node -v` 检查版本。
+1. **Node 版本过旧** — `claude-synergy` 需要 Node 22.12 或更高版本。 使用 `node -v` 检查版本。
 2. **原生模块需要重新构建** — 运行 `npm rebuild better-sqlite3` (或 `pnpm rebuild better-sqlite3`)。
 3. **平台不匹配** — 在 Windows/ARM 上，`better-sqlite3` 需要 C++ 编译工具链。 安装 [windows-build-tools](https://github.com/nicedoc/windows-build-tools) 或带有 "Desktop development with C++" 的 Visual Studio Build Tools。
 

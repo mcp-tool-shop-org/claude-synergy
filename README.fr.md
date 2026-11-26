@@ -360,7 +360,7 @@ Un autre processus `hk` (ou un serveur MCP obsolète) maintient la base de donn�
 
 L'extension native `sqlite-vec` n'a pas pu être chargée. Causes courantes :
 
-1. **Version de Node trop ancienne** : `claude-synergy` nécessite Node 22+. Vérifiez avec `node -v`.
+1. **Version de Node trop ancienne** : `claude-synergy` nécessite Node 22.12 ou une version plus récente. Vérifiez avec `node -v`.
 2. **Module natif nécessitant une reconstruction** : exécutez `npm rebuild better-sqlite3` (ou `pnpm rebuild better-sqlite3`).
 3. **Incompatibilité de la plateforme** : sur Windows/ARM, `better-sqlite3` nécessite un ensemble d'outils de compilation C++. Installez les [windows-build-tools](https://github.com/nicedoc/windows-build-tools) ou les outils de développement Visual Studio avec "Développement Desktop avec C++".
 

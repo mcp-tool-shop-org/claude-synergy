@@ -360,7 +360,7 @@ Otro proceso de `hk` (o un servidor MCP obsoleto) mantiene la base de datos SQLi
 
 La extensión nativa `sqlite-vec` no se pudo cargar. Causas comunes:
 
-1. **Versión de Node demasiado antigua** — `claude-synergy` requiere Node 22+. Verifique con `node -v`.
+1. **Versión de Node demasiado antigua** — `claude-synergy` requiere Node 22.12 o posterior. Verifique con `node -v`.
 2. **Módulo nativo que necesita ser reconstruido** — ejecute `npm rebuild better-sqlite3` (o `pnpm rebuild better-sqlite3`).
 3. **Incompatibilidad de plataforma** — en Windows/ARM, `better-sqlite3` necesita un conjunto de herramientas de compilación de C++. Instale [windows-build-tools](https://github.com/nicedoc/windows-build-tools) o Visual Studio Build Tools con "Desarrollo de escritorio con C++".
 
