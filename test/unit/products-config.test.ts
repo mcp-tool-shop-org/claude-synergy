@@ -297,7 +297,12 @@ describe('loadProductsConfig — repo products.yaml', () => {
     ]);
     expect(cfg!.productMeta['mcp-rust-sdk'].packages).toEqual([
       { ecosystem: 'crates', name: 'rmcp' },
-      { ecosystem: 'crates', name: 'rmcp-macros' },
+    ]);
+    expect(cfg!.productMeta['anthropic-sdk-typescript'].packages).toEqual([
+      { ecosystem: 'npm', name: '@anthropic-ai/sdk' },
+    ]);
+    expect(cfg!.productMeta['mcp-typescript-sdk'].packages).toEqual([
+      { ecosystem: 'npm', name: '@modelcontextprotocol/sdk' },
     ]);
   });
 });

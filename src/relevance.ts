@@ -6,6 +6,7 @@ import type Database from 'better-sqlite3';
 import {
   compareVersions,
   formatFlagMarker,
+  resolveRowScreening,
   type ChangesSinceResult,
 } from './query.js';
 import {
@@ -59,6 +60,7 @@ export interface ProductRelevanceResult {
   latest_version: string | null;
   latest_released_at: string | null;
   releases_behind: number;
+  same_day_versions?: string[];
   breaking_changes: RelevanceBreakingChange[];
   releases: ProductRelevanceRelease[];
 }
@@ -115,10 +117,49 @@ function loadProductCatalog(
   return [];
 }
 
+/**
+ * Strip a Go major-version path suffix (`/v2`, `/v3`, ...) before extracting a
+ * package short name or scoped slug for filename prefix matching.
+ */
+function stripGoMajorSuffix(pkgName: string): string {
+  return pkgName.trim().replace(/\/v\d+$/i, '');
+}
+
+/**
+ * Return true if `notes_path` belongs to `pkgName`: either an unprefixed
+ * version filename (`1.29.0.md`, `v1.0.95.md`) or prefixed with `pkgName`'s
+ * own short name or scoped slug (`sdk-0.97.0.md`, `rmcp-v1.7.0.md`).
+ * Excludes sibling package releases stored under the same product row.
+ */
+export function releaseBelongsToPackage(
+  notesPath: string | null | undefined,
+  pkgName: string
+): boolean {
+  const fileName = (notesPath ?? '').replace(/\\/g, '/').split('/').pop() ?? '';
+  const stem = fileName.replace(/\.md$/i, '');
+  if (!stem) return true;
+  if (/^(?:v)?\d/i.test(stem)) return true;
+
+  const basePkg = stripGoMajorSuffix(pkgName);
+  const shortName = (basePkg.includes('/') ? basePkg.split('/').pop()! : basePkg).toLowerCase();
+  const scopedSlug = basePkg.replace(/^@/, '').replace(/\//g, '-').toLowerCase();
+  const stemLower = stem.toLowerCase();
+
+  for (const prefix of new Set([shortName, scopedSlug])) {
+    if (!prefix) continue;
+    if (stemLower.startsWith(`${prefix}-`) || stemLower.startsWith(`${prefix}@`)) {
+      const rest = stemLower.slice(prefix.length + 1);
+      if (/^(?:v)?\d/i.test(rest)) return true;
+    }
+  }
+  return false;
+}
+
 function candidateMirrorVersions(pkgName: string, installedVersion: string): string[] {
   const trimmed = installedVersion.trim();
   const bare = trimmed.replace(/^v/, '');
-  const shortName = pkgName.includes('/') ? pkgName.split('/').pop()! : pkgName;
+  const basePkg = stripGoMajorSuffix(pkgName);
+  const shortName = basePkg.includes('/') ? basePkg.split('/').pop()! : basePkg;
   const raw = [
     trimmed,
     bare,
@@ -142,76 +183,104 @@ function candidateMirrorVersions(pkgName: string, installedVersion: string): str
 interface MirrorReleaseRow {
   version: string;
   released_at: string | null;
+  notes_path: string | null;
 }
 
-function findMirrorRelease(
+function loadPackageReleases(
   db: Database.Database,
   product: string,
-  pkgName: string,
-  installedVersion: string
-): MirrorReleaseRow | null {
-  const stmt = db.prepare(
-    `SELECT version, released_at FROM releases WHERE product = ? AND version = ?`
-  );
-  for (const candidate of candidateMirrorVersions(pkgName, installedVersion)) {
-    const row = stmt.get(product, candidate) as MirrorReleaseRow | undefined;
-    if (row) return row;
-  }
-  return null;
-}
-
-function findNewestMirrorRelease(
-  db: Database.Database,
-  product: string
-): MirrorReleaseRow | null {
-  const row = db
+  pkgName: string
+): MirrorReleaseRow[] {
+  const rows = db
     .prepare(
-      `SELECT version, released_at FROM releases
-       WHERE product = ? AND released_at IS NOT NULL
-       ORDER BY released_at DESC, version DESC
-       LIMIT 1`
-    )
-    .get(product) as MirrorReleaseRow | undefined;
-  return row ?? null;
-}
-
-function mergeEmptyReleases(
-  db: Database.Database,
-  product: string,
-  fromDate: string,
-  toDate: string,
-  diffWithChanges: ChangesSinceResult[]
-): ChangesSinceResult[] {
-  const byVersion = new Map<string, ChangesSinceResult>();
-  for (const r of diffWithChanges) {
-    byVersion.set(r.version, r);
-  }
-  const allReleases = db
-    .prepare(
-      `SELECT product, version, released_at
+      `SELECT version, released_at, notes_path
        FROM releases
-       WHERE product = ? AND released_at > ? AND released_at <= ?
-       ORDER BY released_at DESC, version ASC`
+       WHERE product = ?
+       ORDER BY CASE WHEN released_at IS NULL THEN 1 ELSE 0 END ASC,
+                released_at DESC,
+                rowid ASC`
     )
-    .all(product, fromDate, toDate) as Array<{
-    product: string;
-    version: string;
-    released_at: string;
+    .all(product) as MirrorReleaseRow[];
+  return rows.filter((r) => releaseBelongsToPackage(r.notes_path, pkgName));
+}
+
+function hasChangesFlagsColumnLocal(db: Database.Database): boolean {
+  const cols = db.prepare(`PRAGMA table_info(changes)`).all() as Array<{ name: string }>;
+  return cols.some((c) => c.name === 'flags');
+}
+
+function loadReleaseChanges(
+  db: Database.Database,
+  product: string,
+  row: { version: string; released_at: string },
+  hasFlagsCol: boolean
+): ChangesSinceResult {
+  const flagsExpr = hasFlagsCol ? 'flags' : 'NULL';
+  const rows = db
+    .prepare(
+      `SELECT ordinal, kind, text, ${flagsExpr} AS flags_json
+       FROM changes
+       WHERE product = ? AND version = ?
+       ORDER BY ordinal ASC`
+    )
+    .all(product, row.version) as Array<{
+    ordinal: number;
+    kind: string;
+    text: string;
+    flags_json?: string | null;
   }>;
 
-  if (allReleases.length <= byVersion.size) {
-    return diffWithChanges;
-  }
+  return {
+    product,
+    version: row.version,
+    released_at: row.released_at,
+    changes: rows.map((r) => {
+      const screened = resolveRowScreening(r.text, r.flags_json, hasFlagsCol);
+      return {
+        ordinal: r.ordinal,
+        kind: r.kind,
+        text: screened.text,
+        flags: screened.flags,
+      };
+    }),
+  };
+}
 
-  return allReleases.map(
-    (rel) =>
-      byVersion.get(rel.version) ?? {
-        product: rel.product,
-        version: rel.version,
-        released_at: rel.released_at,
-        changes: [],
+function toRelevanceReleases(changeResults: ChangesSinceResult[]): {
+  releases: ProductRelevanceRelease[];
+  breakingChanges: RelevanceBreakingChange[];
+} {
+  const breakingChanges: RelevanceBreakingChange[] = [];
+  const releases: ProductRelevanceRelease[] = changeResults.map((rel) => {
+    const breaking: RelevanceChangeItem[] = [];
+    const nonBreaking: RelevanceChangeItem[] = [];
+    for (const ch of rel.changes) {
+      const item: RelevanceChangeItem = {
+        ordinal: ch.ordinal,
+        kind: ch.kind,
+        text: ch.text,
+        flags: ch.flags,
+      };
+      if (ch.kind === 'breaking') {
+        breaking.push(item);
+        breakingChanges.push({
+          ...item,
+          version: rel.version,
+          released_at: rel.released_at,
+        });
+      } else {
+        nonBreaking.push(item);
       }
-  );
+    }
+    return {
+      version: rel.version,
+      released_at: rel.released_at,
+      kind_counts: buildKindCounts(rel.changes),
+      breaking_changes: breaking,
+      changes: [...breaking, ...nonBreaking],
+    };
+  });
+  return { releases, breakingChanges };
 }
 
 function buildKindCounts(changes: RelevanceChangeItem[]): Record<string, number> {
@@ -260,15 +329,36 @@ function evaluateMatchedEntry(
     };
   }
 
-  const matchedRow = findMirrorRelease(db, meta.name, entry.name, entry.version);
-  const newestRow = findNewestMirrorRelease(db, meta.name);
+  const packageReleases = loadPackageReleases(db, meta.name, entry.name);
+  const byVersionRow = new Map<string, MirrorReleaseRow>();
+  for (const r of packageReleases) {
+    byVersionRow.set(r.version, r);
+  }
 
-  if (
-    !matchedRow ||
-    !matchedRow.released_at ||
-    !newestRow ||
-    !newestRow.released_at
-  ) {
+  let matchedRow: MirrorReleaseRow | null = null;
+  for (const candidate of candidateMirrorVersions(entry.name, entry.version)) {
+    const row = byVersionRow.get(candidate);
+    if (row) {
+      matchedRow = row;
+      break;
+    }
+  }
+
+  const datedReleases = packageReleases.filter(
+    (r): r is MirrorReleaseRow & { released_at: string } => Boolean(r.released_at)
+  );
+  const newestDate = datedReleases[0]?.released_at ?? null;
+  const newestDateReleases = newestDate
+    ? datedReleases.filter((r) => r.released_at === newestDate)
+    : [];
+  const latestVersionLabel =
+    newestDateReleases.length === 0
+      ? null
+      : newestDateReleases.length === 1
+        ? newestDateReleases[0].version
+        : newestDateReleases.map((r) => r.version).join(' / ');
+
+  if (!matchedRow || !matchedRow.released_at || !newestDate) {
     return {
       status: 'unknown',
       product: meta.name,
@@ -278,89 +368,112 @@ function evaluateMatchedEntry(
         ...baseInstalled,
         mirror_version: matchedRow?.version ?? null,
       },
-      latest_version: newestRow?.version ?? null,
-      latest_released_at: newestRow?.released_at ?? null,
+      latest_version: latestVersionLabel,
+      latest_released_at: newestDate,
       releases_behind: 0,
       breaking_changes: [],
       releases: [],
     };
   }
 
-  // Delegate version ordering to `compareVersions` from src/query.ts.
-  const diffFromCompare = compareVersions(db, {
-    product: meta.name,
-    fromVersion: matchedRow.version,
-    toVersion: newestRow.version,
-  });
-  const releasesAfter = mergeEmptyReleases(
-    db,
-    meta.name,
-    matchedRow.released_at,
-    newestRow.released_at,
-    diffFromCompare
-  );
+  const installedDate = matchedRow.released_at;
+  const sameDayRows = datedReleases.filter((r) => r.released_at === installedDate);
+  const sameDaySiblingRows = sameDayRows.filter((r) => r.version !== matchedRow.version);
+  const afterRows = datedReleases.filter((r) => r.released_at > installedDate);
+  const hasFlagsCol = hasChangesFlagsColumnLocal(db);
 
-  if (releasesAfter.length === 0) {
+  if (afterRows.length === 0) {
+    if (sameDaySiblingRows.length === 0) {
+      return {
+        status: 'up_to_date',
+        product: meta.name,
+        display_name: meta.display_name,
+        summary: 'no action: up to date',
+        installed: {
+          ...baseInstalled,
+          mirror_version: matchedRow.version,
+        },
+        latest_version: matchedRow.version,
+        latest_released_at: installedDate,
+        releases_behind: 0,
+        breaking_changes: [],
+        releases: [],
+      };
+    }
+
+    const sameDayVersions = sameDayRows.map((r) => r.version);
+    const sameDayResults = sameDayRows.map((r) =>
+      loadReleaseChanges(db, meta.name, r, hasFlagsCol)
+    );
+    const { releases, breakingChanges } = toRelevanceReleases(sameDayResults);
     return {
-      status: 'up_to_date',
+      status: 'unknown',
       product: meta.name,
       display_name: meta.display_name,
-      summary: 'no action: up to date',
+      summary: `unknown: releases on the same day, order not known (${sameDayVersions.join(', ')})`,
       installed: {
         ...baseInstalled,
         mirror_version: matchedRow.version,
       },
-      latest_version: newestRow.version,
-      latest_released_at: newestRow.released_at,
+      latest_version: null,
+      latest_released_at: newestDate,
       releases_behind: 0,
-      breaking_changes: [],
-      releases: [],
+      same_day_versions: sameDayVersions,
+      breaking_changes: breakingChanges,
+      releases,
     };
   }
 
-  const breakingChanges: RelevanceBreakingChange[] = [];
-  const releases: ProductRelevanceRelease[] = releasesAfter.map((rel) => {
-    const breaking: RelevanceChangeItem[] = [];
-    const nonBreaking: RelevanceChangeItem[] = [];
-    for (const ch of rel.changes) {
-      const item: RelevanceChangeItem = {
-        ordinal: ch.ordinal,
-        kind: ch.kind,
-        text: ch.text,
-        flags: ch.flags,
-      };
-      if (ch.kind === 'breaking') {
-        breaking.push(item);
-        breakingChanges.push({
-          ...item,
-          version: rel.version,
-          released_at: rel.released_at,
-        });
-      } else {
-        nonBreaking.push(item);
-      }
-    }
-    return {
-      version: rel.version,
-      released_at: rel.released_at,
-      kind_counts: buildKindCounts(rel.changes),
-      breaking_changes: breaking,
-      changes: [...breaking, ...nonBreaking],
-    };
+  // Reuse `compareVersions` from src/query.ts, then scope strictly to releases
+  // belonging to the mapped package (`afterRows`) and never drop same-day siblings.
+  const diffFromCompare = compareVersions(db, {
+    product: meta.name,
+    fromVersion: matchedRow.version,
+    toVersion: newestDateReleases[0].version,
   });
+  const changesByVersion = new Map<string, ChangesSinceResult>();
+  for (const item of diffFromCompare) {
+    changesByVersion.set(item.version, item);
+  }
+
+  const afterChangeResults: ChangesSinceResult[] = afterRows.map(
+    (rel) =>
+      changesByVersion.get(rel.version) ?? {
+        product: meta.name,
+        version: rel.version,
+        released_at: rel.released_at,
+        changes: [],
+      }
+  );
+
+  const sameDaySiblingResults =
+    sameDaySiblingRows.length > 0
+      ? sameDaySiblingRows.map((r) => loadReleaseChanges(db, meta.name, r, hasFlagsCol))
+      : [];
+
+  const { releases, breakingChanges } = toRelevanceReleases([
+    ...afterChangeResults,
+    ...sameDaySiblingResults,
+  ]);
+  const sameDayVersions = sameDaySiblingRows.length > 0 ? sameDayRows.map((r) => r.version) : undefined;
+  const baseSummary = `${afterRows.length} release${afterRows.length === 1 ? '' : 's'} behind (installed ${entry.version}, newest ${latestVersionLabel})`;
+  const summary = sameDayVersions
+    ? `${baseSummary}; unknown: releases on the same day, order not known (${sameDayVersions.join(', ')})`
+    : baseSummary;
 
   return {
     status: 'action_needed',
     product: meta.name,
     display_name: meta.display_name,
-    summary: `${releases.length} release${releases.length === 1 ? '' : 's'} behind (installed ${entry.version}, newest ${newestRow.version})`,
+    summary,
     installed: {
       ...baseInstalled,
       mirror_version: matchedRow.version,
     },
-    latest_version: newestRow.version,
-    latest_released_at: newestRow.released_at,
-    releases_behind: releases.length,
+    latest_version: latestVersionLabel,
+    latest_released_at: newestDate,
+    releases_behind: afterRows.length,
+    ...(sameDayVersions ? { same_day_versions: sameDayVersions } : {}),
     breaking_changes: breakingChanges,
     releases,
   };
@@ -481,6 +594,11 @@ export function formatRelevanceReport(report: WorkspaceRelevanceReport): string 
           );
         }
       }
+      if (p.same_day_versions && p.same_day_versions.length > 1) {
+        lines.push(
+          `  same-day: unknown: releases on the same day, order not known (${p.same_day_versions.join(', ')})`
+        );
+      }
       lines.push(`  releases (${p.releases.length}):`);
       for (const rel of p.releases) {
         lines.push(
@@ -491,6 +609,24 @@ export function formatRelevanceReport(report: WorkspaceRelevanceReport): string 
       lines.push(
         `${p.product} (${p.installed.ecosystem} ${p.installed.name}@${p.installed.version}): ${p.summary}`
       );
+      if (p.breaking_changes.length > 0) {
+        lines.push(`  breaking (${p.breaking_changes.length}):`);
+        for (const bc of p.breaking_changes) {
+          const flagMarker = formatFlagMarker(bc.flags);
+          const flagSuffix = flagMarker ? ` ${flagMarker}` : '';
+          lines.push(
+            `    - ${bc.released_at}  ${p.product}@${bc.version}  [breaking]${flagSuffix} ${bc.text}`
+          );
+        }
+      }
+      if (p.releases.length > 0) {
+        lines.push(`  same-day releases (${p.releases.length}):`);
+        for (const rel of p.releases) {
+          lines.push(
+            `    ${rel.released_at}  ${p.product}@${rel.version}  (${formatKindCounts(rel.kind_counts)})`
+          );
+        }
+      }
     } else {
       lines.push(
         `${p.product} (${p.installed.ecosystem} ${p.installed.name}@${p.installed.version}): ${p.summary}`
@@ -512,7 +648,9 @@ export function formatRelevanceReport(report: WorkspaceRelevanceReport): string 
       : report.files_read
           .map((f) =>
             f.skipped_lines !== undefined
-              ? `${f.file} (${f.entries_count} pinned, ${f.skipped_lines} unpinned skipped)`
+              ? f.skipped_reason
+                ? `${f.file} (${f.entries_count} read, ${f.skipped_lines} skipped: ${f.skipped_reason})`
+                : `${f.file} (${f.entries_count} pinned, ${f.skipped_lines} unpinned skipped)`
               : `${f.file} (${f.entries_count})`
           )
           .join(', ');

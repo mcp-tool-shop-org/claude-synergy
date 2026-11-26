@@ -164,16 +164,6 @@ products:
     packages:
       - ecosystem: npm
         name: "@anthropic-ai/sdk"
-      - ecosystem: npm
-        name: "@anthropic-ai/aws-sdk"
-      - ecosystem: npm
-        name: "@anthropic-ai/bedrock-sdk"
-      - ecosystem: npm
-        name: "@anthropic-ai/foundry-sdk"
-      - ecosystem: npm
-        name: "@anthropic-ai/google-cloud-sdk"
-      - ecosystem: npm
-        name: "@anthropic-ai/vertex-sdk"
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-typescript
@@ -294,14 +284,6 @@ products:
     packages:
       - ecosystem: npm
         name: "@modelcontextprotocol/sdk"
-      - ecosystem: npm
-        name: "@modelcontextprotocol/client"
-      - ecosystem: npm
-        name: "@modelcontextprotocol/server"
-      - ecosystem: npm
-        name: "@modelcontextprotocol/core"
-      - ecosystem: npm
-        name: "@modelcontextprotocol/server-legacy"
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/typescript-sdk
@@ -372,8 +354,6 @@ products:
     packages:
       - ecosystem: crates
         name: rmcp
-      - ecosystem: crates
-        name: rmcp-macros
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/rust-sdk
