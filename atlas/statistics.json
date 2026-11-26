@@ -99,7 +99,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "scripts",
-      "qualifyingSourceCommits": 3,
+      "qualifyingSourceCommits": 1,
       "rebaseline": null
     },
     {
@@ -123,19 +123,18 @@
         "coChangesOnly": [],
         "collapsed": false,
         "confidence": "low",
-        "importsAndCoChanges": [
-          "test"
-        ],
+        "importsAndCoChanges": [],
         "importsOnly": [
-          "scripts"
+          "scripts",
+          "test"
         ]
       },
-      "cohesion": 0.3,
+      "cohesion": null,
       "cohesionDropped": false,
       "confidence": "low",
       "highWater": null,
       "name": "src",
-      "qualifyingSourceCommits": 7,
+      "qualifyingSourceCommits": 6,
       "rebaseline": null
     },
     {
@@ -156,20 +155,18 @@
     },
     {
       "breakage": {
-        "coChangesOnly": [
-          "src"
-        ],
+        "coChangesOnly": [],
         "collapsed": false,
         "confidence": "low",
         "importsAndCoChanges": [],
         "importsOnly": []
       },
-      "cohesion": 0.176471,
+      "cohesion": null,
       "cohesionDropped": false,
       "confidence": "low",
       "highWater": null,
       "name": "test",
-      "qualifyingSourceCommits": 8,
+      "qualifyingSourceCommits": 7,
       "rebaseline": null
     }
   ],
@@ -192,8 +189,8 @@
         "path": ".github/workflows/release.yml"
       },
       {
-        "commits": 12,
-        "lines": 209,
+        "commits": 10,
+        "lines": 203,
         "path": ".github/workflows/sync.yml"
       },
       {
@@ -203,7 +200,7 @@
       },
       {
         "commits": 6,
-        "lines": 53,
+        "lines": 77,
         "path": "CHANGELOG.md"
       },
       {
@@ -248,7 +245,7 @@
       },
       {
         "commits": 3,
-        "lines": 32,
+        "lines": 34,
         "path": "README.md"
       },
       {
@@ -267,8 +264,8 @@
         "path": "SHIP_GATE.md"
       },
       {
-        "commits": 14,
-        "lines": 523,
+        "commits": 12,
+        "lines": 497,
         "path": "atlas/README.md"
       },
       {
@@ -277,18 +274,18 @@
         "path": "atlas/boundaries.yaml"
       },
       {
-        "commits": 14,
-        "lines": 1995,
+        "commits": 12,
+        "lines": 2001,
         "path": "atlas/page.json"
       },
       {
-        "commits": 14,
-        "lines": 43150,
+        "commits": 12,
+        "lines": 43166,
         "path": "atlas/statistics.json"
       },
       {
-        "commits": 14,
-        "lines": 42291,
+        "commits": 12,
+        "lines": 42970,
         "path": "atlas/structure.json"
       },
       {
@@ -392,7 +389,7 @@
         "path": "model-families.yaml"
       },
       {
-        "commits": 11,
+        "commits": 10,
         "lines": 32,
         "path": "package.json"
       },
@@ -4352,8 +4349,8 @@
         "path": "products/claude-code/releases/2.1.217.md"
       },
       {
-        "commits": 1,
-        "lines": 50,
+        "commits": 3,
+        "lines": 54,
         "path": "products/claude-code/releases/2.1.218.md"
       },
       {
@@ -5407,8 +5404,8 @@
         "path": "products/mcp-registry-official/CATALOG.md"
       },
       {
-        "commits": 2,
-        "lines": 436,
+        "commits": 3,
+        "lines": 438,
         "path": "products/mcp-registry-smithery/CATALOG.md"
       },
       {
@@ -6423,12 +6420,17 @@
       },
       {
         "commits": 1,
+        "lines": 7,
+        "path": "schema.sql"
+      },
+      {
+        "commits": 1,
         "lines": 2,
         "path": "scripts/build-dataset.mjs"
       },
       {
-        "commits": 3,
-        "lines": 97,
+        "commits": 1,
+        "lines": 95,
         "path": "scripts/check-stale-sync-pr.mjs"
       },
       {
@@ -6452,18 +6454,18 @@
         "path": "site/src/content/docs/handbook/getting-started.md"
       },
       {
-        "commits": 4,
-        "lines": 961,
+        "commits": 3,
+        "lines": 879,
         "path": "src/cli.ts"
       },
       {
-        "commits": 1,
-        "lines": 52,
+        "commits": 3,
+        "lines": 264,
         "path": "src/db.ts"
       },
       {
-        "commits": 2,
-        "lines": 255,
+        "commits": 1,
+        "lines": 241,
         "path": "src/extract.ts"
       },
       {
@@ -6472,28 +6474,38 @@
         "path": "src/fetch-changelog.ts"
       },
       {
-        "commits": 5,
-        "lines": 615,
+        "commits": 2,
+        "lines": 498,
         "path": "src/fetch-html.ts"
       },
       {
-        "commits": 3,
-        "lines": 165,
+        "commits": 2,
+        "lines": 15,
+        "path": "src/fetch-mcp-registry.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 73,
         "path": "src/fetch-utils.ts"
       },
       {
-        "commits": 5,
-        "lines": 274,
+        "commits": 2,
+        "lines": 268,
         "path": "src/fetch.ts"
       },
       {
         "commits": 2,
-        "lines": 72,
+        "lines": 25,
+        "path": "src/hybrid.ts"
+      },
+      {
+        "commits": 3,
+        "lines": 196,
         "path": "src/ingest.ts"
       },
       {
-        "commits": 5,
-        "lines": 637,
+        "commits": 4,
+        "lines": 677,
         "path": "src/mcp-server.ts"
       },
       {
@@ -6503,12 +6515,17 @@
       },
       {
         "commits": 3,
-        "lines": 414,
+        "lines": 490,
         "path": "src/query.ts"
       },
       {
         "commits": 4,
-        "lines": 760,
+        "lines": 557,
+        "path": "src/screen.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 536,
         "path": "src/store.ts"
       },
       {
@@ -6547,9 +6564,14 @@
         "path": "test/helpers/mock-gh-api.ts"
       },
       {
-        "commits": 4,
-        "lines": 578,
+        "commits": 1,
+        "lines": 512,
         "path": "test/integration/cli-freshness.test.ts"
+      },
+      {
+        "commits": 3,
+        "lines": 242,
+        "path": "test/integration/cli-json.test.ts"
       },
       {
         "commits": 1,
@@ -6558,7 +6580,7 @@
       },
       {
         "commits": 4,
-        "lines": 406,
+        "lines": 591,
         "path": "test/integration/mcp-server.test.ts"
       },
       {
@@ -6572,8 +6594,13 @@
         "path": "test/unit/db.binding.test.ts"
       },
       {
-        "commits": 2,
-        "lines": 170,
+        "commits": 3,
+        "lines": 306,
+        "path": "test/unit/db.dim-config.test.ts"
+      },
+      {
+        "commits": 1,
+        "lines": 166,
         "path": "test/unit/extract.test.ts"
       },
       {
@@ -6582,19 +6609,24 @@
         "path": "test/unit/fetch-changelog.test.ts"
       },
       {
-        "commits": 5,
-        "lines": 279,
+        "commits": 2,
+        "lines": 264,
         "path": "test/unit/fetch-html.test.ts"
       },
       {
-        "commits": 2,
-        "lines": 111,
+        "commits": 1,
+        "lines": 83,
         "path": "test/unit/fetch-utils.test.ts"
       },
       {
-        "commits": 4,
-        "lines": 436,
+        "commits": 5,
+        "lines": 496,
         "path": "test/unit/fetch.test.ts"
+      },
+      {
+        "commits": 2,
+        "lines": 142,
+        "path": "test/unit/ingest.test.ts"
       },
       {
         "commits": 1,
@@ -6602,9 +6634,14 @@
         "path": "test/unit/products-config.test.ts"
       },
       {
-        "commits": 3,
-        "lines": 249,
+        "commits": 1,
+        "lines": 262,
         "path": "test/unit/query.freshness.test.ts"
+      },
+      {
+        "commits": 3,
+        "lines": 577,
+        "path": "test/unit/screen.test.ts"
       },
       {
         "commits": 1,
@@ -6612,13 +6649,13 @@
         "path": "test/unit/security-validators.test.ts"
       },
       {
-        "commits": 3,
-        "lines": 141,
+        "commits": 1,
+        "lines": 133,
         "path": "test/unit/stale-sync-pr.test.ts"
       },
       {
-        "commits": 5,
-        "lines": 795,
+        "commits": 1,
+        "lines": 661,
         "path": "test/unit/store.test.ts"
       },
       {
@@ -6632,21 +6669,14 @@
     "level": "low",
     "reason": "fewer than 25 source files reach 10 revisions in the window"
   },
-  "generatedAt": "2026-11-26T10:38:24.358Z",
+  "generatedAt": "2026-11-26T12:37:54.715Z",
   "generatedFrom": {
-    "commit": "e57a6d57b5063f7ba1a55e83b4b08333c2cd1ce2"
+    "commit": "99831f620c012fa027714334866c7e6b63cc6773"
   },
   "pairs": [
     {
       "a": "CHANGELOG.md",
-      "b": "src/fetch.ts",
-      "either": 7,
-      "shared": 4,
-      "strength": 0.571429
-    },
-    {
-      "a": "CHANGELOG.md",
-      "b": "src/mcp-server.ts",
+      "b": "test/unit/fetch.test.ts",
       "either": 7,
       "shared": 4,
       "strength": 0.571429
@@ -6654,121 +6684,51 @@
     {
       "a": "atlas/README.md",
       "b": "atlas/page.json",
-      "either": 10,
-      "shared": 10,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/statistics.json",
-      "either": 10,
-      "shared": 10,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/structure.json",
-      "either": 10,
-      "shared": 10,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/statistics.json",
-      "either": 10,
-      "shared": 10,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/structure.json",
-      "either": 10,
-      "shared": 10,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "atlas/statistics.json",
       "b": "atlas/structure.json",
-      "either": 10,
-      "shared": 10,
+      "either": 8,
+      "shared": 8,
       "strength": 1
     },
     {
       "a": "package.json",
       "b": "pnpm-lock.yaml",
-      "either": 13,
+      "either": 12,
       "shared": 7,
-      "strength": 0.538462
-    },
-    {
-      "a": "src/fetch-html.ts",
-      "b": "src/fetch.ts",
-      "either": 6,
-      "shared": 4,
-      "strength": 0.666667
-    },
-    {
-      "a": "src/fetch-html.ts",
-      "b": "src/mcp-server.ts",
-      "either": 6,
-      "shared": 4,
-      "strength": 0.666667
-    },
-    {
-      "a": "src/fetch-html.ts",
-      "b": "test/unit/fetch-html.test.ts",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "src/fetch-html.ts",
-      "b": "test/unit/store.test.ts",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
-    },
-    {
-      "a": "src/fetch.ts",
-      "b": "src/mcp-server.ts",
-      "either": 6,
-      "shared": 4,
-      "strength": 0.666667
-    },
-    {
-      "a": "src/fetch.ts",
-      "b": "test/unit/fetch-html.test.ts",
-      "either": 6,
-      "shared": 4,
-      "strength": 0.666667
-    },
-    {
-      "a": "src/fetch.ts",
-      "b": "test/unit/store.test.ts",
-      "either": 6,
-      "shared": 4,
-      "strength": 0.666667
-    },
-    {
-      "a": "src/mcp-server.ts",
-      "b": "test/unit/fetch-html.test.ts",
-      "either": 6,
-      "shared": 4,
-      "strength": 0.666667
-    },
-    {
-      "a": "src/mcp-server.ts",
-      "b": "test/unit/store.test.ts",
-      "either": 6,
-      "shared": 4,
-      "strength": 0.666667
-    },
-    {
-      "a": "test/unit/fetch-html.test.ts",
-      "b": "test/unit/store.test.ts",
-      "either": 5,
-      "shared": 5,
-      "strength": 1
+      "strength": 0.583333
     }
   ],
   "parameters": {
@@ -6781,16 +6741,16 @@
     "floor": "fallen",
     "floorHeld": false,
     "floorTrigger": "revision-depth",
-    "headDate": "2026-11-26T05:28:18-05:00",
-    "inScopeFiles": 2919,
+    "headDate": "2026-11-26T07:22:48-05:00",
+    "inScopeFiles": 2921,
     "pinnedStart": null,
     "priorFloor": "fallen",
-    "qualifyingCommits": 37,
+    "qualifyingCommits": 36,
     "qualifyingMinimum": 30,
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-05-30T10:28:18.000Z",
+    "since": "2026-05-30T12:22:48.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",

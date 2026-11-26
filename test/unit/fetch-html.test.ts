@@ -437,4 +437,27 @@ describe('fetchAnthropicAppsReleaseNotes', () => {
     expect(sanitizeScrapedHtml('a && b')).toBe('a && b');
     expect(sanitizeScrapedHtml('<p>a &amp;&amp; b</p>')).toBe('<p>a &amp;&amp; b</p>');
   });
+
+  it('escapes pendingHeading text containing <script> in renderSectionHtml (Part 4)', async () => {
+    const xssHeadingHtml = `<!doctype html><html><body><article>
+      <div class="intercom-interblocks-subheading3"><h3 id="h_xss">November 25, 2026</h3></div>
+      <div class="intercom-interblocks-paragraph"><p><b>Heading with &lt;script&gt;alert(1)&lt;/script&gt; before list</b></p></div>
+      <div class="intercom-interblocks-list"><ul><li>Safe list item</li></ul></div>
+      <div class="intercom-interblocks-paragraph"><p><b>Inline &lt;script&gt;bad()&lt;/script&gt; title</b></p><p>Followed by details.</p></div>
+      <div class="intercom-interblocks-paragraph"><p><b>Trailing &lt;script&gt;tail()&lt;/script&gt; title</b></p></div>
+    </article></body></html>`;
+
+    handle = mockFetch([
+      { urlPattern: /support\.claude\.com\/en\/articles\/12138966/, response: () => htmlResponse(xssHeadingHtml) },
+    ]);
+
+    const items = await fetchAnthropicAppsReleaseNotes('2026-01-01');
+    expect(items).toHaveLength(1);
+    const body = items[0].body;
+    expect(body).not.toMatch(/<script>/i);
+    expect(body).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+    expect(body).toContain('&lt;script&gt;bad()&lt;/script&gt;');
+    expect(body).toContain('&lt;script&gt;tail()&lt;/script&gt;');
+    expect(body).toContain('Safe list item');
+  });
 });

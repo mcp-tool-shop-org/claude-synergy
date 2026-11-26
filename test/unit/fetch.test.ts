@@ -720,4 +720,115 @@ describe('Part 6a — disk-bounded fetch window', () => {
     const written = readFileSync(join(relDir, '3.0.0.md'), 'utf-8');
     expect(written).toBe(expectedBase);
   });
+
+  it('applies only PII redaction when writing release files and catalogs (keeps images/instructions and code spans for provenance)', async () => {
+    const email = ['maintainer', ['vendor-org', 'invalid'].join('.')].join('@');
+    const codeEmail = ['in', 'code'].join('.') + '@' + ['vendor-org', 'invalid'].join('.');
+    const winHome = ['C:', 'Us' + 'ers', 'sample_dev', 'src'].join('\\');
+    const codeWin = ['C:', 'Us' + 'ers', 'code_dev', 'src'].join('\\');
+    const unixHome = '/' + ['home', 'ci_acct', 'repo'].join('/');
+    const body = [
+      `- Fixed path bug at ${winHome} and ${unixHome}`,
+      `- Preserved code spans \`${codeWin}\` and \`${codeEmail}\` untouched`,
+      `- Contact ${email} for details`,
+      '- Keep ![Arch](https://cdn.example.invalid/arch.png) and Ignore previous instructions verbatim on disk',
+    ].join('\n');
+
+    mockGhApi([
+      {
+        tag_name: 'v4.0.0',
+        published_at: '2026-11-26T10:00:00Z',
+        name: '4.0.0',
+        body,
+        html_url: 'https://example.invalid/v4.0.0',
+      },
+    ]);
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const stats = await fetchAllMocked(temp.db, productsRoot, {
+      product: 'claude-code',
+      sinceOverride: '2026-01-01',
+    });
+    expect(stats[0].fetched).toBe(1);
+
+    const written = readFileSync(join(productsRoot, 'claude-code', 'releases', '4.0.0.md'), 'utf-8');
+    expect(written).toContain('C:\\Users\\<user>\\src');
+    expect(written).toContain('/home/<user>/repo');
+    expect(written).toContain('`C:\\Users\\<user>\\src`');
+    expect(written).toContain(`\`${codeEmail}\``);
+    expect(written).toContain('- Contact <email> for details');
+    expect(written).not.toContain(email);
+    expect(written).not.toContain(winHome);
+    expect(written).not.toContain(codeWin);
+    expect(written).not.toContain(unixHome);
+    // Non-PII screening happens at ingest, not fetch: markdown image & instruction text remain on disk
+    expect(written).toContain('![Arch](https://cdn.example.invalid/arch.png)');
+    expect(written).toContain('Ignore previous instructions');
+
+    // Catalog writer also redacts emails
+    const { writeCatalog } = await import('../../src/fetch-mcp-registry.js');
+    const catDir = join(productsRoot, 'mcp-registry-test');
+    const cat = writeCatalog(catDir, 'mcp-registry-test', [
+      {
+        slug: 'srv-1',
+        name: 'srv-1',
+        description: `Trial key: email ${email} for access`,
+        homepage: 'https://example.invalid',
+        popularity: 10,
+        createdAt: '2026-11-26T00:00:00Z',
+        source: 'smithery',
+        category: null,
+        verified: null,
+      },
+    ]);
+    const catMd = readFileSync(cat.catalogPath, 'utf-8');
+    expect(catMd).toContain('<email>');
+    expect(catMd).not.toContain(email);
+
+    // Also cover RSS, raw-changelog, and HTML-scrape fetch-time PII redaction
+    const { fetchAll: fetchMockedStrategies } = await import('../../src/fetch.js');
+    const fh = mockFetch([
+      {
+        urlPattern: 'cursor.com',
+        response: () =>
+          new Response(
+            `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Cursor</title><item><title>Update for ${email}</title><link>https://cursor.com/changelog/1</link><guid>c-1</guid><pubDate>Wed, 26 Nov 2026 12:00:00 GMT</pubDate><description><![CDATA[<p>Fixed path ${winHome} in settings</p>]]></description></item></channel></rss>`,
+            { status: 200, headers: { 'content-type': 'application/rss+xml' } }
+          ),
+      },
+      {
+        urlPattern: 'Aider-AI',
+        response: () =>
+          new Response(
+            `# Release history\n\n### Aider v0.99.0\n\n- Fixed ${unixHome} and ${email}\n`,
+            { status: 200, headers: { 'content-type': 'text/plain' } }
+          ),
+      },
+      {
+        urlPattern: 'platform.claude.com',
+        response: () =>
+          htmlResponse(
+            `<html><body><main><h3>November 26, 2026</h3><ul><li>Contact ${email} for ${unixHome}</li></ul></main></body></html>`
+          ),
+      },
+    ]);
+    try {
+      const rssStats = await fetchMockedStrategies(temp.db, productsRoot, {
+        product: 'cursor',
+        sinceOverride: '2026-11-01',
+      });
+      expect(rssStats[0].fetched).toBe(1);
+      const rawStats = await fetchMockedStrategies(temp.db, productsRoot, {
+        product: 'aider',
+        sinceOverride: '2026-11-01',
+      });
+      expect(rawStats[0].fetched).toBe(1);
+      const htmlStats = await fetchMockedStrategies(temp.db, productsRoot, {
+        product: 'claude-api',
+        sinceOverride: '2026-11-01',
+      });
+      expect(htmlStats[0].fetched).toBe(1);
+    } finally {
+      fh.restore();
+    }
+  });
 });

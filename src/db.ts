@@ -1,9 +1,10 @@
 import Database from 'better-sqlite3';
-import { readFileSync, mkdirSync } from 'node:fs';
+import { accessSync, constants, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import * as sqliteVec from 'sqlite-vec';
 import { AppError } from './errors.js';
+import { rescreenChanges } from './ingest.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -15,8 +16,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
  *   2 — Added schema_version tracking
  *   3 — Configurable embedding dimension stored in schema_meta (key: embedding_dim).
  *       Defaults to 768 for backward compat with v2 DBs.
+ *   4 — Added changes.flags JSON array column, changes_fts_update trigger, and
+ *       one-time deterministic vendor text screening of stored changes.
  */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /** Default embedding dimension when none is recorded (matches v2 behavior). */
 export const DEFAULT_EMBEDDING_DIM = 768;
@@ -71,11 +74,88 @@ export function openSqlite(
   }
 }
 
-export function openDb(path: string, opts: { loadVec?: boolean } = {}): Database.Database {
+/** Return true when an error indicates a read-only filesystem or unwritable SQLite file. */
+export function isReadonlyDbError(e: unknown): boolean {
+  const code = String((e as { code?: unknown } | null)?.code ?? '');
+  if (
+    code === 'EACCES' ||
+    code === 'EROFS' ||
+    code === 'EPERM' ||
+    code === 'SQLITE_PERM' ||
+    code === 'SQLITE_READONLY' ||
+    code.startsWith('SQLITE_READONLY_')
+  ) {
+    return true;
+  }
+  const msg = e instanceof Error ? e.message : String(e);
+  return /read-?only database|SQLITE_READONLY/i.test(msg);
+}
+
+function isUnwritableExistingOpenError(e: unknown, absPath: string): boolean {
+  if (isReadonlyDbError(e)) return true;
+  const code = String((e as { code?: unknown } | null)?.code ?? '');
+  return (code === 'SQLITE_CANTOPEN' || code.startsWith('SQLITE_CANTOPEN_')) && existsSync(absPath);
+}
+
+/** Cacheable check for whether `changes.flags` exists (false on unmigrated v3 read-only DBs). */
+export function hasChangesFlagsColumn(db: Database.Database): boolean {
+  const tagged = db as Database.Database & { __synergyHasChangesFlags?: boolean };
+  if (tagged.__synergyHasChangesFlags === true) return true;
+  if (tagged.__synergyHasChangesFlags === false && db.readonly) return false;
+  try {
+    const cols = db.pragma('table_info(changes)') as Array<{ name: string }>;
+    const has = cols.some((c) => c.name === 'flags');
+    if (has || db.readonly) {
+      tagged.__synergyHasChangesFlags = has;
+    }
+    return has;
+  } catch {
+    return false;
+  }
+}
+
+export function openDb(
+  path: string,
+  opts: { loadVec?: boolean; readonly?: boolean } = {},
+): Database.Database {
   const abs = resolve(path);
-  mkdirSync(dirname(abs), { recursive: true });
-  const db = openSqlite(abs);
-  db.pragma('journal_mode = WAL');
+  const parentDir = dirname(abs);
+  if (!opts.readonly && !existsSync(parentDir)) {
+    try {
+      mkdirSync(parentDir, { recursive: true });
+    } catch (e) {
+      if (!isReadonlyDbError(e) || !existsSync(abs)) {
+        throw e;
+      }
+    }
+  }
+
+  let db: Database.Database;
+  if (opts.readonly) {
+    db = openSqlite(abs, (p) => new Database(p, { readonly: true }));
+    db.pragma('busy_timeout = 5000');
+  } else {
+    let rwDb: Database.Database | null = null;
+    try {
+      if (existsSync(abs)) {
+        accessSync(abs, constants.W_OK);
+      }
+      rwDb = openSqlite(abs);
+      rwDb.pragma('busy_timeout = 5000');
+      rwDb.pragma('journal_mode = WAL');
+      db = rwDb;
+    } catch (e) {
+      if (rwDb) {
+        try { rwDb.close(); } catch { /* ignore */ }
+      }
+      if (!isUnwritableExistingOpenError(e, abs)) {
+        throw e;
+      }
+      db = openSqlite(abs, (p) => new Database(p, { readonly: true }));
+      db.pragma('busy_timeout = 5000');
+    }
+  }
+
   db.pragma('foreign_keys = ON');
   if (opts.loadVec !== false) {
     try {
@@ -96,58 +176,89 @@ export function openDb(path: string, opts: { loadVec?: boolean } = {}): Database
   return db;
 }
 
-export function initSchema(db: Database.Database, schemaPath?: string): void {
-  // Idempotent — skip if already initialized
+export function initSchema(
+  db: Database.Database,
+  schemaPath?: string,
+  opts: { onBeforeMigrationLock?: () => void } = {},
+): void {
+  // Idempotent — skip DDL if already initialized
   const existing = db
     .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='products'`)
     .get();
   if (existing) {
-    // Schema exists — ensure version marker is present and run migrations if needed
-    ensureSchemaVersion(db);
+    // Schema exists — ensure version marker is present and run migrations under lock if needed
+    ensureSchemaVersion(db, opts.onBeforeMigrationLock);
     return;
   }
   const resolved = schemaPath ?? resolveSchemaPath();
   const sql = readFileSync(resolved, 'utf-8');
   db.exec(sql);
   // Stamp the new database with the current schema version
-  ensureSchemaVersion(db);
+  ensureSchemaVersion(db, opts.onBeforeMigrationLock);
 }
 
 /**
  * Ensure the schema_meta table exists and the version marker is set.
- * If the DB is at an older version, migrations run here.
+ * Runs check, ALTER, trigger creation, and rescreen inside an IMMEDIATE transaction
+ * and re-reads `schema_version` once the write lock is held.
  */
-function ensureSchemaVersion(db: Database.Database): void {
-  // Create the version tracking table if it doesn't exist
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS schema_meta (
-      key   TEXT PRIMARY KEY,
-      value TEXT NOT NULL
-    )
-  `);
-
-  const row = db
-    .prepare(`SELECT value FROM schema_meta WHERE key = 'schema_version'`)
-    .get() as { value: string } | undefined;
-
-  const currentVersion = row ? parseInt(row.value, 10) : 0;
-
-  if (currentVersion > SCHEMA_VERSION) {
-    throw new Error(
-      `Database schema version ${currentVersion} is newer than this tool supports (version ${SCHEMA_VERSION}). ` +
-        `Please upgrade claude-synergy: npm update -g @mcptoolshop/claude-synergy`,
-    );
+function ensureSchemaVersion(
+  db: Database.Database,
+  onBeforeMigrationLock?: () => void,
+): void {
+  // Fast path: avoid acquiring a write lock on already-current or read-only DBs.
+  try {
+    const fastRow = db
+      .prepare(`SELECT value FROM schema_meta WHERE key = 'schema_version'`)
+      .get() as { value: string } | undefined;
+    const fastVersion = fastRow ? parseInt(fastRow.value, 10) : 0;
+    if (fastVersion > SCHEMA_VERSION) {
+      throw new Error(
+        `Database schema version ${fastVersion} is newer than this tool supports (version ${SCHEMA_VERSION}). ` +
+          `Please upgrade claude-synergy: npm update -g @mcptoolshop/claude-synergy`,
+      );
+    }
+    if (fastVersion === SCHEMA_VERSION) {
+      return;
+    }
+  } catch (e: unknown) {
+    if (e instanceof Error && e.message.includes('is newer than this tool supports')) {
+      throw e;
+    }
   }
 
-  if (currentVersion < SCHEMA_VERSION) {
-    // Run migrations for each version step
-    migrateSchema(db, currentVersion, SCHEMA_VERSION);
+  onBeforeMigrationLock?.();
 
-    // Stamp the version
-    db.prepare(`
-      INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_version', @version)
-    `).run({ version: String(SCHEMA_VERSION) });
-  }
+  const runMigration = db.transaction(() => {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS schema_meta (
+        key   TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    `);
+
+    const row = db
+      .prepare(`SELECT value FROM schema_meta WHERE key = 'schema_version'`)
+      .get() as { value: string } | undefined;
+
+    const currentVersion = row ? parseInt(row.value, 10) : 0;
+
+    if (currentVersion > SCHEMA_VERSION) {
+      throw new Error(
+        `Database schema version ${currentVersion} is newer than this tool supports (version ${SCHEMA_VERSION}). ` +
+          `Please upgrade claude-synergy: npm update -g @mcptoolshop/claude-synergy`,
+      );
+    }
+
+    if (currentVersion < SCHEMA_VERSION) {
+      migrateSchema(db, currentVersion, SCHEMA_VERSION);
+
+      db.prepare(`
+        INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_version', @version)
+      `).run({ version: String(SCHEMA_VERSION) });
+    }
+  });
+  runMigration.immediate();
 }
 
 /**
@@ -169,6 +280,31 @@ function migrateSchema(db: Database.Database, fromVersion: number, toVersion: nu
       db.prepare(`
         INSERT INTO schema_meta (key, value) VALUES ('embedding_dim', @dim)
       `).run({ dim: String(DEFAULT_EMBEDDING_DIM) });
+    }
+  }
+  // Migration 3 → 4: add changes.flags, add changes_fts_update trigger, and
+  // rescreen all existing change rows once.
+  if (fromVersion < 4 && toVersion >= 4) {
+    const hasChanges = db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='changes'`)
+      .get();
+    if (hasChanges) {
+      const cols = db.pragma('table_info(changes)') as Array<{ name: string }>;
+      if (!cols.some((c) => c.name === 'flags')) {
+        db.exec(`ALTER TABLE changes ADD COLUMN flags TEXT NOT NULL DEFAULT '[]'`);
+      }
+      const hasChangesFts = db
+        .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='changes_fts'`)
+        .get();
+      if (hasChangesFts) {
+        db.exec(`
+          CREATE TRIGGER IF NOT EXISTS changes_fts_update AFTER UPDATE OF text ON changes BEGIN
+            INSERT INTO changes_fts(changes_fts, rowid, text) VALUES('delete', old.id, old.text);
+            INSERT INTO changes_fts(rowid, text) VALUES (new.id, new.text);
+          END;
+        `);
+      }
+      rescreenChanges(db);
     }
   }
   void toVersion;

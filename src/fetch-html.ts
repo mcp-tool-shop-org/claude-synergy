@@ -484,6 +484,15 @@ function collectSectionNodes($: cheerio.CheerioAPI, h3El: any): any[] {
   return out;
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /**
  * Convert collected section HTML nodes into clean HTML `<ul><li>...</li></ul>`
  * or `<p>...</p>` blocks that ingestAll's turndown+parseBullets extracts cleanly.
@@ -496,7 +505,7 @@ function renderSectionHtml($: cheerio.CheerioAPI, nodes: any[]): string {
     const $node = $(node);
     if ($node.is('ul, ol') || $node.find('ul, ol').length > 0) {
       if (pendingHeading) {
-        parts.push(`<p>${pendingHeading}</p>`);
+        parts.push(`<p>${escapeHtml(pendingHeading)}</p>`);
         pendingHeading = null;
       }
       const html = $.html(node);
@@ -517,21 +526,21 @@ function renderSectionHtml($: cheerio.CheerioAPI, nodes: any[]): string {
 
     if (isStandaloneBold) {
       if (pendingHeading) {
-        parts.push(`<li><strong>${pendingHeading}</strong></li>`);
+        parts.push(`<li><strong>${escapeHtml(pendingHeading)}</strong></li>`);
       }
       pendingHeading = boldChild.text().replace(/\s+/g, ' ').trim();
     } else if (pendingHeading) {
-      const inner = ($p.length ? $p.html() : $node.html()) ?? rawText;
-      parts.push(`<li><strong>${pendingHeading}:</strong> ${inner.trim()}</li>`);
+      const inner = ($p.length ? $p.html() : $node.html()) ?? escapeHtml(rawText);
+      parts.push(`<li><strong>${escapeHtml(pendingHeading)}:</strong> ${inner.trim()}</li>`);
       pendingHeading = null;
     } else {
-      const inner = ($p.length ? $p.html() : $node.html()) ?? rawText;
+      const inner = ($p.length ? $p.html() : $node.html()) ?? escapeHtml(rawText);
       parts.push(`<li>${inner.trim()}</li>`);
     }
   }
 
   if (pendingHeading) {
-    parts.push(`<li><strong>${pendingHeading}</strong></li>`);
+    parts.push(`<li><strong>${escapeHtml(pendingHeading)}</strong></li>`);
   }
 
   // If parts are bare `<li>` items, wrap in `<ul>` so turndown emits `- ` bullets.

@@ -3,8 +3,15 @@ import { Command, Option } from 'commander';
 import { join, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { openDb, initSchema } from './db.js';
-import { ingestAll, reextractEntities, type IngestStats, type ReextractStats } from './ingest.js';
+import { openDb, initSchema, isReadonlyDbError } from './db.js';
+import {
+  ingestAll,
+  reextractEntities,
+  rescreenChanges,
+  type IngestStats,
+  type ReextractStats,
+  type RescreenStats,
+} from './ingest.js';
 import {
   searchChanges,
   lookupEntity,
@@ -15,6 +22,7 @@ import {
   getChangesSince,
   getCorpusFreshness,
   formatFreshnessStamp,
+  formatFlagMarker,
   type ChangesSinceResult,
 } from './query.js';
 import { embedAll } from './embed.js';
@@ -220,6 +228,25 @@ async function openQueryDbOrFirstUse(
     ? openTrackedDb(store.dbPath)
     : null;
 
+  if (db && !db.readonly) {
+    const hasProducts = db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='products'`)
+      .get();
+    if (hasProducts) {
+      try {
+        initSchema(db);
+      } catch (migErr) {
+        if (isReadonlyDbError(migErr)) {
+          try { db.close(); } catch { /* ignore */ }
+          db = openDb(store.dbPath, { readonly: true });
+          activeDb = db;
+        } else {
+          throw migErr;
+        }
+      }
+    }
+  }
+
   if (!needsAutoSync(db)) {
     return { db, store, emptyOptOut: false };
   }
@@ -391,14 +418,15 @@ program
   .option('-d, --db <path>', 'database path')
   .option('-p, --products <path>', 'products dir')
   .option('--reextract', 're-extract entities for all existing change rows without re-fetching')
-  .action((opts: { db?: string; products?: string; reextract?: boolean; stamp?: boolean }) => {
+  .option('--rescreen', 're-screen all existing change rows in DB without re-fetching')
+  .action((opts: { db?: string; products?: string; reextract?: boolean; rescreen?: boolean; stamp?: boolean }) => {
     const store = resolveCliStore(opts);
     const hasProductsDir = existsSync(store.productsRoot);
-    if (!hasProductsDir && !opts.reextract) {
+    if (!hasProductsDir && !opts.reextract && !opts.rescreen) {
       const appErr = new AppError({
         code: 'PRODUCTS_DIR_NOT_FOUND',
         message: `products dir not found: ${store.productsRoot}`,
-        hint: 'Pass -p <path> or --reextract to re-extract entities from existing DB rows.',
+        hint: 'Pass -p <path> or --reextract / --rescreen to operate on existing DB rows.',
       });
       if (program.opts().json) {
         console.log(JSON.stringify(appErr.toJSON()));
@@ -412,6 +440,7 @@ program
     const start = Date.now();
     let stats: IngestStats;
     let reextractStats: ReextractStats | undefined;
+    let rescreenStats: RescreenStats | undefined;
     try {
       stats = hasProductsDir
         ? ingestAll(db, store.productsRoot)
@@ -424,6 +453,9 @@ program
             total: 0,
             errors: [],
           };
+      if (opts.rescreen) {
+        rescreenStats = rescreenChanges(db);
+      }
       if (opts.reextract) {
         reextractStats = reextractEntities(db);
       }
@@ -449,6 +481,7 @@ program
       console.log(
         JSON.stringify({
           ...stats,
+          ...(rescreenStats ? { rescreen: rescreenStats } : {}),
           ...(reextractStats ? { reextract: reextractStats } : {}),
           elapsed_ms: ms,
           data_as_of: dataAsOf,
@@ -459,6 +492,11 @@ program
       console.log(`  releases:  ${stats.releasesAdded}`);
       console.log(`  changes:   ${stats.changesAdded}`);
       console.log(`  entities:  ${stats.entitiesAdded}`);
+      if (rescreenStats) {
+        console.log(
+          `  rescreen:  ${rescreenStats.changesScanned} changes scanned, ${rescreenStats.changesUpdated} updated, ${rescreenStats.changesFlagged} flagged`
+        );
+      }
       if (reextractStats) {
         console.log(
           `  reextract: ${reextractStats.changesScanned} changes scanned, ${reextractStats.entitiesAfter} entities (${reextractStats.entitiesAdded} new)`
@@ -526,7 +564,7 @@ program
       emitArrayJson(
         results.map((r) => ({
           released_at: r.released_at, product: r.product, version: r.version,
-          kind: r.kind, text: r.text, snippet: r.snippet,
+          kind: r.kind, text: r.text, snippet: r.snippet, flags: r.flags,
         })),
         db,
         opts.product
@@ -536,7 +574,9 @@ program
         console.log('(no results)');
       } else {
         for (const r of results) {
-          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+          const flagMarker = formatFlagMarker(r.flags);
+          const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
           console.log(`  ${r.snippet}`);
         }
         console.log(`\n${results.length} result${results.length === 1 ? '' : 's'}`);
@@ -564,7 +604,7 @@ async function runEntityCommand(
     emitArrayJson(
       results.map((r) => ({
         released_at: r.released_at, product: r.product, version: r.version,
-        kind: r.kind, text: r.text,
+        kind: r.kind, text: r.text, flags: r.flags,
       })),
       db
     );
@@ -945,7 +985,7 @@ program
         emitArrayJson(
           results.map((r) => ({
             released_at: r.released_at, product: r.product, version: r.version,
-            kind: r.kind, text: r.text, rrf_score: r.rrf_score,
+            kind: r.kind, text: r.text, flags: r.flags, rrf_score: r.rrf_score,
             rerank_score: r.rerank_score,
           })),
           db,
@@ -959,7 +999,9 @@ program
             const bm = r.bm25_rank ? `bm25#${r.bm25_rank}` : '       ';
             const vec = r.vec_rank ? `vec#${r.vec_rank}` : '      ';
             const rerank = r.rerank_score !== null ? ` rerank=${r.rerank_score.toFixed(2)}` : '';
-            console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]  ${bm} ${vec} rrf=${r.rrf_score.toFixed(4)}${rerank}`);
+            const flagMarker = formatFlagMarker(r.flags);
+            const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+            console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}  ${bm} ${vec} rrf=${r.rrf_score.toFixed(4)}${rerank}`);
             console.log(`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '…' : ''}`);
           }
           console.log(`\n${results.length} result${results.length === 1 ? '' : 's'} in ${ms}ms (rerank: ${opts.rerank})`);
@@ -1120,7 +1162,9 @@ program
           const date = rel.released_at ?? '????-??-??';
           console.log(`\n${date}  ${rel.product}@${rel.version}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
           for (const c of rel.changes) {
-            console.log(`  - [${c.kind}] ${c.text}`);
+            const flagMarker = formatFlagMarker(c.flags);
+            const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+            console.log(`  - [${c.kind}]${flagInfo} ${c.text}`);
           }
           totalChanges += rel.changes.length;
         }
@@ -1183,7 +1227,7 @@ program
       emitArrayJson(
         results.map((r) => ({
           released_at: r.released_at, product: r.product, version: r.version,
-          kind: r.kind, text: r.text,
+          kind: r.kind, text: r.text, flags: r.flags,
         })),
         db,
         opts.product
@@ -1194,7 +1238,9 @@ program
         console.log('Note: ingest may not have classified any changes as breaking yet — try `hk query "" --kind breaking` patterns, or widen --since.');
       } else {
         for (const r of results) {
-          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+          const flagMarker = formatFlagMarker(r.flags);
+          const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
           console.log(`  ${r.text}`);
         }
         console.log(`\n${results.length} breaking change${results.length === 1 ? '' : 's'}`);
@@ -1245,7 +1291,9 @@ function printEntityResults(name: string, label: string, results: ReturnType<typ
   }
   console.log(`${label} ${name} — ${results.length} mention${results.length === 1 ? '' : 's'}:\n`);
   for (const r of results) {
-    console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+    const flagMarker = formatFlagMarker(r.flags);
+    const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+    console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
     console.log(`  ${r.text}`);
   }
 }

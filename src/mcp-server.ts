@@ -28,7 +28,7 @@ import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import matter from 'gray-matter';
-import { openDb, initSchema } from './db.js';
+import { openDb, initSchema, isReadonlyDbError, hasChangesFlagsColumn } from './db.js';
 import { AppError, formatError } from './errors.js';
 import {
   searchChanges,
@@ -45,6 +45,10 @@ import {
   getCorpusFreshness,
   formatFreshnessStamp,
   formatManualFeedWarning,
+  VENDOR_TEXT_FRAME,
+  formatFlagMarker,
+  frameVendorText,
+  resolveRowScreening,
   type ChangesSinceResult,
   type QueryResult,
   type SyncStatusRow,
@@ -101,12 +105,38 @@ let db: ReturnType<typeof openDb> | null = null;
 if (existsSync(DB_PATH)) {
   try {
     db = openDb(DB_PATH);
+    if (!db.readonly) {
+      const hasProducts = db
+        .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='products'`)
+        .get();
+      if (hasProducts) {
+        try {
+          initSchema(db);
+        } catch (migErr) {
+          if (isReadonlyDbError(migErr)) {
+            try { db.close(); } catch { /* ignore */ }
+            db = openDb(DB_PATH, { readonly: true });
+          } else {
+            throw migErr;
+          }
+        }
+      }
+    }
   } catch (e) {
     // A missing SQLite driver (SQLITE_BINDING_ERROR) prints its code and hint, not a raw stack.
     console.error(`claude-synergy-mcp: ${formatError(e)}`);
     process.exit(1);
   }
 }
+
+export const VENDOR_TEXT_MCP_TOOLS = [
+  'search',
+  'lookup_entity',
+  'get_release',
+  'get_changes_since',
+  'search_breaking_changes',
+  'compare_versions',
+] as const;
 
 function getDbOrThrow(): ReturnType<typeof openDb> {
   if (!db) {
@@ -670,14 +700,15 @@ async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; prod
       limit,
     });
     return {
-      text: formatSearchResults(results.map((r) => ({
+      text: frameVendorText(formatSearchResults(results.map((r) => ({
         product: r.product,
         version: r.version,
         released_at: r.released_at,
         kind: r.kind,
         text: r.text,
+        flags: r.flags,
         mode: 'fts',
-      }))),
+      })))),
     };
   }
 
@@ -699,16 +730,17 @@ async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; prod
     limit,
   });
   return {
-    text: formatSearchResults(results.map((r) => ({
+    text: frameVendorText(formatSearchResults(results.map((r) => ({
       product: r.product,
       version: r.version,
       released_at: r.released_at,
       kind: r.kind,
       text: r.text,
+      flags: r.flags,
       mode: 'hybrid',
       rrf_score: r.rrf_score,
       rerank_score: r.rerank_score,
-    }))),
+    })))),
   };
 }
 
@@ -716,8 +748,10 @@ function formatSearchResults(results: any[]): string {
   if (results.length === 0) return '(no results)';
   const lines: string[] = [];
   for (const r of results) {
+    const flagMarker = formatFlagMarker(r.flags);
+    const flagInfo = flagMarker ? ` ${flagMarker}` : '';
     const scoreInfo = r.rerank_score != null ? ` rerank=${r.rerank_score.toFixed(2)}` : r.rrf_score != null ? ` rrf=${r.rrf_score.toFixed(4)}` : '';
-    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${scoreInfo}`);
+    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}${scoreInfo}`);
     lines.push(`  ${r.text}`);
     lines.push('');
   }
@@ -727,14 +761,16 @@ function formatSearchResults(results: any[]): string {
 
 function handleLookupEntity(args: { type: string; value: string }): string {
   const results = lookupEntity(getDbOrThrow(), args.type, args.value);
-  if (results.length === 0) return `(no mentions of ${args.type}: ${args.value})`;
+  if (results.length === 0) return frameVendorText(`(no mentions of ${args.type}: ${args.value})`);
   const lines = [`${args.type} ${args.value} — ${results.length} mention${results.length === 1 ? '' : 's'}:\n`];
   for (const r of results) {
-    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+    const flagMarker = formatFlagMarker(r.flags);
+    const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
     lines.push(`  ${r.text}`);
     lines.push('');
   }
-  return lines.join('\n');
+  return frameVendorText(lines.join('\n'));
 }
 
 function handleLatestReleases(args: { product?: string; since?: string; limit?: number }): string {
@@ -751,10 +787,13 @@ function handleGetRelease(args: { product: string; version: string }): string {
   const release = activeDb
     .prepare(`SELECT product, version, released_at, source_url, notes_path FROM releases WHERE product = ? AND version = ?`)
     .get(args.product, args.version) as any;
-  if (!release) return `(no such release: ${args.product}@${args.version})`;
+  if (!release) return frameVendorText(`(no such release: ${args.product}@${args.version})`);
+  const hasFlagsCol = hasChangesFlagsColumn(activeDb);
   const changes = activeDb
-    .prepare(`SELECT ordinal, kind, text FROM changes WHERE product = ? AND version = ? ORDER BY ordinal`)
-    .all(args.product, args.version) as any[];
+    .prepare(
+      `SELECT ordinal, kind, text, ${hasFlagsCol ? 'flags' : 'NULL AS flags'} FROM changes WHERE product = ? AND version = ? ORDER BY ordinal`
+    )
+    .all(args.product, args.version) as Array<{ ordinal: number; kind: string; text: string; flags?: string | null }>;
   const lines = [
     `# ${release.product} ${release.version}`,
     `Released: ${release.released_at}`,
@@ -765,9 +804,12 @@ function handleGetRelease(args: { product: string; version: string }): string {
     ``,
   ];
   for (const c of changes) {
-    lines.push(`- [${c.kind}] ${c.text}`);
+    const screened = resolveRowScreening(c.text, c.flags, hasFlagsCol);
+    const flagMarker = formatFlagMarker(screened.flags);
+    const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+    lines.push(`- [${c.kind}]${flagInfo} ${screened.text}`);
   }
-  return lines.join('\n');
+  return frameVendorText(lines.join('\n'));
 }
 
 function handleListProducts(): string {
@@ -918,7 +960,9 @@ function formatChangesSinceResults(results: ChangesSinceResult[]): string {
     const date = rel.released_at ?? '????-??-??';
     lines.push(`${date}  ${rel.product}@${rel.version}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
     for (const c of rel.changes) {
-      lines.push(`  - [${c.kind}] ${c.text}`);
+      const flagMarker = formatFlagMarker(c.flags);
+      const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+      lines.push(`  - [${c.kind}]${flagInfo} ${c.text}`);
     }
     lines.push('');
     total += rel.changes.length;
@@ -940,7 +984,7 @@ function handleGetChangesSince(args: { since: string; until?: string; product?: 
   } catch (e: any) {
     throw new McpError(ErrorCode.InvalidParams, `get_changes_since: ${e.message}`);
   }
-  return formatChangesSinceResults(results);
+  return frameVendorText(formatChangesSinceResults(results));
 }
 
 function handleSearchBreakingChanges(args: { product?: string; since?: string; until?: string; limit?: number }): string {
@@ -957,16 +1001,18 @@ function handleSearchBreakingChanges(args: { product?: string; since?: string; u
     throw new McpError(ErrorCode.InvalidParams, `search_breaking_changes: ${e.message}`);
   }
   if (results.length === 0) {
-    return '(no breaking changes — note: ingest may not have classified any changes as breaking yet)';
+    return frameVendorText('(no breaking changes — note: ingest may not have classified any changes as breaking yet)');
   }
   const lines: string[] = [];
   for (const r of results) {
-    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+    const flagMarker = formatFlagMarker(r.flags);
+    const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
     lines.push(`  ${r.text}`);
     lines.push('');
   }
   lines.push(`${results.length} breaking change${results.length === 1 ? '' : 's'}`);
-  return lines.join('\n');
+  return frameVendorText(lines.join('\n'));
 }
 
 // ── Sync handlers ──────────────────────────────────────────────────────────
@@ -1171,9 +1217,9 @@ function handleCompareVersions(args: { product: string; from_version: string; to
     throw new McpError(ErrorCode.InvalidParams, `compare_versions: ${e.message}`);
   }
   if (results.length === 0) {
-    return `(no intermediate releases between ${args.product}@${args.from_version} and ${args.product}@${args.to_version})`;
+    return frameVendorText(`(no intermediate releases between ${args.product}@${args.from_version} and ${args.product}@${args.to_version})`);
   }
-  return formatChangesSinceResults(results);
+  return frameVendorText(formatChangesSinceResults(results));
 }
 
 // ── Graceful shutdown ────────────────────────────────────────────────────────

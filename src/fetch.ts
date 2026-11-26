@@ -17,6 +17,7 @@ import { fetchHtmlReleases, sanitizeScrapedHtml, type HtmlParserName, type HtmlI
 import { fetchCatalog, writeCatalog, type CatalogType } from './fetch-mcp-registry.js';
 import { loadProductsConfig } from './products-config.js';
 import { createFetchAllController, DEFAULT_FETCH_ALL_TIMEOUT_MS, runGhApi } from './fetch-utils.js';
+import { redactVendorPii } from './screen.js';
 
 // ─── Security helpers ──────────────────────────────────────────────────────
 //
@@ -586,6 +587,7 @@ function yamlQuote(s: string | null | undefined): string {
 
 export function renderGhRelease(product: string, r: GhRelease): string {
   const version = (r.tag_name ?? '').replace(/^v/, '');
+  const bodyText = r.body != null ? redactVendorPii(r.body).text : '(no body)';
   return [
     '---',
     `product: ${product}`,
@@ -597,7 +599,7 @@ export function renderGhRelease(product: string, r: GhRelease): string {
     '',
     `# ${product} ${r.tag_name}`,
     '',
-    r.body ?? '(no body)',
+    bodyText,
     '',
   ].join('\n');
 }
@@ -629,6 +631,8 @@ async function fetchRss(
         continue;
       }
       // F-006: escape every untrusted string before inlining into a YAML quoted scalar.
+      const safeTitle = redactVendorPii(item.title ?? '').text;
+      const cleanBody = item.body ? redactVendorPii(sanitizeScrapedHtml(item.body)).text : '(no body)';
       const body = [
         '---',
         `product: ${target.product}`,
@@ -636,12 +640,12 @@ async function fetchRss(
         `released_at: "${item.pubDate.split('T')[0]}"`,
         `source_url: "${yamlQuote(item.link)}"`,
         `fetched_at: "${new Date().toISOString().split('T')[0]}"`,
-        `title: "${yamlQuote(item.title ?? '')}"`,
+        `title: "${yamlQuote(safeTitle)}"`,
         '---',
         '',
-        `# ${target.product} — ${item.title ?? safeSlug}`,
+        `# ${target.product} — ${safeTitle || safeSlug}`,
         '',
-        item.body ? sanitizeScrapedHtml(item.body) : '(no body)',
+        cleanBody,
         '',
       ].join('\n');
       writeFileSync(path, body, 'utf-8');
@@ -707,7 +711,7 @@ async function fetchRawChangelog(
         '',
         `# ${target.product} v${item.version}`,
         '',
-        item.body,
+        redactVendorPii(item.body).text,
         '',
       ].join('\n');
       writeFileSync(path, body, 'utf-8');
@@ -774,7 +778,8 @@ async function fetchHtmlScrape(
         if (!latest || item.pubDate > latest) latest = item.pubDate;
         continue;
       }
-      const cleanBody = item.body ? sanitizeScrapedHtml(item.body) : '(no body)';
+      const safeTitle = redactVendorPii(item.title ?? '').text;
+      const cleanBody = item.body ? redactVendorPii(sanitizeScrapedHtml(item.body)).text : '(no body)';
       const body = [
         '---',
         `product: ${target.product}`,
@@ -782,10 +787,10 @@ async function fetchHtmlScrape(
         `released_at: "${pubDay}"`,
         `source_url: "${yamlQuote(item.link)}"`,
         `fetched_at: "${new Date().toISOString().split('T')[0]}"`,
-        `title: "${yamlQuote(item.title ?? '')}"`,
+        `title: "${yamlQuote(safeTitle)}"`,
         '---',
         '',
-        `# ${target.product} — ${item.title ?? safeSlug}`,
+        `# ${target.product} — ${safeTitle || safeSlug}`,
         '',
         cleanBody,
         '',
@@ -828,7 +833,8 @@ async function fetchPlaywrightStrategy(
         if (!latest || item.pubDate > latest) latest = item.pubDate;
         continue;
       }
-      const cleanBody = item.body ? sanitizeScrapedHtml(item.body) : '(no body)';
+      const safeTitle = redactVendorPii(item.title ?? '').text;
+      const cleanBody = item.body ? redactVendorPii(sanitizeScrapedHtml(item.body)).text : '(no body)';
       const body = [
         '---',
         `product: ${target.product}`,
@@ -836,10 +842,10 @@ async function fetchPlaywrightStrategy(
         `released_at: "${item.pubDate.split('T')[0]}"`,
         `source_url: "${yamlQuote(item.link)}"`,
         `fetched_at: "${new Date().toISOString().split('T')[0]}"`,
-        `title: "${yamlQuote(item.title ?? '')}"`,
+        `title: "${yamlQuote(safeTitle)}"`,
         '---',
         '',
-        `# ${target.product} — ${item.title ?? safeSlug}`,
+        `# ${target.product} — ${safeTitle || safeSlug}`,
         '',
         cleanBody,
         '',
