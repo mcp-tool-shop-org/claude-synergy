@@ -61,111 +61,33 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 0,
-      "changed": 7,
+      "added": 2,
+      "changed": 20,
       "moved": 0,
-      "parts": 2,
+      "parts": 4,
       "removed": 0
     },
     "items": [
       {
         "kind": "counts",
-        "sentence": "Nothing structural changed since 2026-11-26; 7 files changed content.",
+        "sentence": "Nothing structural changed since 2026-11-26; 2 files added and 20 changed content.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "7ebf55ca383109caee1fe06014fe53e8076a747c",
-      "generatedAt": "2026-11-26T10:28:13.528Z"
+      "commit": "e57a6d57b5063f7ba1a55e83b4b08333c2cd1ce2",
+      "generatedAt": "2026-11-26T10:38:24.358Z"
     },
     "unchanged": true
   },
-  "changesTogether": [
-    {
-      "a": "src/fetch-html.ts",
-      "b": "test/unit/store.test.ts",
-      "either": 5,
-      "partLabels": [
-        "src",
-        "test"
-      ],
-      "parts": [
-        "src",
-        "test"
-      ],
-      "relation": "b-imports-a",
-      "shared": 5
-    },
-    {
-      "a": "test/unit/fetch-html.test.ts",
-      "b": "test/unit/store.test.ts",
-      "either": 5,
-      "partLabels": [
-        "test",
-        "test"
-      ],
-      "parts": [
-        "test",
-        "test"
-      ],
-      "relation": "inside",
-      "shared": 5
-    },
-    {
-      "a": "src/fetch-html.ts",
-      "b": "src/fetch.ts",
-      "either": 6,
-      "partLabels": [
-        "src",
-        "src"
-      ],
-      "parts": [
-        "src",
-        "src"
-      ],
-      "relation": "inside",
-      "shared": 4
-    },
-    {
-      "a": "src/fetch-html.ts",
-      "b": "src/mcp-server.ts",
-      "either": 6,
-      "partLabels": [
-        "src",
-        "src"
-      ],
-      "parts": [
-        "src",
-        "src"
-      ],
-      "relation": "inside",
-      "shared": 4
-    },
-    {
-      "a": "src/fetch.ts",
-      "b": "src/mcp-server.ts",
-      "either": 6,
-      "partLabels": [
-        "src",
-        "src"
-      ],
-      "parts": [
-        "src",
-        "src"
-      ],
-      "relation": "inside",
-      "shared": 4
-    }
-  ],
+  "changesTogether": [],
   "changesTogetherNote": [
-    "1 file changed together with its own test, as expected.",
-    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
-  "changesTogetherWithTests": 1,
-  "commit": "e57a6d57b5063f7ba1a55e83b4b08333c2cd1ce2",
+  "changesTogetherWithTests": 0,
+  "commit": "6233b8e9fef3d2e94ef79ea2ec1ae88e0826bfe1",
   "defaultBranch": "main",
-  "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (89), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
+  "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (91), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
     {
       "checks": [
@@ -182,12 +104,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 31
+          "files": 32
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 54
+          "files": 55
         },
         {
           "boundary": "scripts",
@@ -229,12 +151,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 31
+          "files": 32
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 54
+          "files": 55
         },
         {
           "boundary": "scripts",
@@ -287,7 +209,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 31
         }
       ],
       "runs": [
@@ -362,7 +284,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 31
         }
       ],
       "runs": [
@@ -393,7 +315,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 29
+          "files": 30
         }
       ],
       "runs": [
@@ -422,7 +344,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 29
+          "files": 30
         }
       ],
       "runs": [
@@ -507,7 +429,7 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-26T10:38:24.358Z",
+  "generatedAt": "2026-11-26T11:06:55.675Z",
   "limits": [
     "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
     "1 write and 5 reads use paths built at run time and are not named here.",
@@ -533,19 +455,29 @@
   "readers": [],
   "repo": "mcp-tool-shop-org/claude-synergy",
   "sequences": [],
+  "startBeside": [
+    {
+      "files": [
+        "src/screen.ts"
+      ],
+      "from": "src/ingest.ts"
+    }
+  ],
   "startDoor": "package.json#claude-synergy-mcp",
   "startHere": [
     "src/mcp-server.ts",
     "src/db.ts",
+    "src/ingest.ts",
+    "src/extract.ts",
     "src/errors.ts"
   ],
   "startReason": "This path follows claude-synergy-mcp (a command people run) from its entry, since Tests runs only tests and checks.",
   "summary": null,
   "summaryFrom": null,
-  "testFiles": 85,
+  "testFiles": 86,
   "testedBy": {
     "scripts": 1,
-    "src": 48
+    "src": 49
   },
   "testedCodeParts": 2,
   "unnamedWrites": 1,

@@ -7,6 +7,7 @@ import type Database from 'better-sqlite3';
 import { AppError } from './errors.js';
 import { extractEntities } from './extract.js';
 import { loadProductsConfig } from './products-config.js';
+import { parseFlagsJson, screenVendorText } from './screen.js';
 
 // Turndown converts HTML release bodies (github-copilot, vscode-copilot-chat) to markdown
 // so parseBullets can extract <li> elements as bullet rows for FTS5 + entity extraction.
@@ -207,8 +208,8 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
   `);
 
   const insertChange = db.prepare(`
-    INSERT INTO changes (product, version, ordinal, kind, text)
-    VALUES (@product, @version, @ordinal, @kind, @text)
+    INSERT INTO changes (product, version, ordinal, kind, text, flags)
+    VALUES (@product, @version, @ordinal, @kind, @text, @flags)
   `);
 
   const deleteChanges = db.prepare(`DELETE FROM changes WHERE product = ? AND version = ?`);
@@ -302,19 +303,21 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
           stats.releasesAdded++;
 
           const bullets = compactCommitDumpBody(parseBullets(maybeConvertHtmlToMarkdown(content)));
-          bullets.forEach((bullet, i) => {
-            const kind = classifyKind(bullet);
+          bullets.forEach((rawBullet, i) => {
+            const screened = screenVendorText(rawBullet);
+            const kind = classifyKind(screened.text);
             const result = insertChange.run({
               product,
               version,
               ordinal: i + 1,
               kind,
-              text: bullet,
+              text: screened.text,
+              flags: JSON.stringify(screened.flags),
             });
             stats.changesAdded++;
 
             const changeId = result.lastInsertRowid as number;
-            const entities = extractEntities(bullet);
+            const entities = extractEntities(screened.text);
             for (const [type, value] of entities) {
               insertEntity.run(changeId, type, value);
               stats.entitiesAdded++;
@@ -392,6 +395,103 @@ export function reextractEntities(
 
   tx();
   return { changesScanned, entitiesBefore, entitiesAfter, entitiesAdded };
+}
+
+export interface RescreenStats {
+  changesScanned: number;
+  changesUpdated: number;
+  changesFlagged: number;
+}
+
+/**
+ * Deterministically screen every existing row in `changes`, storing cleaned text
+ * and JSON flag ids while syncing `entities` and `chunks` when text changed.
+ */
+export function rescreenChanges(db: Database.Database): RescreenStats {
+  const selectChanges = db.prepare(`SELECT id, text, flags FROM changes ORDER BY id ASC`);
+  const updateChange = db.prepare(`UPDATE changes SET text = ?, flags = ? WHERE id = ?`);
+
+  const hasEntities = !!db
+    .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='entities'`)
+    .get();
+  const deleteEntitiesForChange = hasEntities
+    ? db.prepare(`DELETE FROM entities WHERE change_id = ?`)
+    : null;
+  const insertEntity = hasEntities
+    ? db.prepare(`INSERT INTO entities (change_id, entity_type, entity_value) VALUES (?, ?, ?)`)
+    : null;
+
+  const hasChunks = !!db
+    .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks'`)
+    .get();
+  const selectChunkForChange = hasChunks
+    ? db.prepare(`SELECT id, context_prefix FROM chunks WHERE change_id = ?`)
+    : null;
+  const updateChunk = hasChunks
+    ? db.prepare(`UPDATE chunks SET original_text = ?, contextualized = ? WHERE id = ?`)
+    : null;
+  const hasChunksFts = hasChunks
+    ? !!db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks_fts'`).get()
+    : false;
+
+  let changesScanned = 0;
+  let changesUpdated = 0;
+  let changesFlagged = 0;
+  let chunksUpdated = false;
+
+  const tx = db.transaction(() => {
+    const rows = selectChanges.all() as Array<{ id: number; text: string; flags: string }>;
+    changesScanned = rows.length;
+
+    for (const row of rows) {
+      const screened = screenVendorText(row.text);
+      const existingFlags = parseFlagsJson(row.flags);
+      const mergedFlags = [...existingFlags];
+      for (const f of screened.flags) {
+        if (!mergedFlags.includes(f)) mergedFlags.push(f);
+      }
+      if (mergedFlags.length > 0) {
+        changesFlagged++;
+      }
+
+      const nextFlagsJson = JSON.stringify(mergedFlags);
+      const textChanged = screened.text !== row.text;
+      const flagsChanged = nextFlagsJson !== row.flags;
+
+      if (textChanged || flagsChanged) {
+        updateChange.run(screened.text, nextFlagsJson, row.id);
+        changesUpdated++;
+      }
+
+      if (textChanged) {
+        if (deleteEntitiesForChange && insertEntity) {
+          deleteEntitiesForChange.run(row.id);
+          for (const [type, value] of extractEntities(screened.text)) {
+            insertEntity.run(row.id, type, value);
+          }
+        }
+        if (selectChunkForChange && updateChunk) {
+          const chunk = selectChunkForChange.get(row.id) as
+            | { id: number; context_prefix: string }
+            | undefined;
+          if (chunk) {
+            const contextualized = chunk.context_prefix
+              ? `${chunk.context_prefix}\n\n${screened.text}`
+              : screened.text;
+            updateChunk.run(screened.text, contextualized, chunk.id);
+            chunksUpdated = true;
+          }
+        }
+      }
+    }
+
+    if (chunksUpdated && hasChunksFts) {
+      db.exec(`INSERT INTO chunks_fts(chunks_fts) VALUES('rebuild')`);
+    }
+  });
+
+  tx();
+  return { changesScanned, changesUpdated, changesFlagged };
 }
 
 function parseBullets(content: string): string[] {

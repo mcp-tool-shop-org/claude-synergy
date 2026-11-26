@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import * as sqliteVec from 'sqlite-vec';
 import { AppError } from './errors.js';
+import { rescreenChanges } from './ingest.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -15,8 +16,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
  *   2 — Added schema_version tracking
  *   3 — Configurable embedding dimension stored in schema_meta (key: embedding_dim).
  *       Defaults to 768 for backward compat with v2 DBs.
+ *   4 — Added changes.flags JSON array column, changes_fts_update trigger, and
+ *       one-time deterministic vendor text screening of stored changes.
  */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /** Default embedding dimension when none is recorded (matches v2 behavior). */
 export const DEFAULT_EMBEDDING_DIM = 768;
@@ -169,6 +172,31 @@ function migrateSchema(db: Database.Database, fromVersion: number, toVersion: nu
       db.prepare(`
         INSERT INTO schema_meta (key, value) VALUES ('embedding_dim', @dim)
       `).run({ dim: String(DEFAULT_EMBEDDING_DIM) });
+    }
+  }
+  // Migration 3 → 4: add changes.flags, add changes_fts_update trigger, and
+  // rescreen all existing change rows once.
+  if (fromVersion < 4 && toVersion >= 4) {
+    const hasChanges = db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='changes'`)
+      .get();
+    if (hasChanges) {
+      const cols = db.pragma('table_info(changes)') as Array<{ name: string }>;
+      if (!cols.some((c) => c.name === 'flags')) {
+        db.exec(`ALTER TABLE changes ADD COLUMN flags TEXT NOT NULL DEFAULT '[]'`);
+      }
+      const hasChangesFts = db
+        .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='changes_fts'`)
+        .get();
+      if (hasChangesFts) {
+        db.exec(`
+          CREATE TRIGGER IF NOT EXISTS changes_fts_update AFTER UPDATE OF text ON changes BEGIN
+            INSERT INTO changes_fts(changes_fts, rowid, text) VALUES('delete', old.id, old.text);
+            INSERT INTO changes_fts(rowid, text) VALUES (new.id, new.text);
+          END;
+        `);
+      }
+      rescreenChanges(db);
     }
   }
   void toVersion;

@@ -720,4 +720,62 @@ describe('Part 6a — disk-bounded fetch window', () => {
     const written = readFileSync(join(relDir, '3.0.0.md'), 'utf-8');
     expect(written).toBe(expectedBase);
   });
+
+  it('applies only PII redaction when writing release files and catalogs (keeps images/instructions for provenance)', async () => {
+    const email = ['maintainer', ['vendor-org', 'invalid'].join('.')].join('@');
+    const winHome = ['C:', 'Us' + 'ers', 'sample_dev', 'src'].join('\\');
+    const unixHome = '/' + ['home', 'ci_acct', 'repo'].join('/');
+    const body = [
+      '- Fixed path bug at `' + winHome + '` and `' + unixHome + '`',
+      `- Contact ${email} for details`,
+      '- Keep ![Arch](https://cdn.example.invalid/arch.png) and Ignore previous instructions verbatim on disk',
+    ].join('\n');
+
+    mockGhApi([
+      {
+        tag_name: 'v4.0.0',
+        published_at: '2026-11-26T10:00:00Z',
+        name: '4.0.0',
+        body,
+        html_url: 'https://example.invalid/v4.0.0',
+      },
+    ]);
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const stats = await fetchAllMocked(temp.db, productsRoot, {
+      product: 'claude-code',
+      sinceOverride: '2026-01-01',
+    });
+    expect(stats[0].fetched).toBe(1);
+
+    const written = readFileSync(join(productsRoot, 'claude-code', 'releases', '4.0.0.md'), 'utf-8');
+    expect(written).toContain('`<home>/src`');
+    expect(written).toContain('`<home>/repo`');
+    expect(written).toContain('<email>');
+    expect(written).not.toContain(email);
+    expect(written).not.toContain(winHome);
+    expect(written).not.toContain(unixHome);
+    // Non-PII screening happens at ingest, not fetch: markdown image & instruction text remain on disk
+    expect(written).toContain('![Arch](https://cdn.example.invalid/arch.png)');
+    expect(written).toContain('Ignore previous instructions');
+
+    // Catalog writer also redacts emails
+    const { writeCatalog } = await import('../../src/fetch-mcp-registry.js');
+    const catDir = join(productsRoot, 'mcp-registry-test');
+    const cat = writeCatalog(catDir, 'mcp-registry-test', [
+      {
+        slug: 'srv-1',
+        name: 'srv-1',
+        description: `Trial key: email ${email} for access`,
+        homepage: 'https://example.invalid',
+        popularity: 10,
+        createdAt: '2026-11-26T00:00:00Z',
+        source: 'smithery',
+        category: null,
+        verified: null,
+      },
+    ]);
+    const catMd = readFileSync(cat.catalogPath, 'utf-8');
+    expect(catMd).toContain('<email>');
+    expect(catMd).not.toContain(email);
+  });
 });

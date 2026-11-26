@@ -68,7 +68,7 @@
 | pipeworx | Live data for AI — one connector to SEC filings, economics, FDA, patents, weather, prediction markets, and more across 750+ official sources, with citations. Th | 8926 | 2026-06-10 | [link](https://pipeworx.io) |
 | revnuvo-mcp | Revnuvo MCP server for the agent economy. Tools: verify domains, resolve DNS, assess domain trust/risk, register agents, create tasks, submit results, verify ta | 8907 | 2026-06-06 | [link](https://mcp.revnuvo.site) |
 | revnuvo-mcp | Revnuvo MCP server for the agent economy. Tools: verify domains, resolve DNS, assess domain trust/risk, register agents, create tasks, submit results, verify ta | 8907 | 2026-06-06 | [link](https://mcp.revnuvo.site) |
-| vibe-pay | Platform access code. Email coryhigham@gmail.com with subject "MCP Trial" to request one | 8540 | 2026-04-05 | [link](https://xqb.io/mcp) |
+| vibe-pay | Platform access code. Email <email> with subject "MCP Trial" to request one | 8540 | 2026-04-05 | [link](https://xqb.io/mcp) |
 | FavCRM — Agentic CRM | **Agentic CRM for service businesses** — 136 typed tools across customers, | 8514 | 2026-05-08 | [link](https://favcrm.io) |
 | Listen to Sadhu | Listen to Sadhu exposes a searchable corpus of Vedic scripture and recorded lectures. Look up verses by reference (e.g. "BG 2.13", "SB 5.5.3", "CC Madhya 8.128" | 8356 | 2026-07-04 | [link](https://mcp.listentosadhu.app) |
 | romulus-31780 | ROMulus is a retro gaming ROM search engine that aggregates results from four major sites. Search by game title and console to get download page URLs, cover ima | 8353 | 2026-05-02 | [link](https://romulus.rocks) |

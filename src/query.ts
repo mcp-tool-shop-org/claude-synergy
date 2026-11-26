@@ -1,6 +1,14 @@
 import type Database from 'better-sqlite3';
 import { AppError } from './errors.js';
 import { loadProductsConfig } from './products-config.js';
+import {
+  VENDOR_TEXT_FRAME,
+  formatFlagMarker,
+  frameVendorText,
+  parseFlagsJson,
+} from './screen.js';
+
+export { VENDOR_TEXT_FRAME, formatFlagMarker, frameVendorText, parseFlagsJson };
 
 // ─── Corpus freshness (Part 1) ────────────────────────────────────────────
 
@@ -362,14 +370,16 @@ export function truncate(text: string | undefined | null, maxLen = 200): string 
  * so columns stay aligned across rows with varying product name lengths.
  */
 export function formatResultLine(
-  row: { released_at: string | null; product: string; version: string; kind: string },
+  row: { released_at: string | null; product: string; version: string; kind: string; flags?: readonly string[] },
   bodyText: string,
   opts: { maxTextLen?: number; productColWidth?: number } = {}
 ): string {
   const date = row.released_at ?? '????-??-??';
   const pv = `${row.product}@${row.version}`;
   const padWidth = opts.productColWidth ?? 40;
-  const header = `${date}  ${pv.padEnd(padWidth)}  [${row.kind}]`;
+  const flagMarker = formatFlagMarker(row.flags);
+  const flagSuffix = flagMarker ? ` ${flagMarker}` : '';
+  const header = `${date}  ${pv.padEnd(padWidth)}  [${row.kind}]${flagSuffix}`;
   const body = `  ${truncate(bodyText, opts.maxTextLen ?? 200)}`;
   return `${header}\n${body}`;
 }
@@ -397,6 +407,7 @@ export interface QueryResult {
   kind: string;
   text: string;
   snippet: string;
+  flags: string[];
 }
 
 export interface QueryOptions {
@@ -438,7 +449,7 @@ export function searchChanges(
 
   const sql = `
     SELECT c.product, c.version, r.released_at,
-           c.ordinal, c.kind, c.text AS body,
+           c.ordinal, c.kind, c.text AS body, c.flags AS flags_json,
            snippet(changes_fts, 0, '[[', ']]', '…', 16) AS snippet
     FROM changes_fts
     JOIN changes c ON changes_fts.rowid = c.id
@@ -449,8 +460,13 @@ export function searchChanges(
     LIMIT @limit
   `;
 
-  const rows = db.prepare(sql).all(params) as Array<Omit<QueryResult, 'text'> & { body: string }>;
-  return rows.map((r) => ({ ...r, text: r.body })) as QueryResult[];
+  const rows = db.prepare(sql).all(params) as Array<
+    Omit<QueryResult, 'text' | 'flags'> & { body: string; flags_json?: string | null }
+  >;
+  return rows.map((r) => {
+    const { body, flags_json, ...rest } = r;
+    return { ...rest, text: body, flags: parseFlagsJson(flags_json) };
+  });
 }
 
 export function lookupEntity(
@@ -460,14 +476,20 @@ export function lookupEntity(
 ): QueryResult[] {
   const sql = `
     SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text,
-           '' AS snippet
+           c.flags AS flags_json, '' AS snippet
     FROM entities e
     JOIN changes c ON e.change_id = c.id
     JOIN releases r ON c.product = r.product AND c.version = r.version
     WHERE e.entity_type = ? AND e.entity_value = ?
     ORDER BY r.released_at ASC, c.product
   `;
-  return db.prepare(sql).all(type, value) as QueryResult[];
+  const rows = db.prepare(sql).all(type, value) as Array<
+    Omit<QueryResult, 'flags'> & { flags_json?: string | null }
+  >;
+  return rows.map((r) => {
+    const { flags_json, ...rest } = r;
+    return { ...rest, flags: parseFlagsJson(flags_json) };
+  });
 }
 
 export function recentReleases(
@@ -646,7 +668,7 @@ export function browseChanges(
 
   const sql = `
     SELECT c.product, c.version, r.released_at,
-           c.ordinal, c.kind, c.text AS body,
+           c.ordinal, c.kind, c.text AS body, c.flags AS flags_json,
            '' AS snippet
     FROM changes c
     JOIN releases r ON c.product = r.product AND c.version = r.version
@@ -655,8 +677,13 @@ export function browseChanges(
     LIMIT @limit
   `;
 
-  const rows = db.prepare(sql).all(params) as Array<Omit<QueryResult, 'text'> & { body: string }>;
-  return rows.map((r) => ({ ...r, text: r.body })) as QueryResult[];
+  const rows = db.prepare(sql).all(params) as Array<
+    Omit<QueryResult, 'text' | 'flags'> & { body: string; flags_json?: string | null }
+  >;
+  return rows.map((r) => {
+    const { body, flags_json, ...rest } = r;
+    return { ...rest, text: body, flags: parseFlagsJson(flags_json) };
+  });
 }
 
 export interface ChangesSinceOptions {
@@ -672,7 +699,7 @@ export interface ChangesSinceResult {
   product: string;
   version: string;
   released_at: string;
-  changes: Array<{ ordinal: number; kind: string; text: string }>;
+  changes: Array<{ ordinal: number; kind: string; text: string; flags: string[] }>;
 }
 
 /**
@@ -718,7 +745,7 @@ export function getChangesSince(
 
   // Pull rows; group in JS so we can honor the change-count cap across releases.
   const sql = `
-    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text
+    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text, c.flags AS flags_json
     FROM changes c
     JOIN releases r ON c.product = r.product AND c.version = r.version
     ${where}
@@ -731,6 +758,7 @@ export function getChangesSince(
     ordinal: number;
     kind: string;
     text: string;
+    flags_json?: string | null;
   }>;
 
   const grouped = new Map<string, ChangesSinceResult>();
@@ -748,7 +776,12 @@ export function getChangesSince(
       };
       grouped.set(key, bucket);
     }
-    bucket.changes.push({ ordinal: r.ordinal, kind: r.kind, text: r.text });
+    bucket.changes.push({
+      ordinal: r.ordinal,
+      kind: r.kind,
+      text: r.text,
+      flags: parseFlagsJson(r.flags_json),
+    });
     total++;
   }
 
@@ -813,7 +846,7 @@ export function compareVersions(
   }
 
   const sql = `
-    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text
+    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text, c.flags AS flags_json
     FROM changes c
     JOIN releases r ON c.product = r.product AND c.version = r.version
     WHERE c.product = @product
@@ -832,6 +865,7 @@ export function compareVersions(
     ordinal: number;
     kind: string;
     text: string;
+    flags_json?: string | null;
   }>;
 
   const grouped = new Map<string, ChangesSinceResult>();
@@ -847,7 +881,12 @@ export function compareVersions(
       };
       grouped.set(key, bucket);
     }
-    bucket.changes.push({ ordinal: r.ordinal, kind: r.kind, text: r.text });
+    bucket.changes.push({
+      ordinal: r.ordinal,
+      kind: r.kind,
+      text: r.text,
+      flags: parseFlagsJson(r.flags_json),
+    });
   }
   return Array.from(grouped.values());
 }

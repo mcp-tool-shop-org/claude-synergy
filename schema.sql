@@ -44,7 +44,8 @@ CREATE TABLE changes (
   version          TEXT NOT NULL,
   ordinal          INTEGER NOT NULL,            -- order within release (1-based)
   kind             TEXT NOT NULL,               -- "added" | "fixed" | "renamed" | "deprecated" | "breaking" | "improved" | "removed" | "internal"
-  text             TEXT NOT NULL,               -- the original bullet, verbatim
+  text             TEXT NOT NULL,               -- screened bullet text
+  flags            TEXT NOT NULL DEFAULT '[]',  -- JSON array of screening flag ids
   FOREIGN KEY (product, version) REFERENCES releases(product, version) ON DELETE CASCADE,
   UNIQUE (product, version, ordinal)
 );
@@ -77,6 +78,10 @@ CREATE TRIGGER changes_fts_insert AFTER INSERT ON changes BEGIN
 END;
 CREATE TRIGGER changes_fts_delete AFTER DELETE ON changes BEGIN
   INSERT INTO changes_fts(changes_fts, rowid, text) VALUES('delete', old.id, old.text);
+END;
+CREATE TRIGGER changes_fts_update AFTER UPDATE OF text ON changes BEGIN
+  INSERT INTO changes_fts(changes_fts, rowid, text) VALUES('delete', old.id, old.text);
+  INSERT INTO changes_fts(rowid, text) VALUES (new.id, new.text);
 END;
 
 -- ============================================================================
