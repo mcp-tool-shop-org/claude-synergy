@@ -343,7 +343,11 @@ export function ingestAll(
   );
 
   const selectExistingHash = db.prepare(
-    `SELECT notes_hash FROM releases WHERE product = ? AND package = ? AND version = ?`
+    `SELECT notes_hash, notes_path FROM releases WHERE product = ? AND package = ? AND version = ?`
+  );
+
+  const updateReleaseNotesPath = db.prepare(
+    `UPDATE releases SET notes_path = ? WHERE product = ? AND package = ? AND version = ?`
   );
 
   const selectStaleByNotesPath = db.prepare(
@@ -363,6 +367,38 @@ export function ingestAll(
     VALUES (?, ?, ?)
   `);
 
+  interface ParsedReleaseCandidate {
+    file: string;
+    notesPath: string;
+    supersededNotesPaths: string[];
+    pkg: string;
+    version: string;
+    released_at: string | null;
+    source_url: string;
+    rawFetchedAt: string;
+    fetched_at: string;
+    bundle_size_kb: number | null;
+    hash: string;
+    content: string;
+    isLegacyErtex: boolean;
+  }
+
+  const isPreferredCandidate = (
+    candidate: ParsedReleaseCandidate,
+    incumbent: ParsedReleaseCandidate,
+  ): boolean => {
+    if (candidate.isLegacyErtex !== incumbent.isLegacyErtex) {
+      return !candidate.isLegacyErtex;
+    }
+    if (candidate.rawFetchedAt !== incumbent.rawFetchedAt) {
+      return candidate.rawFetchedAt > incumbent.rawFetchedAt;
+    }
+    if (candidate.hash !== incumbent.hash) {
+      return candidate.hash > incumbent.hash;
+    }
+    return candidate.notesPath < incumbent.notesPath;
+  };
+
   for (const product of productDirs) {
     const releasesDir = join(productsRoot, product, 'releases');
     if (!existsSync(releasesDir)) {
@@ -373,7 +409,7 @@ export function ingestAll(
 
     let releaseFiles: string[];
     try {
-      releaseFiles = readdirSync(releasesDir).filter((f) => f.endsWith('.md'));
+      releaseFiles = readdirSync(releasesDir).filter((f) => f.endsWith('.md')).sort();
     } catch {
       continue;
     }
@@ -400,6 +436,9 @@ export function ingestAll(
     });
 
     const ingestTransaction = db.transaction(() => {
+      const winnerByKey = new Map<string, ParsedReleaseCandidate>();
+      const fallbackDate = new Date().toISOString().split('T')[0];
+
       for (const file of releaseFiles) {
         try {
           stats.total++;
@@ -418,65 +457,107 @@ export function ingestAll(
           const source_url = fmTyped.source_url ?? '';
           const { pkg, version } = deriveReleaseIdentity(product, rawVersion, notesPath, cfg, source_url);
 
+          const candidate: ParsedReleaseCandidate = {
+            file,
+            notesPath,
+            supersededNotesPaths: [],
+            pkg,
+            version,
+            released_at: fmTyped.released_at ?? null,
+            source_url,
+            rawFetchedAt: fmTyped.fetched_at ?? '',
+            fetched_at: fmTyped.fetched_at ?? fallbackDate,
+            bundle_size_kb: fmTyped.bundle_size_kb_delta ?? null,
+            hash: contentHash(raw),
+            content,
+            isLegacyErtex: /^ertex-/i.test(basename(file, '.md')),
+          };
+
+          const dedupKey = `${pkg}\0${version}`;
+          const incumbent = winnerByKey.get(dedupKey);
+          if (!incumbent) {
+            winnerByKey.set(dedupKey, candidate);
+          } else if (isPreferredCandidate(candidate, incumbent)) {
+            candidate.supersededNotesPaths.push(incumbent.notesPath, ...incumbent.supersededNotesPaths);
+            winnerByKey.set(dedupKey, candidate);
+            stats.skipped++;
+            console.error(
+              `[ingest] skipping duplicate release ${incumbent.notesPath} for ${product} (${pkg || 'unassigned'})@${version}; keeping ${candidate.notesPath}`,
+            );
+          } else {
+            incumbent.supersededNotesPaths.push(candidate.notesPath);
+            stats.skipped++;
+            console.error(
+              `[ingest] skipping duplicate release ${candidate.notesPath} for ${product} (${pkg || 'unassigned'})@${version}; keeping ${incumbent.notesPath}`,
+            );
+          }
+        } catch (e: any) {
+          if (e instanceof AppError) throw e;
+          stats.errors.push({ file, error: e.message });
+        }
+      }
+
+      for (const cand of winnerByKey.values()) {
+        try {
           // Evict any prior release row stored for the same (product, notes_path) under a
           // different (package, version) (e.g. after products.yaml adds/renames a release_prefix)
           // BEFORE checking notes_hash so a release is never stored twice.
-          const staleRows = selectStaleByNotesPath.all(product, notesPath, pkg, version) as Array<{
-            package: string;
-            version: string;
-          }>;
-          for (const stale of staleRows) {
-            const staleChangeIds = (
-              selectChangeIdsForRelease.all(product, stale.package, stale.version) as Array<{ id: number }>
-            ).map((r) => r.id);
-            deleteChangeChildren(db, staleChangeIds);
-            deleteChanges.run(product, stale.package, stale.version);
-            deleteReleaseByKey.run(product, stale.package, stale.version);
+          for (const candidatePath of [cand.notesPath, ...cand.supersededNotesPaths]) {
+            const staleRows = selectStaleByNotesPath.all(product, candidatePath, cand.pkg, cand.version) as Array<{
+              package: string;
+              version: string;
+            }>;
+            for (const stale of staleRows) {
+              const staleChangeIds = (
+                selectChangeIdsForRelease.all(product, stale.package, stale.version) as Array<{ id: number }>
+              ).map((r) => r.id);
+              deleteChangeChildren(db, staleChangeIds);
+              deleteChanges.run(product, stale.package, stale.version);
+              deleteReleaseByKey.run(product, stale.package, stale.version);
+            }
           }
 
           // Dedup: skip re-processing if content hash has not changed
-          const hash = contentHash(raw);
-          const existingRow = selectExistingHash.get(product, pkg, version) as
-            | { notes_hash: string | null }
+          const existingRow = selectExistingHash.get(product, cand.pkg, cand.version) as
+            | { notes_hash: string | null; notes_path: string }
             | undefined;
-          if (existingRow?.notes_hash === hash) {
+          if (existingRow?.notes_hash === cand.hash) {
+            if (existingRow.notes_path !== cand.notesPath) {
+              updateReleaseNotesPath.run(cand.notesPath, product, cand.pkg, cand.version);
+            }
             stats.skipped++;
             continue;
           }
 
-          const released_at = fmTyped.released_at ?? null;
-          const fetched_at = fmTyped.fetched_at ?? new Date().toISOString().split('T')[0];
-          const bundle_size_kb = fmTyped.bundle_size_kb_delta ?? null;
-
           if (existingRow) {
             const existingChangeIds = (
-              selectChangeIdsForRelease.all(product, pkg, version) as Array<{ id: number }>
+              selectChangeIdsForRelease.all(product, cand.pkg, cand.version) as Array<{ id: number }>
             ).map((r) => r.id);
             deleteChangeChildren(db, existingChangeIds);
           }
-          deleteChanges.run(product, pkg, version);
+          deleteChanges.run(product, cand.pkg, cand.version);
 
           insertRelease.run({
             product,
-            package: pkg,
-            version,
-            released_at,
-            notes_path: notesPath,
-            fetched_at,
-            source_url,
-            bundle_size_kb,
-            notes_hash: hash,
+            package: cand.pkg,
+            version: cand.version,
+            released_at: cand.released_at,
+            notes_path: cand.notesPath,
+            fetched_at: cand.fetched_at,
+            source_url: cand.source_url,
+            bundle_size_kb: cand.bundle_size_kb,
+            notes_hash: cand.hash,
           });
           stats.releasesAdded++;
 
-          const bullets = compactCommitDumpBody(parseBullets(maybeConvertHtmlToMarkdown(content)));
+          const bullets = compactCommitDumpBody(parseBullets(maybeConvertHtmlToMarkdown(cand.content)));
           bullets.forEach((rawBullet, i) => {
             const screened = screenVendorText(rawBullet);
             const kind = classifyKind(screened.text);
             const result = insertChange.run({
               product,
-              package: pkg,
-              version,
+              package: cand.pkg,
+              version: cand.version,
               ordinal: i + 1,
               kind,
               text: screened.text,
@@ -493,7 +574,7 @@ export function ingestAll(
           });
         } catch (e: any) {
           if (e instanceof AppError) throw e;
-          stats.errors.push({ file, error: e.message });
+          stats.errors.push({ file: cand.file, error: e.message });
         }
       }
     });

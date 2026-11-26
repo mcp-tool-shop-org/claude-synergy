@@ -876,4 +876,41 @@ describe('multi-package release tag naming (vertex-sdk-v...)', () => {
       .get() as { package: string; version: string };
     expect(row).toEqual({ package: '@anthropic-ai/vertex-sdk', version: '0.17.0' });
   });
+
+  it('treats legacy ertex-sdk-V.md on disk as already saved for vertex-sdk-vV so fetch does not re-download it', async () => {
+    const outDir = join(productsRoot, 'anthropic-sdk-typescript', 'releases');
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(
+      join(outDir, 'ertex-sdk-0.17.0.md'),
+      `---\nproduct: anthropic-sdk-typescript\nversion: "ertex-sdk-v0.17.0"\nreleased_at: "2026-04-20"\nsource_url: "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.17.0"\n---\n\n- Legacy saved copy.\n`,
+      'utf-8',
+    );
+    writeFileSync(
+      join(outDir, 'sdk-0.98.0.md'),
+      `---\nproduct: anthropic-sdk-typescript\nversion: "sdk-0.98.0"\nreleased_at: "2026-04-25"\nsource_url: "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/sdk-0.98.0"\n---\n\n- Newer SDK release.\n`,
+      'utf-8',
+    );
+
+    vi.doMock('node:child_process', () => ({
+      execFile: createExecFileMock(() =>
+        JSON.stringify([
+          {
+            tag_name: 'vertex-sdk-v0.17.0',
+            published_at: '2026-04-20T12:00:00Z',
+            name: 'vertex-sdk-v0.17.0',
+            body: '### Features\n\n- Support Gemini 2.5 via Vertex AI.',
+            html_url: 'https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.17.0',
+          },
+        ]),
+      ),
+    }));
+
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const stats = await fetchAllMocked(temp.db, productsRoot, {
+      product: 'anthropic-sdk-typescript',
+      sinceOverride: '2026-04-01',
+    });
+    expect(stats[0].fetched).toBe(0);
+    expect(existsSync(join(outDir, 'vertex-sdk-0.17.0.md'))).toBe(false);
+  });
 });

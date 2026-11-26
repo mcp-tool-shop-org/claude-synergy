@@ -968,15 +968,17 @@ describe('Schema v4 → v5 migration (multi-package releases)', () => {
       ).run();
       const insCh = db.prepare(`INSERT INTO changes (id, product, version, ordinal, kind, text, flags) VALUES (?, ?, ?, ?, ?, ?, '[]')`);
       insCh.run(101, 'mcp-rust-sdk', 'rmcp-macros-v0.13.0', 1, 'added', 'Winner macro feature COLLISION_WIN_TOK');
+      insCh.run(106, 'mcp-rust-sdk', 'rmcp-macros-v0.13.0', 2, 'added', 'Shared macro bullet across ordinals');
       insCh.run(102, 'mcp-rust-sdk', '0.13.0', 1, 'added', 'Loser macro feature COLLISION_LOSE_TOK');
-      insCh.run(103, 'mcp-rust-sdk', '0.13.0', 2, 'fixed', 'Loser macro extra ordinal COLLISION_LOSE_TOK');
+      insCh.run(103, 'mcp-rust-sdk', '0.13.0', 2, 'fixed', 'Shared macro bullet across ordinals');
+      insCh.run(107, 'mcp-rust-sdk', '0.13.0', 3, 'added', 'Shared macro bullet across ordinals');
       insCh.run(104, 'mcp-rust-sdk', 'rmcp-v0.14.0', 1, 'added', 'Tiebreak winner rmcp 0.14.0');
       insCh.run(105, 'mcp-rust-sdk', '0.14.0', 1, 'added', 'Tiebreak loser rmcp 0.14.0');
 
       db.prepare(`INSERT INTO entities (change_id, entity_type, entity_value) VALUES (101, 'tool', 'MacroWin'), (102, 'tool', 'MacroLose'), (103, 'tool', 'MacroExtra')`).run();
       db.prepare(`INSERT INTO synergies (id, name, title, trigger, status, last_validated, notes_path) VALUES (1, 'syn1', 'Syn 1', 'trig', 'confirmed', '2026-05-01', 'synergies/01.md')`).run();
-      db.prepare(`INSERT INTO synergy_change_refs (synergy_id, change_id) VALUES (1, 102), (1, 103)`).run();
-      db.prepare(`INSERT INTO relevance (change_id, tag, note, added_at) VALUES (102, 'urgent', 'curated note', '2026-05-01'), (103, 'windows', 'extra note', '2026-05-01')`).run();
+      db.prepare(`INSERT INTO synergy_change_refs (synergy_id, change_id) VALUES (1, 102), (1, 107)`).run();
+      db.prepare(`INSERT INTO relevance (change_id, tag, note, added_at) VALUES (102, 'urgent', 'diff text dropped', '2026-05-01'), (103, 'kind-mismatch', 'same text diff kind dropped', '2026-05-01'), (107, 'repointed-across-ordinals', 'moves to 106', '2026-05-01')`).run();
 
       for (const [chId, ver] of [
         [101, 'rmcp-macros-v0.13.0'],
@@ -1014,12 +1016,12 @@ describe('Schema v4 → v5 migration (multi-package releases)', () => {
           .get() as { notes_hash: string };
         expect(tiebreakRow.notes_hash).toBe('zzz_hash');
 
-        // Re-pointed curated relevance & synergy_change_refs onto surviving change 101; zero orphans remain
+        // Only same-(kind, text) change (107 -> 106 across ordinals) is re-pointed; differing text (102) or kind (103) is dropped
         const relRefs = migrated.prepare(`SELECT change_id, tag FROM relevance`).all();
-        expect(relRefs).toEqual([{ change_id: 101, tag: 'urgent' }]);
+        expect(relRefs).toEqual([{ change_id: 106, tag: 'repointed-across-ordinals' }]);
         const synRefs = migrated.prepare(`SELECT synergy_id, change_id FROM synergy_change_refs`).all();
-        expect(synRefs).toEqual([{ synergy_id: 1, change_id: 101 }]);
-        expect((migrated.prepare(`SELECT COUNT(*) AS c FROM entities WHERE change_id IN (102, 103, 105)`).get() as { c: number }).c).toBe(0);
+        expect(synRefs).toEqual([{ synergy_id: 1, change_id: 106 }]);
+        expect((migrated.prepare(`SELECT COUNT(*) AS c FROM entities WHERE change_id IN (102, 103, 105, 107)`).get() as { c: number }).c).toBe(0);
         expect((migrated.prepare(`SELECT COUNT(*) AS c FROM chunks`).get() as { c: number }).c).toBe(1);
         expect((migrated.prepare(`SELECT COUNT(*) AS c FROM chunks_vec`).get() as { c: number }).c).toBe(1);
 
@@ -1171,6 +1173,7 @@ describe('Schema v4 → v5 migration (multi-package releases)', () => {
       expect(caught).toBeInstanceOf(AppError);
       expect((caught as AppError).code).toBe('SCHEMA_MIGRATION_FK_ERROR');
       expect((caught as AppError).hint).toMatch(/hk sync/i);
+      expect((caught as AppError).hint).toMatch(/relevance tags.*synergy references/i);
 
       // Rolled back cleanly to v4 with original rows and foreign_keys pragma preserved
       expect(getSchemaVersion(db)).toBe(4);

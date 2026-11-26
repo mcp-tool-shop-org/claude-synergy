@@ -503,21 +503,24 @@ function migrateToV5PackageSchema(db: Database.Database): void {
           INSERT INTO changes_v5 (id, product, package, version, ordinal, kind, text, flags)
           VALUES (@id, @product, @package, @version, @ordinal, @kind, @text, @flags)
         `);
-        const winningChangeIdByTargetOrdinal = new Map<string, number>();
-        const losingChanges: Array<{ id: number; targetOrdinalKey: string | null }> = [];
+        const winningChangeIdByTargetKindText = new Map<string, number>();
+        const losingChanges: Array<{ id: number; targetKindTextKey: string | null }> = [];
         for (const ch of oldChanges) {
           const legacyKey = `${ch.product}\0${ch.version}`;
           const derived = identityByLegacyKey.get(legacyKey);
           if (!derived) {
-            losingChanges.push({ id: ch.id, targetOrdinalKey: null });
+            losingChanges.push({ id: ch.id, targetKindTextKey: null });
             continue;
           }
           const targetKey = `${ch.product}\0${derived.pkg}\0${derived.version}`;
+          const matchKey = `${targetKey}\0${ch.kind}\0${ch.text}`;
           if (winningLegacyKeyByTarget.get(targetKey) !== legacyKey) {
-            losingChanges.push({ id: ch.id, targetOrdinalKey: `${targetKey}\0${ch.ordinal}` });
+            losingChanges.push({ id: ch.id, targetKindTextKey: matchKey });
             continue;
           }
-          winningChangeIdByTargetOrdinal.set(`${targetKey}\0${ch.ordinal}`, ch.id);
+          if (!winningChangeIdByTargetKindText.has(matchKey)) {
+            winningChangeIdByTargetKindText.set(matchKey, ch.id);
+          }
           insertChV5.run({
             id: ch.id,
             product: ch.product,
@@ -536,8 +539,8 @@ function migrateToV5PackageSchema(db: Database.Database): void {
           const losingIds: number[] = [];
           for (const lc of losingChanges) {
             losingIds.push(lc.id);
-            if (lc.targetOrdinalKey) {
-              const winId = winningChangeIdByTargetOrdinal.get(lc.targetOrdinalKey);
+            if (lc.targetKindTextKey) {
+              const winId = winningChangeIdByTargetKindText.get(lc.targetKindTextKey);
               if (winId !== undefined) {
                 rePointByChangeId.set(lc.id, winId);
               }
@@ -607,7 +610,7 @@ function migrateToV5PackageSchema(db: Database.Database): void {
     throw new AppError({
       code: 'SCHEMA_MIGRATION_FK_ERROR',
       message: `Database migration to schema v${SCHEMA_VERSION} failed foreign key integrity check.`,
-      hint: 'Delete the local database file (e.g. ~/.claude-synergy/data/claude-synergy.db or CLAUDE_SYNERGY_DB) and run `hk sync` to rebuild the store from release notes.',
+      hint: 'Delete the local database file (e.g. ~/.claude-synergy/data/claude-synergy.db or CLAUDE_SYNERGY_DB) and run `hk sync` to rebuild the store from release notes (note: deleting the database also deletes your relevance tags and synergy references).',
       cause: JSON.stringify(fkErrors[0]),
     });
   }

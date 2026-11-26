@@ -413,7 +413,13 @@ function resolveGhReleasePaths(
   assertSafeFilename(vName, `gh-releases vName for tag ${JSON.stringify(tagName)}`);
   const path = join(outDir, `${filename}.md`);
   const vPath = join(outDir, `${vName}.md`);
-  return { path, exists: existsSync(path) || existsSync(vPath) };
+  let legacyErtexExists = false;
+  if (/^vertex-sdk-\d/i.test(filename)) {
+    const ertexName = sanitizeFilename(filename.replace(/^vertex-sdk-/i, 'ertex-sdk-'));
+    assertSafeFilename(ertexName, `gh-releases legacy ertexName for tag ${JSON.stringify(tagName)}`);
+    legacyErtexExists = existsSync(join(outDir, `${ertexName}.md`));
+  }
+  return { path, exists: existsSync(path) || existsSync(vPath) || legacyErtexExists };
 }
 
 async function fetchGhReleases(

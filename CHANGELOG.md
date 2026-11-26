@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Top-level lockfile scanner (`src/workspace.ts`):** Added `readWorkspace(dir)` to read exact top-level lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `uv.lock`, `poetry.lock`, `requirements.txt` exact `==` pins, `Cargo.lock`, `go.mod`) without recursion, globbing, or subprocesses, normalizing names per ecosystem (PEP 503 for PyPI) and skipping symlinked, >20 MB, or malformed lockfiles with named warnings.
 - **Workspace relevance evaluation (`src/relevance.ts`, `hk relevance <dir>`, MCP `workspace_relevance`):** Added read-only, zero-model-call evaluation comparing workspace lockfiles against mirrored releases (using stored `releases.package` and `compareVersions` ordering). Leads with outdated products (breaking changes first), reports explicit `unknown` messages for undated releases or undated installed rows, treats up-to-date and unused products as "no action", emits a freshness stamp (and frames vendor text via `frameVendorText` in MCP), and brings the MCP server to 14 tools and the CLI to 18 commands.
 
+### Changed
+- Re-classifying an already-ingested release via a `products.yaml` `release_prefix` change evicts the prior release row and drops its relevance tags and synergy references.
+
 ### Fixed
 - **Fetch filename prefix stripping (`src/fetch.ts`, `products/anthropic-sdk-typescript/releases/`):** Tightened `^v` stripping to `^v(?=\d)` so `vertex-sdk-v…` tags preserve their `vertex-sdk-` prefix instead of losing their leading `v` (`ertex-sdk-…`), and renamed the existing `ertex-sdk-*.md` files to `vertex-sdk-*.md`.
 
