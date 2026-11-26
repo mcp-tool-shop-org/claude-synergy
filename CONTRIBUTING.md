@@ -4,7 +4,7 @@ Thanks for your interest in contributing. This guide covers adding new products,
 
 ## Prerequisites
 
-- **Node >= 22** (`node -v` to check)
+- **Node >= 22.12** (`node -v` to check)
 - **pnpm >= 10** (`pnpm -v` to check)
 - **gh CLI** (optional, for testing `gh-releases` fetcher locally)
 

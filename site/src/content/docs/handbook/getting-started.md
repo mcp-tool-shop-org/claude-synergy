@@ -7,7 +7,8 @@ sidebar:
 
 ## Prerequisites
 
-- **Node.js 22+** — required for the SQLite native bindings
+- **Node.js 22.12 or newer** — required by the SQLite native bindings and the CLI parser
+- **Windows, macOS or Linux (glibc or musl), x64 or arm64** — the SQLite driver ships prebuilt for these only; 32-bit ARM is not supported
 - **pnpm** (recommended) or npm — for dependency management
 - **Git** — for cloning and contributing
 

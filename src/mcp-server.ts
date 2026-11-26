@@ -30,6 +30,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import matter from 'gray-matter';
 import { openDb } from './db.js';
+import { formatError } from './errors.js';
 import {
   searchChanges,
   lookupEntity,
@@ -92,7 +93,14 @@ if (!existsSync(DB_PATH)) {
   process.exit(1);
 }
 
-const db = openDb(DB_PATH);
+let db: ReturnType<typeof openDb>;
+try {
+  db = openDb(DB_PATH);
+} catch (e) {
+  // A missing SQLite driver (SQLITE_BINDING_ERROR) prints its code and hint, not a raw stack.
+  console.error(`claude-synergy-mcp: ${formatError(e)}`);
+  process.exit(1);
+}
 const hasChunks =
   db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks'`).get() !== undefined;
 

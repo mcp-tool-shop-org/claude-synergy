@@ -1,6 +1,6 @@
 {
   "name": "@mcptoolshop/claude-synergy",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "description": "Local mirror of Anthropic product changelogs + curated cross-product synergies. So the LLM agent inside the harness knows what the harness can do.",
   "type": "module",
   "exports": {
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
-    "better-sqlite3": "^13.0.3",
+    "better-sqlite3": "^13.2.0",
     "cheerio": "^1.0.0",
     "commander": "^15.0.0",
     "fast-xml-parser": "^5.11.1",
@@ -50,7 +50,7 @@
     "vitest": "^2.1.0"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
