@@ -14,10 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **32-bit ARM Linux is no longer supported:** better-sqlite3 13 ships prebuilt drivers only for Windows, macOS and Linux (glibc and musl) on x64 and arm64, where 11 also covered 32-bit ARM.
 
 ### Added
-- **`SQLITE_BINDING_ERROR`:** when the SQLite driver is missing or was built for another Node, the CLI and MCP server now say so, with the supported platforms in the hint, instead of a raw module-not-found stack.
+- **`SQLITE_BINDING_ERROR`:** when the SQLite driver is missing or was built for another Node, the CLI and MCP server now say so, with the supported platforms in the hint, instead of a raw module-not-found stack; when native addons are disabled (`--no-addons`, or `--permission` without `--allow-addons`), the hint says so.
 
 ### Changed
-- **Runtime dependencies:** `better-sqlite3` `^11.5.0` → `^13.0.3`, `commander` `^12.1.0` → `^15.0.0`, `fast-xml-parser` `^4.5.0` → `^5.11.1`.
+- **Runtime dependencies:** `better-sqlite3` `^11.5.0` → `^13.2.0`, `commander` `^12.1.0` → `^15.0.0`, `fast-xml-parser` `^4.5.0` → `^5.11.1`.
 - **Supported platforms stated:** README (8 languages), the handbook and CONTRIBUTING name Node 22.12 and the supported platforms.
 - **Synergies:** a local home path removed from `synergies/03`, `04` and `05`.
 

@@ -5,69 +5,82 @@ import { join } from 'node:path';
 import { openSqlite } from '../../src/db.js';
 import { AppError } from '../../src/errors.js';
 
-const fail = (message: string) => () => {
-  throw new Error(message);
-};
+/** Run openSqlite with an opener that throws `thrown`, and return what openSqlite threw. */
+function caughtFrom(thrown: unknown): unknown {
+  try {
+    openSqlite('/tmp/x.db', () => {
+      throw thrown;
+    });
+  } catch (e) {
+    return e;
+  }
+  throw new Error('openSqlite did not throw');
+}
 
-describe('openSqlite: missing or mismatched native driver', () => {
-  const bindingFailures = [
-    "Cannot find module '/x/node_modules/better-sqlite3/build/Release/better_sqlite3.node'",
-    String.raw`C:\x\node_modules\better-sqlite3\prebuilds\win32-x64.node is not a valid Win32 application.`,
-    '/x/node_modules/better-sqlite3/prebuilds/linuxmusl-x64.node: Error loading shared library',
-    'The module was compiled against a different Node.js version using NODE_MODULE_VERSION 115.',
+const withCode = (message: string, code: string) => Object.assign(new Error(message), { code });
+
+describe('openSqlite: driver load failures become SQLITE_BINDING_ERROR', () => {
+  // Each case is caught by exactly one mapping branch, so removing any branch fails a test.
+  const platformCases: Array<[string, unknown]> = [
+    [
+      'path branch: no prebuild, build/Release fallback missing (Linux armv7)',
+      new Error("Cannot find module '/x/node_modules/better-sqlite3/build/Release/better_sqlite3.node'"),
+    ],
+    [
+      'path branch: Windows prebuild that fails to load',
+      new Error(String.raw`C:\x\node_modules\better-sqlite3\prebuilds\win32-x64.node is not a valid Win32 application.`),
+    ],
+    [
+      'path branch: macOS dlopen message',
+      new Error(
+        "dlopen(/x/node_modules/better-sqlite3/prebuilds/darwin-arm64.node, 0x0001): tried: '/x/node_modules/better-sqlite3/prebuilds/darwin-arm64.node' (mach-o file, but is an incompatible architecture)",
+      ),
+    ],
+    [
+      'NODE_MODULE_VERSION branch: built for another Node',
+      new Error('The module was compiled against a different Node.js version using NODE_MODULE_VERSION 115.'),
+    ],
+    ['ERR_DLOPEN_FAILED code branch, whatever the message', withCode('loader failed', 'ERR_DLOPEN_FAILED')],
   ];
 
-  for (const msg of bindingFailures) {
-    it(`names the error for: ${msg.slice(0, 40)}`, () => {
-      let caught: unknown;
-      try {
-        openSqlite('/tmp/x.db', fail(msg));
-      } catch (e) {
-        caught = e;
-      }
-      expect(caught).toBeInstanceOf(AppError);
-      const err = caught as AppError;
-      expect(err.code).toBe('SQLITE_BINDING_ERROR');
-      expect(err.hint).toMatch(/Node 22\.12/);
-      expect(err.hint).toMatch(/32-bit ARM is not supported/);
-      expect(err.cause).toBe(msg);
+  for (const [name, thrown] of platformCases) {
+    it(name, () => {
+      const err = caughtFrom(thrown);
+      expect(err).toBeInstanceOf(AppError);
+      const app = err as AppError;
+      expect(app.code).toBe('SQLITE_BINDING_ERROR');
+      expect(app.hint).toMatch(/Node 22\.12/);
+      expect(app.hint).toMatch(/32-bit ARM is not supported/);
+      expect(app.cause).toBe((thrown as Error).message);
     });
   }
 
-  it('names a dlopen failure by its error code', () => {
-    const err = Object.assign(new Error('some loader message'), { code: 'ERR_DLOPEN_FAILED' });
-    let caught: unknown;
-    try {
-      openSqlite('/tmp/x.db', () => {
-        throw err;
-      });
-    } catch (e) {
-      caught = e;
-    }
-    expect(caught).toBeInstanceOf(AppError);
-    expect((caught as AppError).code).toBe('SQLITE_BINDING_ERROR');
+  it('ERR_DLOPEN_DISABLED code branch gets the addons-disabled hint', () => {
+    const err = caughtFrom(
+      withCode('Cannot load native addon because loading addons is disabled.', 'ERR_DLOPEN_DISABLED'),
+    );
+    expect(err).toBeInstanceOf(AppError);
+    const app = err as AppError;
+    expect(app.code).toBe('SQLITE_BINDING_ERROR');
+    expect(app.hint).toMatch(/addons are disabled/);
   });
+});
 
-  it('passes other errors through unchanged', () => {
-    const original = new Error('SQLITE_CANTOPEN: unable to open database file');
-    let caught: unknown;
-    try {
-      openSqlite('/tmp/x.db', () => {
-        throw original;
-      });
-    } catch (e) {
-      caught = e;
-    }
-    expect(caught).toBe(original);
-  });
+describe('openSqlite: other errors pass through unchanged', () => {
+  const passthrough: Array<[string, unknown]> = [
+    ['SQLITE_CANTOPEN', withCode('unable to open database file', 'SQLITE_CANTOPEN')],
+    [
+      'ENOENT on a database path that contains better-sqlite3/build',
+      withCode("ENOENT: no such file or directory, open '/tmp/better-sqlite3/build/app.db'", 'ENOENT'),
+    ],
+    ['a non-Error throw', 'plain string'],
+  ];
 
-  it('passes a non-Error throw through unchanged', () => {
-    expect(() =>
-      openSqlite('/tmp/x.db', () => {
-        throw 'plain string';
-      }),
-    ).toThrow('plain string');
-  });
+  for (const [name, thrown] of passthrough) {
+    it(name, () => {
+      expect(caughtFrom(thrown)).toBe(thrown);
+    });
+  }
 
   it('opens a real database with the default driver', () => {
     const dir = mkdtempSync(join(tmpdir(), 'db-binding-'));

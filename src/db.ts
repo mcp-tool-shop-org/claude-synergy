@@ -22,18 +22,28 @@ export const SCHEMA_VERSION = 3;
 export const DEFAULT_EMBEDDING_DIM = 768;
 
 /**
- * What better-sqlite3 13 throws when its native driver cannot load: no prebuild for the platform
- * (it falls back to build/Release/better_sqlite3.node, which is absent), a prebuild that fails to
- * dlopen (wrong libc, corrupt file), or a binary built for another Node.
+ * How better-sqlite3 13's driver load fails, one test per shape:
+ * - a `.node` file under better-sqlite3/prebuilds or /build named in the message: no prebuild for
+ *   the platform (the build/Release fallback is absent) or a prebuild that fails to dlopen;
+ * - NODE_MODULE_VERSION: a binary built for another Node;
+ * - ERR_DLOPEN_FAILED: any dlopen failure, whatever the message says.
+ * The path branch requires `.node`, so a database path that merely contains
+ * "better-sqlite3/build" is not mistaken for a driver failure.
  */
-const BINDING_ERROR_RE =
-  /better_sqlite3\.node|better-sqlite3[\\/](?:prebuilds|build)[\\/]|NODE_MODULE_VERSION|compiled against a different Node\.js version/i;
+const BINDING_ERROR_RE = /better-sqlite3[\\/](?:prebuilds|build)[\\/][^\s'"]*\.node|NODE_MODULE_VERSION/i;
 
-function isBindingError(e: unknown): boolean {
+const PLATFORM_HINT =
+  'claude-synergy needs Node 22.12 or newer on Windows, macOS or Linux (glibc or musl), x64 or arm64. 32-bit ARM is not supported.';
+const ADDONS_DISABLED_HINT =
+  'Native addons are disabled in this Node (--no-addons, or --permission without --allow-addons). Run claude-synergy without those flags.';
+
+/** The hint for a driver-load failure, or null when `e` is not one. */
+function bindingErrorHint(e: unknown): string | null {
   const code = (e as { code?: unknown } | null)?.code;
-  if (code === 'ERR_DLOPEN_FAILED') return true;
+  if (code === 'ERR_DLOPEN_DISABLED') return ADDONS_DISABLED_HINT;
+  if (code === 'ERR_DLOPEN_FAILED') return PLATFORM_HINT;
   const detail = e instanceof Error ? e.message : String(e);
-  return BINDING_ERROR_RE.test(detail);
+  return BINDING_ERROR_RE.test(detail) ? PLATFORM_HINT : null;
 }
 
 /**
@@ -48,14 +58,13 @@ export function openSqlite(
   try {
     return open(abs);
   } catch (e: unknown) {
-    const detail = e instanceof Error ? e.message : String(e);
-    if (isBindingError(e)) {
+    const hint = bindingErrorHint(e);
+    if (hint !== null) {
       throw new AppError({
         code: 'SQLITE_BINDING_ERROR',
         message: 'The SQLite driver (better-sqlite3) could not be loaded on this platform.',
-        hint:
-          'claude-synergy needs Node 22.12 or newer on Windows, macOS or Linux (glibc or musl), x64 or arm64. 32-bit ARM is not supported.',
-        cause: detail,
+        hint,
+        cause: e instanceof Error ? e.message : String(e),
       });
     }
     throw e;
