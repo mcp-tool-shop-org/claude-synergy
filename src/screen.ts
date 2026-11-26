@@ -139,23 +139,28 @@ function stripInvisibleChars(input: string): string {
 // Stage B: fenced code blocks and inline code spans are left verbatim so code
 // examples and generics like `Vec<T>` are never altered.
 const CODE_SEGMENT_RE = /(```[\s\S]*?```|`[^`\r\n]+`)/g;
-const MD_IMAGE_RE = /!\[([^\]]*)\]\(\s*(?:<[^>]+>|[^()\s]+|\([^()]*\))*(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
-const HTML_IMG_RE = /<img\b(?=[\s/>])[^>]*\bsrc\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)[^>]*>/gi;
+const MD_IMAGE_RE = /!\[([^\]]*)\]\(\s*(?:<[^>]*>|[^()<>\s]|\([^()]*\))*(?:\s+(?:"[^"]*"|'[^']*'))?\s*\)/g;
+const HTML_IMG_TAG_RE = /<img\b(?=[\s/>])([^>]*)>/gi;
+const IMG_SRC_ATTR_RE = /\bsrc\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/i;
 const IMG_ALT_RE = /\balt\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i;
-const MD_UNSAFE_LINK_RE = /\[([^\]]*)\]\(\s*<?\s*(?:javascript|data|vbscript)\s*:(?:[^()]+|\([^()]*\))*\)/gi;
-const HTML_UNSAFE_ANCHOR_RE = /<a\b[^>]*\bhref\s*=\s*(?:"\s*(?:javascript|data|vbscript)\s*:[^"]*"|'\s*(?:javascript|data|vbscript)\s*:[^']*'|\s*(?:javascript|data|vbscript)\s*:[^\s>]+)[^>]*>([\s\S]*?)<\/a>/gi;
+const MD_UNSAFE_LINK_RE = /\[([^\]]*)\]\(\s*<?\s*(?:javascript|data|vbscript)\s*:(?:[^()]|\([^()]*\))*\)/gi;
+const HTML_ANCHOR_RE = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi;
+const ANCHOR_UNSAFE_HREF_RE = /\bhref\s*=\s*(?:"\s*(?:javascript|data|vbscript)\s*:[^"]*"|'\s*(?:javascript|data|vbscript)\s*:[^']*'|\s*(?:javascript|data|vbscript)\s*:[^\s>]+)/i;
 const AUTOLINK_UNSAFE_RE = /<\s*((?:javascript|data|vbscript)\s*:[^>\s]+)\s*>/gi;
 
 function neutraliseOutsideCode(segment: string): string {
   return segment
     .replace(MD_IMAGE_RE, (_m, alt: string) => `[image: ${alt}]`)
-    .replace(HTML_IMG_RE, (tag: string) => {
-      const altMatch = IMG_ALT_RE.exec(tag);
+    .replace(HTML_IMG_TAG_RE, (tag: string, attrs: string) => {
+      if (!IMG_SRC_ATTR_RE.test(attrs)) return tag;
+      const altMatch = IMG_ALT_RE.exec(attrs);
       const alt = altMatch ? (altMatch[1] ?? altMatch[2] ?? altMatch[3] ?? '') : '';
       return `[image: ${alt}]`;
     })
     .replace(MD_UNSAFE_LINK_RE, '$1')
-    .replace(HTML_UNSAFE_ANCHOR_RE, '$1')
+    .replace(HTML_ANCHOR_RE, (full: string, attrs: string, inner: string) =>
+      ANCHOR_UNSAFE_HREF_RE.test(attrs) ? inner : full
+    )
     .replace(AUTOLINK_UNSAFE_RE, '$1');
 }
 

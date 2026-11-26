@@ -174,6 +174,10 @@ export async function fetchSmitheryRegistry(opts: { maxEntries?: number; pageSiz
 
 // ─── Writer ─────────────────────────────────────────────────────────────────
 
+function escapeMarkdownTableCell(s: string): string {
+  return s.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+}
+
 /**
  * Write CATALOG.md for the given entries. Currently doesn't produce per-entry files
  * (volume control); a future iteration may add `entries/` for the top-N most popular.
@@ -194,11 +198,11 @@ export function writeCatalog(productDir: string, productName: string, entries: C
   for (const e of entries) {
     const safeDesc = redactVendorPii(e.description).text;
     const safeName = redactVendorPii(e.name).text;
-    const desc = (safeDesc.split('\n')[0] ?? '').slice(0, 160).replace(/\|/g, '\\|');
+    const desc = escapeMarkdownTableCell((safeDesc.split('\n')[0] ?? '').slice(0, 160));
     const pop = e.popularity != null ? String(e.popularity) : '—';
     const date = e.createdAt ? e.createdAt.split('T')[0] : '—';
     const home = e.homepage ? `[link](${e.homepage})` : '—';
-    const name = safeName.replace(/\|/g, '\\|');
+    const name = escapeMarkdownTableCell(safeName);
     lines.push(`| ${name} | ${desc} | ${pop} | ${date} | ${home} |`);
   }
   lines.push('');
