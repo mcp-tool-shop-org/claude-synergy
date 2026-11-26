@@ -10981,7 +10981,7 @@
           "path": ".gitignore"
         },
         {
-          "hash": "1d29529386c58365912b4d18c85fe73273427941cd73ef559606eb715b009a72",
+          "hash": "1188c0447f1eee780c7a3651bc2a5b4ba44f0d04ae52fec421f4b5bfb3d31f28",
           "path": "CHANGELOG.md"
         },
         {
@@ -15667,12 +15667,17 @@
           ],
           "failurePaths": [
             {
+              "in": "frameVendorText",
+              "kind": "throw",
+              "line": 69
+            },
+            {
               "in": "parseFlagsJson",
               "kind": "catch",
-              "line": 59
+              "line": 87
             }
           ],
-          "hash": "263a777bd30a6285f3df84c23c821f8cdf193a06f76ad71b755b6ef7ad000b40",
+          "hash": "a17e886ad490a1590e8933a823ce190135c8243e99f1c419020d6388bf5ce92c",
           "path": "src/screen.ts"
         },
         {
@@ -16260,16 +16265,20 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "0675eb994c2af9c694f04970a8a83519446577dde8541aebf7693b6f2660b203",
+          "hash": "0af8fd41607512a4782004be6f8b340c6d34eb4949f102ad5ca7220346c9b46a",
           "importOrder": [
             "src/db.ts",
+            "src/embed.ts",
             "src/ingest.ts",
+            "src/query.ts",
             "test/helpers/temp-db.ts",
             "test/helpers/seed-corpus.ts"
           ],
           "importsFiles": [
             "src/db.ts",
+            "src/embed.ts",
             "src/ingest.ts",
+            "src/query.ts",
             "test/helpers/seed-corpus.ts",
             "test/helpers/temp-db.ts"
           ],
@@ -16296,7 +16305,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "49a679d160f2465b306edfa3ba7fd6105dc0a7314b1d75a711405012c4962b2f",
+          "hash": "79d41c0134d6666b9614178b1a8433cb406f28c1475906e4169e0442bf189d84",
           "importOrder": [
             "test/helpers/temp-db.ts",
             "src/db.ts",
@@ -16404,10 +16413,17 @@
           "path": "test/unit/db.binding.test.ts"
         },
         {
-          "hash": "a0bb905e72b8b061333425ebffd64f7aac511de483eec3fd7fc02dd3a2e7bca8",
+          "hash": "ddb6b623c49a97957e5d7ffa8fded4bdc63d968de644fb36efa8ac0fd5469e30",
+          "importOrder": [
+            "src/db.ts",
+            "src/embed.ts",
+            "src/query.ts",
+            "src/hybrid.ts"
+          ],
           "importsFiles": [
             "src/db.ts",
             "src/embed.ts",
+            "src/hybrid.ts",
             "src/query.ts"
           ],
           "path": "test/unit/db.dim-config.test.ts",
@@ -16552,7 +16568,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "fcb1a18b3bc47b2a8fc42d54ff9a2cea045bc7e975fb2da2c922fa0dadd94b7f",
+          "hash": "c3f7a843eda01dcebd929e1c9352384f03c49d63bcb89a561846588c21906a98",
           "importOrder": [
             "src/fetch.ts",
             "src/ingest.ts",
@@ -16855,7 +16871,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "f19ce04301d4b704b1152ac5b8d38d82a102a8caf55a84a0c2b8f0b964060661",
+          "hash": "2ef52fdda4322bf1b80b6e9dfcc565b9d7bdb5870f3182a44894937a8020cbbe",
           "importOrder": [
             "src/screen.ts",
             "src/query.ts"
@@ -17922,7 +17938,7 @@
   ],
   "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "6576cd6c81a08f4be64835f7b4ee17f5913b5208",
+    "commit": "4f63048dee1d42cd1025735809ba538971a58079",
     "tracked": 2916
   },
   "landings": [

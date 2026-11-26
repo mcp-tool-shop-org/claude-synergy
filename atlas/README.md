@@ -1,15 +1,14 @@
 # claude-synergy: how it works
 
-Mapped at 2026-11-26 from commit 6576cd6 by Atlas 1.26.0.
+Mapped at 2026-11-26 from commit 4f63048 by Atlas 1.26.0.
 
 ## What this is
 
 10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (91), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.
 
-## What changed since 2026-11-26 (6233b8e)
+## What changed since 2026-11-26 (6576cd6)
 
-- products/claude-code/releases/2.1.218.md is now read by test/unit/screen.test.ts.
-- 16 files changed content, across 4 parts.
+Nothing structural changed since 2026-11-26; 7 files changed content.
 
 ## What comes in
 

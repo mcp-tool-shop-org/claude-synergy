@@ -753,11 +753,12 @@ describe('Part 6a — disk-bounded fetch window', () => {
     const written = readFileSync(join(productsRoot, 'claude-code', 'releases', '4.0.0.md'), 'utf-8');
     expect(written).toContain('C:\\Users\\<user>\\src');
     expect(written).toContain('/home/<user>/repo');
-    expect(written).toContain(`\`${codeWin}\``);
+    expect(written).toContain('`C:\\Users\\<user>\\src`');
     expect(written).toContain(`\`${codeEmail}\``);
     expect(written).toContain('- Contact <email> for details');
     expect(written).not.toContain(email);
     expect(written).not.toContain(winHome);
+    expect(written).not.toContain(codeWin);
     expect(written).not.toContain(unixHome);
     // Non-PII screening happens at ingest, not fetch: markdown image & instruction text remain on disk
     expect(written).toContain('![Arch](https://cdn.example.invalid/arch.png)');

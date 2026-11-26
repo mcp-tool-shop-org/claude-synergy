@@ -62,38 +62,30 @@
   "changes": {
     "fileCounts": {
       "added": 0,
-      "changed": 16,
+      "changed": 7,
       "moved": 0,
-      "parts": 4,
+      "parts": 3,
       "removed": 0
     },
     "items": [
       {
-        "kind": "landing",
-        "sentence": "products/claude-code/releases/2.1.218.md is now read by test/unit/screen.test.ts.",
-        "subjects": [
-          "products/claude-code/releases/2.1.218.md",
-          "test/unit/screen.test.ts"
-        ]
-      },
-      {
         "kind": "counts",
-        "sentence": "16 files changed content, across 4 parts.",
+        "sentence": "Nothing structural changed since 2026-11-26; 7 files changed content.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "6233b8e9fef3d2e94ef79ea2ec1ae88e0826bfe1",
-      "generatedAt": "2026-11-26T11:06:55.675Z"
+      "commit": "6576cd6c81a08f4be64835f7b4ee17f5913b5208",
+      "generatedAt": "2026-11-26T11:55:53.292Z"
     },
-    "unchanged": false
+    "unchanged": true
   },
   "changesTogether": [],
   "changesTogetherNote": [
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "6576cd6c81a08f4be64835f7b4ee17f5913b5208",
+  "commit": "4f63048dee1d42cd1025735809ba538971a58079",
   "defaultBranch": "main",
   "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (91), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
@@ -437,7 +429,7 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-26T11:55:53.292Z",
+  "generatedAt": "2026-11-26T12:22:25.731Z",
   "limits": [
     "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
     "1 write and 5 reads use paths built at run time and are not named here.",
