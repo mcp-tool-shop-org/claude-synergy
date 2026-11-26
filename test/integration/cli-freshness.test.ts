@@ -378,16 +378,17 @@ describe('CLI FIX-1 regressions (Items 1, 8, 10)', () => {
     expect(lDay1.stdout).not.toContain('data as of:');
   }, 35_000);
 
-  it('FIX-2 Item 1: two CLI query processes honour persisted first_use_partial cooldown then auto-sync after expiry', async () => {
+  it('FIX-3 Item 2: DB with releases + partial marker never auto-syncs, empty DB obeys cooldown, and full sync clears marker', async () => {
     const dir = makeDir('cli-partial-cd-');
     const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel><title>Cooldown Feed</title>
 <item><title>Release 2.0.0</title><link>http://127.0.0.1/2.0.0</link><guid>cd-2</guid><pubDate>Wed, 25 Nov 2026 12:00:00 GMT</pubDate><description><![CDATA[- Added persisted cooldown item]]></description></item>
 </channel></rss>`;
     let hits = 0;
+    let serveOkFeed = false;
     const srv = createServer((req, res) => {
       hits++;
-      if (req.url === '/ok.rss') {
+      if (serveOkFeed && req.url === '/ok.rss') {
         res.writeHead(200, { 'content-type': 'application/rss+xml' });
         res.end(rssXml);
       } else {
@@ -410,19 +411,49 @@ describe('CLI FIX-1 regressions (Items 1, 8, 10)', () => {
     fetch:
       type: rss
       url: ${base}/ok.rss
-  - name: cd-bad
-    display_name: Cooldown Bad
-    tier: 3
-    source_url: ${base}/missing.rss
-    fetch_strategy: rss
-    fetch:
-      type: rss
-      url: ${base}/missing.rss
 `,
       'utf-8'
     );
 
     try {
+      // (a) Empty DB: initial failed attempt, then second CLI call inside 10m cooldown runs 0 fetches;
+      //     third CLI call after 10m expiry runs 1 auto-sync.
+      const emptyDbPath = join(dir, 'empty-store', 'data', 'claude-synergy.db');
+      const emptyProductsRoot = join(dir, 'empty-store', 'products');
+      const emptyEnv = {
+        CLAUDE_SYNERGY_DB: emptyDbPath,
+        CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+        CLAUDE_SYNERGY_PRODUCTS_ROOT: emptyProductsRoot,
+        HOME: dir,
+        USERPROFILE: dir,
+      };
+
+      const firstEmpty = await runCliAsync(['latest'], {
+        cwd: dir,
+        env: { ...emptyEnv, CLAUDE_SYNERGY_NOW: '2026-11-26T10:00:00Z' },
+      });
+      expect(firstEmpty.code).toBe(0);
+      expect(hits).toBe(1);
+
+      const insideCooldown = await runCliAsync(['latest'], {
+        cwd: dir,
+        env: { ...emptyEnv, CLAUDE_SYNERGY_NOW: '2026-11-26T10:04:00Z' },
+      });
+      expect(insideCooldown.code).toBe(0);
+      expect(hits).toBe(1);
+      expect(insideCooldown.stderr).toContain('cooling down after a failed attempt');
+
+      serveOkFeed = true;
+      const afterCooldown = await runCliAsync(['latest'], {
+        cwd: dir,
+        env: { ...emptyEnv, CLAUDE_SYNERGY_NOW: '2026-11-26T10:11:00Z' },
+      });
+      expect(afterCooldown.code).toBe(0);
+      expect(hits).toBe(2);
+
+      // (b) DB with releases + legacy first_use_partial marker: never auto-syncs even past 10m,
+      //     migrates to last_sync_partial and shows partial stamp until a clean full sync clears it.
+      hits = 0;
       const dbPath = join(dir, 'store', 'data', 'claude-synergy.db');
       const productsRoot = join(dir, 'store', 'products');
       const relDir = join(productsRoot, 'cd-ok', 'releases');
@@ -432,8 +463,6 @@ describe('CLI FIX-1 regressions (Items 1, 8, 10)', () => {
         `---\nproduct: cd-ok\nversion: "1.0.0"\nreleased_at: "2026-11-24"\nfetched_at: "2026-11-26"\n---\n\n- Baseline release\n`,
         'utf-8'
       );
-
-      // Seed DB with 1 release + a fresh first_use_partial marker recorded at 10:00:00Z.
       const db = openDb(dbPath, { loadVec: false });
       initSchema(db);
       ingestAll(db, productsRoot);
@@ -448,36 +477,36 @@ describe('CLI FIX-1 regressions (Items 1, 8, 10)', () => {
       );
       db.close();
 
-      const sharedEnv = {
+      const populatedEnv = {
         CLAUDE_SYNERGY_DB: dbPath,
         CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
         CLAUDE_SYNERGY_PRODUCTS_ROOT: productsRoot,
         HOME: dir,
         USERPROFILE: dir,
       };
-
-      // Two separate CLI processes within 10m -> zero fetches, partial stamp still shown.
-      for (const clockIso of ['2026-11-26T10:02:00Z', '2026-11-26T10:05:00Z']) {
-        const res = await runCliAsync(['latest'], {
-          cwd: dir,
-          env: { ...sharedEnv, CLAUDE_SYNERGY_NOW: clockIso },
-        });
-        expect(res.code).toBe(0);
-        expect(res.stdout).toContain('partial corpus: synced 1 of 2 products');
-        expect(hits).toBe(0);
-      }
-
-      // Third CLI process after 10m cooldown expiry -> runs one auto-sync.
-      const resAfter = await runCliAsync(['latest'], {
+      const queryPopulated = await runCliAsync(['latest'], {
         cwd: dir,
-        env: { ...sharedEnv, CLAUDE_SYNERGY_NOW: '2026-11-26T10:11:00Z' },
+        env: { ...populatedEnv, CLAUDE_SYNERGY_NOW: '2026-11-26T12:00:00Z' },
       });
-      expect(resAfter.code).toBe(0);
-      expect(hits).toBeGreaterThanOrEqual(2);
-      expect(resAfter.stderr).toContain('first use (partial corpus)');
+      expect(queryPopulated.code).toBe(0);
+      expect(hits).toBe(0);
+      expect(queryPopulated.stdout).toContain('partial: 1/2 feeds (skipped: cd-bad (HTTP 404)) — run hk sync');
+
+      // Full sync clears the partial marker -> next query stamp has no partial note.
+      const syncFull = await runCliAsync(['sync', '--skip-embed'], {
+        cwd: dir,
+        env: { ...populatedEnv, CLAUDE_SYNERGY_NOW: '2026-11-26T12:01:00Z' },
+      });
+      expect(syncFull.code).toBe(0);
+      const queryCleared = await runCliAsync(['latest'], {
+        cwd: dir,
+        env: { ...populatedEnv, CLAUDE_SYNERGY_NOW: '2026-11-26T12:02:00Z' },
+      });
+      expect(queryCleared.code).toBe(0);
+      expect(queryCleared.stdout).not.toContain('partial:');
     } finally {
       srv.closeAllConnections?.();
       await new Promise<void>((r) => srv.close(() => r()));
     }
-  }, 45_000);
+  }, 55_000);
 });

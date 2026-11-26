@@ -723,7 +723,7 @@ describe('MCP server integration', () => {
               expect(lines[0]).toMatch(/^first use \(partial corpus\): synced 1 of 2 products/);
               expect(lines[0]).toContain('local-fail');
               expect(text).toContain('local-ok@');
-              expect(lines[lines.length - 1]).toMatch(/^data as of:.*partial corpus/);
+              expect(lines[lines.length - 1]).toMatch(/^data as of:.*partial: 1\/2 feeds/);
             }
           );
         } finally {

@@ -23,8 +23,7 @@ import { createFetchAllController, DEFAULT_FETCH_ALL_TIMEOUT_MS, runGhApi } from
 // All filesystem-name inputs from external sources (GH tag names, RSS slugs,
 // HTML headings, Playwright DOM ids, etc.) flow through sanitizeFilename()
 // before being passed to join(). External shell inputs (gh CLI `repo` field)
-// flow through assertRepoShape() and are passed via execFileSync's argv path,
-// not execSync's shell template.
+// flow through assertRepoShape() and are passed as an argv array to async execFile().
 
 const REPO_PATTERN = /^[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/;
 const PRODUCT_PATTERN = /^[a-z0-9][a-z0-9-]*$/;
@@ -585,10 +584,8 @@ function yamlQuote(s: string | null | undefined): string {
     .replace(/"/g, '\\"');
 }
 
-function renderGhRelease(product: string, r: GhRelease): string {
+export function renderGhRelease(product: string, r: GhRelease): string {
   const version = (r.tag_name ?? '').replace(/^v/, '');
-  const body =
-    r.body != null ? sanitizeScrapedHtml(r.body, { preserveMarkdown: true }) : '(no body)';
   return [
     '---',
     `product: ${product}`,
@@ -600,7 +597,7 @@ function renderGhRelease(product: string, r: GhRelease): string {
     '',
     `# ${product} ${r.tag_name}`,
     '',
-    body,
+    r.body ?? '(no body)',
     '',
   ].join('\n');
 }

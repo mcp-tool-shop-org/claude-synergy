@@ -323,25 +323,44 @@ describe('runGhApi', () => {
     ).rejects.toThrow(/budget exhausted/);
   });
 
-  it('handles execFile success, error with stderr, and killed/SIGTERM timeout', async () => {
+  it('handles execFile options, success, error with stderr, ABORT_ERR / signal aborts, and timeout (FIX-3 Item 3)', async () => {
     vi.resetModules();
-    let mode: 'ok' | 'err' | 'timeout' = 'ok';
+    let mode: 'ok' | 'err' | 'timeout' | 'abortErr' | 'signalAborted' = 'ok';
+    const abortCtrl = new AbortController();
+    const execFileSpy = vi.fn((_cmd: string, _args: string[], _opts: any, cb: any) => {
+      if (mode === 'err') {
+        cb(Object.assign(new Error('not found'), { code: 1 }), '', 'HTTP 404');
+      } else if (mode === 'timeout') {
+        cb(Object.assign(new Error('killed'), { killed: true, signal: 'SIGTERM' }), '', 'timed out');
+      } else if (mode === 'abortErr') {
+        cb(Object.assign(new Error('The operation was aborted'), { code: 'ABORT_ERR', name: 'AbortError' }), '', '');
+      } else if (mode === 'signalAborted') {
+        abortCtrl.abort(new Error('user stop'));
+        cb(new Error('aborted'), '', '');
+      } else {
+        cb(null, '[{"tag_name":"v1.0.0"}]', '');
+      }
+      return { stdin: { end: () => {} } };
+    });
     vi.doMock('node:child_process', () => ({
-      execFile: vi.fn((_cmd: string, _args: string[], _opts: any, cb: any) => {
-        if (mode === 'err') {
-          cb(Object.assign(new Error('not found'), { code: 1 }), '', 'HTTP 404');
-        } else if (mode === 'timeout') {
-          cb(Object.assign(new Error('killed'), { killed: true, signal: 'SIGTERM' }), '', 'timed out');
-        } else {
-          cb(null, '[{"tag_name":"v1.0.0"}]', '');
-        }
-        return { stdin: { end: () => {} } };
-      }),
+      execFile: execFileSpy,
     }));
 
     const { runGhApi: mockedRunGhApi } = await import('../../src/fetch-utils.js');
 
-    expect(await mockedRunGhApi(['api', 'repos/a/b/releases'])).toBe('[{"tag_name":"v1.0.0"}]');
+    expect(
+      await mockedRunGhApi(['api', 'repos/a/b/releases'], { signal: abortCtrl.signal })
+    ).toBe('[{"tag_name":"v1.0.0"}]');
+    expect(execFileSpy).toHaveBeenCalledWith(
+      'gh',
+      ['api', 'repos/a/b/releases'],
+      expect.objectContaining({
+        timeout: GH_API_CALL_TIMEOUT_MS,
+        signal: abortCtrl.signal,
+        maxBuffer: 50 * 1024 * 1024,
+      }),
+      expect.any(Function)
+    );
 
     mode = 'err';
     await expect(mockedRunGhApi(['api', 'repos/a/b/releases'])).rejects.toMatchObject({
@@ -350,6 +369,14 @@ describe('runGhApi', () => {
     });
 
     mode = 'timeout';
-    await expect(mockedRunGhApi(['api', 'repos/a/b/releases'])).rejects.toThrow(/gh api timed out after/);
+    await expect(mockedRunGhApi(['api', 'repos/a/b/releases'])).rejects.toThrow(/gh api timed out after \d+ms/);
+
+    mode = 'abortErr';
+    await expect(mockedRunGhApi(['api', 'repos/a/b/releases'])).rejects.toThrow(/^gh api aborted:/);
+
+    mode = 'signalAborted';
+    await expect(
+      mockedRunGhApi(['api', 'repos/a/b/releases'], { signal: abortCtrl.signal })
+    ).rejects.toThrow(/^gh api aborted: user stop/);
   });
 });

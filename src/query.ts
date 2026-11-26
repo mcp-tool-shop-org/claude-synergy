@@ -27,6 +27,120 @@ export interface CorpusFreshness {
 
 export type ClockInput = Date | (() => Date);
 
+/** Metadata key in `schema_meta` storing the last partial sync state (drives stamp only). */
+export const LAST_SYNC_PARTIAL_META_KEY = 'last_sync_partial';
+
+/** Legacy metadata key migrated once to `LAST_SYNC_PARTIAL_META_KEY` on read. */
+export const LEGACY_FIRST_USE_PARTIAL_META_KEY = 'first_use_partial';
+
+export interface SkippedProductInfo {
+  product: string;
+  reason: string;
+}
+
+export interface PartialSyncState {
+  succeeded: number;
+  total: number;
+  skipped: SkippedProductInfo[];
+  recorded_at?: string;
+}
+
+/**
+ * Format the partial-sync note surfaced in the freshness stamp on every answer
+ * while `last_sync_partial` is set in `schema_meta`.
+ */
+export function formatPartialNote(
+  report: Pick<PartialSyncState, 'succeeded' | 'total' | 'skipped'>
+): string {
+  const skippedNames = report.skipped.map((s) => `${s.product} (${s.reason})`).join(', ');
+  return skippedNames
+    ? `partial: ${report.succeeded}/${report.total} feeds (skipped: ${skippedNames}) — run hk sync`
+    : `partial: ${report.succeeded}/${report.total} feeds — run hk sync`;
+}
+
+/** Persist the last partial sync state under `last_sync_partial` in `schema_meta`. */
+export function writePartialSyncState(
+  db: Database.Database,
+  state: PartialSyncState,
+  opts: { now?: ClockInput } = {}
+): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS schema_meta (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+  const payload: PartialSyncState = {
+    succeeded: state.succeeded,
+    total: state.total,
+    skipped: state.skipped,
+    recorded_at: state.recorded_at ?? resolveNow(opts.now).toISOString(),
+  };
+  db.prepare(`DELETE FROM schema_meta WHERE key = ?`).run(LEGACY_FIRST_USE_PARTIAL_META_KEY);
+  db.prepare(`
+    INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)
+  `).run(LAST_SYNC_PARTIAL_META_KEY, JSON.stringify(payload));
+}
+
+/** Remove `last_sync_partial` (and any legacy `first_use_partial`) after a clean full sync. */
+export function clearPartialSyncState(db: Database.Database | null): void {
+  if (!db) return;
+  try {
+    db.prepare(`DELETE FROM schema_meta WHERE key IN (?, ?)`).run(
+      LAST_SYNC_PARTIAL_META_KEY,
+      LEGACY_FIRST_USE_PARTIAL_META_KEY
+    );
+  } catch {
+    // schema_meta absent -> nothing to clear
+  }
+}
+
+/**
+ * Read any persisted `last_sync_partial` marker from `schema_meta`, migrating
+ * the legacy `first_use_partial` key once if present.
+ */
+export function readPartialSyncState(db: Database.Database | null): PartialSyncState | null {
+  if (!db) return null;
+  try {
+    const newRow = db
+      .prepare(`SELECT value FROM schema_meta WHERE key = ?`)
+      .get(LAST_SYNC_PARTIAL_META_KEY) as { value: string } | undefined;
+    const legacyRow = db
+      .prepare(`SELECT value FROM schema_meta WHERE key = ?`)
+      .get(LEGACY_FIRST_USE_PARTIAL_META_KEY) as { value: string } | undefined;
+
+    let rawValue = newRow?.value;
+    if (legacyRow?.value) {
+      if (!rawValue) {
+        rawValue = legacyRow.value;
+        if (!db.readonly) {
+          db.prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`).run(
+            LAST_SYNC_PARTIAL_META_KEY,
+            legacyRow.value
+          );
+        }
+      }
+      if (!db.readonly) {
+        db.prepare(`DELETE FROM schema_meta WHERE key = ?`).run(LEGACY_FIRST_USE_PARTIAL_META_KEY);
+      }
+    }
+    if (!rawValue) return null;
+
+    const parsed = JSON.parse(rawValue) as Partial<PartialSyncState>;
+    if (typeof parsed.succeeded === 'number' && typeof parsed.total === 'number') {
+      return {
+        succeeded: parsed.succeeded,
+        total: parsed.total,
+        skipped: Array.isArray(parsed.skipped) ? parsed.skipped : [],
+        recorded_at: typeof parsed.recorded_at === 'string' ? parsed.recorded_at : undefined,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function resolveNow(now?: ClockInput): Date {
   if (typeof now === 'function') return now();
   if (now instanceof Date) return now;
@@ -77,7 +191,7 @@ function datePart(s: string | null | undefined): string | null {
 /**
  * Query overall corpus freshness from `markers.updated_at` + `releases.released_at`
  * (and per-product freshness + `fetch_strategy` when `opts.product` is set).
- * Also surfaces any persisted `first_use_partial` state from `schema_meta`.
+ * Also surfaces any persisted `last_sync_partial` state from `schema_meta`.
  */
 export function getCorpusFreshness(
   db: Database.Database | null,
@@ -105,27 +219,9 @@ export function getCorpusFreshness(
     } catch {
       // Uninitialized DB (no releases table yet) -> leave null so it stamps STALE
     }
-    try {
-      const metaRow = db
-        .prepare(`SELECT value FROM schema_meta WHERE key = 'first_use_partial'`)
-        .get() as { value: string } | undefined;
-      if (metaRow?.value) {
-        const parsed = JSON.parse(metaRow.value) as {
-          succeeded?: number;
-          total?: number;
-          skipped?: Array<{ product: string; reason: string }>;
-        };
-        if (typeof parsed.succeeded === 'number' && typeof parsed.total === 'number') {
-          const skippedList = Array.isArray(parsed.skipped)
-            ? parsed.skipped.map((s) => `${s.product} (${s.reason})`).join(', ')
-            : '';
-          partialNote = skippedList
-            ? `partial corpus: synced ${parsed.succeeded} of ${parsed.total} products (skipped: ${skippedList})`
-            : `partial corpus: synced ${parsed.succeeded} of ${parsed.total} products`;
-        }
-      }
-    } catch {
-      // schema_meta absent or unreadable -> ignore
+    const partialState = readPartialSyncState(db);
+    if (partialState) {
+      partialNote = formatPartialNote(partialState);
     }
   }
 

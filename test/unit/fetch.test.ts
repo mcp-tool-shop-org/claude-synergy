@@ -676,38 +676,49 @@ describe('Part 6a — disk-bounded fetch window', () => {
     }
   });
 
-  it('sanitizes raw HTML in GitHub release bodies while preserving Markdown formatting (FIX-2 Item 7)', async () => {
+  it('writes GitHub release bodies byte-for-byte identically to base 667ff72 (FIX-3 Item 1)', async () => {
     const prodDir = join(productsRoot, 'claude-code');
     const relDir = join(prodDir, 'releases');
     mkdirSync(relDir, { recursive: true });
-    mockGhApi([
-      {
-        tag_name: 'v3.0.0',
-        published_at: '2026-11-26T10:00:00Z',
-        name: '3.0.0',
-        body: [
-          '## Highlights',
-          '> Important & helpful > details with [docs](https://example.test?a=1&b=2)',
-          '- Safe markdown bullet with `<span>code</span>`',
-          '<script>alert(1)</script><object data="https://evil.test/x"></object><img src="https://ok.test/pic.png" srcset="https://evil.test/2x.png 2x" style="background:url(https://evil.test/bg.png)">',
-          '```html',
-          '<script>fencedCodeKept()</script>',
-          '```',
-        ].join('\n'),
-        html_url: 'https://example.invalid/v3.0.0',
-      },
-    ]);
-    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const rawBody = [
+      '## Highlights',
+      '- Generic types `Vec<T>`, `Map<K, V>`, and inline `a < b && c > d` work cleanly',
+      '- Literal escaped example: &lt;img src=x onerror=1&gt;',
+      '```ts',
+      'const items: Array<number> = [1, 2, 3];',
+      '```',
+    ].join('\n');
+    const rel = {
+      tag_name: 'v3.0.0',
+      published_at: '2026-11-26T10:00:00Z',
+      name: '3.0.0',
+      body: rawBody,
+      html_url: 'https://example.invalid/v3.0.0',
+    };
+    mockGhApi([rel]);
+    const { fetchAll: fetchAllMocked, renderGhRelease } = await import('../../src/fetch.js');
+    const expectedBase = [
+      '---',
+      'product: claude-code',
+      'version: "3.0.0"',
+      'released_at: "2026-11-26"',
+      'source_url: "https://example.invalid/v3.0.0"',
+      `fetched_at: "${new Date().toISOString().split('T')[0]}"`,
+      '---',
+      '',
+      '# claude-code v3.0.0',
+      '',
+      rawBody,
+      '',
+    ].join('\n');
+    expect(renderGhRelease('claude-code', rel)).toBe(expectedBase);
+
     const stats = await fetchAllMocked(temp.db, productsRoot, {
       product: 'claude-code',
       sinceOverride: '2026-01-01',
     });
     expect(stats[0].fetched).toBe(1);
     const written = readFileSync(join(relDir, '3.0.0.md'), 'utf-8');
-    expect(written).toContain('> Important & helpful > details with [docs](https://example.test?a=1&b=2)');
-    expect(written).toContain('- Safe markdown bullet with `<span>code</span>`');
-    expect(written).toContain('<script>fencedCodeKept()</script>');
-    expect(written).not.toMatch(/<script>alert\(1\)|<object|\bsrcset\b|url\(/i);
-    expect(written).toContain('<img src="https://ok.test/pic.png">');
+    expect(written).toBe(expectedBase);
   });
 });

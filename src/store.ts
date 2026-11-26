@@ -15,7 +15,30 @@ import type Database from 'better-sqlite3';
 import { initSchema, openDb } from './db.js';
 import { fetchAll, type FetchAllResult } from './fetch.js';
 import { ingestAll, type IngestStats } from './ingest.js';
-import { formatFreshnessStamp, getCorpusFreshness, type ClockInput } from './query.js';
+import {
+  LAST_SYNC_PARTIAL_META_KEY,
+  LEGACY_FIRST_USE_PARTIAL_META_KEY,
+  clearPartialSyncState,
+  formatFreshnessStamp,
+  formatPartialNote,
+  getCorpusFreshness,
+  readPartialSyncState,
+  writePartialSyncState,
+  type ClockInput,
+  type PartialSyncState,
+  type SkippedProductInfo,
+} from './query.js';
+
+export {
+  LAST_SYNC_PARTIAL_META_KEY,
+  LEGACY_FIRST_USE_PARTIAL_META_KEY,
+  clearPartialSyncState,
+  formatPartialNote,
+  readPartialSyncState,
+  writePartialSyncState,
+  type PartialSyncState,
+  type SkippedProductInfo,
+};
 
 /** Default timeout for automatic first-use sync (ms). Overridable via timeout_ms. */
 export const FIRST_USE_SYNC_TIMEOUT_MS = 120_000;
@@ -23,8 +46,8 @@ export const FIRST_USE_SYNC_TIMEOUT_MS = 120_000;
 /** Cooldown after a failed or empty first-use sync attempt (10 minutes). */
 export const FIRST_USE_COOLDOWN_MS = 10 * 60 * 1000;
 
-/** Metadata key in `schema_meta` storing persisted partial first-use sync state. */
-export const FIRST_USE_PARTIAL_META_KEY = 'first_use_partial';
+/** Metadata key in `schema_meta` storing empty-DB cooldown timestamp (applies only when DB has 0 releases). */
+export const EMPTY_SYNC_COOLDOWN_META_KEY = 'last_empty_sync_at';
 
 export type StoreResolutionRule =
   | 'env:CLAUDE_SYNERGY_DB'
@@ -149,11 +172,6 @@ export function hasAnyReleases(db: Database.Database | null): boolean {
   }
 }
 
-export interface SkippedProductInfo {
-  product: string;
-  reason: string;
-}
-
 export interface FirstUseSyncReport {
   dbPath: string;
   productsRoot: string;
@@ -166,96 +184,75 @@ export interface FirstUseSyncReport {
   ingestedEntities: number;
 }
 
-export interface PartialSyncState {
-  succeeded: number;
-  total: number;
-  skipped: SkippedProductInfo[];
-  recorded_at?: string;
-}
-
-/**
- * Persist partial first-use sync details in `schema_meta` so subsequent runs
- * report the incomplete state and retry skipped products once cooldown expires.
- */
-export function writePartialSyncState(
-  db: Database.Database,
-  state: PartialSyncState,
-  opts: { now?: ClockInput } = {}
+function recordEmptySyncAttempt(
+  db: Database.Database | null,
+  outcome: 'failed' | 'empty',
+  now?: ClockInput
 ): void {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS schema_meta (
-      key   TEXT PRIMARY KEY,
-      value TEXT NOT NULL
-    )
-  `);
-  const payload: PartialSyncState = {
-    succeeded: state.succeeded,
-    total: state.total,
-    skipped: state.skipped,
-    recorded_at: state.recorded_at ?? new Date(resolveNowMs(opts.now)).toISOString(),
-  };
-  db.prepare(`
-    INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)
-  `).run(FIRST_USE_PARTIAL_META_KEY, JSON.stringify(payload));
-}
-
-/** Remove the persisted partial first-use marker after a full clean sync. */
-export function clearPartialSyncState(db: Database.Database | null): void {
   if (!db) return;
   try {
-    db.prepare(`DELETE FROM schema_meta WHERE key = ?`).run(FIRST_USE_PARTIAL_META_KEY);
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS schema_meta (
+        key   TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    `);
+    db.prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`).run(
+      EMPTY_SYNC_COOLDOWN_META_KEY,
+      JSON.stringify({
+        recorded_at: new Date(resolveNowMs(now)).toISOString(),
+        outcome,
+      })
+    );
   } catch {
-    // schema_meta absent -> nothing to clear
+    // best-effort on unwritable/closed DB
   }
 }
 
-/** Read any persisted partial first-use marker from `schema_meta`. */
-export function readPartialSyncState(db: Database.Database | null): PartialSyncState | null {
+function readEmptySyncCooldown(
+  db: Database.Database | null
+): { recorded_at: string; outcome: 'failed' | 'empty' } | null {
   if (!db) return null;
   try {
     const row = db
       .prepare(`SELECT value FROM schema_meta WHERE key = ?`)
-      .get(FIRST_USE_PARTIAL_META_KEY) as { value: string } | undefined;
+      .get(EMPTY_SYNC_COOLDOWN_META_KEY) as { value: string } | undefined;
     if (!row?.value) return null;
-    const parsed = JSON.parse(row.value) as Partial<PartialSyncState>;
-    if (typeof parsed.succeeded === 'number' && typeof parsed.total === 'number') {
+    const parsed = JSON.parse(row.value) as { recorded_at?: unknown; outcome?: unknown };
+    if (typeof parsed.recorded_at === 'string') {
       return {
-        succeeded: parsed.succeeded,
-        total: parsed.total,
-        skipped: Array.isArray(parsed.skipped) ? parsed.skipped : [],
-        recorded_at: typeof parsed.recorded_at === 'string' ? parsed.recorded_at : undefined,
+        recorded_at: parsed.recorded_at,
+        outcome: parsed.outcome === 'failed' ? 'failed' : 'empty',
       };
     }
-    return null;
   } catch {
-    return null;
+    // ignore missing schema_meta
   }
+  return null;
 }
 
-/**
- * True when a persisted `first_use_partial` marker's `recorded_at` falls within
- * `FIRST_USE_COOLDOWN_MS` of `now`, preventing every CLI query process from
- * re-running a full sync after a partial attempt.
- */
-export function isPartialMarkerCoolingDown(
-  partial: PartialSyncState | null,
-  now?: ClockInput
-): boolean {
-  if (!partial?.recorded_at) return false;
-  const recordedMs = Date.parse(partial.recorded_at);
-  if (Number.isNaN(recordedMs)) return false;
-  return resolveNowMs(now) - recordedMs < FIRST_USE_COOLDOWN_MS;
-}
-
-/**
- * True when the DB is missing/empty OR carries an unresolved partial marker
- * whose `recorded_at` cooldown has expired.
- */
-export function needsAutoSync(db: Database.Database | null, now?: ClockInput): boolean {
-  if (!hasAnyReleases(db)) return true;
+function isEmptyDbCoolingDown(db: Database.Database | null, now?: ClockInput): boolean {
+  if (!db || hasAnyReleases(db)) return false;
+  const nowMs = resolveNowMs(now);
+  const emptyMeta = readEmptySyncCooldown(db);
+  if (emptyMeta) {
+    const t = Date.parse(emptyMeta.recorded_at);
+    if (!Number.isNaN(t) && nowMs - t < FIRST_USE_COOLDOWN_MS) return true;
+  }
   const partial = readPartialSyncState(db);
-  if (!partial) return false;
-  return !isPartialMarkerCoolingDown(partial, now);
+  if (partial?.recorded_at) {
+    const t = Date.parse(partial.recorded_at);
+    if (!Number.isNaN(t) && nowMs - t < FIRST_USE_COOLDOWN_MS) return true;
+  }
+  return false;
+}
+
+/**
+ * True only when the DB is missing or holds zero releases. A DB that already
+ * has any releases never triggers automatic sync from the CLI or MCP server.
+ */
+export function needsAutoSync(db: Database.Database | null): boolean {
+  return !hasAnyReleases(db);
 }
 
 export interface FirstUseSyncOptions {
@@ -349,13 +346,6 @@ export async function runFirstUseSync(
   return { db, report };
 }
 
-export function formatPartialNote(report: Pick<FirstUseSyncReport, 'succeeded' | 'total' | 'skipped'>): string {
-  const skippedNames = report.skipped.map((s) => `${s.product} (${s.reason})`).join(', ');
-  return skippedNames
-    ? `partial corpus: synced ${report.succeeded} of ${report.total} products (skipped: ${skippedNames})`
-    : `partial corpus: synced ${report.succeeded} of ${report.total} products`;
-}
-
 export function formatFirstUseNotice(
   report: FirstUseSyncReport,
   db: Database.Database | null,
@@ -415,6 +405,8 @@ export class FirstUseSyncCoordinator {
     if (partial && (partial.skipped.length > 0 || partial.succeeded < partial.total)) {
       return 'failed';
     }
+    const emptyMeta = readEmptySyncCooldown(db ?? null);
+    if (emptyMeta) return emptyMeta.outcome;
     return 'empty';
   }
 
@@ -489,10 +481,10 @@ export class FirstUseSyncCoordinator {
       };
     }
 
-    const persistedPartial = readPartialSyncState(opts.db ?? null);
-    if (this.isCoolingDown(opts.now) || isPartialMarkerCoolingDown(persistedPartial, opts.now)) {
+    const existingDb = opts.db ?? (existsSync(opts.dbPath) ? openDb(opts.dbPath) : null);
+    if (this.isCoolingDown(opts.now) || isEmptyDbCoolingDown(existingDb, opts.now)) {
       return {
-        db: opts.db ?? null,
+        db: existingDb,
         report: null,
         performedByThisCall: false,
         cooledDown: true,
@@ -501,15 +493,19 @@ export class FirstUseSyncCoordinator {
     }
 
     this.firstUseStarting = true;
-    const run = runFirstUseSync(opts).then((res) => {
+    const run = runFirstUseSync({ ...opts, db: opts.db ?? existingDb ?? undefined }).then((res) => {
       if (res.report.partial) {
         this.lastPartialNote = formatPartialNote(res.report);
         this.lastAttemptOutcome = 'failed';
         this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
+        if (!hasAnyReleases(res.db)) {
+          recordEmptySyncAttempt(res.db, 'failed', opts.now);
+        }
       } else if (!hasAnyReleases(res.db)) {
         this.lastPartialNote = null;
         this.lastAttemptOutcome = 'empty';
         this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
+        recordEmptySyncAttempt(res.db, 'empty', opts.now);
       } else {
         this.lastPartialNote = null;
         this.lastAttemptOutcome = null;
@@ -530,6 +526,7 @@ export class FirstUseSyncCoordinator {
     } catch (e) {
       this.lastAttemptOutcome = 'failed';
       this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
+      recordEmptySyncAttempt(opts.db ?? existingDb, 'failed', opts.now);
       throw e;
     } finally {
       this.firstUseStarting = false;

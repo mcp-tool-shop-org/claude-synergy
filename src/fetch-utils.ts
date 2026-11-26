@@ -267,13 +267,17 @@ export async function runGhApi(
           const stderrStr = stderr ? String(stderr) : '';
           const e = err as any;
           if (e.stderr === undefined) e.stderr = stderrStr;
-          if (
-            opts.signal?.aborted ||
-            e.killed ||
-            e.code === 'ABORT_ERR' ||
-            e.signal === 'SIGTERM' ||
-            e.signal === 'SIGKILL'
-          ) {
+          if (opts.signal?.aborted || e.code === 'ABORT_ERR' || e.name === 'AbortError') {
+            const reasonMsg = (opts.signal?.reason as any)?.message ?? err.message ?? 'aborted';
+            rejectPromise(
+              Object.assign(new Error(`gh api aborted: ${reasonMsg}`), {
+                code: e.code ?? 'ABORT_ERR',
+                stderr: stderrStr,
+              })
+            );
+            return;
+          }
+          if (e.killed || e.signal === 'SIGTERM' || e.signal === 'SIGKILL') {
             rejectPromise(
               Object.assign(
                 new Error(`gh api timed out after ${callTimeoutMs}ms: ${err.message}`),

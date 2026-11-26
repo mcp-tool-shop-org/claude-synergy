@@ -32,7 +32,6 @@ import {
   isAutoSyncDisabled,
   needsAutoSync,
   printStoreResolutionOnce,
-  readPartialSyncState,
   resolveStorePaths,
   writePartialSyncState,
   type ResolvedStore,
@@ -651,18 +650,16 @@ program
         sinceOverride: opts.since,
         onProgress: makeFetchProgressWriter(),
       });
-      if (!opts.product) {
-        if (stats.summary.failed === 0 && stats.summary.skipped === 0) {
-          clearPartialSyncState(db);
-        } else if (readPartialSyncState(db) !== null) {
-          writePartialSyncState(db, {
-            succeeded: stats.summary.succeeded,
-            total: stats.summary.total,
-            skipped: stats
-              .filter((r) => r.errors.length > 0)
-              .map((r) => ({ product: r.product, reason: r.errors.join('; ') })),
-          });
-        }
+      if (stats.summary.failed === 0 && stats.summary.skipped === 0) {
+        if (!opts.product) clearPartialSyncState(db);
+      } else {
+        writePartialSyncState(db, {
+          succeeded: stats.summary.succeeded,
+          total: stats.summary.total,
+          skipped: stats
+            .filter((r) => r.errors.length > 0)
+            .map((r) => ({ product: r.product, reason: r.errors.join('; ') })),
+        });
       }
       const dataAsOf = getCorpusFreshness(db, { product: opts.product });
       if (program.opts().json) {

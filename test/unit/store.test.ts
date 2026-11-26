@@ -5,7 +5,8 @@ import { homedir, tmpdir } from 'node:os';
 import { delimiter, join, resolve } from 'node:path';
 import {
   FIRST_USE_COOLDOWN_MS,
-  FIRST_USE_PARTIAL_META_KEY,
+  LAST_SYNC_PARTIAL_META_KEY,
+  LEGACY_FIRST_USE_PARTIAL_META_KEY,
   FIRST_USE_SYNC_TIMEOUT_MS,
   FirstUseSyncCoordinator,
   clearPartialSyncState,
@@ -13,7 +14,6 @@ import {
   formatPartialNote,
   hasAnyReleases,
   isAutoSyncDisabled,
-  isPartialMarkerCoolingDown,
   needsAutoSync,
   printStoreResolutionOnce,
   readPartialSyncState,
@@ -395,12 +395,12 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
       },
     });
     partialRes.db.close();
-    expect(coord.getPartialNote()).toContain('partial corpus: synced 1 of 2 products');
+    expect(coord.getPartialNote()).toContain('partial: 1/2 feeds');
     coord.clearPartialNote();
     expect(coord.getPartialNote()).toBeNull();
   });
 
-  it('persists first_use_partial across DB opens, surfaces in stamp, and clears on clean full sync (Item 3)', async () => {
+  it('persists last_sync_partial (driving stamp only), migrates legacy key, and never auto-syncs when DB has releases (FIX-3 Item 2)', async () => {
     const dir = makeTmpDir('store-partial-meta-');
     const dbPath = join(dir, 'data', 'claude-synergy.db');
     const productsRoot = join(dir, 'products');
@@ -427,8 +427,8 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
     });
     res1.db.close();
 
-    // Fresh DB connection sees persisted first_use_partial in schema_meta & stamp;
-    // needsAutoSync stays false during the persisted 10m cooldown and becomes true after.
+    // Fresh DB connection sees persisted last_sync_partial in schema_meta & stamp;
+    // needsAutoSync stays false forever once releases exist (both fresh and >10m later).
     const tFresh = new Date('2026-11-26T10:02:00Z');
     const tExpired = new Date('2026-11-26T10:11:00Z');
     const reopened = openDb(dbPath, { loadVec: false });
@@ -438,41 +438,49 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
       expect(persisted?.total).toBe(2);
       expect(persisted?.skipped).toEqual([{ product: 'p-skip', reason: 'timeout' }]);
       expect(persisted?.recorded_at).toBe('2026-11-26T10:00:00.000Z');
-      expect(isPartialMarkerCoolingDown(persisted, tFresh)).toBe(true);
-      expect(isPartialMarkerCoolingDown(persisted, tExpired)).toBe(false);
-      expect(needsAutoSync(reopened, tFresh)).toBe(false);
-      expect(needsAutoSync(reopened, tExpired)).toBe(true);
-      expect(formatFreshnessStamp(getCorpusFreshness(reopened, { now: tFresh }))).toContain('p-skip (timeout)');
-      expect(FIRST_USE_PARTIAL_META_KEY).toBe('first_use_partial');
+      expect(needsAutoSync(reopened)).toBe(false);
+      expect(formatFreshnessStamp(getCorpusFreshness(reopened, { now: tFresh }))).toContain(
+        'partial: 1/2 feeds (skipped: p-skip (timeout)) — run hk sync'
+      );
+      expect(formatFreshnessStamp(getCorpusFreshness(reopened, { now: tExpired }))).toContain(
+        'partial: 1/2 feeds (skipped: p-skip (timeout)) — run hk sync'
+      );
+      expect(LAST_SYNC_PARTIAL_META_KEY).toBe('last_sync_partial');
+      expect(LEGACY_FIRST_USE_PARTIAL_META_KEY).toBe('first_use_partial');
+
+      // Explicit full sync (0 errors) clears last_sync_partial cleanly.
+      const resClean = await runFirstUseSync({
+        db: reopened,
+        dbPath,
+        productsRoot,
+        fetchRunner: async (): Promise<FetchAllResult> => {
+          const arr: any = [
+            { product: 'p-ok', fetched: 0, newSince: '2026-11-25', latest: null, errors: [] },
+            { product: 'p-skip', fetched: 0, newSince: '2026-01-01', latest: null, errors: [] },
+          ];
+          arr.summary = { total: 2, succeeded: 2, failed: 0, skipped: 0, newChanges: 0, errors: [] };
+          return arr;
+        },
+      });
+      expect(resClean.report.partial).toBe(false);
+      expect(readPartialSyncState(reopened)).toBeNull();
+
+      // Legacy first_use_partial key is migrated once on read and deleted.
+      reopened
+        .prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`)
+        .run(
+          LEGACY_FIRST_USE_PARTIAL_META_KEY,
+          JSON.stringify({ succeeded: 1, total: 2, skipped: [{ product: 'old', reason: 'err' }] })
+        );
+      const migrated = readPartialSyncState(reopened);
+      expect(migrated?.skipped).toEqual([{ product: 'old', reason: 'err' }]);
+      expect(
+        reopened.prepare(`SELECT value FROM schema_meta WHERE key = ?`).get(LEGACY_FIRST_USE_PARTIAL_META_KEY)
+      ).toBeUndefined();
+      clearPartialSyncState(reopened);
+      expect(readPartialSyncState(reopened)).toBeNull();
     } finally {
       reopened.close();
-    }
-
-    // Re-running first-use sync after cooldown where all products succeed clears first_use_partial.
-    const coord = new FirstUseSyncCoordinator();
-    const res2 = await coord.ensureSynced({
-      dbPath,
-      productsRoot,
-      now: tExpired,
-      fetchRunner: async (): Promise<FetchAllResult> => {
-        const arr: any = [
-          { product: 'p-ok', fetched: 0, newSince: '2026-11-25', latest: null, errors: [] },
-          { product: 'p-skip', fetched: 0, newSince: '2026-01-01', latest: null, errors: [] },
-        ];
-        arr.summary = { total: 2, succeeded: 2, failed: 0, skipped: 0, newChanges: 0, errors: [] };
-        return arr;
-      },
-    });
-    try {
-      expect(res2.performedByThisCall).toBe(true);
-      expect(readPartialSyncState(res2.db)).toBeNull();
-      expect(needsAutoSync(res2.db)).toBe(false);
-      writePartialSyncState(res2.db!, { succeeded: 1, total: 2, skipped: [] });
-      expect(readPartialSyncState(res2.db)).not.toBeNull();
-      clearPartialSyncState(res2.db);
-      expect(readPartialSyncState(res2.db)).toBeNull();
-    } finally {
-      res2.db?.close();
     }
   });
 
@@ -501,6 +509,7 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
     // 5 minutes later -> still cooling down, does not invoke fetchRunner again
     const t5m = new Date(t0.getTime() + 5 * 60 * 1000);
     const r2 = await coord.ensureSynced({ dbPath, productsRoot, fetchRunner: failFetch, now: t5m });
+    r2.db?.close();
     expect(r2.cooledDown).toBe(true);
     expect(r2.performedByThisCall).toBe(false);
     expect(fetchCalls).toBe(1);
@@ -574,16 +583,16 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
     initSchema(badMetaDb);
     badMetaDb
       .prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`)
-      .run(FIRST_USE_PARTIAL_META_KEY, '{broken');
+      .run(LAST_SYNC_PARTIAL_META_KEY, '{broken');
     expect(readPartialSyncState(badMetaDb)).toBeNull();
     badMetaDb
       .prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`)
-      .run(FIRST_USE_PARTIAL_META_KEY, '{"foo":1}');
+      .run(LAST_SYNC_PARTIAL_META_KEY, '{"foo":1}');
     expect(readPartialSyncState(badMetaDb)).toBeNull();
     badMetaDb.close();
 
     expect(formatPartialNote({ succeeded: 1, total: 2, skipped: [] })).toBe(
-      'partial corpus: synced 1 of 2 products'
+      'partial: 1/2 feeds — run hk sync'
     );
 
     const coord = new FirstUseSyncCoordinator();
@@ -604,12 +613,13 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
     coord.resetCooldown();
     expect(coord.isCoolingDown(new Date('2026-11-26T10:01:00Z'))).toBe(false);
 
-    const errDb = openDb(dbPath, { loadVec: false });
+    const errDbPath = join(dir, 'data', 'err.db');
+    const errDb = openDb(errDbPath, { loadVec: false });
     try {
       await expect(
         coord.ensureSynced({
           db: errDb,
-          dbPath,
+          dbPath: errDbPath,
           productsRoot,
           fetchRunner: async () => {
             throw new AppError({

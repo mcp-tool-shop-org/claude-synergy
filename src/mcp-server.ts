@@ -424,7 +424,7 @@ function finalizeToolText(
   opts: { scopedProduct?: string; firstUseLine?: string } = {}
 ): string {
   const freshness = getCorpusFreshness(db, { product: opts.scopedProduct });
-  const partialNote = syncCoordinator.getPartialNote() ?? undefined;
+  const partialNote = db ? undefined : (syncCoordinator.getPartialNote() ?? undefined);
   const stamp = formatFreshnessStamp(freshness, { partialNote });
   const sections: string[] = [];
   if (opts.firstUseLine) sections.push(opts.firstUseLine);
@@ -1097,21 +1097,21 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
       timeoutMs,
     });
     const fetched = fetchStats.summary;
-    if (!args.product) {
-      if (fetched.failed === 0 && fetched.skipped === 0) {
+    if (fetched.failed === 0 && fetched.skipped === 0) {
+      if (!args.product) {
         clearPartialSyncState(db);
         syncCoordinator.clearPartialNote();
         syncCoordinator.resetCooldown();
-      } else {
-        const skipped = fetchStats
-          .filter((r) => r.errors.length > 0)
-          .map((r) => ({ product: r.product, reason: r.errors.join('; ') }));
-        writePartialSyncState(db, {
-          succeeded: fetched.succeeded,
-          total: fetched.total,
-          skipped,
-        });
       }
+    } else {
+      const skipped = fetchStats
+        .filter((r) => r.errors.length > 0)
+        .map((r) => ({ product: r.product, reason: r.errors.join('; ') }));
+      writePartialSyncState(db, {
+        succeeded: fetched.succeeded,
+        total: fetched.total,
+        skipped,
+      });
     }
 
     // === ingest ===

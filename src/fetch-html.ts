@@ -367,44 +367,19 @@ function sanitizeCheerioDom($: cheerio.CheerioAPI): void {
 /**
  * Strip dangerous active/executable elements (`<script>`, `<style>`, `<iframe>`,
  * `<object>`, `<embed>`, `<meta http-equiv>`, `<link>`, `<base>`, SVG `<animate>`/`<set>`)
- * and attributes (`on*`, `srcset`, `style` containing `url(...)`, non-HTTP(S)/mailto URLs).
- * When `preserveMarkdown` is true (e.g. GitHub release bodies), fenced/inline code blocks,
- * autolinks, and plain Markdown punctuation are left untouched.
+ * and attributes (`on*`, `srcset`, `style` containing `url(...)`, non-HTTP(S)/mailto URLs)
+ * from scraped HTML bodies before storing them, serializing all nodes escaped.
  */
-export function sanitizeScrapedHtml(
-  rawHtml: string,
-  opts: { preserveMarkdown?: boolean } = {}
-): string {
-  if (!rawHtml || !rawHtml.includes('<')) return rawHtml;
-
-  if (opts.preserveMarkdown) {
-    const stash: string[] = [];
-    const stashToken = (s: string) => {
-      const idx = stash.push(s) - 1;
-      return `@@CS_MD_STASH_${idx}@@`;
-    };
-    const protectedText = rawHtml
-      .replace(/^ {0,3}(`{3,}|~{3,})[\s\S]*?^ {0,3}\1[ \t]*$/gm, stashToken)
-      .replace(/(`+)[^\n]*?\1/g, stashToken)
-      .replace(/<(?:https?|mailto):[^>\s]+>/gi, stashToken);
-
-    if (!/<\/?[a-zA-Z][a-zA-Z0-9-]*(?=[\s/>])/.test(protectedText)) {
-      return rawHtml;
-    }
-
-    const $ = cheerio.load(protectedText, null, false);
-    sanitizeCheerioDom($);
-    const serialized = $.root()
-      .contents()
-      .toArray()
-      .map((n: any) => (n.type === 'text' ? n.data : $.html(n)))
-      .join('');
-    return serialized.replace(/@@CS_MD_STASH_(\d+)@@/g, (_, idx) => stash[Number(idx)] ?? '');
-  }
-
+export function sanitizeScrapedHtml(rawHtml: string): string {
+  if (!rawHtml || (!rawHtml.includes('<') && !rawHtml.includes('&'))) return rawHtml;
   const $ = cheerio.load(rawHtml, null, false);
   sanitizeCheerioDom($);
-  return ($.html() ?? '').trim();
+  return $.root()
+    .contents()
+    .toArray()
+    .map((node) => $.html(node))
+    .join('')
+    .trim();
 }
 
 /**

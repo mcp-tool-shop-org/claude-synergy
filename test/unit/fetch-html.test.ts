@@ -399,7 +399,7 @@ describe('fetchAnthropicAppsReleaseNotes', () => {
     expect(narrow[1].slug).toBe('2026-04-17-claude-cowork');
   });
 
-  it('strips dangerous elements, srcset, style url(...), and non-safe URL schemes while preserving safe attributes and Markdown (Items 15 & FIX-2 Item 7)', async () => {
+  it('strips dangerous elements and attributes while serializing escaped text nodes safely (Items 15, FIX-2 Item 7, FIX-3 Item 1)', async () => {
     const dirty = [
       '<div>',
       '<script>alert(1)</script><style>body{}</style><iframe src="https://x.test"></iframe>',
@@ -423,18 +423,14 @@ describe('fetchAnthropicAppsReleaseNotes', () => {
     expect(clean).toContain('/docs/overview');
     expect(clean).toContain('https://docs.example.test');
 
-    const mdInput = [
-      '## Release Notes',
-      '> Quoted & checked > value with [link](https://example.test?a=1&b=2) and `<script>inline()</script>`',
-      '- Raw block <object data="x"></object><img src="https://ok.test/i.png" srcset="bad 2x" style="background:url(https://bad.test)"> kept',
-      '```html',
-      '<script>codeBlockPreserved()</script>',
-      '```',
-    ].join('\n');
-    const cleanMd = sanitizeScrapedHtml(mdInput, { preserveMarkdown: true });
-    expect(cleanMd).toContain('> Quoted & checked > value with [link](https://example.test?a=1&b=2) and `<script>inline()</script>`');
-    expect(cleanMd).toContain('<script>codeBlockPreserved()</script>');
-    expect(cleanMd).not.toMatch(/<object|\bsrcset\b|url\(/i);
-    expect(cleanMd).toContain('<img src="https://ok.test/i.png">');
+    // FIX-3 Item 1: escaped text like &lt;img ...&gt; must remain escaped, while real <script> and onclick are stripped.
+    const escapedAndLive = sanitizeScrapedHtml(
+      '<div>&lt;img src=x onerror=1&gt;<script>evil()</script><p onclick="bad()">ok</p></div>'
+    );
+    expect(escapedAndLive).toContain('&lt;img src=x onerror=1&gt;');
+    expect(escapedAndLive).not.toMatch(/<img/i);
+    expect(escapedAndLive).not.toMatch(/<script/i);
+    expect(escapedAndLive).not.toMatch(/onclick/i);
+    expect(escapedAndLive).toContain('<p>ok</p>');
   });
 });

@@ -6,7 +6,13 @@ import {
   formatManualFeedWarning,
   utcDaysSince,
 } from '../../src/query.js';
-import { clearPartialSyncState, writePartialSyncState } from '../../src/store.js';
+import {
+  clearPartialSyncState,
+  LAST_SYNC_PARTIAL_META_KEY,
+  LEGACY_FIRST_USE_PARTIAL_META_KEY,
+  readPartialSyncState,
+  writePartialSyncState,
+} from '../../src/store.js';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
 
@@ -106,12 +112,35 @@ describe('getCorpusFreshness & formatFreshnessStamp', () => {
     const updated = getCorpusFreshness(temp.db, { now: new Date('2026-06-12T12:00:00Z') });
     expect(updated.synced_at).toBe('2026-06-10T08:00:00Z');
     expect(updated.stale).toBe(false);
-    expect(formatFreshnessStamp(updated)).toContain('partial corpus: synced 1 of 2 products (skipped: windsurf (timeout))');
+    expect(formatFreshnessStamp(updated)).toContain('partial: 1/2 feeds (skipped: windsurf (timeout)) — run hk sync');
 
     clearPartialSyncState(temp.db);
     const cleared = getCorpusFreshness(temp.db, { now: new Date('2026-06-12T12:00:00Z') });
     expect(cleared.partial_note).toBeUndefined();
-    expect(formatFreshnessStamp(cleared)).not.toContain('partial corpus');
+    expect(formatFreshnessStamp(cleared)).not.toContain('partial:');
+
+    // FIX-3 Item 2: legacy first_use_partial migrates once into last_sync_partial and clears old key.
+    temp.db
+      .prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`)
+      .run(
+        LEGACY_FIRST_USE_PARTIAL_META_KEY,
+        JSON.stringify({ succeeded: 2, total: 3, skipped: [{ product: 'aider', reason: 'timeout' }] })
+      );
+    const migrated = readPartialSyncState(temp.db);
+    expect(migrated).toEqual({
+      succeeded: 2,
+      total: 3,
+      skipped: [{ product: 'aider', reason: 'timeout' }],
+      recorded_at: undefined,
+    });
+    const oldRow = temp.db
+      .prepare(`SELECT value FROM schema_meta WHERE key = ?`)
+      .get(LEGACY_FIRST_USE_PARTIAL_META_KEY);
+    const newRow = temp.db
+      .prepare(`SELECT value FROM schema_meta WHERE key = ?`)
+      .get(LAST_SYNC_PARTIAL_META_KEY) as { value: string } | undefined;
+    expect(oldRow).toBeUndefined();
+    expect(newRow?.value).toContain('aider');
   });
 
   it('supports injectable clock function and CLAUDE_SYNERGY_NOW env', () => {
