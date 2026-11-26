@@ -8,6 +8,7 @@ import { loadProductsConfig } from '../../src/products-config.js';
 import { readWorkspace, type KnownLockfileName } from '../../src/workspace.js';
 import {
   evaluateWorkspaceRelevance,
+  extractVersionFromNotesPath,
   formatRelevanceReport,
 } from '../../src/relevance.js';
 
@@ -63,6 +64,7 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: npm
         name: "@scope/sdk-npm"
+        release_prefix: ""
   - name: tool-npm
     display_name: Test NPM Tool
     tier: 1
@@ -71,6 +73,7 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: npm
         name: "@scope/tool-npm"
+        release_prefix: ""
   - name: sdk-pypi
     display_name: Test PyPI SDK
     tier: 1
@@ -79,6 +82,7 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: pypi
         name: test-pypi-sdk
+        release_prefix: ""
   - name: tool-pypi
     display_name: Test PyPI Tool
     tier: 1
@@ -87,6 +91,7 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: pypi
         name: test-pypi-tool
+        release_prefix: ""
   - name: sdk-rust
     display_name: Test Rust SDK
     tier: 1
@@ -95,6 +100,7 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: crates
         name: test-rust-sdk
+        release_prefix: "test-rust-sdk-v"
   - name: tool-rust
     display_name: Test Rust Tool
     tier: 1
@@ -103,6 +109,7 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: crates
         name: test-rust-tool
+        release_prefix: ""
   - name: sdk-go
     display_name: Test Go SDK
     tier: 1
@@ -111,8 +118,10 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: go
         name: example.invalid/sdk-go
+        release_prefix: ""
       - ecosystem: go
         name: example.invalid/sdk-go/v2
+        release_prefix: ""
   - name: tool-go
     display_name: Test Go Tool
     tier: 1
@@ -121,6 +130,7 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: go
         name: example.invalid/tool-go
+        release_prefix: ""
   - name: unused-product
     display_name: Unused Product
     tier: 1
@@ -129,6 +139,7 @@ function buildTestProductsYaml(dir: string): string {
     packages:
       - ecosystem: npm
         name: "@scope/never-used"
+        release_prefix: ""
 `,
     'utf-8'
   );
@@ -458,9 +469,9 @@ describe('evaluateWorkspaceRelevance — all 7 lockfile formats', () => {
     ]);
 
     // Case B: two releases on installed date (0.97.0 & 0.97.1 on 2026-05-19) plus a newer release (0.98.0)
-    writeRelease(productsRoot, 'sdk-npm', 'sdk-npm-0.97.0', '0.97.0', '2026-05-19', ['- Added 0.97.0']);
-    writeRelease(productsRoot, 'sdk-npm', 'sdk-npm-0.97.1', '0.97.1', '2026-05-19', ['- Fixed 0.97.1']);
-    writeRelease(productsRoot, 'sdk-npm', 'sdk-npm-0.98.0', '0.98.0', '2026-05-21', ['- Added 0.98.0']);
+    writeRelease(productsRoot, 'sdk-npm', '0.97.0', '0.97.0', '2026-05-19', ['- Added 0.97.0']);
+    writeRelease(productsRoot, 'sdk-npm', '0.97.1', '0.97.1', '2026-05-19', ['- Fixed 0.97.1']);
+    writeRelease(productsRoot, 'sdk-npm', '0.98.0', '0.98.0', '2026-05-21', ['- Added 0.98.0']);
     ingestAll(tempDb.db, productsRoot);
 
     const cfg = loadProductsConfig(yamlPath)!;
@@ -527,7 +538,14 @@ require example.invalid/tool-go v1.9.1
     expect(formattedB).toContain('sdk-npm@0.97.1');
   });
 
-  it('scopes mixed-package products strictly to unprefixed or matching notes_path files', () => {
+  it('scopes releases strictly to exact declared release_prefix (<release_prefix><V>.md) and rejects missing notes_path', () => {
+    expect(extractVersionFromNotesPath('a/releases/sdk-1.0.0.md', 'sdk-')).toBe('1.0.0');
+    expect(extractVersionFromNotesPath('a/releases/bedrock-sdk-1.0.0.md', 'sdk-')).toBeNull();
+    expect(extractVersionFromNotesPath('a/releases/sdk-1.0.0.md', '')).toBeNull();
+    expect(extractVersionFromNotesPath('a/releases/rmcp-v1.7.0.md', 'rmcp-v')).toBe('1.7.0');
+    expect(extractVersionFromNotesPath('a/releases/rmcp-macros-v1.7.0.md', 'rmcp-v')).toBeNull();
+    expect(extractVersionFromNotesPath('', 'sdk-')).toBeNull();
+
     const root = makeDir('cs-rel-mixed-');
     const productsRoot = join(root, 'products');
     const yamlPath = join(root, 'products.yaml');
@@ -542,6 +560,7 @@ require example.invalid/tool-go v1.9.1
     packages:
       - ecosystem: npm
         name: "@anthropic-ai/sdk"
+        release_prefix: "sdk-"
   - name: mcp-typescript-sdk
     display_name: MCP TypeScript SDK
     tier: 1
@@ -550,27 +569,43 @@ require example.invalid/tool-go v1.9.1
     packages:
       - ecosystem: npm
         name: "@modelcontextprotocol/sdk"
+        release_prefix: ""
+  - name: mcp-rust-sdk
+    display_name: MCP Rust SDK
+    tier: 1
+    source_url: https://example.invalid/mcp-rust-sdk
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: crates
+        name: rmcp
+        release_prefix: "rmcp-v"
 `,
       'utf-8'
     );
 
-    // Mixed anthropic-sdk-typescript files: sdk-* + bedrock-sdk-* + vertex-sdk-*
+    // Mixed anthropic-sdk-typescript: sdk-1.0.0/2.0.0 vs bedrock-sdk-1.0.0/2.0.0 vs vertex-sdk-0.16.1
+    writeRelease(productsRoot, 'anthropic-sdk-typescript', 'bedrock-sdk-1.0.0', '1.0.0', '2026-05-10', [
+      '- Bedrock 1.0.0',
+    ]);
+    writeRelease(productsRoot, 'anthropic-sdk-typescript', 'bedrock-sdk-2.0.0', '2.0.0', '2026-05-22', [
+      '- Bedrock 2.0.0 (must never match sdk-)',
+    ]);
     writeRelease(productsRoot, 'anthropic-sdk-typescript', 'vertex-sdk-0.16.1', '0.16.1', '2026-05-19', [
       '- Vertex adapter update',
     ]);
-    writeRelease(productsRoot, 'anthropic-sdk-typescript', 'bedrock-sdk-0.29.2', '0.29.2', '2026-05-19', [
-      '- Bedrock adapter update',
+    writeRelease(productsRoot, 'anthropic-sdk-typescript', 'sdk-1.0.0', 'sdk-v1.0.0', '2026-05-19', [
+      '- Core SDK 1.0.0',
     ]);
-    writeRelease(productsRoot, 'anthropic-sdk-typescript', 'sdk-0.97.0', '0.97.0', '2026-05-19', [
-      '- Core SDK 0.97.0',
-    ]);
-    writeRelease(productsRoot, 'anthropic-sdk-typescript', 'sdk-0.98.0', '0.98.0', '2026-05-21', [
-      '- Core SDK 0.98.0',
+    writeRelease(productsRoot, 'anthropic-sdk-typescript', 'sdk-2.0.0', 'sdk-v2.0.0', '2026-05-21', [
+      '- Core SDK 2.0.0',
     ]);
 
-    // Mixed mcp-typescript-sdk files: bare 1.29.0 alongside newer prefixed server v2 alphas
+    // Bare-version product with release_prefix: "" alongside other-pkg-2.0.0.md and server v2 alpha
     writeRelease(productsRoot, 'mcp-typescript-sdk', '1.29.0', '1.29.0', '2026-03-30', [
       '- MCP TypeScript SDK 1.29.0',
+    ]);
+    writeRelease(productsRoot, 'mcp-typescript-sdk', 'other-pkg-2.0.0', '2.0.0', '2026-04-02', [
+      '- Foreign package with bare version string in version column',
     ]);
     writeRelease(
       productsRoot,
@@ -580,54 +615,87 @@ require example.invalid/tool-go v1.9.1
       '2026-04-01',
       ['- Server v2 alpha']
     );
-    ingestAll(tempDb.db, productsRoot);
 
+    // mcp-rust-sdk: version column holds whole tag ("rmcp-v1.6.0"), so matching uses <V> ("1.6.0")
+    writeRelease(productsRoot, 'mcp-rust-sdk', 'rmcp-v1.6.0', 'rmcp-v1.6.0', '2026-05-01', [
+      '- Rust SDK 1.6.0',
+    ]);
+    writeRelease(productsRoot, 'mcp-rust-sdk', 'rmcp-v1.7.0', 'rmcp-v1.7.0', '2026-05-13', [
+      '- Rust SDK 1.7.0',
+    ]);
+    writeRelease(productsRoot, 'mcp-rust-sdk', 'rmcp-macros-v1.8.0', 'rmcp-macros-v1.8.0', '2026-05-20', [
+      '- Proc macro crate (must never match rmcp)',
+    ]);
+    writeRelease(productsRoot, 'mcp-rust-sdk', '9.9.9', '9.9.9', '2026-05-21', [
+      '- Unprefixed file must never match rmcp-v',
+    ]);
+
+    ingestAll(tempDb.db, productsRoot);
     const cfg = loadProductsConfig(yamlPath)!;
 
-    // 1. Sub-packages are unmapped (bedrock-sdk is not matched); @anthropic-ai/sdk@0.16.1 does not match vertex-sdk-0.16.1
-    const wsFalseVertex = makeDir('cs-ws-mixed-1-');
+    // 1. sdk- vs bedrock-sdk/vertex-sdk; "" vs other-pkg/server; rmcp-v vs rmcp-macros-v/9.9.9
+    const ws = makeDir('cs-ws-mixed-1-');
     writeFileSync(
-      join(wsFalseVertex, 'package-lock.json'),
+      join(ws, 'package-lock.json'),
       JSON.stringify({
         lockfileVersion: 3,
         packages: {
-          'node_modules/@anthropic-ai/bedrock-sdk': { version: '0.29.2' },
-          'node_modules/@anthropic-ai/sdk': { version: '0.16.1' },
+          'node_modules/@anthropic-ai/sdk': { version: '1.0.0' },
           'node_modules/@modelcontextprotocol/sdk': { version: '1.29.0' },
         },
       }),
       'utf-8'
     );
-    const report1 = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(wsFalseVertex), {
-      productsConfig: cfg,
-    });
-    expect(report1.action_needed_count).toBe(0);
-    const sdkRes1 = report1.products.find((p) => p.product === 'anthropic-sdk-typescript')!;
-    expect(sdkRes1.status).toBe('unknown');
-    expect(sdkRes1.summary).toBe('unknown: installed 0.16.1 is not in the mirror');
-
-    const mcpRes1 = report1.products.find((p) => p.product === 'mcp-typescript-sdk')!;
-    expect(mcpRes1.status).toBe('up_to_date');
-    expect(mcpRes1.latest_version).toBe('1.29.0');
-
-    // 2. Installed @anthropic-ai/sdk@0.97.0 compares strictly against sdk-* rows (ignores bedrock-sdk/vertex-sdk)
-    const wsSdk97 = makeDir('cs-ws-mixed-2-');
     writeFileSync(
-      join(wsSdk97, 'package-lock.json'),
+      join(ws, 'Cargo.lock'),
+      'version = 4\n\n[[package]]\nname = "rmcp"\nversion = "1.6.0"\n',
+      'utf-8'
+    );
+
+    const report1 = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(ws), { productsConfig: cfg });
+    const tsRes = report1.products.find((p) => p.product === 'anthropic-sdk-typescript')!;
+    expect(tsRes.status).toBe('action_needed');
+    expect(tsRes.latest_version).toBe('2.0.0');
+    expect(tsRes.releases.map((r) => r.version)).toEqual(['2.0.0']);
+    expect(tsRes.releases[0].changes[0].text).toBe('Core SDK 2.0.0');
+
+    const mcpTsRes = report1.products.find((p) => p.product === 'mcp-typescript-sdk')!;
+    expect(mcpTsRes.status).toBe('up_to_date');
+    expect(mcpTsRes.latest_version).toBe('1.29.0');
+
+    const rustRes = report1.products.find((p) => p.product === 'mcp-rust-sdk')!;
+    expect(rustRes.status).toBe('action_needed');
+    expect(rustRes.latest_version).toBe('1.7.0');
+    expect(rustRes.releases.map((r) => r.version)).toEqual(['1.7.0']);
+
+    // 2. Installed @anthropic-ai/sdk@0.16.1 does not match vertex-sdk-0.16.1
+    const wsVertex = makeDir('cs-ws-mixed-vertex-');
+    writeFileSync(
+      join(wsVertex, 'package-lock.json'),
       JSON.stringify({
         lockfileVersion: 3,
-        packages: { 'node_modules/@anthropic-ai/sdk': { version: '0.97.0' } },
+        packages: { 'node_modules/@anthropic-ai/sdk': { version: '0.16.1' } },
       }),
       'utf-8'
     );
-    const report2 = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(wsSdk97), {
+    const reportVertex = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(wsVertex), {
       productsConfig: cfg,
     });
-    expect(report2.action_needed_count).toBe(1);
-    expect(report2.products[0].releases.map((r) => r.version)).toEqual(['0.98.0']);
-    expect(report2.products[0].releases.some((r) => r.version === '0.29.2' || r.version === '0.16.1')).toBe(
-      false
-    );
+    expect(reportVertex.products[0].status).toBe('unknown');
+
+    // 3. Row with empty notes_path decides the answer -> unknown when dated >= installedDate
+    tempDb.db
+      .prepare(
+        `INSERT INTO releases (product, version, released_at, notes_path, fetched_at, source_url)
+         VALUES ('mcp-typescript-sdk', '1.99.0', '2026-04-05', '', '2026-04-05', 'https://example.invalid')`
+      )
+      .run();
+    const reportMissingPath = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(ws), {
+      productsConfig: cfg,
+    });
+    const mcpMissing = reportMissingPath.products.find((p) => p.product === 'mcp-typescript-sdk')!;
+    expect(mcpMissing.status).toBe('unknown');
+    expect(mcpMissing.summary).toBe('unknown: release in mirror has no notes_path');
   });
 
   it('formats go.mod replace-skipped summary in files read', () => {

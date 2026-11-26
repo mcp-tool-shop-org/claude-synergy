@@ -12,6 +12,7 @@ import {
 import {
   loadProductsConfig,
   type PackageEcosystem,
+  type PackageIdentity,
   type ProductMeta,
   type ProductsConfig,
 } from './products-config.js';
@@ -118,79 +119,46 @@ function loadProductCatalog(
 }
 
 /**
- * Strip a Go major-version path suffix (`/v2`, `/v3`, ...) before extracting a
- * package short name or scoped slug for filename prefix matching.
+ * Extract `<V>` if and only if `notesPath` is non-empty, ends with `.md`,
+ * and its file stem is strictly `<releasePrefix><V>` where `<V>` begins with
+ * an ASCII digit. Rows without `notesPath` or with any other stem return `null`.
  */
-function stripGoMajorSuffix(pkgName: string): string {
-  return pkgName.trim().replace(/\/v\d+$/i, '');
-}
-
-/**
- * Return true if `notes_path` belongs to `pkgName`: either an unprefixed
- * version filename (`1.29.0.md`, `v1.0.95.md`) or prefixed with `pkgName`'s
- * own short name or scoped slug (`sdk-0.97.0.md`, `rmcp-v1.7.0.md`).
- * Excludes sibling package releases stored under the same product row.
- */
-export function releaseBelongsToPackage(
+export function extractVersionFromNotesPath(
   notesPath: string | null | undefined,
-  pkgName: string
-): boolean {
-  const fileName = (notesPath ?? '').replace(/\\/g, '/').split('/').pop() ?? '';
-  const stem = fileName.replace(/\.md$/i, '');
-  if (!stem) return true;
-  if (/^(?:v)?\d/i.test(stem)) return true;
-
-  const basePkg = stripGoMajorSuffix(pkgName);
-  const shortName = (basePkg.includes('/') ? basePkg.split('/').pop()! : basePkg).toLowerCase();
-  const scopedSlug = basePkg.replace(/^@/, '').replace(/\//g, '-').toLowerCase();
-  const stemLower = stem.toLowerCase();
-
-  for (const prefix of new Set([shortName, scopedSlug])) {
-    if (!prefix) continue;
-    if (stemLower.startsWith(`${prefix}-`) || stemLower.startsWith(`${prefix}@`)) {
-      const rest = stemLower.slice(prefix.length + 1);
-      if (/^(?:v)?\d/i.test(rest)) return true;
-    }
-  }
-  return false;
+  releasePrefix: string
+): string | null {
+  if (!notesPath || typeof notesPath !== 'string') return null;
+  const trimmedPath = notesPath.trim();
+  if (!trimmedPath) return null;
+  const fileName = trimmedPath.replace(/\\/g, '/').split('/').pop() ?? '';
+  if (!fileName.endsWith('.md')) return null;
+  const stem = fileName.slice(0, -3);
+  if (!stem.startsWith(releasePrefix)) return null;
+  const versionPart = stem.slice(releasePrefix.length);
+  if (!/^\d/.test(versionPart)) return null;
+  return versionPart;
 }
 
-function candidateMirrorVersions(pkgName: string, installedVersion: string): string[] {
-  const trimmed = installedVersion.trim();
-  const bare = trimmed.replace(/^v/, '');
-  const basePkg = stripGoMajorSuffix(pkgName);
-  const shortName = basePkg.includes('/') ? basePkg.split('/').pop()! : basePkg;
-  const raw = [
-    trimmed,
-    bare,
-    `v${bare}`,
-    `${pkgName}@${bare}`,
-    `${pkgName}@v${bare}`,
-    `${shortName}-v${bare}`,
-    `${shortName}-${bare}`,
-  ];
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const c of raw) {
-    if (c && !seen.has(c)) {
-      seen.add(c);
-      out.push(c);
-    }
-  }
-  return out;
-}
-
-interface MirrorReleaseRow {
+interface RawReleaseRow {
   version: string;
   released_at: string | null;
   notes_path: string | null;
 }
 
+interface PackageReleaseRow {
+  /** Extracted `<V>` from `notes_path`, used for matching and reporting. */
+  version: string;
+  /** Raw `releases.version` column value, used to join `changes` / `compareVersions`. */
+  dbVersion: string;
+  released_at: string | null;
+  notes_path: string;
+}
+
 function loadPackageReleases(
   db: Database.Database,
   product: string,
-  pkgName: string
-): MirrorReleaseRow[] {
+  releasePrefix: string
+): { packageReleases: PackageReleaseRow[]; missingNotesPathRows: RawReleaseRow[] } {
   const rows = db
     .prepare(
       `SELECT version, released_at, notes_path
@@ -200,8 +168,26 @@ function loadPackageReleases(
                 released_at DESC,
                 rowid ASC`
     )
-    .all(product) as MirrorReleaseRow[];
-  return rows.filter((r) => releaseBelongsToPackage(r.notes_path, pkgName));
+    .all(product) as RawReleaseRow[];
+
+  const packageReleases: PackageReleaseRow[] = [];
+  const missingNotesPathRows: RawReleaseRow[] = [];
+  for (const r of rows) {
+    if (!r.notes_path || typeof r.notes_path !== 'string' || !r.notes_path.trim()) {
+      missingNotesPathRows.push(r);
+      continue;
+    }
+    const extracted = extractVersionFromNotesPath(r.notes_path, releasePrefix);
+    if (extracted !== null) {
+      packageReleases.push({
+        version: extracted,
+        dbVersion: r.version,
+        released_at: r.released_at,
+        notes_path: r.notes_path,
+      });
+    }
+  }
+  return { packageReleases, missingNotesPathRows };
 }
 
 function hasChangesFlagsColumnLocal(db: Database.Database): boolean {
@@ -212,7 +198,7 @@ function hasChangesFlagsColumnLocal(db: Database.Database): boolean {
 function loadReleaseChanges(
   db: Database.Database,
   product: string,
-  row: { version: string; released_at: string },
+  row: { version: string; dbVersion: string; released_at: string },
   hasFlagsCol: boolean
 ): ChangesSinceResult {
   const flagsExpr = hasFlagsCol ? 'flags' : 'NULL';
@@ -223,7 +209,7 @@ function loadReleaseChanges(
        WHERE product = ? AND version = ?
        ORDER BY ordinal ASC`
     )
-    .all(product, row.version) as Array<{
+    .all(product, row.dbVersion) as Array<{
     ordinal: number;
     kind: string;
     text: string;
@@ -304,6 +290,7 @@ function evaluateMatchedEntry(
   db: Database.Database | null,
   hasReleasesTable: boolean,
   meta: ProductMeta,
+  pkg: PackageIdentity,
   entry: WorkspacePackageEntry
 ): ProductRelevanceResult {
   const baseInstalled = {
@@ -329,23 +316,22 @@ function evaluateMatchedEntry(
     };
   }
 
-  const packageReleases = loadPackageReleases(db, meta.name, entry.name);
-  const byVersionRow = new Map<string, MirrorReleaseRow>();
+  const { packageReleases, missingNotesPathRows } = loadPackageReleases(
+    db,
+    meta.name,
+    pkg.release_prefix
+  );
+  const byVersionRow = new Map<string, PackageReleaseRow>();
   for (const r of packageReleases) {
     byVersionRow.set(r.version, r);
   }
 
-  let matchedRow: MirrorReleaseRow | null = null;
-  for (const candidate of candidateMirrorVersions(entry.name, entry.version)) {
-    const row = byVersionRow.get(candidate);
-    if (row) {
-      matchedRow = row;
-      break;
-    }
-  }
+  const installedTrimmed = entry.version.trim();
+  const installedBare = installedTrimmed.replace(/^v(?=\d)/i, '');
+  const matchedRow = byVersionRow.get(installedTrimmed) ?? byVersionRow.get(installedBare) ?? null;
 
   const datedReleases = packageReleases.filter(
-    (r): r is MirrorReleaseRow & { released_at: string } => Boolean(r.released_at)
+    (r): r is PackageReleaseRow & { released_at: string } => Boolean(r.released_at)
   );
   const newestDate = datedReleases[0]?.released_at ?? null;
   const newestDateReleases = newestDate
@@ -377,6 +363,24 @@ function evaluateMatchedEntry(
   }
 
   const installedDate = matchedRow.released_at;
+  if (missingNotesPathRows.some((r) => !r.released_at || r.released_at >= installedDate)) {
+    return {
+      status: 'unknown',
+      product: meta.name,
+      display_name: meta.display_name,
+      summary: 'unknown: release in mirror has no notes_path',
+      installed: {
+        ...baseInstalled,
+        mirror_version: matchedRow.version,
+      },
+      latest_version: null,
+      latest_released_at: newestDate,
+      releases_behind: 0,
+      breaking_changes: [],
+      releases: [],
+    };
+  }
+
   const sameDayRows = datedReleases.filter((r) => r.released_at === installedDate);
   const sameDaySiblingRows = sameDayRows.filter((r) => r.version !== matchedRow.version);
   const afterRows = datedReleases.filter((r) => r.released_at > installedDate);
@@ -424,27 +428,27 @@ function evaluateMatchedEntry(
     };
   }
 
-  // Reuse `compareVersions` from src/query.ts, then scope strictly to releases
-  // belonging to the mapped package (`afterRows`) and never drop same-day siblings.
+  // Reuse `compareVersions` from src/query.ts (joining on DB `version`), then scope
+  // strictly to releases belonging to the mapped package (`afterRows`) using `<V>`.
   const diffFromCompare = compareVersions(db, {
     product: meta.name,
-    fromVersion: matchedRow.version,
-    toVersion: newestDateReleases[0].version,
+    fromVersion: matchedRow.dbVersion,
+    toVersion: newestDateReleases[0].dbVersion,
   });
-  const changesByVersion = new Map<string, ChangesSinceResult>();
+  const changesByDbVersion = new Map<string, ChangesSinceResult>();
   for (const item of diffFromCompare) {
-    changesByVersion.set(item.version, item);
+    changesByDbVersion.set(item.version, item);
   }
 
-  const afterChangeResults: ChangesSinceResult[] = afterRows.map(
-    (rel) =>
-      changesByVersion.get(rel.version) ?? {
-        product: meta.name,
-        version: rel.version,
-        released_at: rel.released_at,
-        changes: [],
-      }
-  );
+  const afterChangeResults: ChangesSinceResult[] = afterRows.map((rel) => {
+    const found = changesByDbVersion.get(rel.dbVersion);
+    return {
+      product: meta.name,
+      version: rel.version,
+      released_at: rel.released_at,
+      changes: found ? found.changes : [],
+    };
+  });
 
   const sameDaySiblingResults =
     sameDaySiblingRows.length > 0
@@ -518,22 +522,24 @@ export function evaluateWorkspaceRelevance(
 
   for (const meta of catalog) {
     const packages = meta.packages ?? [];
-    const matchedEntries: WorkspacePackageEntry[] = [];
+    const matchedPairs: Array<{ pkg: PackageIdentity; entry: WorkspacePackageEntry }> = [];
     for (const pkg of packages) {
       const key = `${pkg.ecosystem}:${normalizePackageName(pkg.ecosystem, pkg.name)}`;
       const hits = entriesByPackageKey.get(key);
       if (hits) {
-        matchedEntries.push(...hits);
+        for (const entry of hits) {
+          matchedPairs.push({ pkg, entry });
+        }
       }
     }
 
-    if (matchedEntries.length === 0) {
+    if (matchedPairs.length === 0) {
       unusedNames.push(meta.name);
       continue;
     }
 
-    const candidates = matchedEntries.map((entry) =>
-      evaluateMatchedEntry(db, hasReleasesTable, meta, entry)
+    const candidates = matchedPairs.map(({ pkg, entry }) =>
+      evaluateMatchedEntry(db, hasReleasesTable, meta, pkg, entry)
     );
     matchedProducts.push(pickPreferredResult(candidates));
   }

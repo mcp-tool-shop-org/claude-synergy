@@ -664,6 +664,7 @@ describe('MCP server integration', () => {
     packages:
       - ecosystem: npm
         name: "@test/cli"
+        release_prefix: ""
 `,
             'utf-8'
           );
@@ -1228,6 +1229,7 @@ describe('MCP server integration', () => {
     packages:
       - ecosystem: npm
         name: "@test/cli"
+        release_prefix: ""
   - name: test-sdk
     display_name: Test SDK
     tier: 1
@@ -1236,6 +1238,7 @@ describe('MCP server integration', () => {
     packages:
       - ecosystem: npm
         name: "@test/sdk"
+        release_prefix: "sdk-"
 `,
           'utf-8'
         );

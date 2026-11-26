@@ -31,7 +31,7 @@
 #   OPTIONAL:
 #     notes           string   Free-text notes (e.g., platform requirements).
 #     packages        list     Package identities matched against workspace lockfiles:
-#                              each entry is { ecosystem: npm|pypi|crates|go, name: <pkg> }.
+#                              each entry is { ecosystem: npm|pypi|crates|go, name: <pkg>, release_prefix: <prefix> }.
 #     fetch           object   Fetcher configuration. Omit if the product's
 #                              corpus is seeded manually (no automated fetch).
 #
@@ -80,6 +80,7 @@ products:
     packages:
       - ecosystem: npm
         name: "@anthropic-ai/claude-code"
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: anthropics/claude-code
@@ -114,6 +115,7 @@ products:
     packages:
       - ecosystem: pypi
         name: claude-agent-sdk
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: anthropics/claude-agent-sdk-python
@@ -126,6 +128,7 @@ products:
     packages:
       - ecosystem: npm
         name: "@anthropic-ai/claude-agent-sdk"
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: anthropics/claude-agent-sdk-typescript
@@ -138,8 +141,10 @@ products:
     packages:
       - ecosystem: go
         name: github.com/anthropics/anthropic-cli
+        release_prefix: ""
       - ecosystem: go
         name: github.com/anthropics/anthropic-cli/v2
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-cli
@@ -152,6 +157,7 @@ products:
     packages:
       - ecosystem: pypi
         name: anthropic
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-python
@@ -164,6 +170,7 @@ products:
     packages:
       - ecosystem: npm
         name: "@anthropic-ai/sdk"
+        release_prefix: "sdk-"
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-typescript
@@ -177,8 +184,10 @@ products:
     packages:
       - ecosystem: go
         name: github.com/anthropics/anthropic-sdk-go
+        release_prefix: ""
       - ecosystem: go
         name: github.com/anthropics/anthropic-sdk-go/v2
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-go
@@ -272,6 +281,7 @@ products:
     packages:
       - ecosystem: pypi
         name: mcp
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/python-sdk
@@ -284,6 +294,7 @@ products:
     packages:
       - ecosystem: npm
         name: "@modelcontextprotocol/sdk"
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/typescript-sdk
@@ -297,6 +308,7 @@ products:
     packages:
       - ecosystem: go
         name: github.com/modelcontextprotocol/go-sdk
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/go-sdk
@@ -354,6 +366,7 @@ products:
     packages:
       - ecosystem: crates
         name: rmcp
+        release_prefix: "rmcp-v"
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/rust-sdk
@@ -384,6 +397,7 @@ products:
     packages:
       - ecosystem: npm
         name: "@modelcontextprotocol/inspector"
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/inspector
@@ -396,6 +410,7 @@ products:
     packages:
       - ecosystem: go
         name: github.com/modelcontextprotocol/registry
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/registry
@@ -408,6 +423,7 @@ products:
     packages:
       - ecosystem: npm
         name: "@anthropic-ai/mcpb"
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/mcpb
@@ -420,6 +436,7 @@ products:
     packages:
       - ecosystem: npm
         name: "@modelcontextprotocol/conformance"
+        release_prefix: ""
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/conformance

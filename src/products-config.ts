@@ -42,6 +42,7 @@ export const VALID_PACKAGE_ECOSYSTEMS: ReadonlySet<PackageEcosystem> = new Set([
 export interface PackageIdentity {
   ecosystem: PackageEcosystem;
   name: string;
+  release_prefix: string;
 }
 
 export interface ProductMeta {
@@ -227,7 +228,27 @@ export function validateProductPackages(productName: string, rawPackages: unknow
         hint: 'Provide the exact package name from the package manifest (e.g., "@anthropic-ai/sdk").',
       });
     }
-    out.push({ ecosystem: eco as PackageEcosystem, name: trimmed });
+    const rawPrefix = rec.release_prefix;
+    if (typeof rawPrefix !== 'string') {
+      throw new AppError({
+        code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] release_prefix is required and must be a string`,
+        hint: 'Set release_prefix (use "" when release filenames have no prefix).',
+      });
+    }
+    if (
+      rawPrefix.includes('/') ||
+      rawPrefix.includes('\\') ||
+      rawPrefix.includes('.') ||
+      /\s|\0/.test(rawPrefix)
+    ) {
+      throw new AppError({
+        code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] release_prefix ${JSON.stringify(rawPrefix)} must not contain "/", ".", or whitespace`,
+        hint: 'Declare only the exact filename prefix before the version digits (e.g., "sdk-" or "").',
+      });
+    }
+    out.push({ ecosystem: eco as PackageEcosystem, name: trimmed, release_prefix: rawPrefix });
   }
   return out;
 }

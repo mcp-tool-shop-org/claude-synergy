@@ -237,12 +237,16 @@ describe('loadProductsConfig — packages identity validation', () => {
     packages:
       - ecosystem: npm
         name: "@scope/pkg"
+        release_prefix: "sdk-"
       - ecosystem: pypi
         name: some-py-pkg
+        release_prefix: ""
       - ecosystem: crates
         name: some-crate
+        release_prefix: "rmcp-v"
       - ecosystem: go
         name: example.invalid/mod
+        release_prefix: ""
   - name: unmapped-prod
     display_name: Unmapped Product
     tier: 1
@@ -251,21 +255,26 @@ describe('loadProductsConfig — packages identity validation', () => {
 `;
     const cfg = loadProductsConfig(writeYaml(yaml))!;
     expect(cfg.productMeta['mapped-prod'].packages).toEqual([
-      { ecosystem: 'npm', name: '@scope/pkg' },
-      { ecosystem: 'pypi', name: 'some-py-pkg' },
-      { ecosystem: 'crates', name: 'some-crate' },
-      { ecosystem: 'go', name: 'example.invalid/mod' },
+      { ecosystem: 'npm', name: '@scope/pkg', release_prefix: 'sdk-' },
+      { ecosystem: 'pypi', name: 'some-py-pkg', release_prefix: '' },
+      { ecosystem: 'crates', name: 'some-crate', release_prefix: 'rmcp-v' },
+      { ecosystem: 'go', name: 'example.invalid/mod', release_prefix: '' },
     ]);
     expect(cfg.productMeta['unmapped-prod'].packages).toBeUndefined();
   });
 
-  it('throws PRODUCTS_PACKAGES_CONFIG_ERROR for unknown ecosystem, empty name, or bad shape', () => {
+  it('throws PRODUCTS_PACKAGES_CONFIG_ERROR for unknown ecosystem, empty name, or bad release_prefix', () => {
     const cases = [
       `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages: "not-an-array"\n`,
       `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - "just-a-string"\n`,
-      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: maven\n        name: com.example:pkg\n`,
-      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "   "\n`,
-      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "has space"\n`,
+      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: maven\n        name: com.example:pkg\n        release_prefix: ""\n`,
+      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "   "\n        release_prefix: ""\n`,
+      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "has space"\n        release_prefix: ""\n`,
+      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "@scope/pkg"\n`,
+      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "@scope/pkg"\n        release_prefix: 123\n`,
+      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "@scope/pkg"\n        release_prefix: "sub/pkg-"\n`,
+      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "@scope/pkg"\n        release_prefix: "v1.0-"\n`,
+      `products:\n  - name: bad\n    display_name: Bad\n    tier: 1\n    source_url: https://example.invalid\n    fetch_strategy: gh-releases\n    packages:\n      - ecosystem: npm\n        name: "@scope/pkg"\n        release_prefix: "has space-"\n`,
     ];
 
     for (const c of cases) {
@@ -290,19 +299,19 @@ describe('loadProductsConfig — repo products.yaml', () => {
     expect(Object.keys(cfg!.productMeta).length).toBeGreaterThan(20);
     expect(cfg!.fetchTargets.length).toBeGreaterThan(15);
     expect(cfg!.productMeta['claude-code'].packages).toEqual([
-      { ecosystem: 'npm', name: '@anthropic-ai/claude-code' },
+      { ecosystem: 'npm', name: '@anthropic-ai/claude-code', release_prefix: '' },
     ]);
     expect(cfg!.productMeta['claude-agent-sdk-python'].packages).toEqual([
-      { ecosystem: 'pypi', name: 'claude-agent-sdk' },
+      { ecosystem: 'pypi', name: 'claude-agent-sdk', release_prefix: '' },
     ]);
     expect(cfg!.productMeta['mcp-rust-sdk'].packages).toEqual([
-      { ecosystem: 'crates', name: 'rmcp' },
+      { ecosystem: 'crates', name: 'rmcp', release_prefix: 'rmcp-v' },
     ]);
     expect(cfg!.productMeta['anthropic-sdk-typescript'].packages).toEqual([
-      { ecosystem: 'npm', name: '@anthropic-ai/sdk' },
+      { ecosystem: 'npm', name: '@anthropic-ai/sdk', release_prefix: 'sdk-' },
     ]);
     expect(cfg!.productMeta['mcp-typescript-sdk'].packages).toEqual([
-      { ecosystem: 'npm', name: '@modelcontextprotocol/sdk' },
+      { ecosystem: 'npm', name: '@modelcontextprotocol/sdk', release_prefix: '' },
     ]);
   });
 });
