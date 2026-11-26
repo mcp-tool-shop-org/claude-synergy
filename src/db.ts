@@ -21,10 +21,40 @@ export const SCHEMA_VERSION = 3;
 /** Default embedding dimension when none is recorded (matches v2 behavior). */
 export const DEFAULT_EMBEDDING_DIM = 768;
 
+/** What better-sqlite3 throws when its native binding is missing or was built for another Node. */
+const BINDING_ERROR_RE =
+  /better_sqlite3\.node|Could not locate the bindings file|NODE_MODULE_VERSION|compiled against a different Node\.js version/i;
+
+/**
+ * Open a SQLite database, turning a missing or mismatched native driver into a named
+ * SQLITE_BINDING_ERROR. Other errors (a bad path, a locked file) pass through unchanged.
+ * `open` is injectable for tests.
+ */
+export function openSqlite(
+  abs: string,
+  open: (p: string) => Database.Database = (p) => new Database(p),
+): Database.Database {
+  try {
+    return open(abs);
+  } catch (e: unknown) {
+    const detail = e instanceof Error ? e.message : String(e);
+    if (BINDING_ERROR_RE.test(detail)) {
+      throw new AppError({
+        code: 'SQLITE_BINDING_ERROR',
+        message: 'The SQLite driver (better-sqlite3) could not be loaded on this platform.',
+        hint:
+          'claude-synergy needs Node 22.12 or newer on Windows, macOS or Linux (glibc or musl), x64 or arm64. 32-bit ARM is not supported.',
+        cause: detail,
+      });
+    }
+    throw e;
+  }
+}
+
 export function openDb(path: string, opts: { loadVec?: boolean } = {}): Database.Database {
   const abs = resolve(path);
   mkdirSync(dirname(abs), { recursive: true });
-  const db = new Database(abs);
+  const db = openSqlite(abs);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   if (opts.loadVec !== false) {

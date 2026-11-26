@@ -360,7 +360,7 @@ CI: `.github/workflows/test.yml` पुश और PR पर `pnpm test:coverage`
 
 `sqlite-vec` देशी एक्सटेंशन लोड होने में विफल रहा। सामान्य कारण:
 
-1. **Node का संस्करण बहुत पुराना** — `claude-synergy` को Node 22.12 या उससे नया संस्करण की आवश्यकता है। `node -v` से जांचें।
+1. **Node का संस्करण बहुत पुराना** — `claude-synergy` को Windows, macOS या Linux (glibc या musl) पर x64 या arm64 में Node 22.12 या उससे नया संस्करण (32-बिट ARM समर्थित नहीं है) की आवश्यकता है। `node -v` से जांचें।
 2. **देशी मॉड्यूल को फिर से बनाने की आवश्यकता है** — `npm rebuild better-sqlite3` (या `pnpm rebuild better-sqlite3`) चलाएं।
 3. **प्लेटफ़ॉर्म बेमेल** — Windows/ARM पर, `better-sqlite3` को एक C++ बिल्ड टूलचेन की आवश्यकता होती है। [windows-build-tools](https://github.com/nicedoc/windows-build-tools) या "डेस्कटॉप डेवलपमेंट विद C++" के साथ विज़ुअल स्टूडियो बिल्ड टूल्स स्थापित करें।
 
