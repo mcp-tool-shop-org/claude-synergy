@@ -73,8 +73,6 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers:** 44 products / 1,171 release files / 6,573 changes / 1,260 entities / 12 synergies / 519 tests / 14 MCP tools / 18 CLI commands. (Corpus refreshed via `sync_now` on 2026-05-24.)
-
 ---
 
 ## Status — all tiers shipped

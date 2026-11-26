@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-26
+
+**Which releases matter to your workspace, and one version line per package.** `hk relevance <dir>` and the MCP `workspace_relevance` tool read a project's top-level lockfiles and report which mirrored releases are ahead of what it uses, with "no action" as the default. Products that bundle several packages (the Anthropic TypeScript, C# and CLI SDKs, the MCP TypeScript and Rust SDKs, Continue and Cursor) now keep each package's releases apart, so `latest`, `diff`, `compare_versions` and the rest no longer mix one package's versions into another's. Upgrade notes: the store migrates to schema v5 automatically; on a multi-package product, `get_release` and `compare_versions` now need `package`; and on the first sync after upgrading, the four Vertex SDK releases (`ertex-sdk-*` renamed to `vertex-sdk-*`) are re-ingested once and lose any relevance tags placed on them.
+
 ### Added
 - **Multi-package separation & single source of truth (`products.yaml`, `src/products-config.ts`, `src/ingest.ts`):** Expanded `products.yaml` `packages[].release_prefix` to declare every package across every multi-package product (`anthropic-cli`, `anthropic-sdk-typescript`, `anthropic-sdk-csharp`, `mcp-typescript-sdk`, `mcp-rust-sdk`, `continue-dev`, `cursor`), added `nuget` ecosystem support, optional `ecosystem` entries, duplicate non-Go `release_prefix` validation, and `unassigned` labelling (`UNASSIGNED_PACKAGE` `""`) for unmatched stems.
 - **Schema v5 (`schema.sql`, `schema-vec.sql`, `src/db.ts`):** Added `package` to `releases`, `changes`, and `chunks`, changed release keys to `(product, package, version)` so colliding versions (e.g. `aws-sdk` and `foundry-sdk` `0.3.0`) coexist without overwriting, and shipped an automatic `v4 → v5` migration under an `IMMEDIATE` lock with query-time fallback on read-only pre-v5 DBs.
@@ -17,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Re-classifying an already-ingested release via a `products.yaml` `release_prefix` change evicts the prior release row and drops its relevance tags and synergy references.
+- **README:** removed the year-old "Live numbers" line (its counts and May corpus date no longer held once its version label was dropped).
 
 ### Fixed
 - **Fetch filename prefix stripping (`src/fetch.ts`, `products/anthropic-sdk-typescript/releases/`):** Tightened `^v` stripping to `^v(?=\d)` so `vertex-sdk-v…` tags preserve their `vertex-sdk-` prefix instead of losing their leading `v` (`ertex-sdk-…`), and renamed the existing `ertex-sdk-*.md` files to `vertex-sdk-*.md`.
