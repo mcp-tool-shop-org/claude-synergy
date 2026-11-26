@@ -4,7 +4,7 @@ import { join, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { openDb, initSchema } from './db.js';
-import { ingestAll } from './ingest.js';
+import { ingestAll, reextractEntities, type IngestStats, type ReextractStats } from './ingest.js';
 import {
   searchChanges,
   lookupEntity,
@@ -13,13 +13,26 @@ import {
   entityFrequency,
   browseChanges,
   getChangesSince,
+  getCorpusFreshness,
+  formatFreshnessStamp,
   type ChangesSinceResult,
 } from './query.js';
 import { embedAll } from './embed.js';
 import { hybridSearch } from './hybrid.js';
-import { fetchAll, listFetchTargets, seedMarkersFromDb } from './fetch.js';
+import { fetchAll, seedMarkersFromDb } from './fetch.js';
 import type { FetchProgressEvent, FetchAllSummary } from './fetch.js';
 import { AppError, formatError } from './errors.js';
+import {
+  FIRST_USE_SYNC_TIMEOUT_MS,
+  formatFirstUseNotice,
+  formatPartialNote,
+  hasAnyReleases,
+  isAutoSyncDisabled,
+  printStoreResolutionOnce,
+  resolveStorePaths,
+  runFirstUseSync,
+  type ResolvedStore,
+} from './store.js';
 import type Database from 'better-sqlite3';
 
 // ── Log levels ──────────────────────────────────────────────────────────────
@@ -65,9 +78,14 @@ function shutdown(signal: string): void {
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 
-const cwd = process.cwd();
-const DEFAULT_DB = join(cwd, 'data', 'claude-synergy.db');
-const DEFAULT_PRODUCTS = join(cwd, 'products');
+function resolveCliStore(opts: { db?: string; products?: string; productsRoot?: string }): ResolvedStore {
+  const store = resolveStorePaths({
+    explicitDb: opts.db,
+    explicitProductsRoot: opts.productsRoot ?? opts.products,
+  });
+  printStoreResolutionOnce(store);
+  return store;
+}
 
 // Single-source-of-truth version from package.json (avoids hardcoded drift).
 const _require = createRequire(import.meta.url);
@@ -175,24 +193,85 @@ type ContextProviderName = (typeof CONTEXT_PROVIDERS)[number];
 type EmbedProviderName = (typeof EMBED_PROVIDERS)[number];
 type RerankProviderName = (typeof RERANK_PROVIDERS)[number];
 
-/** Check if the database has any ingested changes. */
-function isDbEmpty(db: Database.Database): boolean {
-  try {
-    const row = db.prepare('SELECT COUNT(*) AS n FROM changes').get() as { n: number } | undefined;
-    return !row || row.n === 0;
-  } catch {
-    // Table doesn't exist yet (DB was never initialized)
-    return true;
-  }
+interface QueryDbSession {
+  db: Database.Database | null;
+  store: ResolvedStore;
+  emptyOptOut: boolean;
+  partialNote?: string;
 }
 
-/** Print empty-DB guidance to stderr and return true if empty. */
-function warnIfEmpty(db: Database.Database): boolean {
-  if (isDbEmpty(db)) {
-    console.error('No data yet. Run `hk sync` to fetch changelogs, then `hk query <term>` to search.');
-    return true;
+/**
+ * Open the resolved DB for query commands. If missing or empty:
+ * - when CLAUDE_SYNERGY_NO_AUTO_SYNC=1, emit guidance to stderr and return `emptyOptOut: true` without creating a DB;
+ * - otherwise run first-use sync (fetch -> ingest, no embed) and write a one-line notice to stderr.
+ */
+async function openQueryDbOrFirstUse(
+  opts: { db?: string },
+  scopedProduct?: string
+): Promise<QueryDbSession> {
+  const store = resolveCliStore(opts);
+  let db: Database.Database | null = existsSync(store.dbPath)
+    ? openTrackedDb(store.dbPath)
+    : null;
+
+  if (hasAnyReleases(db)) {
+    return { db, store, emptyOptOut: false };
   }
-  return false;
+
+  if (isAutoSyncDisabled()) {
+    if (!program.opts().json) {
+      console.error('No data yet (auto-sync disabled). Run `hk sync` to fetch changelogs, then `hk query <term>` to search.');
+    }
+    return { db, store, emptyOptOut: true };
+  }
+
+  const { db: syncedDb, report } = await runFirstUseSync({
+    dbPath: store.dbPath,
+    productsRoot: store.productsRoot,
+    db: db ?? undefined,
+    timeoutMs: FIRST_USE_SYNC_TIMEOUT_MS,
+  });
+  activeDb = syncedDb;
+  const notice = formatFirstUseNotice(report, syncedDb, { product: scopedProduct });
+  process.stderr.write(`${notice}\n`);
+  return {
+    db: syncedDb,
+    store,
+    emptyOptOut: false,
+    partialNote: report.partial ? formatPartialNote(report) : undefined,
+  };
+}
+
+function emitArrayJson(
+  arr: unknown[],
+  db: Database.Database | null,
+  scopedProduct?: string
+): void {
+  console.log(JSON.stringify(arr));
+  const dataAsOf = getCorpusFreshness(db, { product: scopedProduct });
+  process.stderr.write(`${JSON.stringify({ data_as_of: dataAsOf })}\n`);
+}
+
+function emitTextStamp(
+  db: Database.Database | null,
+  scopedProduct?: string,
+  partialNote?: string
+): void {
+  const freshness = getCorpusFreshness(db, { product: scopedProduct });
+  console.log(formatFreshnessStamp(freshness, { partialNote }));
+}
+
+function emitEmptyQueryOutput(session: QueryDbSession, scopedProduct?: string): void {
+  if (program.opts().json) {
+    emitArrayJson([], session.db, scopedProduct);
+  } else {
+    console.log('(empty corpus — run `hk sync` to populate)');
+    emitTextStamp(session.db, scopedProduct);
+  }
+  if (session.db) {
+    session.db.close();
+    activeDb = null;
+  }
 }
 
 // ── Fetch progress helpers ──────────────────────────────────────────────────
@@ -254,56 +333,113 @@ program
 program
   .command('init')
   .description('Create the database file with the current schema')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .action((opts: { db: string }) => {
-    const db = openTrackedDb(opts.db);
+  .option('-d, --db <path>', 'database path')
+  .action((opts: { db?: string }) => {
+    const store = resolveCliStore(opts);
+    const db = openTrackedDb(store.dbPath);
     initSchema(db);
-    console.log(`✓ initialized ${resolve(opts.db)}`);
+    const dataAsOf = getCorpusFreshness(db);
+    if (program.opts().json) {
+      console.log(JSON.stringify({ db: resolve(store.dbPath), initialized: true, data_as_of: dataAsOf }));
+    } else {
+      console.log(`✓ initialized ${resolve(store.dbPath)}`);
+      console.log(formatFreshnessStamp(dataAsOf));
+    }
     db.close();
+    activeDb = null;
   });
 
 program
   .command('ingest')
   .description('Parse products/*/releases/*.md and load into DB (idempotent)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .option('-p, --products <path>', 'products dir', DEFAULT_PRODUCTS)
-  .action((opts: { db: string; products: string }) => {
-    if (!existsSync(opts.products)) {
-      console.error(`✗ products dir not found: ${opts.products}`);
+  .option('-d, --db <path>', 'database path')
+  .option('-p, --products <path>', 'products dir')
+  .option('--reextract', 're-extract entities for all existing change rows without re-fetching')
+  .action((opts: { db?: string; products?: string; reextract?: boolean }) => {
+    const store = resolveCliStore(opts);
+    const hasProductsDir = existsSync(store.productsRoot);
+    if (!hasProductsDir && !opts.reextract) {
+      const appErr = new AppError({
+        code: 'PRODUCTS_DIR_NOT_FOUND',
+        message: `products dir not found: ${store.productsRoot}`,
+        hint: 'Pass -p <path> or --reextract to re-extract entities from existing DB rows.',
+      });
+      if (program.opts().json) {
+        console.log(JSON.stringify(appErr.toJSON()));
+      } else {
+        console.error(`✗ products dir not found: ${store.productsRoot}`);
+      }
       process.exit(1);
     }
-    const db = openTrackedDb(opts.db);
+    const db = openTrackedDb(store.dbPath);
     initSchema(db);
     const start = Date.now();
-    const stats = ingestAll(db, opts.products);
+    const stats: IngestStats = hasProductsDir
+      ? ingestAll(db, store.productsRoot)
+      : {
+          productsCount: 0,
+          releasesAdded: 0,
+          changesAdded: 0,
+          entitiesAdded: 0,
+          skipped: 0,
+          total: 0,
+          errors: [],
+        };
+    let reextractStats: ReextractStats | undefined;
+    if (opts.reextract) {
+      reextractStats = reextractEntities(db);
+    }
     const ms = Date.now() - start;
-    console.log(`✓ ingested ${stats.productsCount} products in ${ms}ms`);
-    console.log(`  releases:  ${stats.releasesAdded}`);
-    console.log(`  changes:   ${stats.changesAdded}`);
-    console.log(`  entities:  ${stats.entitiesAdded}`);
-    if (stats.errors.length > 0) {
-      console.log(`\n✗ errors: ${stats.errors.length}`);
-      stats.errors.slice(0, 5).forEach((e) => console.log(`  ${e.file}: ${e.error}`));
-      if (stats.errors.length > 5) {
-        console.log(`  ... and ${stats.errors.length - 5} more`);
+    const dataAsOf = getCorpusFreshness(db);
+    if (program.opts().json) {
+      console.log(
+        JSON.stringify({
+          ...stats,
+          ...(reextractStats ? { reextract: reextractStats } : {}),
+          elapsed_ms: ms,
+          data_as_of: dataAsOf,
+        })
+      );
+    } else {
+      console.log(`✓ ingested ${stats.productsCount} products in ${ms}ms`);
+      console.log(`  releases:  ${stats.releasesAdded}`);
+      console.log(`  changes:   ${stats.changesAdded}`);
+      console.log(`  entities:  ${stats.entitiesAdded}`);
+      if (reextractStats) {
+        console.log(
+          `  reextract: ${reextractStats.changesScanned} changes scanned, ${reextractStats.entitiesAfter} entities (${reextractStats.entitiesAdded} new)`
+        );
       }
+      if (stats.errors.length > 0) {
+        console.log(`\n✗ errors: ${stats.errors.length}`);
+        stats.errors.slice(0, 5).forEach((e) => console.log(`  ${e.file}: ${e.error}`));
+        if (stats.errors.length > 5) {
+          console.log(`  ... and ${stats.errors.length - 5} more`);
+        }
+      }
+      console.log(formatFreshnessStamp(dataAsOf));
     }
     db.close();
+    activeDb = null;
   });
 
 program
   .command('query <text>')
   .description('Full-text search across all change bullets (FTS5). Quote multi-word: hk query "managed agents"')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-d, --db <path>', 'database path')
   .option('-p, --product <name>', 'limit to one product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .option('-l, --limit <n>', 'max results', '20')
-  .action((text: string, opts: { db: string; product?: string; since?: string; until?: string; kind?: string; limit: string }) => {
+  .action(async (text: string, opts: { db?: string; product?: string; since?: string; until?: string; kind?: string; limit: string }) => {
     logDebug(`text=${JSON.stringify(text)} opts=${JSON.stringify(opts)}`);
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
+    const session = await openQueryDbOrFirstUse(opts, opts.product);
+    if (session.emptyOptOut || !session.db) {
+      emitEmptyQueryOutput(session, opts.product);
+      return;
+    }
+    const db = session.db;
     const q = text;
     const since = resolveDateOrExit('since', opts.since);
     const until = resolveDateOrExit('until', opts.until);
@@ -324,148 +460,152 @@ program
         cause: e.message,
       });
       if (program.opts().json) {
-        console.log(JSON.stringify(appErr.toJSON()));
+        console.log(JSON.stringify({ ...appErr.toJSON(), data_as_of: getCorpusFreshness(db, { product: opts.product }) }));
       } else {
         console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
       }
       db.close();
+      activeDb = null;
       process.exit(1);
     }
     if (program.opts().json) {
-      console.log(JSON.stringify(results.map(r => ({
-        released_at: r.released_at, product: r.product, version: r.version,
-        kind: r.kind, text: r.text, snippet: r.snippet,
-      }))));
-    } else if (results.length === 0) {
-      console.log('(no results)');
+      emitArrayJson(
+        results.map((r) => ({
+          released_at: r.released_at, product: r.product, version: r.version,
+          kind: r.kind, text: r.text, snippet: r.snippet,
+        })),
+        db,
+        opts.product
+      );
     } else {
-      for (const r of results) {
-        console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
-        console.log(`  ${r.snippet}`);
+      if (results.length === 0) {
+        console.log('(no results)');
+      } else {
+        for (const r of results) {
+          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+          console.log(`  ${r.snippet}`);
+        }
+        console.log(`\n${results.length} result${results.length === 1 ? '' : 's'}`);
       }
-      console.log(`\n${results.length} result${results.length === 1 ? '' : 's'}`);
+      emitTextStamp(db, opts.product, session.partialNote);
     }
     db.close();
+    activeDb = null;
   });
+
+async function runEntityCommand(
+  entityType: string,
+  lookupValue: string,
+  label: string,
+  opts: { db?: string }
+): Promise<void> {
+  const session = await openQueryDbOrFirstUse(opts);
+  if (session.emptyOptOut || !session.db) {
+    emitEmptyQueryOutput(session);
+    return;
+  }
+  const db = session.db;
+  const results = lookupEntity(db, entityType, lookupValue);
+  if (program.opts().json) {
+    emitArrayJson(
+      results.map((r) => ({
+        released_at: r.released_at, product: r.product, version: r.version,
+        kind: r.kind, text: r.text,
+      })),
+      db
+    );
+  } else {
+    printEntityResults(lookupValue, label, results);
+    emitTextStamp(db, undefined, session.partialNote);
+  }
+  db.close();
+  activeDb = null;
+}
 
 program
   .command('env-var <name>')
   .description('Find when an env var was introduced or last changed')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .action((name: string, opts: { db: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
-    const results = lookupEntity(db, 'env_var', name);
-    if (program.opts().json) {
-      console.log(JSON.stringify(results.map(r => ({
-        released_at: r.released_at, product: r.product, version: r.version,
-        kind: r.kind, text: r.text,
-      }))));
-    } else {
-      printEntityResults(name, 'env var', results);
-    }
-    db.close();
+  .option('-d, --db <path>', 'database path')
+  .action(async (name: string, opts: { db?: string }) => {
+    await runEntityCommand('env_var', name, 'env var', opts);
   });
 
 program
   .command('command <slash>')
   .description('Find a slash command\'s history')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .action((slash: string, opts: { db: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
+  .option('-d, --db <path>', 'database path')
+  .action(async (slash: string, opts: { db?: string }) => {
     const normalized = slash.startsWith('/') ? slash : '/' + slash;
-    const results = lookupEntity(db, 'slash_command', normalized);
-    if (program.opts().json) {
-      console.log(JSON.stringify(results.map(r => ({
-        released_at: r.released_at, product: r.product, version: r.version,
-        kind: r.kind, text: r.text,
-      }))));
-    } else {
-      printEntityResults(normalized, 'slash command', results);
-    }
-    db.close();
+    await runEntityCommand('slash_command', normalized, 'slash command', opts);
   });
 
 program
   .command('model <id>')
   .description('Find a Claude model ID\'s history (deprecations, launches)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .action((id: string, opts: { db: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
-    const results = lookupEntity(db, 'model_id', id);
-    if (program.opts().json) {
-      console.log(JSON.stringify(results.map(r => ({
-        released_at: r.released_at, product: r.product, version: r.version,
-        kind: r.kind, text: r.text,
-      }))));
-    } else {
-      printEntityResults(id, 'model id', results);
-    }
-    db.close();
+  .option('-d, --db <path>', 'database path')
+  .action(async (id: string, opts: { db?: string }) => {
+    await runEntityCommand('model_id', id, 'model id', opts);
   });
 
 program
   .command('cve <id>')
   .description('Find releases mentioning a specific CVE')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .action((id: string, opts: { db: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
-    const results = lookupEntity(db, 'cve', id);
-    if (program.opts().json) {
-      console.log(JSON.stringify(results.map(r => ({
-        released_at: r.released_at, product: r.product, version: r.version,
-        kind: r.kind, text: r.text,
-      }))));
-    } else {
-      printEntityResults(id, 'CVE', results);
-    }
-    db.close();
+  .option('-d, --db <path>', 'database path')
+  .action(async (id: string, opts: { db?: string }) => {
+    await runEntityCommand('cve', id, 'CVE', opts);
   });
 
 program
   .command('seed-markers')
   .description('Seed fetch markers from the current DB state (run once after study-swarm to enable incremental fetch)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .action((opts: { db: string }) => {
-    const db = openTrackedDb(opts.db);
+  .option('-d, --db <path>', 'database path')
+  .action((opts: { db?: string }) => {
+    const store = resolveCliStore(opts);
+    const db = openTrackedDb(store.dbPath);
     initSchema(db);
     const results = seedMarkersFromDb(db);
-    for (const r of results) {
-      console.log(`${r.product.padEnd(35)} ${r.seededTo ? '→ ' + r.seededTo.split('T')[0] : '(no releases on disk)'}`);
+    const seededCount = results.filter((r) => r.seededTo).length;
+    const dataAsOf = getCorpusFreshness(db);
+    if (program.opts().json) {
+      console.log(JSON.stringify({ markers: results, seeded: seededCount, data_as_of: dataAsOf }));
+    } else {
+      for (const r of results) {
+        console.log(`${r.product.padEnd(35)} ${r.seededTo ? '→ ' + r.seededTo.split('T')[0] : '(no releases on disk)'}`);
+      }
+      console.log(`\n✓ seeded ${seededCount} marker${seededCount === 1 ? '' : 's'}`);
+      console.log(formatFreshnessStamp(dataAsOf));
     }
-    console.log(`\n✓ seeded ${results.filter((r) => r.seededTo).length} marker${results.filter((r) => r.seededTo).length === 1 ? '' : 's'}`);
     db.close();
+    activeDb = null;
   });
 
 program
   .command('fetch')
   .description('Pull new GitHub releases since last sync (Tier 1 sources only — 10 SDK/CLI products)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .option('-r, --products-root <path>', 'products dir root', DEFAULT_PRODUCTS)
+  .option('-d, --db <path>', 'database path')
+  .option('-r, --products-root <path>', 'products dir root')
   .option('-p, --product <name>', 'limit to one product')
   .option('--since <iso>', 'override the stored marker (YYYY-MM-DD or full ISO)')
-  .action(async (opts: { db: string; productsRoot: string; product?: string; since?: string }) => {
-    const db = openTrackedDb(opts.db);
+  .action(async (opts: { db?: string; productsRoot?: string; product?: string; since?: string }) => {
+    const store = resolveCliStore(opts);
+    const db = openTrackedDb(store.dbPath);
     initSchema(db);
     try {
-      const stats = await fetchAll(db, opts.productsRoot, {
+      const stats = await fetchAll(db, store.productsRoot, {
         product: opts.product,
         sinceOverride: opts.since,
         onProgress: makeFetchProgressWriter(),
       });
-      // Per-product detail to stdout
-      for (const s of stats) {
-        const status = s.fetched > 0 ? `+${s.fetched} new` : `current (since ${s.newSince})`;
-        console.log(`${s.product.padEnd(35)} ${status}${s.latest ? `  latest: ${s.latest.split('T')[0]}` : ''}`);
-      }
-      // Consolidated summary
+      const dataAsOf = getCorpusFreshness(db, { product: opts.product });
       if (program.opts().json) {
-        console.log(JSON.stringify({ stats, summary: stats.summary }));
+        console.log(JSON.stringify({ stats, summary: stats.summary, data_as_of: dataAsOf }));
       } else {
+        for (const s of stats) {
+          const status = s.fetched > 0 ? `+${s.fetched} new` : `current (since ${s.newSince})`;
+          console.log(`${s.product.padEnd(35)} ${status}${s.latest ? `  latest: ${s.latest.split('T')[0]}` : ''}`);
+        }
         printFetchSummary(stats.summary);
+        console.log(formatFreshnessStamp(dataAsOf));
       }
       // Exit code 3 = partial success (some products failed, others succeeded)
       if (stats.summary.failed > 0 && stats.summary.succeeded > 0) {
@@ -475,14 +615,15 @@ program
       }
     } finally {
       db.close();
+      activeDb = null;
     }
   });
 
 program
   .command('sync')
   .description('Run fetch → ingest → embed in sequence (for daily cron / GH Action)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .option('-r, --products-root <path>', 'products dir', DEFAULT_PRODUCTS)
+  .option('-d, --db <path>', 'database path')
+  .option('-r, --products-root <path>', 'products dir')
   .option('--skip-fetch', 'skip the fetch step (just ingest+embed existing files)')
   .option('--skip-embed', 'skip the embed step (fetch+ingest only)')
   .addOption(
@@ -497,36 +638,40 @@ program
   )
   .action(
     async (opts: {
-      db: string;
-      productsRoot: string;
+      db?: string;
+      productsRoot?: string;
       skipFetch?: boolean;
       skipEmbed?: boolean;
       context: ContextProviderName;
       embedProvider: EmbedProviderName;
     }) => {
-      const db = openTrackedDb(opts.db);
+      const store = resolveCliStore(opts);
+      const db = openTrackedDb(store.dbPath);
       initSchema(db);
       const t0 = Date.now();
+      const isJson = !!program.opts().json;
       try {
+        let fetchSummary: FetchAllSummary | null = null;
         if (!opts.skipFetch) {
           process.stderr.write('=== fetch ===\n');
-          const stats = await fetchAll(db, opts.productsRoot, {
+          const stats = await fetchAll(db, store.productsRoot, {
             onProgress: makeFetchProgressWriter(),
           });
-          if (program.opts().json) {
-            // JSON summary deferred to final output
-          } else {
+          fetchSummary = stats.summary;
+          if (!isJson) {
             printFetchSummary(stats.summary);
           }
         }
         process.stderr.write('\n=== ingest ===\n');
-        const { ingestAll } = await import('./ingest.js');
-        const ingestStats = ingestAll(db, opts.productsRoot);
-        console.log(`ingested ${ingestStats.releasesAdded} releases, ${ingestStats.changesAdded} changes, ${ingestStats.entitiesAdded} entities`);
+        const ingestStats = ingestAll(db, store.productsRoot);
+        if (!isJson) {
+          console.log(`ingested ${ingestStats.releasesAdded} releases, ${ingestStats.changesAdded} changes, ${ingestStats.entitiesAdded} entities`);
+        }
 
+        let embedStats: Awaited<ReturnType<typeof embedAll>> | null = null;
         if (!opts.skipEmbed) {
           process.stderr.write('\n=== embed ===\n');
-          const embedStats = await embedAll(db, {
+          embedStats = await embedAll(db, {
             contextProviderName: opts.context,
             embeddingProviderName: opts.embedProvider,
             onProgress: (p) => {
@@ -536,9 +681,26 @@ program
               process.stderr.write(`  Embedding batch ${p.batchesCompleted}/${p.batchesTotal} (${p.chunksCompleted}/${p.chunksTotal} chunks)${prov}${tokens}${reqs}\n`);
             },
           });
-          console.log(`embedded ${embedStats.chunksCreated} new chunks via ${embedStats.contextProvider} + ${embedStats.embeddingProvider}`);
+          if (!isJson) {
+            console.log(`embedded ${embedStats.chunksCreated} new chunks via ${embedStats.contextProvider} + ${embedStats.embeddingProvider}`);
+          }
         }
-        console.log(`\n✓ sync complete in ${Date.now() - t0}ms`);
+        const elapsedMs = Date.now() - t0;
+        const dataAsOf = getCorpusFreshness(db);
+        if (isJson) {
+          console.log(
+            JSON.stringify({
+              fetch: fetchSummary,
+              ingest: ingestStats,
+              embed: embedStats,
+              elapsed_ms: elapsedMs,
+              data_as_of: dataAsOf,
+            })
+          );
+        } else {
+          console.log(`\n✓ sync complete in ${elapsedMs}ms`);
+          console.log(formatFreshnessStamp(dataAsOf));
+        }
       } catch (e: any) {
         const appErr = new AppError({
           code: 'SYNC_FAILED',
@@ -547,14 +709,15 @@ program
           cause: e.message,
           retryable: true,
         });
-        if (program.opts().json) {
-          console.log(JSON.stringify(appErr.toJSON()));
+        if (isJson) {
+          console.log(JSON.stringify({ ...appErr.toJSON(), data_as_of: getCorpusFreshness(db) }));
         } else {
           console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
         }
         process.exit(2);
       } finally {
         db.close();
+        activeDb = null;
       }
     }
   );
@@ -562,7 +725,7 @@ program
 program
   .command('embed')
   .description('Generate contextual chunks + embeddings (Tier 2b — opt-in semantic layer)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-d, --db <path>', 'database path')
   .addOption(
     new Option('-c, --context <provider>', 'context provider')
       .default('structured')
@@ -579,7 +742,7 @@ program
   .option('--force', 'recompute even if chunk already exists')
   .action(
     async (opts: {
-      db: string;
+      db?: string;
       context: ContextProviderName;
       embed: EmbedProviderName;
       product?: string;
@@ -587,7 +750,9 @@ program
       batchSize: string;
       force?: boolean;
     }) => {
-    const db = openTrackedDb(opts.db);
+    const store = resolveCliStore(opts);
+    const db = openTrackedDb(store.dbPath);
+    const isJson = !!program.opts().json;
     try {
       const stats = await embedAll(db, {
         contextProviderName: opts.context,
@@ -603,11 +768,17 @@ program
           process.stderr.write(`Embedding batch ${p.batchesCompleted}/${p.batchesTotal} (${p.chunksCompleted}/${p.chunksTotal} chunks)${prov}${tokens}${reqs}\n`);
         },
       });
-      console.log(`✓ embedded ${stats.chunksCreated} chunks in ${stats.totalMs}ms`);
-      console.log(`  context provider: ${stats.contextProvider} (${stats.contextMs}ms total)`);
-      console.log(`  embedding model:  ${stats.embeddingProvider} (${stats.embedMs}ms total)`);
-      if (stats.chunksCreated === 0) {
-        console.log(`  (nothing to do — all changes already embedded; use --force to re-embed)`);
+      const dataAsOf = getCorpusFreshness(db, { product: opts.product });
+      if (isJson) {
+        console.log(JSON.stringify({ ...stats, data_as_of: dataAsOf }));
+      } else {
+        console.log(`✓ embedded ${stats.chunksCreated} chunks in ${stats.totalMs}ms`);
+        console.log(`  context provider: ${stats.contextProvider} (${stats.contextMs}ms total)`);
+        console.log(`  embedding model:  ${stats.embeddingProvider} (${stats.embedMs}ms total)`);
+        if (stats.chunksCreated === 0) {
+          console.log(`  (nothing to do — all changes already embedded; use --force to re-embed)`);
+        }
+        console.log(formatFreshnessStamp(dataAsOf));
       }
     } catch (e: any) {
       const hint = (e.message.includes('Ollama') || e.message.includes('11434'))
@@ -620,21 +791,22 @@ program
         cause: e.message,
         retryable: true,
       });
-      if (program.opts().json) {
-        console.log(JSON.stringify(appErr.toJSON()));
+      if (isJson) {
+        console.log(JSON.stringify({ ...appErr.toJSON(), data_as_of: getCorpusFreshness(db, { product: opts.product }) }));
       } else {
         console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
       }
       process.exit(2);
     } finally {
       db.close();
+      activeDb = null;
     }
   });
 
 program
   .command('hybrid <text>')
   .description('Hybrid FTS5 + sqlite-vec search via RRF, optional rerank (requires `hk embed` first)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-d, --db <path>', 'database path')
   .option('-p, --product <name>', 'limit to one product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
@@ -656,7 +828,7 @@ program
     async (
       text: string,
       opts: {
-        db: string;
+        db?: string;
         product?: string;
         since?: string;
         until?: string;
@@ -668,7 +840,12 @@ program
         rerankCandidates: string;
       }
     ) => {
-    const db = openTrackedDb(opts.db);
+    const session = await openQueryDbOrFirstUse(opts, opts.product);
+    if (session.emptyOptOut || !session.db) {
+      emitEmptyQueryOutput(session, opts.product);
+      return;
+    }
+    const db = session.db;
     const since = resolveDateOrExit('since', opts.since);
     const until = resolveDateOrExit('until', opts.until);
     try {
@@ -686,22 +863,29 @@ program
       });
       const ms = Date.now() - t0;
       if (program.opts().json) {
-        console.log(JSON.stringify(results.map(r => ({
-          released_at: r.released_at, product: r.product, version: r.version,
-          kind: r.kind, text: r.text, rrf_score: r.rrf_score,
-          rerank_score: r.rerank_score,
-        }))));
-      } else if (results.length === 0) {
-        console.log('(no results)');
+        emitArrayJson(
+          results.map((r) => ({
+            released_at: r.released_at, product: r.product, version: r.version,
+            kind: r.kind, text: r.text, rrf_score: r.rrf_score,
+            rerank_score: r.rerank_score,
+          })),
+          db,
+          opts.product
+        );
       } else {
-        for (const r of results) {
-          const bm = r.bm25_rank ? `bm25#${r.bm25_rank}` : '       ';
-          const vec = r.vec_rank ? `vec#${r.vec_rank}` : '      ';
-          const rerank = r.rerank_score !== null ? ` rerank=${r.rerank_score.toFixed(2)}` : '';
-          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]  ${bm} ${vec} rrf=${r.rrf_score.toFixed(4)}${rerank}`);
-          console.log(`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '…' : ''}`);
+        if (results.length === 0) {
+          console.log('(no results)');
+        } else {
+          for (const r of results) {
+            const bm = r.bm25_rank ? `bm25#${r.bm25_rank}` : '       ';
+            const vec = r.vec_rank ? `vec#${r.vec_rank}` : '      ';
+            const rerank = r.rerank_score !== null ? ` rerank=${r.rerank_score.toFixed(2)}` : '';
+            console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]  ${bm} ${vec} rrf=${r.rrf_score.toFixed(4)}${rerank}`);
+            console.log(`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '…' : ''}`);
+          }
+          console.log(`\n${results.length} result${results.length === 1 ? '' : 's'} in ${ms}ms (rerank: ${opts.rerank})`);
         }
-        console.log(`\n${results.length} result${results.length === 1 ? '' : 's'} in ${ms}ms (rerank: ${opts.rerank})`);
+        emitTextStamp(db, opts.product, session.partialNote);
       }
     } catch (e: any) {
       const hint = (e.message.includes('Ollama') || e.message.includes('11434'))
@@ -715,61 +899,78 @@ program
         retryable: true,
       });
       if (program.opts().json) {
-        console.log(JSON.stringify(appErr.toJSON()));
+        console.log(JSON.stringify({ ...appErr.toJSON(), data_as_of: getCorpusFreshness(db, { product: opts.product }) }));
       } else {
         console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
       }
       process.exit(2);
     } finally {
       db.close();
+      activeDb = null;
     }
   });
 
 program
   .command('latest')
   .description('Recent releases across all products (or one)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-d, --db <path>', 'database path')
   .option('-p, --product <name>', 'limit to one product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-l, --limit <n>', 'max results', '20')
-  .action((opts: { db: string; product?: string; since?: string; limit: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
+  .action(async (opts: { db?: string; product?: string; since?: string; limit: string }) => {
+    const session = await openQueryDbOrFirstUse(opts, opts.product);
+    if (session.emptyOptOut || !session.db) {
+      emitEmptyQueryOutput(session, opts.product);
+      return;
+    }
+    const db = session.db;
     const since = resolveDateOrExit('since', opts.since);
     const releases = recentReleases(db, opts.product, intOpt('limit', opts.limit, 20), since);
     if (program.opts().json) {
-      console.log(JSON.stringify(releases));
-    } else if (releases.length === 0) {
-      console.log('(no releases)');
+      emitArrayJson(releases, db, opts.product);
     } else {
-      for (const r of releases) {
-        console.log(`${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
+      if (releases.length === 0) {
+        console.log('(no releases)');
+      } else {
+        for (const r of releases) {
+          console.log(`${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
+        }
       }
+      emitTextStamp(db, opts.product, session.partialNote);
     }
     db.close();
+    activeDb = null;
   });
 
 program
   .command('products')
   .description('List all products in the DB with release counts')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
-  .action((opts: { db: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
+  .option('-d, --db <path>', 'database path')
+  .action(async (opts: { db?: string }) => {
+    const session = await openQueryDbOrFirstUse(opts);
+    if (session.emptyOptOut || !session.db) {
+      emitEmptyQueryOutput(session);
+      return;
+    }
+    const db = session.db;
     const products = listProducts(db);
     if (program.opts().json) {
-      console.log(JSON.stringify(products));
-    } else if (products.length === 0) {
-      console.log('(no products)');
+      emitArrayJson(products, db);
     } else {
-      console.log('Product                              Releases  Latest');
-      console.log('───────────────────────────────────  ────────  ──────────────────');
-      for (const p of products) {
-        const latest = p.latest_version ? `${p.latest_version} (${p.latest_date})` : '—';
-        console.log(`${p.name.padEnd(36)} ${String(p.release_count).padStart(8)}  ${latest}`);
+      if (products.length === 0) {
+        console.log('(no products)');
+      } else {
+        console.log('Product                              Releases  Latest');
+        console.log('───────────────────────────────────  ────────  ──────────────────');
+        for (const p of products) {
+          const latest = p.latest_version ? `${p.latest_version} (${p.latest_date})` : '—';
+          console.log(`${p.name.padEnd(36)} ${String(p.release_count).padStart(8)}  ${latest}`);
+        }
       }
+      emitTextStamp(db, undefined, session.partialNote);
     }
     db.close();
+    activeDb = null;
   });
 
 // ── hk diff ────────────────────────────────────────────────────────────────
@@ -779,20 +980,25 @@ program
 program
   .command('diff [product]')
   .description('Show changes in a date window, grouped by release. Default: last 7 days across all products.')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-d, --db <path>', 'database path')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)', '7d')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative); default: now')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .option('-l, --limit <n>', 'max change rows', '200')
-  .action((product: string | undefined, opts: { db: string; since: string; until?: string; kind?: string; limit: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
+  .action(async (product: string | undefined, opts: { db?: string; since: string; until?: string; kind?: string; limit: string }) => {
+    const session = await openQueryDbOrFirstUse(opts, product);
+    if (session.emptyOptOut || !session.db) {
+      emitEmptyQueryOutput(session, product);
+      return;
+    }
+    const db = session.db;
     const since = resolveDateOrExit('since', opts.since);
     const until = resolveDateOrExit('until', opts.until);
     if (!since) {
       // Should be unreachable because --since has a default, but guard anyway
       console.error('error: --since is required');
       db.close();
+      activeDb = null;
       process.exit(1);
       return;
     }
@@ -812,33 +1018,41 @@ program
         hint: 'Verify --since / --until parse correctly and the DB is initialized.',
         cause: e.message,
       });
-      if (program.opts().json) console.log(JSON.stringify(appErr.toJSON()));
-      else console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      if (program.opts().json) {
+        console.log(JSON.stringify({ ...appErr.toJSON(), data_as_of: getCorpusFreshness(db, { product }) }));
+      } else {
+        console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      }
       db.close();
+      activeDb = null;
       process.exit(1);
       return;
     }
     if (program.opts().json) {
-      console.log(JSON.stringify(results));
-    } else if (results.length === 0) {
-      const scope = product ? ` for product "${product}"` : '';
-      console.log(`(no changes in window since ${since}${until ? ` until ${until}` : ''}${scope})`);
-      console.log('Try widening the date window: hk diff --since 30d, or remove --kind / --product filters.');
+      emitArrayJson(results, db, product);
     } else {
-      let totalChanges = 0;
-      for (const rel of results) {
-        const date = rel.released_at ?? '????-??-??';
-        console.log(`\n${date}  ${rel.product}@${rel.version}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
-        for (const c of rel.changes) {
-          console.log(`  - [${c.kind}] ${c.text}`);
+      if (results.length === 0) {
+        const scope = product ? ` for product "${product}"` : '';
+        console.log(`(no changes in window since ${since}${until ? ` until ${until}` : ''}${scope})`);
+        console.log('Try widening the date window: hk diff --since 30d, or remove --kind / --product filters.');
+      } else {
+        let totalChanges = 0;
+        for (const rel of results) {
+          const date = rel.released_at ?? '????-??-??';
+          console.log(`\n${date}  ${rel.product}@${rel.version}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
+          for (const c of rel.changes) {
+            console.log(`  - [${c.kind}] ${c.text}`);
+          }
+          totalChanges += rel.changes.length;
         }
-        totalChanges += rel.changes.length;
+        const sinceLbl = opts.since;
+        const untilLbl = opts.until ? ` until ${opts.until}` : '';
+        console.log(`\n${totalChanges} change${totalChanges === 1 ? '' : 's'} across ${results.length} release${results.length === 1 ? '' : 's'} since ${sinceLbl}${untilLbl}`);
       }
-      const sinceLbl = opts.since;
-      const untilLbl = opts.until ? ` until ${opts.until}` : '';
-      console.log(`\n${totalChanges} change${totalChanges === 1 ? '' : 's'} across ${results.length} release${results.length === 1 ? '' : 's'} since ${sinceLbl}${untilLbl}`);
+      emitTextStamp(db, product, session.partialNote);
     }
     db.close();
+    activeDb = null;
   });
 
 // ── hk breaking ────────────────────────────────────────────────────────────
@@ -846,14 +1060,18 @@ program
 program
   .command('breaking')
   .description('List breaking changes, most recent first. Filter by product / date window.')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-d, --db <path>', 'database path')
   .option('-p, --product <name>', 'limit to one product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-l, --limit <n>', 'max results', '50')
-  .action((opts: { db: string; product?: string; since?: string; until?: string; limit: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
+  .action(async (opts: { db?: string; product?: string; since?: string; until?: string; limit: string }) => {
+    const session = await openQueryDbOrFirstUse(opts, opts.product);
+    if (session.emptyOptOut || !session.db) {
+      emitEmptyQueryOutput(session, opts.product);
+      return;
+    }
+    const db = session.db;
     const since = resolveDateOrExit('since', opts.since);
     const until = resolveDateOrExit('until', opts.until);
     let results;
@@ -872,49 +1090,69 @@ program
         hint: 'Verify --since / --until parse correctly and the DB is initialized.',
         cause: e.message,
       });
-      if (program.opts().json) console.log(JSON.stringify(appErr.toJSON()));
-      else console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      if (program.opts().json) {
+        console.log(JSON.stringify({ ...appErr.toJSON(), data_as_of: getCorpusFreshness(db, { product: opts.product }) }));
+      } else {
+        console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      }
       db.close();
+      activeDb = null;
       process.exit(1);
       return;
     }
     if (program.opts().json) {
-      console.log(JSON.stringify(results.map(r => ({
-        released_at: r.released_at, product: r.product, version: r.version,
-        kind: r.kind, text: r.text,
-      }))));
-    } else if (results.length === 0) {
-      console.log('(no breaking changes)');
-      console.log('Note: ingest may not have classified any changes as breaking yet — try `hk query "" --kind breaking` patterns, or widen --since.');
+      emitArrayJson(
+        results.map((r) => ({
+          released_at: r.released_at, product: r.product, version: r.version,
+          kind: r.kind, text: r.text,
+        })),
+        db,
+        opts.product
+      );
     } else {
-      for (const r of results) {
-        console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
-        console.log(`  ${r.text}`);
+      if (results.length === 0) {
+        console.log('(no breaking changes)');
+        console.log('Note: ingest may not have classified any changes as breaking yet — try `hk query "" --kind breaking` patterns, or widen --since.');
+      } else {
+        for (const r of results) {
+          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]`);
+          console.log(`  ${r.text}`);
+        }
+        console.log(`\n${results.length} breaking change${results.length === 1 ? '' : 's'}`);
       }
-      console.log(`\n${results.length} breaking change${results.length === 1 ? '' : 's'}`);
+      emitTextStamp(db, opts.product, session.partialNote);
     }
     db.close();
+    activeDb = null;
   });
 
 program
   .command('top <entity-type>')
   .description('Most-mentioned entities of a type (env_var, slash_command, cli_option, model_id, beta_header, cve, ghsa, hook_event, setting_key)')
-  .option('-d, --db <path>', 'database path', DEFAULT_DB)
+  .option('-d, --db <path>', 'database path')
   .option('-l, --limit <n>', 'max results', '30')
-  .action((entityType: string, opts: { db: string; limit: string }) => {
-    const db = openTrackedDb(opts.db);
-    if (warnIfEmpty(db)) { db.close(); return; }
+  .action(async (entityType: string, opts: { db?: string; limit: string }) => {
+    const session = await openQueryDbOrFirstUse(opts);
+    if (session.emptyOptOut || !session.db) {
+      emitEmptyQueryOutput(session);
+      return;
+    }
+    const db = session.db;
     const results = entityFrequency(db, entityType, intOpt('limit', opts.limit, 30));
     if (program.opts().json) {
-      console.log(JSON.stringify(results));
-    } else if (results.length === 0) {
-      console.log(`(no entities of type "${entityType}")`);
+      emitArrayJson(results, db);
     } else {
-      for (const r of results) {
-        console.log(`${String(r.count).padStart(4)}  ${r.first_seen ?? '????-??-??'}  ${r.value}`);
+      if (results.length === 0) {
+        console.log(`(no entities of type "${entityType}")`);
+      } else {
+        for (const r of results) {
+          console.log(`${String(r.count).padStart(4)}  ${r.first_seen ?? '????-??-??'}  ${r.value}`);
+        }
       }
+      emitTextStamp(db, undefined, session.partialNote);
     }
     db.close();
+    activeDb = null;
   });
 
 function printEntityResults(name: string, label: string, results: ReturnType<typeof lookupEntity>) {

@@ -178,6 +178,22 @@ describe('loadProductsConfig — validation + error paths', () => {
     );
   });
 
+  it('throws when html-scrape uses an unsupported parser', () => {
+    const badHtmlParserYaml = `products:
+  - name: foo
+    display_name: foo
+    tier: 3
+    source_url: https://example.test
+    fetch_strategy: html-scrape
+    fetch:
+      type: html-scrape
+      parser: unknown-html-parser
+`;
+    expect(() => loadProductsConfig(writeYaml(badHtmlParserYaml))).toThrow(
+      /html-scrape 'parser' must be one of/
+    );
+  });
+
   it('throws when catalog is missing catalog_type', () => {
     expect(() => loadProductsConfig(writeYaml(catalogMissingTypeYaml()))).toThrow(
       /catalog requires 'catalog_type'/

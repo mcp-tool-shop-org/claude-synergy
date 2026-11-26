@@ -1,5 +1,209 @@
 import type Database from 'better-sqlite3';
 import { AppError } from './errors.js';
+import { loadProductsConfig } from './products-config.js';
+
+// ─── Corpus freshness (Part 1) ────────────────────────────────────────────
+
+/** Threshold (in days) after which the corpus is flagged as STALE. */
+export const STALE_AFTER_DAYS = 7;
+
+export interface ProductFreshness {
+  product: string;
+  synced_at: string | null;
+  newest_release: string | null;
+  fetch_strategy: string | null;
+}
+
+export interface CorpusFreshness {
+  synced_at: string | null;
+  newest_release: string | null;
+  age_days: number | null;
+  synced_age_days: number | null;
+  stale: boolean;
+  stale_after_days: number;
+  product?: ProductFreshness;
+}
+
+export type ClockInput = Date | (() => Date);
+
+function resolveNow(now?: ClockInput): Date {
+  if (typeof now === 'function') return now();
+  if (now instanceof Date) return now;
+  const envNow = process.env.CLAUDE_SYNERGY_NOW?.trim();
+  if (envNow) {
+    const parsed = new Date(envNow);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return new Date();
+}
+
+/**
+ * Compute whole UTC calendar days elapsed from `dateStr` (YYYY-MM-DD or ISO)
+ * to `now`. Returns null if `dateStr` is null or unparseable.
+ */
+export function utcDaysSince(dateStr: string | null | undefined, now: Date): number | null {
+  if (!dateStr) return null;
+  const trimmed = dateStr.trim();
+  let y: number;
+  let m: number;
+  let d: number;
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})/.exec(trimmed);
+  if (ymd) {
+    y = parseInt(ymd[1], 10);
+    m = parseInt(ymd[2], 10) - 1;
+    d = parseInt(ymd[3], 10);
+  } else {
+    const parsed = new Date(trimmed);
+    if (Number.isNaN(parsed.getTime())) return null;
+    y = parsed.getUTCFullYear();
+    m = parsed.getUTCMonth();
+    d = parsed.getUTCDate();
+  }
+  const thenUtc = Date.UTC(y, m, d);
+  const nowUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.max(0, Math.floor((nowUtc - thenUtc) / 86_400_000));
+}
+
+function datePart(s: string | null | undefined): string | null {
+  if (!s) return null;
+  const m = /^(\d{4}-\d{2}-\d{2})/.exec(s.trim());
+  if (m) return m[1];
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return s;
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Query overall corpus freshness from `releases` (and per-product freshness +
+ * `fetch_strategy` when `opts.product` is set). Safe on null or uninitialized DBs.
+ */
+export function getCorpusFreshness(
+  db: Database.Database | null,
+  opts: { product?: string; now?: ClockInput } = {}
+): CorpusFreshness {
+  const nowDate = resolveNow(opts.now);
+  let syncedAt: string | null = null;
+  let newestRelease: string | null = null;
+
+  if (db) {
+    try {
+      const row = db
+        .prepare(`SELECT MAX(fetched_at) AS synced_at, MAX(released_at) AS newest_release FROM releases`)
+        .get() as { synced_at: string | null; newest_release: string | null } | undefined;
+      syncedAt = row?.synced_at ?? null;
+      newestRelease = row?.newest_release ?? null;
+    } catch {
+      // Uninitialized DB (no releases table yet) -> leave null so it stamps STALE
+    }
+  }
+
+  const ageDays = utcDaysSince(newestRelease, nowDate);
+  const syncedAgeDays = utcDaysSince(syncedAt, nowDate);
+  const stale = syncedAt === null || (syncedAgeDays !== null && syncedAgeDays > STALE_AFTER_DAYS);
+
+  const result: CorpusFreshness = {
+    synced_at: syncedAt,
+    newest_release: newestRelease,
+    age_days: ageDays,
+    synced_age_days: syncedAgeDays,
+    stale,
+    stale_after_days: STALE_AFTER_DAYS,
+  };
+
+  if (opts.product) {
+    let prodSynced: string | null = null;
+    let prodNewest: string | null = null;
+    let fetchStrategy: string | null = null;
+
+    if (db) {
+      try {
+        const prodRow = db
+          .prepare(
+            `SELECT MAX(fetched_at) AS synced_at, MAX(released_at) AS newest_release FROM releases WHERE product = ?`
+          )
+          .get(opts.product) as { synced_at: string | null; newest_release: string | null } | undefined;
+        prodSynced = prodRow?.synced_at ?? null;
+        prodNewest = prodRow?.newest_release ?? null;
+
+        const metaRow = db
+          .prepare(`SELECT fetch_strategy FROM products WHERE name = ?`)
+          .get(opts.product) as { fetch_strategy: string | null } | undefined;
+        fetchStrategy = metaRow?.fetch_strategy ?? null;
+      } catch {
+        // Ignore uninitialized schema
+      }
+    }
+
+    if (!fetchStrategy) {
+      fetchStrategy = loadProductsConfig()?.productMeta[opts.product]?.fetch_strategy ?? null;
+    }
+
+    result.product = {
+      product: opts.product,
+      synced_at: prodSynced,
+      newest_release: prodNewest,
+      fetch_strategy: fetchStrategy,
+    };
+  }
+
+  return result;
+}
+
+/**
+ * Format the single-line "data as of" stamp appended to every CLI text and MCP
+ * response. Prefixes `STALE:` and names refresh commands when `stale` is true.
+ */
+export function formatFreshnessStamp(
+  freshness: CorpusFreshness,
+  opts: { partialNote?: string } = {}
+): string {
+  const parts: string[] = [];
+
+  if (freshness.synced_at === null && freshness.newest_release === null) {
+    parts.push('data as of: empty corpus (no releases synced)');
+  } else {
+    const syncStr = datePart(freshness.synced_at) ?? 'unknown';
+    const relDate = datePart(freshness.newest_release);
+    const relStr = relDate
+      ? `${relDate} (${freshness.age_days ?? 0} day${freshness.age_days === 1 ? '' : 's'} old)`
+      : 'none';
+    parts.push(`data as of: synced ${syncStr}, newest release ${relStr}`);
+  }
+
+  if (freshness.product) {
+    const p = freshness.product;
+    const pSynced = datePart(p.synced_at) ?? 'never';
+    const pNewest = datePart(p.newest_release) ?? 'none';
+    const strat = p.fetch_strategy ?? 'unknown';
+    const manualTag = p.fetch_strategy === 'manual' ? ', MANUAL FEED — not refreshed by sync' : '';
+    parts.push(`${p.product}: synced ${pSynced}, newest release ${pNewest} (${strat}${manualTag})`);
+  }
+
+  if (opts.partialNote) {
+    parts.push(opts.partialNote);
+  }
+
+  const base = parts.join('; ');
+  if (freshness.stale) {
+    return `STALE: ${base} — refresh with sync_now or hk sync`;
+  }
+  return base;
+}
+
+/**
+ * Loud warning banner for any product whose `fetch_strategy` remains `manual`.
+ */
+export function formatManualFeedWarning(
+  product: string,
+  newestRelease: string | null,
+  now?: ClockInput
+): string {
+  const nowDate = resolveNow(now);
+  const days = utcDaysSince(newestRelease, nowDate);
+  const dateStr = datePart(newestRelease) ?? 'never';
+  const ageStr = days === null ? 'unknown' : String(days);
+  return `MANUAL FEED (${product}): last updated ${dateStr}, ${ageStr} days old, not refreshed by sync`;
+}
 
 // ─── CLI / MCP formatting helpers ─────────────────────────────────────────
 

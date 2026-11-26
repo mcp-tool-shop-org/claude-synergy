@@ -51,7 +51,9 @@
 #
 #     type: html-scrape
 #       parser         string   REQUIRED. Parser name. One of:
-#                               "github-copilot-blog", "vscode-updates".
+#                               "github-copilot-blog", "vscode-updates",
+#                               "claude-api-release-notes",
+#                               "anthropic-apps-release-notes".
 #
 #     type: playwright
 #       (no additional fields — currently hardcoded to Windsurf's CSR changelog)
@@ -77,24 +79,26 @@ products:
       type: gh-releases
       repo: anthropics/claude-code
 
-  # ── Tier 3 / manual-seed (no automated fetcher yet) ──────────────────────
-  # Renamed from `webfetch` to `manual` in v1.2.1 — the original label suggested
-  # an automated WebFetch-based fetcher that was never implemented. These two
-  # corpora are still seeded by hand (the initial study-swarm pulled them via
-  # WebFetch one-shot, but `sync_now` does not refresh them). `sync_status`
-  # renders the strategy as "manual" instead of "never" so callers can
-  # distinguish "needs implementation" from "stale gh-releases."
+  # ── Tier 3 / HTML-scraped Anthropic release notes ────────────────────────
+  # Server-rendered release-notes pages for Claude API / Platform and
+  # Anthropic Apps (Help Center), scraped via cheerio in src/fetch-html.ts.
   - name: claude-api
     display_name: Claude API / Platform
     tier: 3
     source_url: https://platform.claude.com/docs/en/release-notes/overview
-    fetch_strategy: manual
+    fetch_strategy: html-scrape
+    fetch:
+      type: html-scrape
+      parser: claude-api-release-notes
 
   - name: anthropic-apps
     display_name: Anthropic Apps (Design / Cowork / Chat / Mobile)
     tier: 3
     source_url: https://support.claude.com/en/articles/12138966-release-notes
-    fetch_strategy: manual
+    fetch_strategy: html-scrape
+    fetch:
+      type: html-scrape
+      parser: anthropic-apps-release-notes
 
   # ── Tier 1 / GitHub Releases — Anthropic SDKs ────────────────────────────
   - name: claude-agent-sdk-python

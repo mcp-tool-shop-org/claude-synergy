@@ -1,5 +1,25 @@
-import { describe, it, expect } from 'vitest';
-import { extractEntities } from '../../src/extract.js';
+import { describe, it, expect, afterEach } from 'vitest';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { extractEntities, loadModelFamilies, buildModelIdPattern } from '../../src/extract.js';
+import { ingestAll, reextractEntities } from '../../src/ingest.js';
+import { AppError } from '../../src/errors.js';
+import { createTempDb } from '../helpers/temp-db.js';
+
+const tempDirs: string[] = [];
+function makeTmpDir(prefix: string): string {
+  const dir = mkdtempSync(join(tmpdir(), prefix));
+  tempDirs.push(dir);
+  return dir;
+}
+
+afterEach(() => {
+  while (tempDirs.length > 0) {
+    const dir = tempDirs.pop()!;
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 function values(text: string, type: string): string[] {
   return extractEntities(text)
@@ -106,9 +126,9 @@ describe('extractEntities', () => {
   });
 
   describe('model_id', () => {
-    it('matches modern model IDs with optional date suffix', () => {
+    it('matches modern model IDs with optional date suffix including fable and mythos', () => {
       const text =
-        'Supports claude-opus-4-7, claude-sonnet-4-6-20250929, claude-haiku-4-5, and legacy claude-opus-4-20250514.';
+        'Supports claude-opus-4-7, claude-sonnet-4-6-20250929, claude-haiku-4-5, legacy claude-opus-4-20250514, claude-fable-5-2, and claude-mythos-5-2.';
       const found = values(text, 'model_id');
       expect(found).toEqual(
         expect.arrayContaining([
@@ -116,13 +136,68 @@ describe('extractEntities', () => {
           'claude-sonnet-4-6-20250929',
           'claude-haiku-4-5',
           'claude-opus-4-20250514',
+          'claude-fable-5-2',
+          'claude-mythos-5-2',
         ])
       );
     });
 
-    it('does not match claude-code or claude-mythos-preview', () => {
+    it('does not match claude-code-2.1.292, claude-agent-sdk, claude-code-action, or unlisted families', () => {
       expect(values('claude-code release', 'model_id')).toEqual([]);
+      expect(values('claude-code-2.1.292 shipped today', 'model_id')).toEqual([]);
+      expect(values('claude-agent-sdk-0.2.82 and claude-agent-sdk-2-1', 'model_id')).toEqual([]);
+      expect(values('claude-code-action updated', 'model_id')).toEqual([]);
       expect(values('claude-mythos-preview', 'model_id')).toEqual([]);
+      expect(values('claude-zephyr-5-2 is not in model-families.yaml', 'model_id')).toEqual([]);
+    });
+
+    it('matches a newly added family from a temp model-families.yaml with no code change', () => {
+      const dir = makeTmpDir('mf-custom-');
+      const yamlPath = join(dir, 'model-families.yaml');
+      writeFileSync(yamlPath, 'families:\n  - opus\n  - zephyr\n  - foo.bar\n', 'utf-8');
+
+      const found = extractEntities(
+        'Released claude-zephyr-6-1, claude-foo.bar-1-0, and fake claude-fooXbar-1-0.',
+        { modelFamiliesPath: yamlPath }
+      )
+        .filter(([t]) => t === 'model_id')
+        .map(([, v]) => v);
+
+      expect(found).toContain('claude-zephyr-6-1');
+      // Escaped dot in foo.bar must match literal dot and reject arbitrary character X
+      expect(found).toContain('claude-foo.bar-1-0');
+      expect(found).not.toContain('claude-fooXbar-1-0');
+    });
+
+    it('throws named AppError on missing, malformed, or empty model-families.yaml', () => {
+      const dir = makeTmpDir('mf-bad-');
+      const missingPath = join(dir, 'does-not-exist.yaml');
+      expect(() => loadModelFamilies(missingPath)).toThrow(AppError);
+      try {
+        loadModelFamilies(missingPath);
+      } catch (e) {
+        expect((e as AppError).code).toBe('MODEL_FAMILIES_CONFIG_ERROR');
+      }
+
+      const malformedPath = join(dir, 'malformed.yaml');
+      writeFileSync(malformedPath, 'families: [unclosed\n  bad: :\n', 'utf-8');
+      expect(() => buildModelIdPattern(malformedPath)).toThrow(AppError);
+
+      const emptyPath = join(dir, 'empty.yaml');
+      writeFileSync(emptyPath, 'families: []\n', 'utf-8');
+      expect(() => buildModelIdPattern(emptyPath)).toThrow(AppError);
+
+      const wrongKeyPath = join(dir, 'wrong-key.yaml');
+      writeFileSync(wrongKeyPath, 'other: [opus]\n', 'utf-8');
+      expect(() => buildModelIdPattern(wrongKeyPath)).toThrow(AppError);
+
+      const nonStringPath = join(dir, 'non-string.yaml');
+      writeFileSync(nonStringPath, 'families:\n  - 123\n', 'utf-8');
+      expect(() => loadModelFamilies(nonStringPath)).toThrow(AppError);
+
+      const invalidCharsPath = join(dir, 'invalid-chars.yaml');
+      writeFileSync(invalidCharsPath, 'families:\n  - "bad family with spaces"\n', 'utf-8');
+      expect(() => loadModelFamilies(invalidCharsPath)).toThrow(AppError);
     });
   });
 
@@ -219,6 +294,56 @@ describe('extractEntities', () => {
       expect(types.has('env_var'), 'should extract env_var entity type').toBe(true);
       expect(types.has('slash_command'), 'should extract slash_command entity type').toBe(true);
       expect(types.has('cli_option'), 'should extract cli_option entity type').toBe(true);
+    });
+  });
+
+  describe('reextractEntities', () => {
+    it('adds new entities from updated model-families.yaml without modifying existing change rows', () => {
+      const tmp = createTempDb({ loadVec: false });
+      const dir = makeTmpDir('reextract-');
+      try {
+        mkdirSync(join(dir, 'products', 'test-api', 'releases'), { recursive: true });
+        writeFileSync(
+          join(dir, 'products', 'test-api', 'releases', '2026-11-01.md'),
+          `---
+product: test-api
+version: "2026-11-01"
+released_at: "2026-11-01"
+fetched_at: "2026-11-01"
+---
+
+- Added claude-opus-4-7 and claude-nova-5-1 support
+`,
+          'utf-8'
+        );
+
+        ingestAll(tmp.db, join(dir, 'products'));
+        const changesBefore = tmp.db.prepare(`SELECT id, product, version, ordinal, kind, text FROM changes ORDER BY id`).all();
+        const beforeEntities = tmp.db
+          .prepare(`SELECT entity_value FROM entities WHERE entity_type = 'model_id'`)
+          .all() as Array<{ entity_value: string }>;
+        expect(beforeEntities.map((e) => e.entity_value)).toEqual(['claude-opus-4-7']);
+
+        const customFamilies = join(dir, 'model-families.yaml');
+        writeFileSync(customFamilies, 'families:\n  - opus\n  - nova\n', 'utf-8');
+
+        const stats = reextractEntities(tmp.db, { modelFamiliesPath: customFamilies });
+        expect(stats.changesScanned).toBe(1);
+        expect(stats.entitiesAdded).toBe(1);
+        expect(stats.entitiesAfter).toBe(2);
+
+        const changesAfter = tmp.db.prepare(`SELECT id, product, version, ordinal, kind, text FROM changes ORDER BY id`).all();
+        expect(changesAfter).toEqual(changesBefore);
+
+        const afterEntities = (
+          tmp.db
+            .prepare(`SELECT entity_value FROM entities WHERE entity_type = 'model_id' ORDER BY entity_value`)
+            .all() as Array<{ entity_value: string }>
+        ).map((e) => e.entity_value);
+        expect(afterEntities).toEqual(['claude-nova-5-1', 'claude-opus-4-7']);
+      } finally {
+        tmp.cleanup();
+      }
     });
   });
 });

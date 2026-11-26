@@ -144,6 +144,10 @@ const HARDCODED_FALLBACK_TARGETS: FetchTarget[] = [
   // Raw markdown CHANGELOG
   { product: 'aider', strategy: 'raw-changelog', rawChangelogUrl: 'https://raw.githubusercontent.com/Aider-AI/aider/main/HISTORY.md', rawChangelogParser: 'aider-history' },
 
+  // ── Tier 3 / HTML-scraped Anthropic release notes ────────────────────────
+  { product: 'claude-api', strategy: 'html-scrape', htmlParser: 'claude-api-release-notes' },
+  { product: 'anthropic-apps', strategy: 'html-scrape', htmlParser: 'anthropic-apps-release-notes' },
+
   // ── Tier 4b additions — HTML-scraped sources ──────────────────────────────
   { product: 'github-copilot', strategy: 'html-scrape', htmlParser: 'github-copilot-blog' },
   { product: 'vscode-copilot-chat', strategy: 'html-scrape', htmlParser: 'vscode-updates' },

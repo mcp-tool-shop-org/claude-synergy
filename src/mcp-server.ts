@@ -3,15 +3,14 @@
 // (Claude Code sessions, Agent SDK apps, Cowork plugins, etc).
 //
 // Run via stdio:
-//   claude-synergy-mcp                              # uses ./data/claude-synergy.db
+//   claude-synergy-mcp                              # resolves DB via env / arg / cwd-if-exists / ~/.claude-synergy
 //   CLAUDE_SYNERGY_DB=path/to/file.db claude-synergy-mcp
 //
 // In Claude Code .mcp.json:
 //   {
 //     "mcpServers": {
 //       "claude-synergy": {
-//         "command": "claude-synergy-mcp",
-//         "env": { "CLAUDE_SYNERGY_DB": "E:/AI/claude-synergy/data/claude-synergy.db" }
+//         "command": "claude-synergy-mcp"
 //       }
 //     }
 //   }
@@ -29,7 +28,7 @@ import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import matter from 'gray-matter';
-import { openDb } from './db.js';
+import { openDb, initSchema } from './db.js';
 import { formatError } from './errors.js';
 import {
   searchChanges,
@@ -37,17 +36,29 @@ import {
   recentReleases,
   listProducts,
   entityFrequency,
-  browseChanges,
   getChangesSince,
+  browseChanges,
   compareVersions,
   listSynergies,
   getSynergy,
   getSyncStatus,
+  getCorpusFreshness,
+  formatFreshnessStamp,
+  formatManualFeedWarning,
   type ChangesSinceResult,
   type QueryResult,
   type SyncStatusRow,
 } from './query.js';
 import { hybridSearch } from './hybrid.js';
+import {
+  FIRST_USE_SYNC_TIMEOUT_MS,
+  FirstUseSyncCoordinator,
+  formatFirstUseNotice,
+  hasAnyReleases,
+  isAutoSyncDisabled,
+  printStoreResolutionOnce,
+  resolveStorePaths,
+} from './store.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -58,24 +69,20 @@ const { version: PKG_VERSION } = _require('../package.json') as { version: strin
 // Synergy names: lowercase + digits + dash/underscore (filenames on disk).
 const SYNERGY_NAME_RE = /^[a-z0-9_-]+$/i;
 
-const DB_PATH =
-  process.env.CLAUDE_SYNERGY_DB ??
-  process.argv[2] ??
-  join(process.cwd(), 'data', 'claude-synergy.db');
+const store = resolveStorePaths({
+  explicitDb: process.argv[2],
+});
+printStoreResolutionOnce(store);
+
+const DB_PATH = store.dbPath;
+const PRODUCTS_ROOT = store.productsRoot;
 
 const SYNERGIES_DIR =
   process.env.CLAUDE_SYNERGY_SYNERGIES_DIR ??
   resolveSynergiesDir();
 
-// Where sync_now writes new release files. Defaults to <db-parent>/../products so
-// the usual layout (data/claude-synergy.db + products/<slug>/releases/*.md) works
-// without configuration. Override via env for tests or non-standard layouts.
-const PRODUCTS_ROOT =
-  process.env.CLAUDE_SYNERGY_PRODUCTS_ROOT ??
-  join(dirname(DB_PATH), '..', 'products');
-
 function resolveSynergiesDir(): string {
-  // Try repo-root/synergies relative to DB, then cwd
+  // Try repo-root/synergies relative to DB, then cwd, then package root
   const dbDir = dirname(DB_PATH);
   const candidates = [
     join(dbDir, '..', 'synergies'),
@@ -86,23 +93,36 @@ function resolveSynergiesDir(): string {
   return candidates[0];
 }
 
-if (!existsSync(DB_PATH)) {
-  console.error(
-    `claude-synergy-mcp: DB not found at ${DB_PATH}. Run 'hk init && hk ingest && hk embed' first, or set CLAUDE_SYNERGY_DB.`
-  );
-  process.exit(1);
+let db: ReturnType<typeof openDb> | null = null;
+if (existsSync(DB_PATH)) {
+  try {
+    db = openDb(DB_PATH);
+  } catch (e) {
+    // A missing SQLite driver (SQLITE_BINDING_ERROR) prints its code and hint, not a raw stack.
+    console.error(`claude-synergy-mcp: ${formatError(e)}`);
+    process.exit(1);
+  }
 }
 
-let db: ReturnType<typeof openDb>;
-try {
-  db = openDb(DB_PATH);
-} catch (e) {
-  // A missing SQLite driver (SQLITE_BINDING_ERROR) prints its code and hint, not a raw stack.
-  console.error(`claude-synergy-mcp: ${formatError(e)}`);
-  process.exit(1);
+function getDbOrThrow(): ReturnType<typeof openDb> {
+  if (!db) {
+    throw new McpError(ErrorCode.InternalError, `database not initialized at ${DB_PATH}`);
+  }
+  return db;
 }
-const hasChunks =
-  db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks'`).get() !== undefined;
+
+function getHasChunks(database: ReturnType<typeof openDb> | null): boolean {
+  if (!database) return false;
+  try {
+    return (
+      database.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks'`).get() !== undefined
+    );
+  } catch {
+    return false;
+  }
+}
+
+const syncCoordinator = new FirstUseSyncCoordinator();
 
 const server = new Server(
   { name: 'claude-synergy', version: PKG_VERSION },
@@ -387,29 +407,88 @@ function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promi
   });
 }
 
+function extractScopedProduct(args: unknown): string | undefined {
+  if (args && typeof args === 'object' && !Array.isArray(args)) {
+    const p = (args as Record<string, unknown>).product;
+    if (typeof p === 'string' && p.length > 0) return p;
+  }
+  return undefined;
+}
+
+function finalizeToolText(
+  body: string,
+  opts: { scopedProduct?: string; firstUseLine?: string } = {}
+): string {
+  const freshness = getCorpusFreshness(db, { product: opts.scopedProduct });
+  const partialNote = syncCoordinator.getPartialNote() ?? undefined;
+  const stamp = formatFreshnessStamp(freshness, { partialNote });
+  const sections: string[] = [];
+  if (opts.firstUseLine) sections.push(opts.firstUseLine);
+  sections.push(body);
+  if (freshness.product?.fetch_strategy === 'manual') {
+    sections.push(formatManualFeedWarning(freshness.product.product, freshness.product.newest_release));
+  }
+  sections.push(stamp);
+  return sections.join('\n\n');
+}
+
+async function ensureCorpusReady(scopedProduct?: string): Promise<string | undefined> {
+  if (hasAnyReleases(db)) return undefined;
+  if (isAutoSyncDisabled()) {
+    return undefined;
+  }
+  const res = await syncCoordinator.ensureSynced({
+    dbPath: DB_PATH,
+    productsRoot: PRODUCTS_ROOT,
+    db: db ?? undefined,
+    timeoutMs: FIRST_USE_SYNC_TIMEOUT_MS,
+  });
+  db = res.db;
+  if (res.performedByThisCall) {
+    return formatFirstUseNotice(res.report, db, { product: scopedProduct });
+  }
+  return undefined;
+}
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
-  try {
+  const scopedProduct = extractScopedProduct(args);
+
+  const runTool = async (): Promise<{ text: string; isError?: boolean; firstUseLine?: string }> => {
+    if (name === 'sync_now') {
+      const r = asRecord(args ?? {}, 'sync_now');
+      const text = await handleSyncNow({
+        product: optString(r, 'product', 'sync_now'),
+        dryRun: optBool(r, 'dry_run', 'sync_now'),
+        includeIngest: optBool(r, 'include_ingest', 'sync_now'),
+        includeEmbed: optBool(r, 'include_embed', 'sync_now'),
+        timeoutMs: optInt(r, 'timeout_ms', 'sync_now', 1_000, 600_000),
+      });
+      return { text };
+    }
+
+    // Validate parameters before triggering first-use sync so bad inputs reject fast.
+    let parsedCall: () => Promise<{ text: string; isError?: boolean }>;
     switch (name) {
       case 'search': {
         const r = asRecord(args, 'search');
-        const searchResult = await withTimeout(
-          handleSearch({
-            query: requireString(r, 'query', 'search'),
-            mode: optEnum<'hybrid' | 'fts'>(r, 'mode', SEARCH_MODES, 'search'),
-            product: optString(r, 'product', 'search'),
-            since: optString(r, 'since', 'search'),
-            until: optString(r, 'until', 'search'),
-            kind: optString(r, 'kind', 'search'),
-            rerank: optEnum<'none' | 'ollama-judge'>(r, 'rerank', RERANK_MODES, 'search'),
-            limit: optInt(r, 'limit', 'search'),
-          }),
-          SEARCH_TIMEOUT_MS,
-          'search timed out (30s) — is the embedding provider (Ollama) running?',
-        );
-        return {
-          content: [{ type: 'text', text: searchResult }],
+        const params = {
+          query: requireString(r, 'query', 'search'),
+          mode: optEnum<'hybrid' | 'fts'>(r, 'mode', SEARCH_MODES, 'search'),
+          product: optString(r, 'product', 'search'),
+          since: optString(r, 'since', 'search'),
+          until: optString(r, 'until', 'search'),
+          kind: optString(r, 'kind', 'search'),
+          rerank: optEnum<'none' | 'ollama-judge'>(r, 'rerank', RERANK_MODES, 'search'),
+          limit: optInt(r, 'limit', 'search'),
         };
+        parsedCall = () =>
+          withTimeout(
+            handleSearch(params),
+            SEARCH_TIMEOUT_MS,
+            'search timed out (30s) — is the embedding provider (Ollama) running?',
+          );
+        break;
       }
       case 'lookup_entity': {
         const r = asRecord(args, 'lookup_entity');
@@ -420,46 +499,32 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             `lookup_entity: type must be one of ${[...ENTITY_TYPES].join(', ')}`
           );
         }
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleLookupEntity({ type, value: requireString(r, 'value', 'lookup_entity') }),
-            },
-          ],
-        };
+        const value = requireString(r, 'value', 'lookup_entity');
+        parsedCall = async () => ({ text: handleLookupEntity({ type, value }) });
+        break;
       }
       case 'latest_releases': {
         const r = asRecord(args ?? {}, 'latest_releases');
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleLatestReleases({
-                product: optString(r, 'product', 'latest_releases'),
-                since: optString(r, 'since', 'latest_releases'),
-                limit: optInt(r, 'limit', 'latest_releases'),
-              }),
-            },
-          ],
+        const params = {
+          product: optString(r, 'product', 'latest_releases'),
+          since: optString(r, 'since', 'latest_releases'),
+          limit: optInt(r, 'limit', 'latest_releases'),
         };
+        parsedCall = async () => ({ text: handleLatestReleases(params) });
+        break;
       }
       case 'get_release': {
         const r = asRecord(args, 'get_release');
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleGetRelease({
-                product: requireString(r, 'product', 'get_release'),
-                version: requireString(r, 'version', 'get_release'),
-              }),
-            },
-          ],
+        const params = {
+          product: requireString(r, 'product', 'get_release'),
+          version: requireString(r, 'version', 'get_release'),
         };
+        parsedCall = async () => ({ text: handleGetRelease(params) });
+        break;
       }
       case 'list_products':
-        return { content: [{ type: 'text', text: handleListProducts() }] };
+        parsedCall = async () => ({ text: handleListProducts() });
+        break;
       case 'top_entities': {
         const r = asRecord(args, 'top_entities');
         const type = requireString(r, 'type', 'top_entities');
@@ -469,25 +534,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             `top_entities: type must be one of ${[...ENTITY_TYPES].join(', ')}`
           );
         }
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleTopEntities({ type, limit: optInt(r, 'limit', 'top_entities') }),
-            },
-          ],
-        };
+        const limit = optInt(r, 'limit', 'top_entities');
+        parsedCall = async () => ({ text: handleTopEntities({ type, limit }) });
+        break;
       }
       case 'list_synergies': {
         const r = asRecord(args ?? {}, 'list_synergies');
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleListSynergies({ product: optString(r, 'product', 'list_synergies') }),
-            },
-          ],
-        };
+        const product = optString(r, 'product', 'list_synergies');
+        parsedCall = async () => ({ text: handleListSynergies({ product }) });
+        break;
       }
       case 'read_synergy': {
         const r = asRecord(args, 'read_synergy');
@@ -498,123 +553,119 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             'read_synergy: name must match /^[a-z0-9_-]+$/i'
           );
         }
-        return { content: [{ type: 'text', text: handleReadSynergy({ name: synName }) }] };
+        parsedCall = async () => ({ text: handleReadSynergy({ name: synName }) });
+        break;
       }
       case 'get_changes_since': {
         const r = asRecord(args, 'get_changes_since');
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleGetChangesSince({
-                since: requireString(r, 'since', 'get_changes_since'),
-                until: optString(r, 'until', 'get_changes_since'),
-                product: optString(r, 'product', 'get_changes_since'),
-                kind: optString(r, 'kind', 'get_changes_since'),
-                limit: optInt(r, 'limit', 'get_changes_since'),
-              }),
-            },
-          ],
+        const params = {
+          since: requireString(r, 'since', 'get_changes_since'),
+          until: optString(r, 'until', 'get_changes_since'),
+          product: optString(r, 'product', 'get_changes_since'),
+          kind: optString(r, 'kind', 'get_changes_since'),
+          limit: optInt(r, 'limit', 'get_changes_since'),
         };
+        parsedCall = async () => ({ text: handleGetChangesSince(params) });
+        break;
       }
       case 'search_breaking_changes': {
         const r = asRecord(args ?? {}, 'search_breaking_changes');
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleSearchBreakingChanges({
-                product: optString(r, 'product', 'search_breaking_changes'),
-                since: optString(r, 'since', 'search_breaking_changes'),
-                until: optString(r, 'until', 'search_breaking_changes'),
-                limit: optInt(r, 'limit', 'search_breaking_changes'),
-              }),
-            },
-          ],
+        const params = {
+          product: optString(r, 'product', 'search_breaking_changes'),
+          since: optString(r, 'since', 'search_breaking_changes'),
+          until: optString(r, 'until', 'search_breaking_changes'),
+          limit: optInt(r, 'limit', 'search_breaking_changes'),
         };
+        parsedCall = async () => ({ text: handleSearchBreakingChanges(params) });
+        break;
       }
       case 'compare_versions': {
         const r = asRecord(args, 'compare_versions');
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleCompareVersions({
-                product: requireString(r, 'product', 'compare_versions'),
-                from_version: requireString(r, 'from_version', 'compare_versions'),
-                to_version: requireString(r, 'to_version', 'compare_versions'),
-              }),
-            },
-          ],
+        const params = {
+          product: requireString(r, 'product', 'compare_versions'),
+          from_version: requireString(r, 'from_version', 'compare_versions'),
+          to_version: requireString(r, 'to_version', 'compare_versions'),
         };
+        parsedCall = async () => ({ text: handleCompareVersions(params) });
+        break;
       }
       case 'sync_status': {
         const r = asRecord(args ?? {}, 'sync_status');
-        return {
-          content: [
-            {
-              type: 'text',
-              text: handleSyncStatus({
-                product: optString(r, 'product', 'sync_status'),
-                staleOnly: optBool(r, 'stale_only', 'sync_status'),
-                staleHours: optInt(r, 'stale_hours', 'sync_status', 1, 100_000),
-              }),
-            },
-          ],
+        const params = {
+          product: optString(r, 'product', 'sync_status'),
+          staleOnly: optBool(r, 'stale_only', 'sync_status'),
+          staleHours: optInt(r, 'stale_hours', 'sync_status', 1, 100_000),
         };
-      }
-      case 'sync_now': {
-        const r = asRecord(args ?? {}, 'sync_now');
-        const text = await handleSyncNow({
-          product: optString(r, 'product', 'sync_now'),
-          dryRun: optBool(r, 'dry_run', 'sync_now'),
-          includeIngest: optBool(r, 'include_ingest', 'sync_now'),
-          includeEmbed: optBool(r, 'include_embed', 'sync_now'),
-          timeoutMs: optInt(r, 'timeout_ms', 'sync_now', 1_000, 600_000),
-        });
-        return { content: [{ type: 'text', text }] };
+        parsedCall = async () => ({ text: handleSyncStatus(params) });
+        break;
       }
       default:
         throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
+
+    if (!hasAnyReleases(db) && isAutoSyncDisabled()) {
+      return {
+        text: `Corpus is empty at ${DB_PATH} (auto-sync is disabled via CLAUDE_SYNERGY_NO_AUTO_SYNC=1). Run \`sync_now\` or \`hk sync\` to populate it.`,
+        isError: true,
+      };
+    }
+
+    const firstUseLine = await ensureCorpusReady(scopedProduct);
+    const out = await parsedCall();
+    return { ...out, firstUseLine };
+  };
+
+  try {
+    const result = await runTool();
+    const stamped = finalizeToolText(result.text, {
+      scopedProduct,
+      firstUseLine: result.firstUseLine,
+    });
+    return {
+      ...(result.isError ? { isError: true } : {}),
+      content: [{ type: 'text', text: stamped }],
+    };
   } catch (e: any) {
     if (e instanceof McpError) throw e;
     throw new McpError(ErrorCode.InternalError, e.message);
   }
 });
 
-async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; product?: string; since?: string; until?: string; kind?: string; rerank?: 'none' | 'ollama-judge'; limit?: number }): Promise<string> {
+async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; product?: string; since?: string; until?: string; kind?: string; rerank?: 'none' | 'ollama-judge'; limit?: number }): Promise<{ text: string; isError?: boolean }> {
+  const activeDb = getDbOrThrow();
   const mode = args.mode ?? 'hybrid';
   const limit = args.limit ?? 10;
 
   if (mode === 'fts') {
-    const results = searchChanges(db, args.query, {
+    const results = searchChanges(activeDb, args.query, {
       product: args.product,
       since: args.since,
       until: args.until,
       kind: args.kind,
       limit,
     });
-    return formatSearchResults(results.map((r) => ({
-      product: r.product,
-      version: r.version,
-      released_at: r.released_at,
-      kind: r.kind,
-      text: r.text,
-      mode: 'fts',
-    })));
+    return {
+      text: formatSearchResults(results.map((r) => ({
+        product: r.product,
+        version: r.version,
+        released_at: r.released_at,
+        kind: r.kind,
+        text: r.text,
+        mode: 'fts',
+      }))),
+    };
   }
 
   // mode === 'hybrid'. Refuse to silently fall back to FTS — clients asking
   // for semantic search deserve a clear contract failure they can catch.
-  if (!hasChunks) {
-    throw new McpError(
-      ErrorCode.InvalidParams,
-      'hybrid mode requires embeddings — run `hk embed` first, or pass mode="fts"'
-    );
+  if (!getHasChunks(activeDb)) {
+    return {
+      isError: true,
+      text: 'hybrid mode requires embeddings — run `hk embed` first, or pass mode="fts"',
+    };
   }
 
-  const results = await hybridSearch(db, args.query, {
+  const results = await hybridSearch(activeDb, args.query, {
     product: args.product,
     since: args.since,
     until: args.until,
@@ -622,16 +673,18 @@ async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; prod
     rerankProviderName: args.rerank ?? 'none',
     limit,
   });
-  return formatSearchResults(results.map((r) => ({
-    product: r.product,
-    version: r.version,
-    released_at: r.released_at,
-    kind: r.kind,
-    text: r.text,
-    mode: 'hybrid',
-    rrf_score: r.rrf_score,
-    rerank_score: r.rerank_score,
-  })));
+  return {
+    text: formatSearchResults(results.map((r) => ({
+      product: r.product,
+      version: r.version,
+      released_at: r.released_at,
+      kind: r.kind,
+      text: r.text,
+      mode: 'hybrid',
+      rrf_score: r.rrf_score,
+      rerank_score: r.rerank_score,
+    }))),
+  };
 }
 
 function formatSearchResults(results: any[]): string {
@@ -648,7 +701,7 @@ function formatSearchResults(results: any[]): string {
 }
 
 function handleLookupEntity(args: { type: string; value: string }): string {
-  const results = lookupEntity(db, args.type, args.value);
+  const results = lookupEntity(getDbOrThrow(), args.type, args.value);
   if (results.length === 0) return `(no mentions of ${args.type}: ${args.value})`;
   const lines = [`${args.type} ${args.value} — ${results.length} mention${results.length === 1 ? '' : 's'}:\n`];
   for (const r of results) {
@@ -661,7 +714,7 @@ function handleLookupEntity(args: { type: string; value: string }): string {
 
 function handleLatestReleases(args: { product?: string; since?: string; limit?: number }): string {
   const limit = args.limit ?? 20;
-  const releases = recentReleases(db, args.product, limit, args.since);
+  const releases = recentReleases(getDbOrThrow(), args.product, limit, args.since);
   if (releases.length === 0) return '(no releases)';
   return releases
     .map((r) => `${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`)
@@ -669,11 +722,12 @@ function handleLatestReleases(args: { product?: string; since?: string; limit?: 
 }
 
 function handleGetRelease(args: { product: string; version: string }): string {
-  const release = db
+  const activeDb = getDbOrThrow();
+  const release = activeDb
     .prepare(`SELECT product, version, released_at, source_url, notes_path FROM releases WHERE product = ? AND version = ?`)
     .get(args.product, args.version) as any;
   if (!release) return `(no such release: ${args.product}@${args.version})`;
-  const changes = db
+  const changes = activeDb
     .prepare(`SELECT ordinal, kind, text FROM changes WHERE product = ? AND version = ? ORDER BY ordinal`)
     .all(args.product, args.version) as any[];
   const lines = [
@@ -692,7 +746,7 @@ function handleGetRelease(args: { product: string; version: string }): string {
 }
 
 function handleListProducts(): string {
-  const products = listProducts(db);
+  const products = listProducts(getDbOrThrow());
   if (products.length === 0) return '(no products)';
   const lines = [
     'Product                              Releases  Latest',
@@ -706,7 +760,7 @@ function handleListProducts(): string {
 }
 
 function handleTopEntities(args: { type: string; limit?: number }): string {
-  const results = entityFrequency(db, args.type, args.limit ?? 30);
+  const results = entityFrequency(getDbOrThrow(), args.type, args.limit ?? 30);
   if (results.length === 0) return `(no entities of type ${args.type})`;
   return results
     .map((r) => `${String(r.count).padStart(4)}  ${r.first_seen ?? '????-??-??'}  ${r.value}`)
@@ -719,6 +773,7 @@ function handleTopEntities(args: { type: string; limit?: number }): string {
 // installs that haven't re-ingested still get an answer.
 
 function dbSynergiesEmpty(): boolean {
+  if (!db) return true;
   try {
     const row = db
       .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='synergies'`)
@@ -733,7 +788,7 @@ function dbSynergiesEmpty(): boolean {
 
 function handleListSynergies(args: { product?: string } = {}): string {
   // Try DB first
-  if (!dbSynergiesEmpty()) {
+  if (!dbSynergiesEmpty() && db) {
     try {
       const rows = listSynergies(db, args.product ? { product: args.product } : undefined);
       if (rows.length === 0) {
@@ -799,7 +854,7 @@ function handleReadSynergy(args: { name: string }): string {
     return `(synergy not found: ${args.name})`;
   }
   // Try DB first
-  if (!dbSynergiesEmpty()) {
+  if (!dbSynergiesEmpty() && db) {
     try {
       const synergy = getSynergy(db, args.name) as any;
       if (synergy && synergy.body) {
@@ -850,7 +905,7 @@ function formatChangesSinceResults(results: ChangesSinceResult[]): string {
 function handleGetChangesSince(args: { since: string; until?: string; product?: string; kind?: string; limit?: number }): string {
   let results: ChangesSinceResult[];
   try {
-    results = getChangesSince(db, {
+    results = getChangesSince(getDbOrThrow(), {
       since: args.since,
       until: args.until,
       product: args.product,
@@ -866,7 +921,7 @@ function handleGetChangesSince(args: { since: string; until?: string; product?: 
 function handleSearchBreakingChanges(args: { product?: string; since?: string; until?: string; limit?: number }): string {
   let results: QueryResult[];
   try {
-    results = browseChanges(db, {
+    results = browseChanges(getDbOrThrow(), {
       product: args.product,
       since: args.since,
       until: args.until,
@@ -903,7 +958,7 @@ function formatHours(h: number | null): string {
 }
 
 function handleSyncStatus(args: { product?: string; staleOnly?: boolean; staleHours?: number }): string {
-  const rows: SyncStatusRow[] = getSyncStatus(db, {
+  const rows: SyncStatusRow[] = getSyncStatus(getDbOrThrow(), {
     product: args.product,
     staleOnly: args.staleOnly,
     staleHours: args.staleHours,
@@ -917,10 +972,9 @@ function handleSyncStatus(args: { product?: string; staleOnly?: boolean; staleHo
     'Product                              Strategy        Last fetch   Hours  Ingested  Latest release',
     '───────────────────────────────────  ──────────────  ──────────  ──────  ────────  ──────────────',
   ];
+  const manualWarnings: string[] = [];
+  const nowDate = new Date();
   for (const r of rows) {
-    // `manual` strategy products are seeded by hand and have no fetcher
-    // dispatch — render them as "manual" instead of "never" so callers can
-    // tell "needs implementation" apart from "stale gh-releases" (v1.2.1).
     const isManual = r.fetch_strategy === 'manual';
     const product = (r.product ?? '').padEnd(36);
     const strategy = (r.fetch_strategy ?? '—').padEnd(14);
@@ -931,16 +985,17 @@ function handleSyncStatus(args: { product?: string; staleOnly?: boolean; staleHo
     const ingested = String(r.releases_ingested).padStart(8);
     const latest = r.last_release_at ? r.last_release_at.split('T')[0] : '—';
     lines.push(`${product} ${strategy} ${lastFetch}  ${hours}  ${ingested}  ${latest}`);
+    if (isManual) {
+      manualWarnings.push(formatManualFeedWarning(r.product, r.last_release_at, nowDate));
+    }
   }
   lines.push('');
   lines.push(`${rows.length} product${rows.length === 1 ? '' : 's'}`);
+  if (manualWarnings.length > 0) {
+    lines.push(...manualWarnings);
+  }
   return lines.join('\n');
 }
-
-// Module-level lock — second concurrent sync_now call rejects rather than
-// races on the SQLite WAL. Reset in finally{} so a thrown error doesn't
-// leave the lock stuck.
-let syncInProgress = false;
 
 interface SyncNowArgs {
   product?: string;
@@ -951,7 +1006,7 @@ interface SyncNowArgs {
 }
 
 async function handleSyncNow(args: SyncNowArgs): Promise<string> {
-  if (syncInProgress) {
+  if (syncCoordinator.isSyncInProgress()) {
     throw new McpError(
       ErrorCode.InvalidParams,
       'sync_now: another sync is already in progress — retry after it completes (or call sync_status to see progress)',
@@ -977,24 +1032,39 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
     }
     const lines = [`(dry_run — would fetch ${targets.length} product${targets.length === 1 ? '' : 's'})`, ''];
     for (const t of targets) {
-      const marker = db
-        .prepare(`SELECT version FROM markers WHERE product = ? AND name = 'last_fetched_release_at'`)
-        .get(t.product) as { version: string } | undefined;
-      const since = marker?.version ?? '2026-01-01 (no marker)';
+      let since = '2026-01-01 (no marker)';
+      if (db) {
+        try {
+          const marker = db
+            .prepare(`SELECT version FROM markers WHERE product = ? AND name = 'last_fetched_release_at'`)
+            .get(t.product) as { version: string } | undefined;
+          if (marker?.version) since = marker.version;
+        } catch {
+          // uninitialized DB
+        }
+      }
       lines.push(`  ${t.product.padEnd(36)} ${t.strategy.padEnd(14)} since ${since}`);
     }
     return lines.join('\n');
   }
 
-  syncInProgress = true;
+  syncCoordinator.setManualSyncActive(true);
   const t0 = Date.now();
   try {
+    if (!db) {
+      db = openDb(DB_PATH);
+    }
+    initSchema(db);
+
     // === fetch ===
     const fetchStats = await fetchAll(db, PRODUCTS_ROOT, {
       product: args.product,
       timeoutMs,
     });
     const fetched = fetchStats.summary;
+    if (fetched.failed === 0 && fetched.skipped === 0 && !args.product) {
+      syncCoordinator.clearPartialNote();
+    }
 
     // === ingest ===
     let ingestSummary = '';
@@ -1039,14 +1109,14 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
     if (embedError) lines.push(embedError);
     return lines.join('\n');
   } finally {
-    syncInProgress = false;
+    syncCoordinator.setManualSyncActive(false);
   }
 }
 
 function handleCompareVersions(args: { product: string; from_version: string; to_version: string }): string {
   let results: ChangesSinceResult[];
   try {
-    results = compareVersions(db, {
+    results = compareVersions(getDbOrThrow(), {
       product: args.product,
       fromVersion: args.from_version,
       toVersion: args.to_version,
@@ -1063,7 +1133,10 @@ function handleCompareVersions(args: { product: string; from_version: string; to
 // ── Graceful shutdown ────────────────────────────────────────────────────────
 // Close DB and exit cleanly on signals or MCP transport disconnect.
 function shutdownMcp(): void {
-  try { db.close(); } catch { /* best-effort */ }
+  if (db) {
+    try { db.close(); } catch { /* best-effort */ }
+    db = null;
+  }
   process.exit(0);
 }
 
@@ -1073,4 +1146,4 @@ process.on('SIGTERM', shutdownMcp);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error(`claude-synergy-mcp ready (db: ${DB_PATH}, vec: ${hasChunks ? 'on' : 'off'})`);
+console.error(`claude-synergy-mcp ready (db: ${DB_PATH}, vec: ${getHasChunks(db) ? 'on' : 'off'})`);

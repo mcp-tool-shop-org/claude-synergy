@@ -99,8 +99,8 @@ function contentHash(raw: string): string {
 // Single source of truth lives in products.yaml at repo root.
 const HARDCODED_PRODUCT_META: Record<string, { tier: number; strategy: string; url: string; display: string }> = {
   'claude-code': { tier: 2, strategy: 'git-changelog', url: 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md', display: 'Claude Code' },
-  'claude-api': { tier: 3, strategy: 'webfetch', url: 'https://platform.claude.com/docs/en/release-notes/overview', display: 'Claude API / Platform' },
-  'anthropic-apps': { tier: 3, strategy: 'webfetch', url: 'https://support.claude.com/en/articles/12138966-release-notes', display: 'Anthropic Apps (Design / Cowork / Chat / Mobile)' },
+  'claude-api': { tier: 3, strategy: 'html-scrape', url: 'https://platform.claude.com/docs/en/release-notes/overview', display: 'Claude API / Platform' },
+  'anthropic-apps': { tier: 3, strategy: 'html-scrape', url: 'https://support.claude.com/en/articles/12138966-release-notes', display: 'Anthropic Apps (Design / Cowork / Chat / Mobile)' },
   'claude-agent-sdk-python': { tier: 1, strategy: 'gh-releases', url: 'https://github.com/anthropics/claude-agent-sdk-python', display: 'Claude Agent SDK (Python)' },
   'claude-agent-sdk-typescript': { tier: 1, strategy: 'gh-releases', url: 'https://github.com/anthropics/claude-agent-sdk-typescript', display: 'Claude Agent SDK (TypeScript)' },
   'anthropic-cli': { tier: 1, strategy: 'gh-releases', url: 'https://github.com/anthropics/anthropic-cli', display: 'Anthropic CLI (ant)' },
@@ -330,8 +330,70 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
   return stats;
 }
 
+export interface ReextractStats {
+  changesScanned: number;
+  entitiesBefore: number;
+  entitiesAfter: number;
+  entitiesAdded: number;
+}
+
+/**
+ * Re-run entity extraction across every existing row in `changes` without
+ * re-fetching or modifying `releases` / `changes` rows.
+ */
+export function reextractEntities(
+  db: Database.Database,
+  opts: { modelFamiliesPath?: string } = {}
+): ReextractStats {
+  const existingKeys = new Set<string>();
+  const selectExisting = db.prepare(
+    `SELECT change_id, entity_type, entity_value FROM entities`
+  );
+  const selectChanges = db.prepare(`SELECT id, text FROM changes ORDER BY id ASC`);
+  const deleteAllEntities = db.prepare(`DELETE FROM entities`);
+  const insertEntity = db.prepare(
+    `INSERT INTO entities (change_id, entity_type, entity_value) VALUES (?, ?, ?)`
+  );
+
+  let changesScanned = 0;
+  let entitiesBefore = 0;
+  let entitiesAfter = 0;
+  let entitiesAdded = 0;
+
+  const tx = db.transaction(() => {
+    const priorRows = selectExisting.all() as Array<{
+      change_id: number;
+      entity_type: string;
+      entity_value: string;
+    }>;
+    entitiesBefore = priorRows.length;
+    for (const r of priorRows) {
+      existingKeys.add(`${r.change_id}:${r.entity_type}:${r.entity_value}`);
+    }
+
+    const changeRows = selectChanges.all() as Array<{ id: number; text: string }>;
+    changesScanned = changeRows.length;
+
+    deleteAllEntities.run();
+
+    for (const ch of changeRows) {
+      const extracted = extractEntities(ch.text, opts);
+      for (const [type, value] of extracted) {
+        insertEntity.run(ch.id, type, value);
+        entitiesAfter++;
+        if (!existingKeys.has(`${ch.id}:${type}:${value}`)) {
+          entitiesAdded++;
+        }
+      }
+    }
+  });
+
+  tx();
+  return { changesScanned, entitiesBefore, entitiesAfter, entitiesAdded };
+}
+
 function parseBullets(content: string): string[] {
-  const lines = content.split('\n');
+  const lines = content.split(/\r?\n/);
   const bullets: string[] = [];
   let current = '';
   let inFencedBlock = false;
@@ -420,7 +482,7 @@ const URL_INLINE_RE = /\[(?:[^\]]*)\]\((https?:\/\/[^)\s]+)\)|\((https?:\/\/[^)\
  * or end of file. Returns an array of bullet strings (already trimmed).
  */
 function extractBodySection(body: string, sectionLabel: string): string[] {
-  const lines = body.split('\n');
+  const lines = body.split(/\r?\n/);
   // Find heading: `**<sectionLabel>:**` or `**<sectionLabel>**:` or heading-style `## <label>`
   const headingRe = new RegExp(
     `^\\s*(?:\\*\\*${sectionLabel}:?\\*\\*:?\\s*|##+\\s+${sectionLabel}:?\\s*)$`,

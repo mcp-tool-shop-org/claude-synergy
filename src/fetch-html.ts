@@ -1,4 +1,4 @@
-// HTML scrape fetchers for Tier 4b products that publish changelogs as HTML.
+// HTML scrape fetchers for Tier 3 / Tier 4b products that publish changelogs as HTML.
 // Each target picks an `htmlParser` and gets a dedicated parser function below.
 
 import * as cheerio from 'cheerio';
@@ -282,9 +282,234 @@ export async function fetchVscodeUpdates(sinceIso: string, signal?: AbortSignal)
   return items;
 }
 
+// ─── Anthropic release notes helpers (claude-api / anthropic-apps) ─────────
+
+const MONTHS: Record<string, number> = {
+  jan: 0, january: 0,
+  feb: 1, february: 1,
+  mar: 2, march: 2,
+  apr: 3, april: 3,
+  may: 4,
+  jun: 5, june: 5,
+  jul: 6, july: 6,
+  aug: 7, august: 7,
+  sep: 8, sept: 8, september: 8,
+  oct: 9, october: 9,
+  nov: 10, november: 10,
+  dec: 11, december: 11,
+};
+
+/**
+ * Parse a date heading like "November 23, 2026" or "2026-11-23" into UTC noon
+ * ISO + YYYY-MM-DD so dates never shift by host timezone.
+ */
+function parseHeadingDateUtc(text: string): { dateStr: string; iso: string } | null {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(clean);
+  if (ymd) {
+    const y = parseInt(ymd[1], 10);
+    const m = parseInt(ymd[2], 10) - 1;
+    const d = parseInt(ymd[3], 10);
+    const dt = new Date(Date.UTC(y, m, d, 12, 0, 0));
+    if (!Number.isNaN(dt.getTime())) {
+      return { dateStr: dt.toISOString().slice(0, 10), iso: dt.toISOString() };
+    }
+  }
+  const mdy = /^(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2}),?\s+(\d{4})$/i.exec(clean);
+  if (mdy) {
+    const monthIdx = MONTHS[mdy[1].toLowerCase()];
+    const day = parseInt(mdy[2], 10);
+    const year = parseInt(mdy[3], 10);
+    if (monthIdx !== undefined && day >= 1 && day <= 31) {
+      const dt = new Date(Date.UTC(year, monthIdx, day, 12, 0, 0));
+      if (!Number.isNaN(dt.getTime()) && dt.getUTCMonth() === monthIdx && dt.getUTCDate() === day) {
+        return { dateStr: dt.toISOString().slice(0, 10), iso: dt.toISOString() };
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Collect sibling elements belonging to one dated `<h3>` section, handling
+ * both direct sibling layouts (claude-api docs-prose) and wrapped block
+ * layouts (Intercom Help Center `div.intercom-interblocks-subheading3 > h3`).
+ */
+function collectSectionNodes($: cheerio.CheerioAPI, h3El: any): any[] {
+  const $h3 = $(h3El);
+  const directNext = $h3.nextAll().toArray();
+  const walk = directNext.length > 0 ? directNext : $h3.parent().nextAll().toArray();
+  const out: any[] = [];
+  for (const node of walk) {
+    const $node = $(node);
+    if ($node.is('h1, h2, h3') || $node.find('h1, h2, h3').length > 0) {
+      break;
+    }
+    out.push(node);
+  }
+  return out;
+}
+
+/**
+ * Convert collected section HTML nodes into clean HTML `<ul><li>...</li></ul>`
+ * or `<p>...</p>` blocks that ingestAll's turndown+parseBullets extracts cleanly.
+ */
+function renderSectionHtml($: cheerio.CheerioAPI, nodes: any[]): string {
+  const parts: string[] = [];
+  let pendingHeading: string | null = null;
+
+  for (const node of nodes) {
+    const $node = $(node);
+    if ($node.is('ul, ol') || $node.find('ul, ol').length > 0) {
+      if (pendingHeading) {
+        parts.push(`<p>${pendingHeading}</p>`);
+        pendingHeading = null;
+      }
+      const html = $.html(node);
+      if (html) parts.push(html);
+      continue;
+    }
+
+    const $p = $node.is('p') ? $node : $node.find('p').first();
+    const rawText = ($p.length ? $p.text() : $node.text()).replace(/\s+/g, ' ').trim();
+    if (!rawText) continue;
+
+    // Intercom articles often use `<p><b>Feature title</b></p>` followed by
+    // one or more description `<p>` blocks; combine into a list item so
+    // `ingestAll` turns it into a searchable bullet row.
+    const boldChild = $p.length ? $p.children('b, strong').first() : $node.children('b, strong').first();
+    const isStandaloneBold =
+      boldChild.length > 0 && boldChild.text().replace(/\s+/g, ' ').trim() === rawText;
+
+    if (isStandaloneBold) {
+      if (pendingHeading) {
+        parts.push(`<li><strong>${pendingHeading}</strong></li>`);
+      }
+      pendingHeading = boldChild.text().replace(/\s+/g, ' ').trim();
+    } else if (pendingHeading) {
+      const inner = ($p.length ? $p.html() : $node.html()) ?? rawText;
+      parts.push(`<li><strong>${pendingHeading}:</strong> ${inner.trim()}</li>`);
+      pendingHeading = null;
+    } else {
+      const inner = ($p.length ? $p.html() : $node.html()) ?? rawText;
+      parts.push(`<li>${inner.trim()}</li>`);
+    }
+  }
+
+  if (pendingHeading) {
+    parts.push(`<li><strong>${pendingHeading}</strong></li>`);
+  }
+
+  // If parts are bare `<li>` items, wrap in `<ul>` so turndown emits `- ` bullets.
+  const hasBareLi = parts.some((p) => p.startsWith('<li>'));
+  if (!hasBareLi) return parts.join('\n');
+  const wrapped: string[] = [];
+  let liBuffer: string[] = [];
+  for (const p of parts) {
+    if (p.startsWith('<li>')) {
+      liBuffer.push(p);
+    } else {
+      if (liBuffer.length > 0) {
+        wrapped.push(`<ul>${liBuffer.join('')}</ul>`);
+        liBuffer = [];
+      }
+      wrapped.push(p);
+    }
+  }
+  if (liBuffer.length > 0) wrapped.push(`<ul>${liBuffer.join('')}</ul>`);
+  return wrapped.join('\n');
+}
+
+async function fetchDatedH3ReleaseNotes(
+  url: string,
+  sinceIso: string,
+  signal?: AbortSignal
+): Promise<HtmlItem[]> {
+  const res = await fetchWithRetry(url, { headers: UA, signal });
+  if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+  const html = await res.text();
+  const $ = cheerio.load(html);
+
+  const root = $('article').first();
+  const h3Nodes = (
+    root.length
+      ? root.find('h3')
+      : $('main').first().length
+        ? $('main').first().find('h3')
+        : $('h3')
+  ).toArray();
+
+  const items: HtmlItem[] = [];
+  const seenDates = new Set<string>();
+
+  for (const el of h3Nodes) {
+    const $h3 = $(el);
+    const title = $h3.text().replace(/\s+/g, ' ').trim();
+    const parsed = parseHeadingDateUtc(title);
+    if (!parsed) continue;
+    if (parsed.iso <= sinceIso) continue;
+
+    const sectionNodes = collectSectionNodes($, el);
+    const body = renderSectionHtml($, sectionNodes).trim();
+    if (!body) continue;
+
+    const anchor = $h3.attr('id')?.trim();
+    const link = anchor ? `${url}#${anchor}` : url;
+    const slug = seenDates.has(parsed.dateStr)
+      ? `${parsed.dateStr}-${anchor || items.length + 1}`
+      : parsed.dateStr;
+    seenDates.add(parsed.dateStr);
+
+    items.push({
+      slug,
+      title,
+      pubDate: parsed.iso,
+      link,
+      body,
+    });
+  }
+
+  return items;
+}
+
+/**
+ * Fetch Claude API / Platform release notes from the server-rendered docs page.
+ * Source: https://platform.claude.com/docs/en/release-notes/overview
+ */
+export async function fetchClaudeApiReleaseNotes(
+  sinceIso: string,
+  signal?: AbortSignal
+): Promise<HtmlItem[]> {
+  return fetchDatedH3ReleaseNotes(
+    'https://platform.claude.com/docs/en/release-notes/overview',
+    sinceIso,
+    signal
+  );
+}
+
+/**
+ * Fetch Anthropic Apps release notes from the server-rendered Help Center page.
+ * Source: https://support.claude.com/en/articles/12138966-release-notes
+ */
+export async function fetchAnthropicAppsReleaseNotes(
+  sinceIso: string,
+  signal?: AbortSignal
+): Promise<HtmlItem[]> {
+  return fetchDatedH3ReleaseNotes(
+    'https://support.claude.com/en/articles/12138966-release-notes',
+    sinceIso,
+    signal
+  );
+}
+
 // ─── Dispatcher ─────────────────────────────────────────────────────────────
 
-export type HtmlParserName = 'github-copilot-blog' | 'windsurf-changelog' | 'vscode-updates';
+export type HtmlParserName =
+  | 'github-copilot-blog'
+  | 'windsurf-changelog'
+  | 'vscode-updates'
+  | 'claude-api-release-notes'
+  | 'anthropic-apps-release-notes';
 
 export async function fetchHtmlReleases(parser: HtmlParserName, sinceIso: string, signal?: AbortSignal): Promise<HtmlItem[]> {
   switch (parser) {
@@ -294,5 +519,9 @@ export async function fetchHtmlReleases(parser: HtmlParserName, sinceIso: string
       return fetchWindsurfChangelog(sinceIso, signal);
     case 'vscode-updates':
       return fetchVscodeUpdates(sinceIso, signal);
+    case 'claude-api-release-notes':
+      return fetchClaudeApiReleaseNotes(sinceIso, signal);
+    case 'anthropic-apps-release-notes':
+      return fetchAnthropicAppsReleaseNotes(sinceIso, signal);
   }
 }

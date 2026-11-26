@@ -52,7 +52,12 @@ export interface FetchTarget {
   rawChangelogUrl?: string;
   rawChangelogParser?: 'aider-history' | 'keep-a-changelog';
   // html-scrape
-  htmlParser?: 'github-copilot-blog' | 'vscode-updates' | 'windsurf-changelog';
+  htmlParser?:
+    | 'github-copilot-blog'
+    | 'vscode-updates'
+    | 'windsurf-changelog'
+    | 'claude-api-release-notes'
+    | 'anthropic-apps-release-notes';
 }
 
 export interface ProductsConfig {
@@ -197,10 +202,23 @@ function buildFetchTarget(name: string, fetch: NonNullable<RawYaml['products']>[
       target.rawChangelogParser = fetch.parser;
       break;
 
-    case 'html-scrape':
+    case 'html-scrape': {
       if (!fetch.parser) throw new Error(`[claude-synergy] ${name}: html-scrape requires 'parser'`);
+      const validHtmlParsers = new Set([
+        'github-copilot-blog',
+        'vscode-updates',
+        'windsurf-changelog',
+        'claude-api-release-notes',
+        'anthropic-apps-release-notes',
+      ]);
+      if (!validHtmlParsers.has(fetch.parser)) {
+        throw new Error(
+          `[claude-synergy] ${name}: html-scrape 'parser' must be one of: ${[...validHtmlParsers].join(', ')} (got '${fetch.parser}')`
+        );
+      }
       target.htmlParser = fetch.parser as FetchTarget['htmlParser'];
       break;
+    }
 
     case 'catalog':
       if (!fetch.catalog_type) throw new Error(`[claude-synergy] ${name}: catalog requires 'catalog_type'`);
@@ -221,6 +239,8 @@ function buildFetchTarget(name: string, fetch: NonNullable<RawYaml['products']>[
 }
 
 function resolveYamlPath(): string | null {
+  const envYaml = process.env.CLAUDE_SYNERGY_PRODUCTS_YAML?.trim();
+  if (envYaml) return envYaml;
   // Try repo root relative to compiled bin location, then cwd
   const candidates = [
     join(__dirname, '..', 'products.yaml'),
