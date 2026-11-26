@@ -12,7 +12,9 @@ import {
   fetchClaudeApiReleaseNotes,
   fetchAnthropicAppsReleaseNotes,
   fetchHtmlReleases,
+  sanitizeScrapedHtml,
 } from '../../src/fetch-html.js';
+import { AppError } from '../../src/errors.js';
 import { ingestAll } from '../../src/ingest.js';
 import { createTempDb } from '../helpers/temp-db.js';
 import { mockFetch, type FetchMockHandle } from '../helpers/fetch-mock.js';
@@ -328,5 +330,57 @@ describe('fetchAnthropicAppsReleaseNotes', () => {
       },
     ]);
     await expect(fetchAnthropicAppsReleaseNotes('2026-01-01')).rejects.toThrow(/404/);
+  });
+
+  it('throws AppError HTML_LAYOUT_CHANGED before since filter when no heading parses as a date (Item 7)', async () => {
+    const noDateHtml = readFileSync(join(FIXTURES_DIR, 'no-date-headings.html'), 'utf-8');
+    handle = mockFetch([
+      { urlPattern: /platform\.claude\.com/, response: () => htmlResponse(noDateHtml) },
+      { urlPattern: /support\.claude\.com/, response: () => htmlResponse(noDateHtml) },
+    ]);
+
+    for (const call of [
+      () => fetchClaudeApiReleaseNotes('2026-01-01'),
+      () => fetchAnthropicAppsReleaseNotes('2026-01-01'),
+    ]) {
+      let caught: unknown;
+      try {
+        await call();
+      } catch (e) {
+        caught = e;
+      }
+      expect(caught).toBeInstanceOf(AppError);
+      expect((caught as AppError).code).toBe('HTML_LAYOUT_CHANGED');
+    }
+  });
+
+  it('produces stable heading/content slugs on same-day entries regardless of sinceIso (Item 14)', async () => {
+    const sameDayHtml = `<!doctype html><html><body><article>
+      <div class="intercom-interblocks-subheading3"><h3 id="h_001">April 17, 2026</h3></div>
+      <div class="intercom-interblocks-paragraph"><p><b>Claude Design</b></p><p>Launched Design workspace.</p></div>
+      <div class="intercom-interblocks-subheading3"><h3 id="h_002">April 17, 2026</h3></div>
+      <div class="intercom-interblocks-paragraph"><p><b>Claude Cowork</b></p><p>Added Cowork folders.</p></div>
+      <div class="intercom-interblocks-subheading3"><h3 id="h_003">April 10, 2026</h3></div>
+      <div class="intercom-interblocks-paragraph"><p>Earlier item.</p></div>
+    </article></body></html>`;
+    handle = mockFetch([
+      { urlPattern: /support\.claude\.com/, response: () => htmlResponse(sameDayHtml) },
+    ]);
+
+    const full = await fetchAnthropicAppsReleaseNotes('2026-01-01');
+    const narrow = await fetchAnthropicAppsReleaseNotes('2026-04-12');
+    expect(narrow.map((i) => i.slug)).toEqual(full.slice(0, 2).map((i) => i.slug));
+    expect(narrow[0].slug).toBe('2026-04-17-claude-design');
+    expect(narrow[1].slug).toBe('2026-04-17-claude-cowork');
+  });
+
+  it('strips script, style, iframe, inline on* handlers, and javascript: links (Item 15)', async () => {
+    const dirty = `<div><script>alert(1)</script><style>body{}</style><iframe src="https://x.test"></iframe><p onclick="evil()">Keep <a href="javascript:alert(2)" onmouseover="bad()">link</a> and <a href="https://docs.example.test">safe</a></p></div>`;
+    const clean = sanitizeScrapedHtml(dirty);
+    expect(clean).not.toMatch(/<script|<style|<iframe/i);
+    expect(clean).not.toMatch(/\bonclick\b|\bonmouseover\b/i);
+    expect(clean).not.toMatch(/javascript:/i);
+    expect(clean).toContain('Keep');
+    expect(clean).toContain('https://docs.example.test');
   });
 });

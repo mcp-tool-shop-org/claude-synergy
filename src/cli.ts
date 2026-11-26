@@ -24,13 +24,17 @@ import type { FetchProgressEvent, FetchAllSummary } from './fetch.js';
 import { AppError, formatError } from './errors.js';
 import {
   FIRST_USE_SYNC_TIMEOUT_MS,
+  FirstUseSyncCoordinator,
+  clearPartialSyncState,
   formatFirstUseNotice,
   formatPartialNote,
   hasAnyReleases,
   isAutoSyncDisabled,
+  needsAutoSync,
   printStoreResolutionOnce,
+  readPartialSyncState,
   resolveStorePaths,
-  runFirstUseSync,
+  writePartialSyncState,
   type ResolvedStore,
 } from './store.js';
 import type Database from 'better-sqlite3';
@@ -200,10 +204,13 @@ interface QueryDbSession {
   partialNote?: string;
 }
 
+const cliSyncCoordinator = new FirstUseSyncCoordinator();
+
 /**
- * Open the resolved DB for query commands. If missing or empty:
- * - when CLAUDE_SYNERGY_NO_AUTO_SYNC=1, emit guidance to stderr and return `emptyOptOut: true` without creating a DB;
- * - otherwise run first-use sync (fetch -> ingest, no embed) and write a one-line notice to stderr.
+ * Open the resolved DB for query commands. If missing/empty or carrying a
+ * `first_use_partial` marker:
+ * - when CLAUDE_SYNERGY_NO_AUTO_SYNC=1, emit guidance (if empty) without auto-syncing;
+ * - otherwise run first-use sync (fetch -> ingest, no embed) subject to the 10-minute cooldown.
  */
 async function openQueryDbOrFirstUse(
   opts: { db?: string },
@@ -214,31 +221,45 @@ async function openQueryDbOrFirstUse(
     ? openTrackedDb(store.dbPath)
     : null;
 
-  if (hasAnyReleases(db)) {
+  if (!needsAutoSync(db)) {
     return { db, store, emptyOptOut: false };
   }
 
   if (isAutoSyncDisabled()) {
-    if (!program.opts().json) {
-      console.error('No data yet (auto-sync disabled). Run `hk sync` to fetch changelogs, then `hk query <term>` to search.');
+    if (!hasAnyReleases(db)) {
+      if (!program.opts().json) {
+        console.error('No data yet (auto-sync disabled). Run `hk sync` to fetch changelogs, then `hk query <term>` to search.');
+      }
+      return { db, store, emptyOptOut: true };
     }
-    return { db, store, emptyOptOut: true };
+    return { db, store, emptyOptOut: false };
   }
 
-  const { db: syncedDb, report } = await runFirstUseSync({
+  const synced = await cliSyncCoordinator.ensureSynced({
     dbPath: store.dbPath,
     productsRoot: store.productsRoot,
     db: db ?? undefined,
     timeoutMs: FIRST_USE_SYNC_TIMEOUT_MS,
   });
-  activeDb = syncedDb;
-  const notice = formatFirstUseNotice(report, syncedDb, { product: scopedProduct });
-  process.stderr.write(`${notice}\n`);
+  activeDb = synced.db;
+  if (synced.cooledDown) {
+    if (!hasAnyReleases(synced.db)) {
+      if (!program.opts().json) {
+        console.error('No data yet (first-use auto-sync cooling down for 10m). Run `hk sync` to populate.');
+      }
+      return { db: synced.db, store, emptyOptOut: true };
+    }
+    return { db: synced.db, store, emptyOptOut: false };
+  }
+  if (synced.report && synced.db) {
+    const notice = formatFirstUseNotice(synced.report, synced.db, { product: scopedProduct });
+    process.stderr.write(`${notice}\n`);
+  }
   return {
-    db: syncedDb,
+    db: synced.db,
     store,
-    emptyOptOut: false,
-    partialNote: report.partial ? formatPartialNote(report) : undefined,
+    emptyOptOut: !hasAnyReleases(synced.db),
+    partialNote: synced.report?.partial ? formatPartialNote(synced.report) : undefined,
   };
 }
 
@@ -252,21 +273,31 @@ function emitArrayJson(
   process.stderr.write(`${JSON.stringify({ data_as_of: dataAsOf })}\n`);
 }
 
+function isStampSuppressed(cmdOpts?: { stamp?: boolean }): boolean {
+  return program.opts().stamp === false || cmdOpts?.stamp === false;
+}
+
 function emitTextStamp(
   db: Database.Database | null,
   scopedProduct?: string,
-  partialNote?: string
+  partialNote?: string,
+  cmdOpts?: { stamp?: boolean }
 ): void {
+  if (isStampSuppressed(cmdOpts)) return;
   const freshness = getCorpusFreshness(db, { product: scopedProduct });
   console.log(formatFreshnessStamp(freshness, { partialNote }));
 }
 
-function emitEmptyQueryOutput(session: QueryDbSession, scopedProduct?: string): void {
+function emitEmptyQueryOutput(
+  session: QueryDbSession,
+  scopedProduct?: string,
+  cmdOpts?: { stamp?: boolean }
+): void {
   if (program.opts().json) {
     emitArrayJson([], session.db, scopedProduct);
   } else {
     console.log('(empty corpus — run `hk sync` to populate)');
-    emitTextStamp(session.db, scopedProduct);
+    emitTextStamp(session.db, scopedProduct, session.partialNote, cmdOpts);
   }
   if (session.db) {
     session.db.close();
@@ -322,6 +353,7 @@ program
   .version(PKG_VERSION)
   .enablePositionalOptions()
   .option('--json', 'Output results as JSON (for CI/scripting)')
+  .option('--no-stamp', 'Omit trailing freshness stamp from text output')
   .option('--verbose', 'Show verbose output (also: HK_LOG_LEVEL=verbose)')
   .option('--debug', 'Show debug output including query parameters (also: HK_LOG_LEVEL=debug)')
   .hook('preAction', () => {
@@ -334,7 +366,7 @@ program
   .command('init')
   .description('Create the database file with the current schema')
   .option('-d, --db <path>', 'database path')
-  .action((opts: { db?: string }) => {
+  .action((opts: { db?: string; stamp?: boolean }) => {
     const store = resolveCliStore(opts);
     const db = openTrackedDb(store.dbPath);
     initSchema(db);
@@ -343,7 +375,7 @@ program
       console.log(JSON.stringify({ db: resolve(store.dbPath), initialized: true, data_as_of: dataAsOf }));
     } else {
       console.log(`✓ initialized ${resolve(store.dbPath)}`);
-      console.log(formatFreshnessStamp(dataAsOf));
+      if (!isStampSuppressed(opts)) console.log(formatFreshnessStamp(dataAsOf));
     }
     db.close();
     activeDb = null;
@@ -355,7 +387,7 @@ program
   .option('-d, --db <path>', 'database path')
   .option('-p, --products <path>', 'products dir')
   .option('--reextract', 're-extract entities for all existing change rows without re-fetching')
-  .action((opts: { db?: string; products?: string; reextract?: boolean }) => {
+  .action((opts: { db?: string; products?: string; reextract?: boolean; stamp?: boolean }) => {
     const store = resolveCliStore(opts);
     const hasProductsDir = existsSync(store.productsRoot);
     if (!hasProductsDir && !opts.reextract) {
@@ -374,20 +406,38 @@ program
     const db = openTrackedDb(store.dbPath);
     initSchema(db);
     const start = Date.now();
-    const stats: IngestStats = hasProductsDir
-      ? ingestAll(db, store.productsRoot)
-      : {
-          productsCount: 0,
-          releasesAdded: 0,
-          changesAdded: 0,
-          entitiesAdded: 0,
-          skipped: 0,
-          total: 0,
-          errors: [],
-        };
+    let stats: IngestStats;
     let reextractStats: ReextractStats | undefined;
-    if (opts.reextract) {
-      reextractStats = reextractEntities(db);
+    try {
+      stats = hasProductsDir
+        ? ingestAll(db, store.productsRoot)
+        : {
+            productsCount: 0,
+            releasesAdded: 0,
+            changesAdded: 0,
+            entitiesAdded: 0,
+            skipped: 0,
+            total: 0,
+            errors: [],
+          };
+      if (opts.reextract) {
+        reextractStats = reextractEntities(db);
+      }
+    } catch (e: any) {
+      const appErr = e instanceof AppError ? e : new AppError({
+        code: 'INGEST_FAILED',
+        message: `ingest failed: ${e?.message ?? String(e)}`,
+        hint: 'Check products markdown files and configuration.',
+        cause: e?.message ?? String(e),
+      });
+      if (program.opts().json) {
+        console.log(JSON.stringify({ ...appErr.toJSON(), data_as_of: getCorpusFreshness(db) }));
+      } else {
+        console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      }
+      db.close();
+      activeDb = null;
+      process.exit(1);
     }
     const ms = Date.now() - start;
     const dataAsOf = getCorpusFreshness(db);
@@ -417,7 +467,7 @@ program
           console.log(`  ... and ${stats.errors.length - 5} more`);
         }
       }
-      console.log(formatFreshnessStamp(dataAsOf));
+      if (!isStampSuppressed(opts)) console.log(formatFreshnessStamp(dataAsOf));
     }
     db.close();
     activeDb = null;
@@ -432,11 +482,11 @@ program
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .option('-l, --limit <n>', 'max results', '20')
-  .action(async (text: string, opts: { db?: string; product?: string; since?: string; until?: string; kind?: string; limit: string }) => {
+  .action(async (text: string, opts: { db?: string; product?: string; since?: string; until?: string; kind?: string; limit: string; stamp?: boolean }) => {
     logDebug(`text=${JSON.stringify(text)} opts=${JSON.stringify(opts)}`);
     const session = await openQueryDbOrFirstUse(opts, opts.product);
     if (session.emptyOptOut || !session.db) {
-      emitEmptyQueryOutput(session, opts.product);
+      emitEmptyQueryOutput(session, opts.product, opts);
       return;
     }
     const db = session.db;
@@ -487,7 +537,7 @@ program
         }
         console.log(`\n${results.length} result${results.length === 1 ? '' : 's'}`);
       }
-      emitTextStamp(db, opts.product, session.partialNote);
+      emitTextStamp(db, opts.product, session.partialNote, opts);
     }
     db.close();
     activeDb = null;
@@ -497,11 +547,11 @@ async function runEntityCommand(
   entityType: string,
   lookupValue: string,
   label: string,
-  opts: { db?: string }
+  opts: { db?: string; stamp?: boolean }
 ): Promise<void> {
   const session = await openQueryDbOrFirstUse(opts);
   if (session.emptyOptOut || !session.db) {
-    emitEmptyQueryOutput(session);
+    emitEmptyQueryOutput(session, undefined, opts);
     return;
   }
   const db = session.db;
@@ -516,7 +566,7 @@ async function runEntityCommand(
     );
   } else {
     printEntityResults(lookupValue, label, results);
-    emitTextStamp(db, undefined, session.partialNote);
+    emitTextStamp(db, undefined, session.partialNote, opts);
   }
   db.close();
   activeDb = null;
@@ -559,7 +609,7 @@ program
   .command('seed-markers')
   .description('Seed fetch markers from the current DB state (run once after study-swarm to enable incremental fetch)')
   .option('-d, --db <path>', 'database path')
-  .action((opts: { db?: string }) => {
+  .action((opts: { db?: string; stamp?: boolean }) => {
     const store = resolveCliStore(opts);
     const db = openTrackedDb(store.dbPath);
     initSchema(db);
@@ -573,7 +623,7 @@ program
         console.log(`${r.product.padEnd(35)} ${r.seededTo ? '→ ' + r.seededTo.split('T')[0] : '(no releases on disk)'}`);
       }
       console.log(`\n✓ seeded ${seededCount} marker${seededCount === 1 ? '' : 's'}`);
-      console.log(formatFreshnessStamp(dataAsOf));
+      if (!isStampSuppressed(opts)) console.log(formatFreshnessStamp(dataAsOf));
     }
     db.close();
     activeDb = null;
@@ -586,7 +636,7 @@ program
   .option('-r, --products-root <path>', 'products dir root')
   .option('-p, --product <name>', 'limit to one product')
   .option('--since <iso>', 'override the stored marker (YYYY-MM-DD or full ISO)')
-  .action(async (opts: { db?: string; productsRoot?: string; product?: string; since?: string }) => {
+  .action(async (opts: { db?: string; productsRoot?: string; product?: string; since?: string; stamp?: boolean }) => {
     const store = resolveCliStore(opts);
     const db = openTrackedDb(store.dbPath);
     initSchema(db);
@@ -596,6 +646,19 @@ program
         sinceOverride: opts.since,
         onProgress: makeFetchProgressWriter(),
       });
+      if (!opts.product) {
+        if (stats.summary.failed === 0 && stats.summary.skipped === 0) {
+          clearPartialSyncState(db);
+        } else if (readPartialSyncState(db) !== null) {
+          writePartialSyncState(db, {
+            succeeded: stats.summary.succeeded,
+            total: stats.summary.total,
+            skipped: stats
+              .filter((r) => r.errors.length > 0)
+              .map((r) => ({ product: r.product, reason: r.errors.join('; ') })),
+          });
+        }
+      }
       const dataAsOf = getCorpusFreshness(db, { product: opts.product });
       if (program.opts().json) {
         console.log(JSON.stringify({ stats, summary: stats.summary, data_as_of: dataAsOf }));
@@ -605,7 +668,7 @@ program
           console.log(`${s.product.padEnd(35)} ${status}${s.latest ? `  latest: ${s.latest.split('T')[0]}` : ''}`);
         }
         printFetchSummary(stats.summary);
-        console.log(formatFreshnessStamp(dataAsOf));
+        if (!isStampSuppressed(opts)) console.log(formatFreshnessStamp(dataAsOf));
       }
       // Exit code 3 = partial success (some products failed, others succeeded)
       if (stats.summary.failed > 0 && stats.summary.succeeded > 0) {
@@ -644,6 +707,7 @@ program
       skipEmbed?: boolean;
       context: ContextProviderName;
       embedProvider: EmbedProviderName;
+      stamp?: boolean;
     }) => {
       const store = resolveCliStore(opts);
       const db = openTrackedDb(store.dbPath);
@@ -658,6 +722,17 @@ program
             onProgress: makeFetchProgressWriter(),
           });
           fetchSummary = stats.summary;
+          if (stats.summary.failed === 0 && stats.summary.skipped === 0) {
+            clearPartialSyncState(db);
+          } else {
+            writePartialSyncState(db, {
+              succeeded: stats.summary.succeeded,
+              total: stats.summary.total,
+              skipped: stats
+                .filter((r) => r.errors.length > 0)
+                .map((r) => ({ product: r.product, reason: r.errors.join('; ') })),
+            });
+          }
           if (!isJson) {
             printFetchSummary(stats.summary);
           }
@@ -699,10 +774,10 @@ program
           );
         } else {
           console.log(`\n✓ sync complete in ${elapsedMs}ms`);
-          console.log(formatFreshnessStamp(dataAsOf));
+          if (!isStampSuppressed(opts)) console.log(formatFreshnessStamp(dataAsOf));
         }
       } catch (e: any) {
-        const appErr = new AppError({
+        const appErr = e instanceof AppError ? e : new AppError({
           code: 'SYNC_FAILED',
           message: `sync failed: ${e.message}`,
           hint: 'Check network connectivity and API credentials. Re-run with --verbose for details.',
@@ -749,6 +824,7 @@ program
       limit?: string;
       batchSize: string;
       force?: boolean;
+      stamp?: boolean;
     }) => {
     const store = resolveCliStore(opts);
     const db = openTrackedDb(store.dbPath);
@@ -778,7 +854,7 @@ program
         if (stats.chunksCreated === 0) {
           console.log(`  (nothing to do — all changes already embedded; use --force to re-embed)`);
         }
-        console.log(formatFreshnessStamp(dataAsOf));
+        if (!isStampSuppressed(opts)) console.log(formatFreshnessStamp(dataAsOf));
       }
     } catch (e: any) {
       const hint = (e.message.includes('Ollama') || e.message.includes('11434'))
@@ -838,11 +914,12 @@ program
         limit: string;
         topK: string;
         rerankCandidates: string;
+        stamp?: boolean;
       }
     ) => {
     const session = await openQueryDbOrFirstUse(opts, opts.product);
     if (session.emptyOptOut || !session.db) {
-      emitEmptyQueryOutput(session, opts.product);
+      emitEmptyQueryOutput(session, opts.product, opts);
       return;
     }
     const db = session.db;
@@ -885,7 +962,7 @@ program
           }
           console.log(`\n${results.length} result${results.length === 1 ? '' : 's'} in ${ms}ms (rerank: ${opts.rerank})`);
         }
-        emitTextStamp(db, opts.product, session.partialNote);
+        emitTextStamp(db, opts.product, session.partialNote, opts);
       }
     } catch (e: any) {
       const hint = (e.message.includes('Ollama') || e.message.includes('11434'))
@@ -917,10 +994,10 @@ program
   .option('-p, --product <name>', 'limit to one product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-l, --limit <n>', 'max results', '20')
-  .action(async (opts: { db?: string; product?: string; since?: string; limit: string }) => {
+  .action(async (opts: { db?: string; product?: string; since?: string; limit: string; stamp?: boolean }) => {
     const session = await openQueryDbOrFirstUse(opts, opts.product);
     if (session.emptyOptOut || !session.db) {
-      emitEmptyQueryOutput(session, opts.product);
+      emitEmptyQueryOutput(session, opts.product, opts);
       return;
     }
     const db = session.db;
@@ -936,7 +1013,7 @@ program
           console.log(`${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
         }
       }
-      emitTextStamp(db, opts.product, session.partialNote);
+      emitTextStamp(db, opts.product, session.partialNote, opts);
     }
     db.close();
     activeDb = null;
@@ -946,10 +1023,10 @@ program
   .command('products')
   .description('List all products in the DB with release counts')
   .option('-d, --db <path>', 'database path')
-  .action(async (opts: { db?: string }) => {
+  .action(async (opts: { db?: string; stamp?: boolean }) => {
     const session = await openQueryDbOrFirstUse(opts);
     if (session.emptyOptOut || !session.db) {
-      emitEmptyQueryOutput(session);
+      emitEmptyQueryOutput(session, undefined, opts);
       return;
     }
     const db = session.db;
@@ -967,7 +1044,7 @@ program
           console.log(`${p.name.padEnd(36)} ${String(p.release_count).padStart(8)}  ${latest}`);
         }
       }
-      emitTextStamp(db, undefined, session.partialNote);
+      emitTextStamp(db, undefined, session.partialNote, opts);
     }
     db.close();
     activeDb = null;
@@ -985,10 +1062,10 @@ program
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative); default: now')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .option('-l, --limit <n>', 'max change rows', '200')
-  .action(async (product: string | undefined, opts: { db?: string; since: string; until?: string; kind?: string; limit: string }) => {
+  .action(async (product: string | undefined, opts: { db?: string; since: string; until?: string; kind?: string; limit: string; stamp?: boolean }) => {
     const session = await openQueryDbOrFirstUse(opts, product);
     if (session.emptyOptOut || !session.db) {
-      emitEmptyQueryOutput(session, product);
+      emitEmptyQueryOutput(session, product, opts);
       return;
     }
     const db = session.db;
@@ -1049,7 +1126,7 @@ program
         const untilLbl = opts.until ? ` until ${opts.until}` : '';
         console.log(`\n${totalChanges} change${totalChanges === 1 ? '' : 's'} across ${results.length} release${results.length === 1 ? '' : 's'} since ${sinceLbl}${untilLbl}`);
       }
-      emitTextStamp(db, product, session.partialNote);
+      emitTextStamp(db, product, session.partialNote, opts);
     }
     db.close();
     activeDb = null;
@@ -1065,10 +1142,10 @@ program
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-l, --limit <n>', 'max results', '50')
-  .action(async (opts: { db?: string; product?: string; since?: string; until?: string; limit: string }) => {
+  .action(async (opts: { db?: string; product?: string; since?: string; until?: string; limit: string; stamp?: boolean }) => {
     const session = await openQueryDbOrFirstUse(opts, opts.product);
     if (session.emptyOptOut || !session.db) {
-      emitEmptyQueryOutput(session, opts.product);
+      emitEmptyQueryOutput(session, opts.product, opts);
       return;
     }
     const db = session.db;
@@ -1120,7 +1197,7 @@ program
         }
         console.log(`\n${results.length} breaking change${results.length === 1 ? '' : 's'}`);
       }
-      emitTextStamp(db, opts.product, session.partialNote);
+      emitTextStamp(db, opts.product, session.partialNote, opts);
     }
     db.close();
     activeDb = null;
@@ -1131,10 +1208,10 @@ program
   .description('Most-mentioned entities of a type (env_var, slash_command, cli_option, model_id, beta_header, cve, ghsa, hook_event, setting_key)')
   .option('-d, --db <path>', 'database path')
   .option('-l, --limit <n>', 'max results', '30')
-  .action(async (entityType: string, opts: { db?: string; limit: string }) => {
+  .action(async (entityType: string, opts: { db?: string; limit: string; stamp?: boolean }) => {
     const session = await openQueryDbOrFirstUse(opts);
     if (session.emptyOptOut || !session.db) {
-      emitEmptyQueryOutput(session);
+      emitEmptyQueryOutput(session, undefined, opts);
       return;
     }
     const db = session.db;
@@ -1149,11 +1226,15 @@ program
           console.log(`${String(r.count).padStart(4)}  ${r.first_seen ?? '????-??-??'}  ${r.value}`);
         }
       }
-      emitTextStamp(db, undefined, session.partialNote);
+      emitTextStamp(db, undefined, session.partialNote, opts);
     }
     db.close();
     activeDb = null;
   });
+
+for (const cmd of program.commands) {
+  cmd.option('--no-stamp', 'Omit trailing freshness stamp from text output');
+}
 
 function printEntityResults(name: string, label: string, results: ReturnType<typeof lookupEntity>) {
   if (results.length === 0) {

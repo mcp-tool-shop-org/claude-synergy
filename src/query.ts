@@ -21,6 +21,7 @@ export interface CorpusFreshness {
   synced_age_days: number | null;
   stale: boolean;
   stale_after_days: number;
+  partial_note?: string;
   product?: ProductFreshness;
 }
 
@@ -74,8 +75,9 @@ function datePart(s: string | null | undefined): string | null {
 }
 
 /**
- * Query overall corpus freshness from `releases` (and per-product freshness +
- * `fetch_strategy` when `opts.product` is set). Safe on null or uninitialized DBs.
+ * Query overall corpus freshness from `markers.updated_at` + `releases.released_at`
+ * (and per-product freshness + `fetch_strategy` when `opts.product` is set).
+ * Also surfaces any persisted `first_use_partial` state from `schema_meta`.
  */
 export function getCorpusFreshness(
   db: Database.Database | null,
@@ -84,16 +86,46 @@ export function getCorpusFreshness(
   const nowDate = resolveNow(opts.now);
   let syncedAt: string | null = null;
   let newestRelease: string | null = null;
+  let partialNote: string | undefined;
 
   if (db) {
     try {
-      const row = db
-        .prepare(`SELECT MAX(fetched_at) AS synced_at, MAX(released_at) AS newest_release FROM releases`)
-        .get() as { synced_at: string | null; newest_release: string | null } | undefined;
-      syncedAt = row?.synced_at ?? null;
-      newestRelease = row?.newest_release ?? null;
+      const markerRow = db
+        .prepare(`SELECT MAX(updated_at) AS synced_at FROM markers`)
+        .get() as { synced_at: string | null } | undefined;
+      syncedAt = markerRow?.synced_at ?? null;
+    } catch {
+      // Uninitialized DB (no markers table yet) -> leave null so it stamps STALE
+    }
+    try {
+      const relRow = db
+        .prepare(`SELECT MAX(released_at) AS newest_release FROM releases`)
+        .get() as { newest_release: string | null } | undefined;
+      newestRelease = relRow?.newest_release ?? null;
     } catch {
       // Uninitialized DB (no releases table yet) -> leave null so it stamps STALE
+    }
+    try {
+      const metaRow = db
+        .prepare(`SELECT value FROM schema_meta WHERE key = 'first_use_partial'`)
+        .get() as { value: string } | undefined;
+      if (metaRow?.value) {
+        const parsed = JSON.parse(metaRow.value) as {
+          succeeded?: number;
+          total?: number;
+          skipped?: Array<{ product: string; reason: string }>;
+        };
+        if (typeof parsed.succeeded === 'number' && typeof parsed.total === 'number') {
+          const skippedList = Array.isArray(parsed.skipped)
+            ? parsed.skipped.map((s) => `${s.product} (${s.reason})`).join(', ')
+            : '';
+          partialNote = skippedList
+            ? `partial corpus: synced ${parsed.succeeded} of ${parsed.total} products (skipped: ${skippedList})`
+            : `partial corpus: synced ${parsed.succeeded} of ${parsed.total} products`;
+        }
+      }
+    } catch {
+      // schema_meta absent or unreadable -> ignore
     }
   }
 
@@ -108,6 +140,7 @@ export function getCorpusFreshness(
     synced_age_days: syncedAgeDays,
     stale,
     stale_after_days: STALE_AFTER_DAYS,
+    ...(partialNote ? { partial_note: partialNote } : {}),
   };
 
   if (opts.product) {
@@ -117,13 +150,15 @@ export function getCorpusFreshness(
 
     if (db) {
       try {
-        const prodRow = db
-          .prepare(
-            `SELECT MAX(fetched_at) AS synced_at, MAX(released_at) AS newest_release FROM releases WHERE product = ?`
-          )
-          .get(opts.product) as { synced_at: string | null; newest_release: string | null } | undefined;
-        prodSynced = prodRow?.synced_at ?? null;
-        prodNewest = prodRow?.newest_release ?? null;
+        const prodMarker = db
+          .prepare(`SELECT MAX(updated_at) AS synced_at FROM markers WHERE product = ?`)
+          .get(opts.product) as { synced_at: string | null } | undefined;
+        prodSynced = prodMarker?.synced_at ?? null;
+
+        const prodRel = db
+          .prepare(`SELECT MAX(released_at) AS newest_release FROM releases WHERE product = ?`)
+          .get(opts.product) as { newest_release: string | null } | undefined;
+        prodNewest = prodRel?.newest_release ?? null;
 
         const metaRow = db
           .prepare(`SELECT fetch_strategy FROM products WHERE name = ?`)
@@ -162,7 +197,7 @@ export function formatFreshnessStamp(
   if (freshness.synced_at === null && freshness.newest_release === null) {
     parts.push('data as of: empty corpus (no releases synced)');
   } else {
-    const syncStr = datePart(freshness.synced_at) ?? 'unknown';
+    const syncStr = datePart(freshness.synced_at) ?? 'never';
     const relDate = datePart(freshness.newest_release);
     const relStr = relDate
       ? `${relDate} (${freshness.age_days ?? 0} day${freshness.age_days === 1 ? '' : 's'} old)`
@@ -179,8 +214,9 @@ export function formatFreshnessStamp(
     parts.push(`${p.product}: synced ${pSynced}, newest release ${pNewest} (${strat}${manualTag})`);
   }
 
-  if (opts.partialNote) {
-    parts.push(opts.partialNote);
+  const partial = opts.partialNote ?? freshness.partial_note;
+  if (partial) {
+    parts.push(partial);
   }
 
   const base = parts.join('; ');

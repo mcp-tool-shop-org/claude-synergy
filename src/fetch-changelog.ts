@@ -7,8 +7,7 @@
 //
 // Dispatch lives in fetch.ts (fetchRawChangelog); each parser is a pure function exported here.
 
-import { execSync } from 'node:child_process';
-import { fetchWithRetry } from './fetch-utils.js';
+import { fetchWithRetry, runGhApi } from './fetch-utils.js';
 
 export interface ChangelogItem {
   version: string;
@@ -19,7 +18,12 @@ export interface ChangelogItem {
 /** Parser name union — kept in sync with the dispatcher in fetch.ts. */
 export type ChangelogParserName = 'aider-history' | 'keep-a-changelog';
 
-export async function fetchAiderHistory(url: string, sinceIso: string, signal?: AbortSignal): Promise<ChangelogItem[]> {
+export async function fetchAiderHistory(
+  url: string,
+  sinceIso: string,
+  signal?: AbortSignal,
+  deadlineMs?: number
+): Promise<ChangelogItem[]> {
   const res = await fetchWithRetry(url, {
     headers: { 'user-agent': 'claude-synergy/0.1.0' },
     signal,
@@ -30,7 +34,7 @@ export async function fetchAiderHistory(url: string, sinceIso: string, signal?: 
   const items = parseAiderHistory(md);
 
   // Aider HISTORY.md doesn't carry dates per release; correlate with GH release tags for dates.
-  const releaseDates = aiderReleaseDates();
+  const releaseDates = await aiderReleaseDates(signal, deadlineMs);
   for (const item of items) {
     const tag = `v${item.version}`;
     if (releaseDates.has(tag)) {
@@ -186,12 +190,12 @@ export function parseKeepAChangelog(md: string): ChangelogItem[] {
 }
 
 /** Pull GH release tag → date map for aider so HISTORY.md entries can be dated when possible. */
-function aiderReleaseDates(): Map<string, string> {
+async function aiderReleaseDates(signal?: AbortSignal, deadlineMs?: number): Promise<Map<string, string>> {
   try {
-    const out = execSync(`gh api "repos/Aider-AI/aider/releases?per_page=100"`, {
-      encoding: 'utf-8',
+    const out = await runGhApi(['api', 'repos/Aider-AI/aider/releases?per_page=100'], {
+      signal,
+      deadlineMs,
       maxBuffer: 10 * 1024 * 1024,
-      stdio: ['ignore', 'pipe', 'pipe'],
     });
     const releases = JSON.parse(out) as Array<{ tag_name: string; published_at: string }>;
     const map = new Map<string, string>();

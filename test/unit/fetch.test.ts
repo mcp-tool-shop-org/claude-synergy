@@ -6,6 +6,11 @@ import { fetchAll, seedMarkersFromDb, listFetchTargets, resolveEffectiveSince, s
 import { ingestAll } from '../../src/ingest.js';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
+import { mockFetch } from '../helpers/fetch-mock.js';
+
+function htmlResponse(body: string, status = 200): Response {
+  return new Response(body, { status, headers: { 'content-type': 'text/html' } });
+}
 
 let temp: TempDb;
 let productsRoot: string;
@@ -559,5 +564,125 @@ describe('Part 6a — disk-bounded fetch window', () => {
     expect(stats[0].fetched).toBe(39);
     expect(existsSync(join(relDir, '2.1.293.md'))).toBe(true);
     expect(existsSync(join(relDir, '2.1.331.md'))).toBe(true);
+  });
+
+  it('continues past page 1 when an island gap spans into page 2 and stops on page 1 afterward (Item 6)', async () => {
+    const relDir = join(productsRoot, 'claude-code', 'releases');
+    mkdirSync(relDir, { recursive: true });
+    // Anchor oldest on disk at 2026-06-01, newest on disk at 2026-11-25.
+    writeFileSync(join(relDir, '2.0.1.md'), '---\nreleased_at: "2026-06-01"\n---\n- baseline\n');
+    writeFileSync(join(relDir, '2.0.205.md'), '---\nreleased_at: "2026-11-25"\n---\n- island\n');
+
+    // Page 1 (100 items): v2.0.205 .. v2.0.106; pre-seed v2.0.106 (page 1's last item!)
+    // so only `pageHadMissingInWindow` keeps pagination going into Page 2!
+    writeFileSync(join(relDir, '2.0.106.md'), '---\nreleased_at: "2026-08-15"\n---\n- boundary\n');
+    const page1 = Array.from({ length: 100 }, (_, i) => {
+      const minor = 205 - i;
+      const date = minor === 205 ? '2026-11-25T10:00:00Z' : '2026-08-15T10:00:00Z';
+      return {
+        tag_name: `v2.0.${minor}`,
+        published_at: date,
+        name: `2.0.${minor}`,
+        body: `- Item ${minor}`,
+        html_url: `https://example.invalid/v2.0.${minor}`,
+      };
+    });
+    const page2 = [
+      {
+        tag_name: 'v2.0.105',
+        published_at: '2026-07-10T10:00:00Z',
+        name: '2.0.105',
+        body: '- Page 2 gap item',
+        html_url: 'https://example.invalid/v2.0.105',
+      },
+      {
+        tag_name: 'v2.0.1',
+        published_at: '2026-06-01T10:00:00Z',
+        name: '2.0.1',
+        body: '- Baseline',
+        html_url: 'https://example.invalid/v2.0.1',
+      },
+    ];
+
+    let ghCalls = 0;
+    const respond = (pageUrlOrArgs: any) => {
+      ghCalls++;
+      const joined = Array.isArray(pageUrlOrArgs) ? pageUrlOrArgs.join(' ') : String(pageUrlOrArgs);
+      if (/[?&]page=1(?:&|$)/.test(joined)) return JSON.stringify(page1);
+      if (/[?&]page=2(?:&|$)/.test(joined)) return JSON.stringify(page2);
+      return '[]';
+    };
+    vi.doMock('node:child_process', () => ({
+      execFile: vi.fn((_cmd: string, args: string[], _opts: any, cb: any) => {
+        cb(null, respond(args), '');
+        return { stdin: { end: () => {} } };
+      }),
+      execFileSync: vi.fn((_cmd: string, args: string[]) => respond(args)),
+      execSync: vi.fn(respond),
+    }));
+
+    const { fetchAll: fetchAllMocked } = await import('../../src/fetch.js');
+    const first = await fetchAllMocked(temp.db, productsRoot, { product: 'claude-code' });
+    // 98 missing on page 1 (205 & 106 existed) + 1 missing on page 2 (105; 1 existed) = 99!
+    expect(first[0].fetched).toBe(99);
+    expect(existsSync(join(relDir, '2.0.105.md'))).toBe(true);
+    expect(ghCalls).toBe(2);
+
+    // Second run: every item on page 1 exists on disk (and last item <= sinceIso is saved),
+    // so pagination short-circuits after page 1 (only 1 gh call) and fetches 0.
+    ghCalls = 0;
+    const second = await fetchAllMocked(temp.db, productsRoot, { product: 'claude-code' });
+    expect(second[0].fetched).toBe(0);
+    expect(ghCalls).toBe(1);
+  });
+
+  it('matches hand-seeded <YYYY-MM-DD>-<subproduct>.md files for anthropic-apps without re-writing or advancing marker on layout error (Items 7 & 14)', async () => {
+    const relDir = join(productsRoot, 'anthropic-apps', 'releases');
+    mkdirSync(relDir, { recursive: true });
+    writeFileSync(
+      join(relDir, '2026-04-17-claude-design.md'),
+      `---\nproduct: anthropic-apps\nversion: "2026-04-17"\nreleased_at: "2026-04-17"\nfetched_at: "2026-05-21"\n---\n\n- Launched Claude Design\n`,
+      'utf-8'
+    );
+
+    const html = `<!doctype html><html><body><article>
+      <div class="intercom-interblocks-subheading3"><h3 id="h_new">November 24, 2026</h3></div>
+      <div class="intercom-interblocks-paragraph"><p>Added workspace export.</p></div>
+      <div class="intercom-interblocks-subheading3"><h3 id="h_old">April 17, 2026</h3></div>
+      <div class="intercom-interblocks-paragraph"><p>Launched Claude Design.</p></div>
+    </article></body></html>`;
+
+    const fetchHandle = mockFetch([
+      { urlPattern: /support\.claude\.com\/en\/articles\/12138966/, response: () => htmlResponse(html) },
+    ]);
+    try {
+      const { fetchAll: fetchAllReal } = await import('../../src/fetch.js');
+      const stats = await fetchAllReal(temp.db, productsRoot, { product: 'anthropic-apps' });
+      expect(stats[0].fetched).toBe(1);
+      expect(existsSync(join(relDir, '2026-11-24.md'))).toBe(true);
+      expect(existsSync(join(relDir, '2026-04-17.md'))).toBe(false);
+    } finally {
+      fetchHandle.restore();
+    }
+
+    // Item 7: broken layout leaves existing marker untouched and returns error.
+    const beforeMarker = temp.db
+      .prepare(`SELECT version FROM markers WHERE product='anthropic-apps'`)
+      .get() as { version: string };
+    const badFetchHandle = mockFetch([
+      { urlPattern: /support\.claude\.com/, response: () => htmlResponse('<html><body><h3>Overview</h3></body></html>') },
+    ]);
+    try {
+      const { fetchAll: fetchAllReal } = await import('../../src/fetch.js');
+      const errStats = await fetchAllReal(temp.db, productsRoot, { product: 'anthropic-apps' });
+      expect(errStats[0].fetched).toBe(0);
+      expect(errStats[0].errors[0]).toMatch(/no dated release headings/i);
+      const afterMarker = temp.db
+        .prepare(`SELECT version FROM markers WHERE product='anthropic-apps'`)
+        .get() as { version: string };
+      expect(afterMarker.version).toBe(beforeMarker.version);
+    } finally {
+      badFetchHandle.restore();
+    }
   });
 });

@@ -1,18 +1,26 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readdirSync, existsSync, chmodSync } from 'node:fs';
+import { homedir, tmpdir } from 'node:os';
+import { delimiter, join, resolve } from 'node:path';
 import {
+  FIRST_USE_COOLDOWN_MS,
+  FIRST_USE_PARTIAL_META_KEY,
   FIRST_USE_SYNC_TIMEOUT_MS,
   FirstUseSyncCoordinator,
+  clearPartialSyncState,
   formatFirstUseNotice,
   hasAnyReleases,
   isAutoSyncDisabled,
+  needsAutoSync,
   printStoreResolutionOnce,
+  readPartialSyncState,
   resetStoreNoticeForTests,
   resolveStorePaths,
   runFirstUseSync,
+  writePartialSyncState,
 } from '../../src/store.js';
+import { formatFreshnessStamp, getCorpusFreshness } from '../../src/query.js';
 import { createTempDb } from '../helpers/temp-db.js';
 import { openDb, initSchema } from '../../src/db.js';
 import type { FetchAllResult } from '../../src/fetch.js';
@@ -100,6 +108,15 @@ describe('resolveStorePaths (4-rule precedence)', () => {
     expect(res.rule).toBe('user-home-default');
     expect(res.dbPath).toBe(join(home, '.claude-synergy', 'data', 'claude-synergy.db'));
     expect(res.productsRoot).toBe(join(home, '.claude-synergy', 'products'));
+
+    // Item 13: resolveStorePaths relies on os.homedir() directly rather than env.HOME mismatch.
+    const osHome = homedir();
+    const homedirRes = resolveStorePaths({
+      cwd,
+      env: { HOME: '/ignored-override-home', USERPROFILE: '/ignored-override-profile' },
+    });
+    expect(homedirRes.dbPath).toBe(join(osHome, '.claude-synergy', 'data', 'claude-synergy.db'));
+    expect(homedirRes.productsRoot).toBe(join(osHome, '.claude-synergy', 'products'));
   });
 
   it('CLAUDE_SYNERGY_PRODUCTS_ROOT overrides derived products root', () => {
@@ -310,7 +327,7 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
 
     // (ii) unrelated cwd — check entries before and after first-use sync
     const beforeCwdEntries = readdirSync(unrelatedCwd);
-    const rUnrelated = resolveStorePaths({ cwd: unrelatedCwd, env: { HOME: tempHome } });
+    const rUnrelated = resolveStorePaths({ cwd: unrelatedCwd, homeDir: tempHome, env: {} });
     expect(rUnrelated.rule).toBe('user-home-default');
     expect(rUnrelated.dbPath).toBe(join(tempHome, '.claude-synergy', 'data', 'claude-synergy.db'));
 
@@ -379,4 +396,158 @@ describe('runFirstUseSync & FirstUseSyncCoordinator', () => {
     coord.clearPartialNote();
     expect(coord.getPartialNote()).toBeNull();
   });
+
+  it('persists first_use_partial across DB opens, surfaces in stamp, and clears on clean full sync (Item 3)', async () => {
+    const dir = makeTmpDir('store-partial-meta-');
+    const dbPath = join(dir, 'data', 'claude-synergy.db');
+    const productsRoot = join(dir, 'products');
+
+    const res1 = await runFirstUseSync({
+      dbPath,
+      productsRoot,
+      fetchRunner: async (_db: any, root: string): Promise<FetchAllResult> => {
+        const relDir = join(root, 'p-ok', 'releases');
+        mkdirSync(relDir, { recursive: true });
+        writeFileSync(
+          join(relDir, '1.0.0.md'),
+          `---\nproduct: p-ok\nversion: "1.0.0"\nreleased_at: "2026-11-25"\nfetched_at: "2026-11-26"\n---\n\n- ok bullet\n`,
+          'utf-8'
+        );
+        const arr: any = [
+          { product: 'p-ok', fetched: 1, newSince: '2026-01-01', latest: '2026-11-25', errors: [] },
+          { product: 'p-skip', fetched: 0, newSince: '2026-01-01', latest: null, errors: ['timeout'] },
+        ];
+        arr.summary = { total: 2, succeeded: 1, failed: 1, skipped: 0, newChanges: 1, errors: [] };
+        return arr;
+      },
+    });
+    res1.db.close();
+
+    // Fresh DB connection sees persisted first_use_partial in schema_meta & stamp & needsAutoSync.
+    const reopened = openDb(dbPath, { loadVec: false });
+    try {
+      const persisted = readPartialSyncState(reopened);
+      expect(persisted?.succeeded).toBe(1);
+      expect(persisted?.total).toBe(2);
+      expect(persisted?.skipped).toEqual([{ product: 'p-skip', reason: 'timeout' }]);
+      expect(needsAutoSync(reopened)).toBe(true);
+      expect(formatFreshnessStamp(getCorpusFreshness(reopened))).toContain('p-skip (timeout)');
+      expect(FIRST_USE_PARTIAL_META_KEY).toBe('first_use_partial');
+    } finally {
+      reopened.close();
+    }
+
+    // Re-running first-use sync where all products succeed clears first_use_partial.
+    const coord = new FirstUseSyncCoordinator();
+    const res2 = await coord.ensureSynced({
+      dbPath,
+      productsRoot,
+      fetchRunner: async (): Promise<FetchAllResult> => {
+        const arr: any = [
+          { product: 'p-ok', fetched: 0, newSince: '2026-11-25', latest: null, errors: [] },
+          { product: 'p-skip', fetched: 0, newSince: '2026-01-01', latest: null, errors: [] },
+        ];
+        arr.summary = { total: 2, succeeded: 2, failed: 0, skipped: 0, newChanges: 0, errors: [] };
+        return arr;
+      },
+    });
+    try {
+      expect(res2.performedByThisCall).toBe(true);
+      expect(readPartialSyncState(res2.db)).toBeNull();
+      expect(needsAutoSync(res2.db)).toBe(false);
+      writePartialSyncState(res2.db!, { succeeded: 1, total: 2, skipped: [] });
+      expect(readPartialSyncState(res2.db)).not.toBeNull();
+      clearPartialSyncState(res2.db);
+      expect(readPartialSyncState(res2.db)).toBeNull();
+    } finally {
+      res2.db?.close();
+    }
+  });
+
+  it('cools down in-process for 10 minutes after failed or empty first-use attempt using fixed clock (Item 5)', async () => {
+    const dir = makeTmpDir('store-cooldown-');
+    const dbPath = join(dir, 'data', 'claude-synergy.db');
+    const productsRoot = join(dir, 'products');
+    const coord = new FirstUseSyncCoordinator();
+    let fetchCalls = 0;
+
+    const t0 = new Date('2026-11-26T12:00:00Z');
+    const failFetch = async (): Promise<FetchAllResult> => {
+      fetchCalls++;
+      const arr: any = [
+        { product: 'p1', fetched: 0, newSince: '2026-01-01', latest: null, errors: ['offline'] },
+      ];
+      arr.summary = { total: 1, succeeded: 0, failed: 1, skipped: 0, newChanges: 0, errors: [] };
+      return arr;
+    };
+
+    const r1 = await coord.ensureSynced({ dbPath, productsRoot, fetchRunner: failFetch, now: t0 });
+    r1.db?.close();
+    expect(fetchCalls).toBe(1);
+    expect(FIRST_USE_COOLDOWN_MS).toBe(600_000);
+
+    // 5 minutes later -> still cooling down, does not invoke fetchRunner again
+    const t5m = new Date(t0.getTime() + 5 * 60 * 1000);
+    const r2 = await coord.ensureSynced({ dbPath, productsRoot, fetchRunner: failFetch, now: t5m });
+    expect(r2.cooledDown).toBe(true);
+    expect(r2.performedByThisCall).toBe(false);
+    expect(fetchCalls).toBe(1);
+
+    // 11 minutes later -> cooldown expired, retries fetchRunner
+    const t11m = new Date(t0.getTime() + 11 * 60 * 1000);
+    const r3 = await coord.ensureSynced({ dbPath, productsRoot, fetchRunner: failFetch, now: t11m });
+    r3.db?.close();
+    expect(r3.cooledDown).toBe(false);
+    expect(r3.performedByThisCall).toBe(true);
+    expect(fetchCalls).toBe(2);
+  });
+
+  it('cuts off a slow fake gh subprocess on PATH at the timeout bound and marks first-use partial (Item 2)', async () => {
+    const dir = makeTmpDir('slow-gh-');
+    const binDir = join(dir, 'bin');
+    mkdirSync(binDir, { recursive: true });
+
+    if (process.platform === 'win32') {
+      const csc = 'C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe';
+      const src = join(binDir, 'gh.cs');
+      const exe = join(binDir, 'gh.exe');
+      writeFileSync(src, 'class P { static void Main() { System.Threading.Thread.Sleep(10000); } }\n', 'utf-8');
+      execFileSync(csc, ['/nologo', `/out:${exe}`, src], { stdio: 'ignore', timeout: 15_000 });
+    } else {
+      const shPath = join(binDir, 'gh');
+      writeFileSync(shPath, `#!/usr/bin/env node\nsetTimeout(() => {}, 10000);\n`, 'utf-8');
+      chmodSync(shPath, 0o755);
+    }
+
+    const dbPath = join(dir, 'data', 'claude-synergy.db');
+    const productsRoot = join(dir, 'products');
+    const prevPath = process.env.PATH ?? '';
+    process.env.PATH = `${binDir}${delimiter}${prevPath}`;
+    const startMs = Date.now();
+    try {
+      const { fetchAll } = await import('../../src/fetch.js');
+      const { db, report } = await runFirstUseSync({
+        dbPath,
+        productsRoot,
+        timeoutMs: 350,
+        fetchRunner: (database, root, opts) =>
+          fetchAll(database, root, { ...opts, product: 'claude-code' }),
+      });
+      const elapsedMs = Date.now() - startMs;
+      try {
+        expect(elapsedMs).toBeLessThan(4_000);
+        expect(report.partial).toBe(true);
+        expect(report.succeeded).toBe(0);
+        expect(report.skipped[0].product).toBe('claude-code');
+        expect(report.skipped[0].reason).toMatch(/timed out|aborted|killed/i);
+        const notice = formatFirstUseNotice(report, db, { now: new Date('2026-11-26T12:00:00Z') });
+        expect(notice).toMatch(/^first use \(partial corpus\): synced 0 of 1 products/);
+        expect(notice).toContain('claude-code');
+      } finally {
+        db.close();
+      }
+    } finally {
+      process.env.PATH = prevPath;
+    }
+  }, 20_000);
 });

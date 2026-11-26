@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import matter from 'gray-matter';
 import TurndownService from 'turndown';
 import type Database from 'better-sqlite3';
+import { AppError } from './errors.js';
 import { extractEntities } from './extract.js';
 import { loadProductsConfig } from './products-config.js';
 
@@ -320,6 +321,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
             }
           });
         } catch (e: any) {
+          if (e instanceof AppError) throw e;
           stats.errors.push({ file, error: e.message });
         }
       }

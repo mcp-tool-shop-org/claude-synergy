@@ -29,7 +29,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import matter from 'gray-matter';
 import { openDb, initSchema } from './db.js';
-import { formatError } from './errors.js';
+import { AppError, formatError } from './errors.js';
 import {
   searchChanges,
   lookupEntity,
@@ -53,11 +53,15 @@ import { hybridSearch } from './hybrid.js';
 import {
   FIRST_USE_SYNC_TIMEOUT_MS,
   FirstUseSyncCoordinator,
+  clearPartialSyncState,
   formatFirstUseNotice,
   hasAnyReleases,
   isAutoSyncDisabled,
+  needsAutoSync,
   printStoreResolutionOnce,
+  readPartialSyncState,
   resolveStorePaths,
+  writePartialSyncState,
 } from './store.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -433,7 +437,7 @@ function finalizeToolText(
 }
 
 async function ensureCorpusReady(scopedProduct?: string): Promise<string | undefined> {
-  if (hasAnyReleases(db)) return undefined;
+  if (!needsAutoSync(db)) return undefined;
   if (isAutoSyncDisabled()) {
     return undefined;
   }
@@ -443,8 +447,10 @@ async function ensureCorpusReady(scopedProduct?: string): Promise<string | undef
     db: db ?? undefined,
     timeoutMs: FIRST_USE_SYNC_TIMEOUT_MS,
   });
-  db = res.db;
-  if (res.performedByThisCall) {
+  if (res.db) {
+    db = res.db;
+  }
+  if (res.performedByThisCall && res.report) {
     return formatFirstUseNotice(res.report, db, { product: scopedProduct });
   }
   return undefined;
@@ -611,6 +617,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     const firstUseLine = await ensureCorpusReady(scopedProduct);
+    if (!hasAnyReleases(db) && !syncCoordinator.isSyncInProgress()) {
+      return {
+        text: `Corpus is empty at ${DB_PATH} (first-use auto-sync cooling down for 10m after an empty or failed attempt). Run \`sync_now\` or \`hk sync\` to populate it.`,
+        isError: true,
+        firstUseLine,
+      };
+    }
     const out = await parsedCall();
     return { ...out, firstUseLine };
   };
@@ -627,6 +640,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     };
   } catch (e: any) {
     if (e instanceof McpError) throw e;
+    if (e instanceof AppError) {
+      return {
+        isError: true,
+        content: [{ type: 'text', text: finalizeToolText(formatError(e), { scopedProduct }) }],
+      };
+    }
     throw new McpError(ErrorCode.InternalError, e.message);
   }
 });
@@ -1048,9 +1067,8 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
     return lines.join('\n');
   }
 
-  syncCoordinator.setManualSyncActive(true);
-  const t0 = Date.now();
-  try {
+  return await syncCoordinator.runManualSync(async () => {
+    const t0 = Date.now();
     if (!db) {
       db = openDb(DB_PATH);
     }
@@ -1062,8 +1080,21 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
       timeoutMs,
     });
     const fetched = fetchStats.summary;
-    if (fetched.failed === 0 && fetched.skipped === 0 && !args.product) {
-      syncCoordinator.clearPartialNote();
+    if (!args.product) {
+      if (fetched.failed === 0 && fetched.skipped === 0) {
+        clearPartialSyncState(db);
+        syncCoordinator.clearPartialNote();
+        syncCoordinator.resetCooldown();
+      } else {
+        const skipped = fetchStats
+          .filter((r) => r.errors.length > 0)
+          .map((r) => ({ product: r.product, reason: r.errors.join('; ') }));
+        writePartialSyncState(db, {
+          succeeded: fetched.succeeded,
+          total: fetched.total,
+          skipped,
+        });
+      }
     }
 
     // === ingest ===
@@ -1108,9 +1139,7 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
     if (embedSummary) lines.push(embedSummary);
     if (embedError) lines.push(embedError);
     return lines.join('\n');
-  } finally {
-    syncCoordinator.setManualSyncActive(false);
-  }
+  });
 }
 
 function handleCompareVersions(args: { product: string; from_version: string; to_version: string }): string {

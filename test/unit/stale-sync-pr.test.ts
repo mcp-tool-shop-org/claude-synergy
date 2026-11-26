@@ -1,11 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseDocument } from 'yaml';
-import { evaluateSyncPrStaleness } from '../../scripts/check-stale-sync-pr.mjs';
+import { evaluateSyncPrStaleness, STALE_SYNC_COMMENT_MARKER } from '../../scripts/check-stale-sync-pr.mjs';
 
-const REPO_ROOT = resolve(import.meta.dirname, '../..');
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = resolve(__dirname, '../..');
 const SCRIPT_PATH = resolve(REPO_ROOT, 'scripts/check-stale-sync-pr.mjs');
 const SYNC_YML_PATH = resolve(REPO_ROOT, '.github/workflows/sync.yml');
 
@@ -97,11 +99,20 @@ describe('.github/workflows/sync.yml validation', () => {
       'cancel-in-progress': false,
     });
     expect(data.jobs.sync['timeout-minutes']).toBe(60);
+    expect(data.jobs.sync.env).toEqual({
+      CLAUDE_SYNERGY_DB: 'data/claude-synergy.db',
+    });
     expect(data.jobs.sync.permissions).toEqual({
       contents: 'write',
       'pull-requests': 'write',
       actions: 'write',
     });
+
+    const summaryStep = (data.jobs.sync.steps as Array<Record<string, any>>).find(
+      (s) => s.name === 'Refresh top-level summaries'
+    );
+    expect(summaryStep?.run).toContain('--no-stamp products > PRODUCTS.txt');
+    expect(summaryStep?.run).toContain('--no-stamp latest --limit 50 > LATEST.txt');
 
     const prStep = (data.jobs.sync.steps as Array<Record<string, any>>).find(
       (s) => s.name === 'Open or refresh the sync pull request'
@@ -110,6 +121,8 @@ describe('.github/workflows/sync.yml validation', () => {
     expect(prStep?.env?.STALE_SYNC_PR_DAYS).toBe('3');
     expect(prStep?.run).toContain('check-stale-sync-pr.mjs');
     expect(prStep?.run).toContain('sync-stale');
+    expect(prStep?.run).toContain(STALE_SYNC_COMMENT_MARKER);
+    expect(prStep?.run).toContain('--method PATCH');
     expect(prStep?.run).toContain('exit 1');
   });
 });

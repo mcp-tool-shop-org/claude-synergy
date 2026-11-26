@@ -25,6 +25,12 @@ function makeDir(prefix: string): string {
 beforeEach(() => {
   temp = createTempDb({ loadVec: false });
   seedSampleProducts(temp.db);
+  temp.db
+    .prepare(
+      `INSERT INTO markers (product, name, version, updated_at)
+       VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+    )
+    .run();
   temp.db.close();
 });
 
@@ -142,7 +148,7 @@ describe('CLI freshness stamps & --json shapes (Part 1)', () => {
         .find((l) => l.trim().startsWith('{"data_as_of"'));
       expect(stderrJsonLine, `missing stderr data_as_of JSON line for ${args[1]}`).toBeDefined();
       const meta = JSON.parse(stderrJsonLine!);
-      expect(meta.data_as_of).toHaveProperty('synced_at', '2026-05-21');
+      expect(meta.data_as_of).toHaveProperty('synced_at', '2026-05-21T10:00:00Z');
       expect(meta.data_as_of).toHaveProperty('newest_release', '2026-04-10');
     }
   }, 60_000);
@@ -163,7 +169,7 @@ describe('CLI freshness stamps & --json shapes (Part 1)', () => {
     const seedObj = JSON.parse(seedOut.stdout.trim());
     expect(Array.isArray(seedObj.markers)).toBe(true);
     expect(seedObj).toHaveProperty('data_as_of');
-    expect(seedObj.data_as_of.synced_at).toBe('2026-05-21');
+    expect(seedObj.data_as_of.synced_at).toBe('2026-05-21T10:00:00Z');
 
     const reextractOut = runCli(['--json', 'ingest', '--db', temp.path, '--reextract']);
     expect(reextractOut.code).toBe(0);
@@ -269,4 +275,104 @@ describe('CLI first-use sync, opt-out, and two-cwd replay (Part 3)', () => {
       await new Promise<void>((r) => srv.close(() => r()));
     }
   }, 45_000);
+});
+
+describe('CLI FIX-1 regressions (Items 1, 8, 10)', () => {
+  it('Item 1: relative CLAUDE_SYNERGY_DB=data/claude-synergy.db writes into clone dir, never HOME', async () => {
+    const root = makeDir('cli-rel-db-');
+    const cloneDir = join(root, 'repo');
+    const fakeHome = join(root, 'home');
+    mkdirSync(cloneDir, { recursive: true });
+    mkdirSync(fakeHome, { recursive: true });
+
+    const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Local</title>
+<item><title>Release 3.0.0</title><link>http://127.0.0.1/3.0.0</link><guid>rel-3-0-0</guid><pubDate>Thu, 26 Nov 2026 08:00:00 GMT</pubDate><description><![CDATA[<ul><li>Added rel-db check</li></ul>]]></description></item>
+</channel></rss>`;
+    const srv = createServer((_, res) => {
+      res.writeHead(200, { 'content-type': 'application/rss+xml' });
+      res.end(rssXml);
+    });
+    await new Promise<void>((r) => srv.listen(0, '127.0.0.1', r));
+    const port = (srv.address() as { port: number }).port;
+    const prodYaml = join(root, 'products.yaml');
+    writeFileSync(
+      prodYaml,
+      `products:\n  - name: rel-tool\n    display_name: Rel Tool\n    tier: 3\n    source_url: http://127.0.0.1:${port}/feed.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${port}/feed.rss\n`,
+      'utf-8'
+    );
+
+    try {
+      const out = await runCliAsync(['sync', '--skip-embed'], {
+        cwd: cloneDir,
+        env: {
+          CLAUDE_SYNERGY_DB: 'data/claude-synergy.db',
+          CLAUDE_SYNERGY_PRODUCTS_YAML: prodYaml,
+          HOME: fakeHome,
+          USERPROFILE: fakeHome,
+        },
+      });
+      expect(out.code, out.stderr).toBe(0);
+      expect(out.stderr).toContain('rule: env:CLAUDE_SYNERGY_DB');
+      expect(existsSync(join(cloneDir, 'data', 'claude-synergy.db'))).toBe(true);
+      expect(existsSync(join(cloneDir, 'products', 'rel-tool', 'releases'))).toBe(true);
+      expect(readdirSync(fakeHome)).toEqual([]);
+    } finally {
+      srv.closeAllConnections?.();
+      await new Promise<void>((r) => srv.close(() => r()));
+    }
+  }, 35_000);
+
+  it('Item 8: hk --help succeeds with broken model-families.yaml and hk ingest formats MODEL_FAMILIES_CONFIG_ERROR without stack', () => {
+    const dir = makeDir('cli-bad-mf-');
+    const badYaml = join(dir, 'bad-families.yaml');
+    writeFileSync(badYaml, 'families: [unclosed\n  bad: :\n', 'utf-8');
+
+    const helpOut = runCli(['--help'], {
+      env: { CLAUDE_SYNERGY_MODEL_FAMILIES: badYaml },
+    });
+    expect(helpOut.code).toBe(0);
+    expect(helpOut.stdout).toContain('Usage: hk');
+
+    // Ingest against a directory with a release file triggers lazy extraction -> formatted error.
+    const prodDir = join(dir, 'products', 'p1', 'releases');
+    mkdirSync(prodDir, { recursive: true });
+    writeFileSync(
+      join(prodDir, '1.0.0.md'),
+      `---\nproduct: p1\nversion: "1.0.0"\nreleased_at: "2026-11-25"\nfetched_at: "2026-11-26"\n---\n\n- Added claude-opus-4-7\n`,
+      'utf-8'
+    );
+    const dbPath = join(dir, 'data', 'test.db');
+    const ingestOut = runCli(['ingest', '--db', dbPath, '--products', join(dir, 'products')], {
+      env: { CLAUDE_SYNERGY_MODEL_FAMILIES: badYaml },
+    });
+    expect(ingestOut.code).not.toBe(0);
+    expect(ingestOut.stderr).toContain('[MODEL_FAMILIES_CONFIG_ERROR]');
+    expect(ingestOut.stderr).not.toMatch(/^\s+at\s+/m);
+  }, 30_000);
+
+  it('Item 10: --no-stamp makes products and latest identical across two clock days', () => {
+    const pDay1 = runCli(['--no-stamp', 'products', '--db', temp.path], {
+      env: { CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z' },
+    });
+    const pDay2 = runCli(['--no-stamp', 'products', '--db', temp.path], {
+      env: { CLAUDE_SYNERGY_NOW: '2026-07-01T12:00:00Z' },
+    });
+    expect(pDay1.code).toBe(0);
+    expect(pDay2.code).toBe(0);
+    expect(pDay1.stdout).toBe(pDay2.stdout);
+    expect(pDay1.stdout).not.toContain('data as of:');
+    expect(pDay1.stdout).not.toContain('STALE:');
+
+    const lDay1 = runCli(['--no-stamp', 'latest', '--limit', '50', '--db', temp.path], {
+      env: { CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z' },
+    });
+    const lDay2 = runCli(['--no-stamp', 'latest', '--limit', '50', '--db', temp.path], {
+      env: { CLAUDE_SYNERGY_NOW: '2026-07-01T12:00:00Z' },
+    });
+    expect(lDay1.code).toBe(0);
+    expect(lDay2.code).toBe(0);
+    expect(lDay1.stdout).toBe(lDay2.stdout);
+    expect(lDay1.stdout).not.toContain('data as of:');
+  }, 35_000);
 });

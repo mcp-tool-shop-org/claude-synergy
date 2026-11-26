@@ -2,7 +2,7 @@
 // Regex-based; runs at ingest time. No LLM in the loop.
 
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
 import { AppError } from './errors.js';
@@ -110,8 +110,9 @@ export function loadModelFamilies(yamlPath?: string): string[] {
 export function buildModelIdPattern(yamlPath?: string): RegExp {
   const families = loadModelFamilies(yamlPath);
   const alternation = families.map(escapeRegExp).join('|');
+  // Allow suffixes like -v1:0 or -latest while blocking partial digit runs (-2025, -6, .1, 202509291).
   return new RegExp(
-    `\\b(claude-(?:${alternation})-\\d+(?:-\\d+)?(?:-\\d{8})?)(?![-A-Za-z0-9]|\\.\\d)\\b`,
+    `\\b(claude-(?:${alternation})-\\d{1,2}(?:-\\d{1,2})?(?:-\\d{8})?)(?![A-Za-z0-9_]|\\.\\d|-(?![A-Za-z]))`,
     'g'
   );
 }
@@ -166,17 +167,30 @@ function buildPatterns(modelIdPattern: RegExp): Array<{ type: string; pattern: R
   ];
 }
 
-const DEFAULT_MODEL_ID_PATTERN = buildModelIdPattern();
-const DEFAULT_PATTERNS = buildPatterns(DEFAULT_MODEL_ID_PATTERN);
+type PatternList = Array<{ type: string; pattern: RegExp }>;
+
+const patternCache = new Map<string, PatternList>();
+
+/** Reset memoized model-family extraction patterns (intended for tests). */
+export function clearModelFamiliesCache(): void {
+  patternCache.clear();
+}
+
+function getPatternsForPath(yamlPath?: string): PatternList {
+  const key = resolve(resolveModelFamiliesPath(yamlPath));
+  const cached = patternCache.get(key);
+  if (cached) return cached;
+  const compiled = buildPatterns(buildModelIdPattern(key));
+  patternCache.set(key, compiled);
+  return compiled;
+}
 
 export interface ExtractOptions {
   modelFamiliesPath?: string;
 }
 
 export function extractEntities(text: string, opts?: ExtractOptions): Array<[string, string]> {
-  const patterns = opts?.modelFamiliesPath
-    ? buildPatterns(buildModelIdPattern(opts.modelFamiliesPath))
-    : DEFAULT_PATTERNS;
+  const patterns = getPatternsForPath(opts?.modelFamiliesPath);
   const found: Array<[string, string]> = [];
   const seen = new Set<string>();
   for (const { type, pattern } of patterns) {

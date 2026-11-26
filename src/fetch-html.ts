@@ -1,7 +1,9 @@
 // HTML scrape fetchers for Tier 3 / Tier 4b products that publish changelogs as HTML.
 // Each target picks an `htmlParser` and gets a dedicated parser function below.
 
+import { createHash } from 'node:crypto';
 import * as cheerio from 'cheerio';
+import { AppError } from './errors.js';
 import { fetchWithRetry } from './fetch-utils.js';
 
 export interface HtmlItem {
@@ -300,22 +302,55 @@ const MONTHS: Record<string, number> = {
 };
 
 /**
- * Parse a date heading like "November 23, 2026" or "2026-11-23" into UTC noon
- * ISO + YYYY-MM-DD so dates never shift by host timezone.
+ * Strip dangerous active/executable elements and attributes (`<script>`, `<style>`,
+ * `<iframe>`, `on*` event handlers, `javascript:` URLs) from scraped HTML bodies
+ * before storing them to markdown files.
  */
-function parseHeadingDateUtc(text: string): { dateStr: string; iso: string } | null {
+export function sanitizeScrapedHtml(rawHtml: string): string {
+  if (!rawHtml || !rawHtml.includes('<')) return rawHtml;
+  const $ = cheerio.load(rawHtml, null, false);
+  $('script, style, iframe').remove();
+  $('*').each((_, el) => {
+    const attribs = (el as any).attribs as Record<string, string> | undefined;
+    if (!attribs) return;
+    const $el = $(el);
+    for (const [name, val] of Object.entries(attribs)) {
+      const trimmed = name.trim().toLowerCase();
+      if (/^on[a-z]/i.test(trimmed)) {
+        $el.removeAttr(name);
+      } else if (/^(?:href|src|action|formaction|xlink:href)$/i.test(trimmed)) {
+        const normalized = String(val ?? '').replace(/[\x00-\x20]+/g, '').toLowerCase();
+        if (normalized.startsWith('javascript:')) {
+          $el.removeAttr(name);
+        }
+      }
+    }
+  });
+  return ($.html() ?? '').trim();
+}
+
+/**
+ * Parse a date heading like "November 23, 2026", "2026-11-23", or
+ * "April 17, 2026 — Claude Design" into UTC noon ISO + YYYY-MM-DD so dates
+ * never shift by host timezone, plus any trailing title suffix for slug stability.
+ */
+function parseHeadingDateUtc(text: string): { dateStr: string; iso: string; extraTitle: string } | null {
   const clean = text.replace(/\s+/g, ' ').trim();
-  const ymd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(clean);
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})(?:\s*(?:[-–—:]\s*|\s+)(.+))?$/.exec(clean);
   if (ymd) {
     const y = parseInt(ymd[1], 10);
     const m = parseInt(ymd[2], 10) - 1;
     const d = parseInt(ymd[3], 10);
     const dt = new Date(Date.UTC(y, m, d, 12, 0, 0));
     if (!Number.isNaN(dt.getTime())) {
-      return { dateStr: dt.toISOString().slice(0, 10), iso: dt.toISOString() };
+      return {
+        dateStr: dt.toISOString().slice(0, 10),
+        iso: dt.toISOString(),
+        extraTitle: (ymd[4] ?? '').trim(),
+      };
     }
   }
-  const mdy = /^(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2}),?\s+(\d{4})$/i.exec(clean);
+  const mdy = /^(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2}),?\s+(\d{4})(?:\s*(?:[-–—:]\s*|\s+)(.+))?$/i.exec(clean);
   if (mdy) {
     const monthIdx = MONTHS[mdy[1].toLowerCase()];
     const day = parseInt(mdy[2], 10);
@@ -323,11 +358,57 @@ function parseHeadingDateUtc(text: string): { dateStr: string; iso: string } | n
     if (monthIdx !== undefined && day >= 1 && day <= 31) {
       const dt = new Date(Date.UTC(year, monthIdx, day, 12, 0, 0));
       if (!Number.isNaN(dt.getTime()) && dt.getUTCMonth() === monthIdx && dt.getUTCDate() === day) {
-        return { dateStr: dt.toISOString().slice(0, 10), iso: dt.toISOString() };
+        return {
+          dateStr: dt.toISOString().slice(0, 10),
+          iso: dt.toISOString(),
+          extraTitle: (mdy[4] ?? '').trim(),
+        };
       }
     }
   }
   return null;
+}
+
+function slugifyFragment(raw: string): string {
+  return raw
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 48);
+}
+
+function stableSectionSlug(
+  parsed: { dateStr: string; extraTitle: string },
+  dateCount: number,
+  anchor: string | undefined,
+  body: string,
+  usedSlugs: Set<string>,
+  $: cheerio.CheerioAPI
+): string {
+  let slug = parsed.dateStr;
+  if (dateCount > 1 || parsed.extraTitle) {
+    const firstBoldOrText = cheerio.load(body, null, false)('strong, b, h4, li, p')
+      .first()
+      .text()
+      .replace(/\s+/g, ' ')
+      .trim();
+    const semanticAnchor = anchor && !/^h_[0-9a-f]+$/i.test(anchor) ? anchor : '';
+    const candidatePart =
+      slugifyFragment(parsed.extraTitle) ||
+      slugifyFragment(semanticAnchor) ||
+      slugifyFragment(firstBoldOrText) ||
+      slugifyFragment(anchor ?? '');
+    slug = candidatePart
+      ? `${parsed.dateStr}-${candidatePart}`
+      : `${parsed.dateStr}-${createHash('sha256').update(body).digest('hex').slice(0, 8)}`;
+  }
+
+  if (usedSlugs.has(slug)) {
+    const shortHash = createHash('sha256').update(`${anchor ?? ''}\n${body}`).digest('hex').slice(0, 8);
+    slug = `${slug}-${shortHash}`;
+  }
+  usedSlugs.add(slug);
+  return slug;
 }
 
 /**
@@ -439,31 +520,52 @@ async function fetchDatedH3ReleaseNotes(
         : $('h3')
   ).toArray();
 
-  const items: HtmlItem[] = [];
-  const seenDates = new Set<string>();
+  // Scan all headings BEFORE applying `sinceIso` so a layout change is detected even
+  // when existing releases are all older than `sinceIso`, and so same-day counts stay stable.
+  const datedSections: Array<{
+    el: any;
+    $h3: cheerio.Cheerio<any>;
+    title: string;
+    parsed: { dateStr: string; iso: string; extraTitle: string };
+  }> = [];
+  const dateCounts = new Map<string, number>();
 
   for (const el of h3Nodes) {
     const $h3 = $(el);
     const title = $h3.text().replace(/\s+/g, ' ').trim();
     const parsed = parseHeadingDateUtc(title);
     if (!parsed) continue;
-    if (parsed.iso <= sinceIso) continue;
+    datedSections.push({ el, $h3, title, parsed });
+    dateCounts.set(parsed.dateStr, (dateCounts.get(parsed.dateStr) ?? 0) + 1);
+  }
 
-    const sectionNodes = collectSectionNodes($, el);
-    const body = renderSectionHtml($, sectionNodes).trim();
+  if (datedSections.length === 0) {
+    throw new AppError({
+      code: 'HTML_LAYOUT_CHANGED',
+      message: `no dated release headings found at ${url} (scanned ${h3Nodes.length} <h3> elements)`,
+      hint: 'Inspect the release notes page markup and update date heading selectors in src/fetch-html.ts.',
+    });
+  }
+
+  const items: HtmlItem[] = [];
+  const usedSlugs = new Set<string>();
+
+  for (const entry of datedSections) {
+    if (entry.parsed.iso <= sinceIso) continue;
+
+    const sectionNodes = collectSectionNodes($, entry.el);
+    const body = sanitizeScrapedHtml(renderSectionHtml($, sectionNodes)).trim();
     if (!body) continue;
 
-    const anchor = $h3.attr('id')?.trim();
+    const anchor = entry.$h3.attr('id')?.trim();
     const link = anchor ? `${url}#${anchor}` : url;
-    const slug = seenDates.has(parsed.dateStr)
-      ? `${parsed.dateStr}-${anchor || items.length + 1}`
-      : parsed.dateStr;
-    seenDates.add(parsed.dateStr);
+    const dateCount = dateCounts.get(entry.parsed.dateStr) ?? 1;
+    const slug = stableSectionSlug(entry.parsed, dateCount, anchor, body, usedSlugs, $);
 
     items.push({
       slug,
-      title,
-      pubDate: parsed.iso,
+      title: entry.title,
+      pubDate: entry.parsed.iso,
       link,
       body,
     });
@@ -512,16 +614,23 @@ export type HtmlParserName =
   | 'anthropic-apps-release-notes';
 
 export async function fetchHtmlReleases(parser: HtmlParserName, sinceIso: string, signal?: AbortSignal): Promise<HtmlItem[]> {
+  let items: HtmlItem[];
   switch (parser) {
     case 'github-copilot-blog':
-      return fetchGithubCopilotBlog(sinceIso, signal);
+      items = await fetchGithubCopilotBlog(sinceIso, signal);
+      break;
     case 'windsurf-changelog':
-      return fetchWindsurfChangelog(sinceIso, signal);
+      items = await fetchWindsurfChangelog(sinceIso, signal);
+      break;
     case 'vscode-updates':
-      return fetchVscodeUpdates(sinceIso, signal);
+      items = await fetchVscodeUpdates(sinceIso, signal);
+      break;
     case 'claude-api-release-notes':
-      return fetchClaudeApiReleaseNotes(sinceIso, signal);
+      items = await fetchClaudeApiReleaseNotes(sinceIso, signal);
+      break;
     case 'anthropic-apps-release-notes':
-      return fetchAnthropicAppsReleaseNotes(sinceIso, signal);
+      items = await fetchAnthropicAppsReleaseNotes(sinceIso, signal);
+      break;
   }
+  return items.map((item) => ({ ...item, body: sanitizeScrapedHtml(item.body) }));
 }

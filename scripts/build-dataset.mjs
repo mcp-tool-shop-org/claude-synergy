@@ -116,7 +116,7 @@ console.log(`Loaded ${entries.length} entries from ${ENTRIES_DIR}`);
 // ── Citation validation ──────────────────────────────────────────────────────
 if (!existsSync(DB_PATH)) {
   console.error(`DB not found at ${DB_PATH}. Corpus citation validation requires the synced data/claude-synergy.db.`);
-  console.error('Run `hk sync` or `node scripts/dogfood-sync.mjs` first.');
+  console.error('Run `hk sync --db data/claude-synergy.db` or `node scripts/dogfood-sync.mjs` first.');
   process.exit(2);
 }
 

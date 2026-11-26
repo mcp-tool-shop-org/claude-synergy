@@ -1,8 +1,13 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, unlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { extractEntities, loadModelFamilies, buildModelIdPattern } from '../../src/extract.js';
+import {
+  clearModelFamiliesCache,
+  extractEntities,
+  loadModelFamilies,
+  buildModelIdPattern,
+} from '../../src/extract.js';
 import { ingestAll, reextractEntities } from '../../src/ingest.js';
 import { AppError } from '../../src/errors.js';
 import { createTempDb } from '../helpers/temp-db.js';
@@ -167,6 +172,32 @@ describe('extractEntities', () => {
       // Escaped dot in foo.bar must match literal dot and reject arbitrary character X
       expect(found).toContain('claude-foo.bar-1-0');
       expect(found).not.toContain('claude-fooXbar-1-0');
+    });
+
+    it('extracts suffixed model IDs (-v1:0, -latest) to base ID while still blocking partial digit runs', () => {
+      expect(values('Configured claude-sonnet-4-5-20250929-v1:0 on Bedrock', 'model_id')).toEqual([
+        'claude-sonnet-4-5-20250929',
+      ]);
+      expect(values('Using claude-opus-4-5-latest alias', 'model_id')).toEqual(['claude-opus-4-5']);
+      expect(values('Partial digit runs claude-opus-4-5-2025, claude-opus-4-5-6, claude-opus-4-5-202509291', 'model_id')).toEqual([]);
+      expect(values('claude-code-2.1.292 and claude-agent-sdk-0.2.82', 'model_id')).toEqual([]);
+    });
+
+    it('lazily loads and memoizes model-families.yaml by path across extractEntities calls', () => {
+      clearModelFamiliesCache();
+      const dir = makeTmpDir('mf-memo-');
+      const yamlPath = join(dir, 'model-families.yaml');
+      writeFileSync(yamlPath, 'families:\n  - opus\n  - memo\n', 'utf-8');
+
+      expect(extractEntities('Uses claude-memo-5-1.', { modelFamiliesPath: yamlPath })).toEqual([
+        ['model_id', 'claude-memo-5-1'],
+      ]);
+      // Deleting the YAML file after initial compilation proves memoization avoids re-reading per row.
+      unlinkSync(yamlPath);
+      expect(extractEntities('Still extracts claude-memo-5-2.', { modelFamiliesPath: yamlPath })).toEqual([
+        ['model_id', 'claude-memo-5-2'],
+      ]);
+      clearModelFamiliesCache();
     });
 
     it('throws named AppError on missing, malformed, or empty model-families.yaml', () => {

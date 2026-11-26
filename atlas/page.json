@@ -61,54 +61,30 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 2,
-      "changed": 4,
+      "added": 1,
+      "changed": 25,
       "moved": 0,
       "parts": 5,
       "removed": 0
     },
     "items": [
       {
-        "kind": "import-added",
-        "sentence": "test now imports scripts.",
-        "subjects": [
-          "test",
-          "scripts"
-        ]
-      },
-      {
-        "kind": "door",
-        "sentence": "Daily sync now also runs scripts/check-stale-sync-pr.mjs.",
-        "subjects": [
-          ".github/workflows/sync.yml",
-          "scripts/check-stale-sync-pr.mjs"
-        ]
-      },
-      {
         "kind": "landing",
-        "sentence": ".github/workflows/sync.yml is now read by test/unit/stale-sync-pr.test.ts.",
+        "sentence": "test/fixtures/mock-responses/no-date-headings.html is now read by test/unit/fetch-html.test.ts.",
         "subjects": [
-          ".github/workflows/sync.yml",
-          "test/unit/stale-sync-pr.test.ts"
-        ]
-      },
-      {
-        "kind": "landing",
-        "sentence": "scripts/check-stale-sync-pr.mjs is now read by test/unit/stale-sync-pr.test.ts.",
-        "subjects": [
-          "scripts/check-stale-sync-pr.mjs",
-          "test/unit/stale-sync-pr.test.ts"
+          "test/fixtures/mock-responses/no-date-headings.html",
+          "test/unit/fetch-html.test.ts"
         ]
       },
       {
         "kind": "counts",
-        "sentence": "2 files added and 4 changed content, across 5 parts.",
+        "sentence": "1 file added and 25 changed content, across 5 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "46c15a0b23b6dedad366a2437041b88cba068782",
-      "generatedAt": "2026-11-26T08:20:27.084Z"
+      "commit": "ea2170cfe8ab0c0e20c467a016a8914391b4ca5c",
+      "generatedAt": "2026-11-26T08:45:19.283Z"
     },
     "unchanged": false
   },
@@ -117,9 +93,9 @@
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "ea2170cfe8ab0c0e20c467a016a8914391b4ca5c",
+  "commit": "315ce7de3fec7cb56d78f7889d5c2a0704c12cd5",
   "defaultBranch": "main",
-  "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (89), JavaScript (10), CSS (2), HTML (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
+  "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (89), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
     {
       "checks": [
@@ -461,13 +437,14 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-26T08:45:19.283Z",
+  "generatedAt": "2026-11-26T09:35:43.805Z",
   "limits": [
     "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
     "1 write and 4 reads use paths built at run time and are not named here.",
-    "9 writes and 46 reads go to a path their caller passes, not to this repository.",
+    "9 writes and 52 reads go to a path their caller passes, not to this repository.",
     "7 reads go to the directory the command is run in (products.yaml, schema-vec.sql and schema.sql), not to this repository.",
     "1 read goes to the directory the command is run in (data/) or a path its caller passes, not to this repository.",
+    "1 command is built at run time and not followed.",
     "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
   "mainDoor": ".github/workflows/test.yml",
@@ -496,7 +473,7 @@
   "startReason": "This path follows claude-synergy-mcp (a command people run) from its entry, since Tests runs only tests and checks.",
   "summary": null,
   "summaryFrom": null,
-  "testFiles": 84,
+  "testFiles": 85,
   "testedBy": {
     "scripts": 1,
     "src": 48

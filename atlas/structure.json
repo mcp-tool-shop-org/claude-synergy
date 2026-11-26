@@ -21,7 +21,7 @@
           "path": ".github/workflows/release.yml"
         },
         {
-          "hash": "ec43f23d427239753a8bf5d7639bf4c866a72cab2a94e28fcf74b0b4dfb19458",
+          "hash": "ce931dca85f6453748c8c0f16c5fdf68d5d20b78fb2508b6381332dce45eea0d",
           "path": ".github/workflows/sync.yml"
         },
         {
@@ -10981,11 +10981,11 @@
           "path": ".gitignore"
         },
         {
-          "hash": "79118742600b71f74f99519733e14d64c25d09e6587b59a9cbd4f666f42d8979",
+          "hash": "a3cd701be27808f5fb8cab66b3feed0147e11b548d8726f2a468702b5795dad0",
           "path": "CHANGELOG.md"
         },
         {
-          "hash": "7857e0579aeb038f953de9bd79d935ccb22edff8f435bac229f9b428247f4e84",
+          "hash": "ae27092d41395c8cabe45c246e7b73713253faf3f95808d16d2a83fe8905e7bf",
           "path": "CONTRIBUTING.md"
         },
         {
@@ -11021,7 +11021,7 @@
           "path": "README.ja.md"
         },
         {
-          "hash": "5c4c8b952b3341f30cead4093de0ad9597e5c1d8b214443d5463ecb9182192e6",
+          "hash": "bc07414b3be36e3791de9040bb0b3b02f6e6a50258ede873c57c98dd23e20bfa",
           "path": "README.md"
         },
         {
@@ -11065,7 +11065,7 @@
           "path": "model-families.yaml"
         },
         {
-          "hash": "e917efff77b176c1f85a9929313b9b249bb6a46ffaa60db3b967d11eed862afa",
+          "hash": "ab528d0a41974784b2ac982c98cbe4d08dfb94b6a2794763911de687ea066b3f",
           "path": "package.json"
         },
         {
@@ -11137,7 +11137,7 @@
           "path": "scripts/apply-a3c-review.mjs"
         },
         {
-          "hash": "500421344b675d9b2ef4dbd389bb76607b6ef7c583dfa747ed84377648859af7",
+          "hash": "e2ca715dbc52f2253d40755269ed86ab88684602bf62e454aa3ff9c21676bb0e",
           "path": "scripts/build-dataset.mjs"
         },
         {
@@ -11150,34 +11150,34 @@
             {
               "in": "parseUtcDateMs",
               "kind": "throw",
-              "line": 13
+              "line": 14
             },
             {
               "in": "parseUtcDateMs",
               "kind": "throw",
-              "line": 17
+              "line": 18
             },
             {
               "in": "parseUtcDateMs",
               "kind": "throw",
-              "line": 27
+              "line": 28
             },
             {
               "in": "evaluateSyncPrStaleness",
               "kind": "throw",
-              "line": 41
+              "line": 42
             },
             {
               "in": "parseCliArgs",
               "kind": "throw",
-              "line": 75
+              "line": 76
             },
             {
               "kind": "catch",
-              "line": 88
+              "line": 89
             }
           ],
-          "hash": "192ec105ec2e1bad57cde12207f6017bf27ddf7b3588b7dfe522309beebbb6fe",
+          "hash": "888d3056670cfa84fdfefe4b69bb6b00fec32e1fb0094175d9f416e4fd46df66",
           "path": "scripts/check-stale-sync-pr.mjs",
           "sequences": []
         },
@@ -11424,7 +11424,7 @@
     },
     {
       "dynamicReads": 4,
-      "dynamicSpawns": 0,
+      "dynamicSpawns": 1,
       "dynamicSpawnsInTests": 0,
       "dynamicWrites": 1,
       "entryPoints": [
@@ -11443,58 +11443,62 @@
             {
               "in": "shutdown",
               "kind": "catch",
-              "line": 70
+              "line": 74
             },
             {
               "in": "parseRelativeDate",
               "kind": "throw",
-              "line": 129
+              "line": 133
             },
             {
               "in": "parseRelativeDate",
               "kind": "throw",
-              "line": 141
+              "line": 145
             },
             {
               "in": "parseRelativeDate",
               "kind": "throw",
-              "line": 159
+              "line": 163
             },
             {
               "in": "resolveDateOrExit",
               "kind": "catch",
-              "line": 175
+              "line": 179
             },
             {
               "kind": "catch",
-              "line": 455
+              "line": 426
             },
             {
               "kind": "catch",
-              "line": 704
+              "line": 505
             },
             {
               "kind": "catch",
-              "line": 783
+              "line": 779
             },
             {
               "kind": "catch",
-              "line": 890
+              "line": 859
             },
             {
               "kind": "catch",
-              "line": 1014
+              "line": 967
             },
             {
               "kind": "catch",
-              "line": 1086
+              "line": 1091
             },
             {
               "kind": "catch",
-              "line": 1173
+              "line": 1163
+            },
+            {
+              "kind": "catch",
+              "line": 1254
             }
           ],
-          "hash": "7843108ba5e5e41c67388bffcf4f884979465cd57c5bb85e2a92ec8cdf494b18",
+          "hash": "937a575781588c8b9a34ae49ec33259f43093a35aaf67e0553539258c3f3989b",
           "importOrder": [
             "src/db.ts",
             "src/ingest.ts",
@@ -11520,14 +11524,14 @@
             {
               "calls": [
                 {
-                  "line": 82,
+                  "line": 86,
                   "name": "resolveStorePaths",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 86,
+                  "line": 90,
                   "name": "printStoreResolutionOnce",
                   "target": {
                     "file": "src/store.ts"
@@ -11542,7 +11546,7 @@
             {
               "calls": [
                 {
-                  "line": 111,
+                  "line": 115,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
@@ -11557,7 +11561,7 @@
             {
               "calls": [
                 {
-                  "line": 180,
+                  "line": 184,
                   "name": "formatError",
                   "target": {
                     "file": "src/errors.ts"
@@ -11572,7 +11576,7 @@
             {
               "calls": [
                 {
-                  "line": 82,
+                  "line": 86,
                   "name": "resolveStorePaths",
                   "target": {
                     "file": "src/store.ts"
@@ -11580,7 +11584,7 @@
                   "via": "resolveCliStore"
                 },
                 {
-                  "line": 86,
+                  "line": 90,
                   "name": "printStoreResolutionOnce",
                   "target": {
                     "file": "src/store.ts"
@@ -11588,7 +11592,7 @@
                   "via": "resolveCliStore"
                 },
                 {
-                  "line": 111,
+                  "line": 115,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
@@ -11596,35 +11600,59 @@
                   "via": "openTrackedDb"
                 },
                 {
-                  "line": 217,
-                  "name": "hasAnyReleases",
-                  "target": {
-                    "file": "src/store.ts"
-                  }
-                },
-                {
-                  "line": 221,
-                  "name": "isAutoSyncDisabled",
+                  "line": 224,
+                  "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
                   "line": 228,
-                  "name": "runFirstUseSync",
+                  "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 235,
+                  "branch": "isAutoSyncDisabled()",
+                  "line": 229,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 238,
+                  "name": "ensureSynced",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "branch": "synced.cooledDown",
+                  "line": 246,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 255,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 241,
+                  "line": 261,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 262,
                   "name": "formatPartialNote",
                   "target": {
                     "file": "src/store.ts"
@@ -11639,7 +11667,7 @@
             {
               "calls": [
                 {
-                  "line": 251,
+                  "line": 272,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11654,14 +11682,14 @@
             {
               "calls": [
                 {
-                  "line": 260,
+                  "line": 287,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 261,
+                  "line": 288,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11676,7 +11704,7 @@
             {
               "calls": [
                 {
-                  "line": 251,
+                  "line": 272,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11684,7 +11712,7 @@
                   "via": "emitArrayJson"
                 },
                 {
-                  "line": 261,
+                  "line": 288,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11700,7 +11728,7 @@
             {
               "calls": [
                 {
-                  "line": 281,
+                  "line": 312,
                   "name": "toLocaleString",
                   "target": null
                 }
@@ -11713,7 +11741,7 @@
             {
               "calls": [
                 {
-                  "line": 281,
+                  "line": 312,
                   "name": "toLocaleString",
                   "target": null,
                   "via": "fmtNum"
@@ -11727,7 +11755,7 @@
             {
               "calls": [
                 {
-                  "line": 82,
+                  "line": 86,
                   "name": "resolveStorePaths",
                   "target": {
                     "file": "src/store.ts"
@@ -11735,7 +11763,7 @@
                   "via": "resolveCliStore"
                 },
                 {
-                  "line": 86,
+                  "line": 90,
                   "name": "printStoreResolutionOnce",
                   "target": {
                     "file": "src/store.ts"
@@ -11743,7 +11771,7 @@
                   "via": "resolveCliStore"
                 },
                 {
-                  "line": 111,
+                  "line": 115,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
@@ -11751,16 +11779,8 @@
                   "via": "openTrackedDb"
                 },
                 {
-                  "line": 217,
-                  "name": "hasAnyReleases",
-                  "target": {
-                    "file": "src/store.ts"
-                  },
-                  "via": "openQueryDbOrFirstUse"
-                },
-                {
-                  "line": 221,
-                  "name": "isAutoSyncDisabled",
+                  "line": 224,
+                  "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
                   },
@@ -11768,14 +11788,41 @@
                 },
                 {
                   "line": 228,
-                  "name": "runFirstUseSync",
+                  "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
                   },
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 235,
+                  "branch": "isAutoSyncDisabled()",
+                  "line": 229,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 238,
+                  "name": "ensureSynced",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "branch": "synced.cooledDown",
+                  "line": 246,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 255,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
@@ -11783,7 +11830,15 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 241,
+                  "line": 261,
+                  "name": "hasAnyReleases",
+                  "target": {
+                    "file": "src/store.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 262,
                   "name": "formatPartialNote",
                   "target": {
                     "file": "src/store.ts"
@@ -11792,7 +11847,7 @@
                 },
                 {
                   "branch": "session.emptyOptOut || !session.db",
-                  "line": 251,
+                  "line": 272,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11801,7 +11856,7 @@
                 },
                 {
                   "branch": "session.emptyOptOut || !session.db",
-                  "line": 261,
+                  "line": 288,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11809,7 +11864,7 @@
                   "via": "emitTextStamp"
                 },
                 {
-                  "line": 508,
+                  "line": 558,
                   "name": "lookupEntity",
                   "target": {
                     "file": "src/query.ts"
@@ -12175,6 +12230,7 @@
         {
           "exports": [
             "buildModelIdPattern",
+            "clearModelFamiliesCache",
             "escapeRegExp",
             "extractEntities",
             "loadModelFamilies",
@@ -12222,7 +12278,7 @@
               "line": 96
             }
           ],
-          "hash": "121167f2b17553c6c211da0780ea08243d6991a3b0dc4c5517273af89c7ee37d",
+          "hash": "5e29a424a85bcccb4ad837e0d7e7e126a9053c7d169807745839572b77f89ca1",
           "importsFiles": [
             "src/errors.ts"
           ],
@@ -12238,20 +12294,20 @@
             {
               "in": "fetchAiderHistory",
               "kind": "throw",
-              "line": 27
+              "line": 31
             },
             {
               "in": "fetchKeepAChangelog",
               "kind": "throw",
-              "line": 104
+              "line": 108
             },
             {
               "in": "aiderReleaseDates",
               "kind": "catch",
-              "line": 200
+              "line": 204
             }
           ],
-          "hash": "b8ef3c3cbfea01a12537ceca0df871645cd723acd45c4f1b5e7735580373e6d3",
+          "hash": "bf833eb3c644a1468f37b1f35e925645b8956f542013973971ed8c38e2188080",
           "importsFiles": [
             "src/fetch-utils.ts"
           ],
@@ -12264,42 +12320,49 @@
             "fetchGithubCopilotBlog",
             "fetchHtmlReleases",
             "fetchVscodeUpdates",
-            "fetchWindsurfChangelog"
+            "fetchWindsurfChangelog",
+            "sanitizeScrapedHtml"
           ],
           "failurePaths": [
             {
               "in": "fetchGithubCopilotBlog",
               "kind": "catch",
-              "line": 40
+              "line": 42
             },
             {
               "in": "fetchGithubCopilotBlog",
               "kind": "catch",
-              "line": 69
+              "line": 71
             },
             {
               "in": "fetchWindsurfChangelog",
               "kind": "throw",
-              "line": 90
+              "line": 92
             },
             {
               "in": "fetchWindsurfChangelog",
               "kind": "catch",
-              "line": 129
+              "line": 131
             },
             {
               "in": "fetchVscodeUpdates",
               "kind": "catch",
-              "line": 278
+              "line": 280
             },
             {
               "in": "fetchDatedH3ReleaseNotes",
               "kind": "throw",
-              "line": 429
+              "line": 510
+            },
+            {
+              "in": "fetchDatedH3ReleaseNotes",
+              "kind": "throw",
+              "line": 543
             }
           ],
-          "hash": "476a6c30fe4edf2c70ccfc8aa42c7abeaf6f4e8af64b76241e6711f48caa4a6f",
+          "hash": "45025102bb444b409aef13a09e3f50ae314097cc5517723662bae7a75905eeb9",
           "importsFiles": [
+            "src/errors.ts",
             "src/fetch-utils.ts"
           ],
           "path": "src/fetch-html.ts"
@@ -12376,48 +12439,44 @@
         {
           "exports": [
             "createFetchAllController",
-            "fetchWithRetry"
+            "fetchWithRetry",
+            "runGhApi"
           ],
           "failurePaths": [
             {
               "in": "fetchWithRetry",
               "kind": "throw",
-              "line": 58
+              "line": 63
             },
             {
               "in": "fetchWithRetry",
               "kind": "throw",
-              "line": 81
+              "line": 86
             },
             {
               "in": "fetchWithRetry",
               "kind": "throw",
-              "line": 99
+              "line": 104
             },
             {
               "in": "fetchWithRetry",
               "kind": "catch",
-              "line": 100
+              "line": 105
             },
             {
               "in": "fetchWithRetry",
               "kind": "throw",
-              "line": 103
+              "line": 108
             },
             {
               "in": "fetchWithRetry",
               "kind": "catch",
-              "line": 116
+              "line": 121
             },
             {
               "in": "fetchWithRetry",
               "kind": "throw",
-              "line": 118
-            },
-            {
-              "in": "fetchWithRetry",
-              "kind": "throw",
-              "line": 124
+              "line": 123
             },
             {
               "in": "fetchWithRetry",
@@ -12425,12 +12484,27 @@
               "line": 129
             },
             {
+              "in": "fetchWithRetry",
+              "kind": "throw",
+              "line": 134
+            },
+            {
               "in": "isGitHubApiUrl",
               "kind": "catch",
-              "line": 193
+              "line": 198
+            },
+            {
+              "in": "runGhApi",
+              "kind": "throw",
+              "line": 242
+            },
+            {
+              "in": "runGhApi",
+              "kind": "throw",
+              "line": 250
             }
           ],
-          "hash": "616fbbd0f8985ada28c6d4f059360321821209653bc4886890f8071ccd6c7d95",
+          "hash": "f21d724e01d390f6a8d694c90d9f5ccfa9aee0abd4a19e61d695655f258cbc0b",
           "path": "src/fetch-utils.ts"
         },
         {
@@ -12447,110 +12521,110 @@
             {
               "in": "assertRepoShape",
               "kind": "throw",
-              "line": 35
+              "line": 34
             },
             {
               "in": "assertProductShape",
               "kind": "throw",
-              "line": 43
+              "line": 42
             },
             {
               "in": "sanitizeFilename",
               "kind": "throw",
-              "line": 58
+              "line": 57
             },
             {
               "in": "assertSafeFilename",
               "kind": "throw",
-              "line": 65
+              "line": 64
             },
             {
               "in": "fetchAll",
               "kind": "throw",
-              "line": 202
+              "line": 201
             },
             {
               "in": "fetchOne",
               "kind": "catch",
-              "line": 371
+              "line": 372
             },
             {
               "in": "fetchGhReleases",
               "kind": "throw",
-              "line": 425
+              "line": 428
             },
             {
               "in": "fetchGhReleases",
               "kind": "catch",
-              "line": 442
+              "line": 451
             },
             {
               "in": "ghReleases",
               "kind": "catch",
-              "line": 478
+              "line": 485
             },
             {
               "in": "ghReleases",
               "kind": "throw",
-              "line": 486
+              "line": 493
             },
             {
               "in": "ghReleases",
               "kind": "throw",
-              "line": 492
+              "line": 499
             },
             {
               "in": "ghReleases",
               "kind": "catch",
-              "line": 498
+              "line": 505
             },
             {
               "in": "fetchRss",
               "kind": "throw",
-              "line": 606
+              "line": 615
             },
             {
               "in": "fetchRss",
               "kind": "catch",
-              "line": 642
+              "line": 651
             },
             {
               "in": "fetchRawChangelog",
               "kind": "throw",
-              "line": 660
+              "line": 670
             },
             {
               "in": "fetchRawChangelog",
               "kind": "throw",
-              "line": 674
+              "line": 684
             },
             {
               "in": "fetchRawChangelog",
               "kind": "catch",
-              "line": 707
+              "line": 717
             },
             {
               "in": "fetchHtmlScrape",
               "kind": "throw",
-              "line": 729
+              "line": 756
             },
             {
               "in": "fetchHtmlScrape",
               "kind": "catch",
-              "line": 764
+              "line": 797
             },
             {
               "in": "fetchPlaywrightStrategy",
               "kind": "catch",
-              "line": 817
+              "line": 851
             },
             {
               "in": "fetchCatalogStrategy",
               "kind": "throw",
-              "line": 835
+              "line": 869
             }
           ],
-          "hash": "06f4f9d1e244c1def866688a2326d124855fbfefb1c1e6e67959cbb2b6e62839",
+          "hash": "20b7183566fa8185839b0f48825769283c8a3b3f1097873cacda0c9083c41763",
           "importsFiles": [
             "src/fetch-changelog.ts",
             "src/fetch-html.ts",
@@ -12580,13 +12654,21 @@
                   }
                 },
                 {
-                  "line": 856,
+                  "line": 890,
                   "name": "prepare",
                   "target": null,
                   "via": "readMarker"
                 },
                 {
-                  "line": 608,
+                  "line": 484,
+                  "name": "runGhApi",
+                  "target": {
+                    "file": "src/fetch-utils.ts"
+                  },
+                  "via": "ghReleases"
+                },
+                {
+                  "line": 617,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
@@ -12594,7 +12676,15 @@
                   "via": "fetchRss"
                 },
                 {
-                  "line": 668,
+                  "line": 645,
+                  "name": "sanitizeScrapedHtml",
+                  "target": {
+                    "file": "src/fetch-html.ts"
+                  },
+                  "via": "fetchRss"
+                },
+                {
+                  "line": 678,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12602,7 +12692,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 671,
+                  "line": 681,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12610,7 +12700,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 731,
+                  "line": 758,
                   "name": "fetchHtmlReleases",
                   "target": {
                     "file": "src/fetch-html.ts"
@@ -12618,7 +12708,15 @@
                   "via": "fetchHtmlScrape"
                 },
                 {
-                  "line": 837,
+                  "line": 778,
+                  "name": "sanitizeScrapedHtml",
+                  "target": {
+                    "file": "src/fetch-html.ts"
+                  },
+                  "via": "fetchHtmlScrape"
+                },
+                {
+                  "line": 871,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12626,7 +12724,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 839,
+                  "line": 873,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12634,7 +12732,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 784,
+                  "line": 817,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
@@ -12642,7 +12740,15 @@
                   "via": "fetchPlaywrightStrategy"
                 },
                 {
-                  "line": 879,
+                  "line": 832,
+                  "name": "sanitizeScrapedHtml",
+                  "target": {
+                    "file": "src/fetch-html.ts"
+                  },
+                  "via": "fetchPlaywrightStrategy"
+                },
+                {
+                  "line": 913,
                   "name": "prepare",
                   "target": null,
                   "via": "writeMarker"
@@ -12656,13 +12762,21 @@
             {
               "calls": [
                 {
-                  "line": 856,
+                  "line": 890,
                   "name": "prepare",
                   "target": null,
                   "via": "readMarker"
                 },
                 {
-                  "line": 608,
+                  "line": 484,
+                  "name": "runGhApi",
+                  "target": {
+                    "file": "src/fetch-utils.ts"
+                  },
+                  "via": "ghReleases"
+                },
+                {
+                  "line": 617,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
@@ -12670,7 +12784,15 @@
                   "via": "fetchRss"
                 },
                 {
-                  "line": 668,
+                  "line": 645,
+                  "name": "sanitizeScrapedHtml",
+                  "target": {
+                    "file": "src/fetch-html.ts"
+                  },
+                  "via": "fetchRss"
+                },
+                {
+                  "line": 678,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12678,7 +12800,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 671,
+                  "line": 681,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12686,7 +12808,7 @@
                   "via": "fetchRawChangelog"
                 },
                 {
-                  "line": 731,
+                  "line": 758,
                   "name": "fetchHtmlReleases",
                   "target": {
                     "file": "src/fetch-html.ts"
@@ -12694,7 +12816,15 @@
                   "via": "fetchHtmlScrape"
                 },
                 {
-                  "line": 837,
+                  "line": 778,
+                  "name": "sanitizeScrapedHtml",
+                  "target": {
+                    "file": "src/fetch-html.ts"
+                  },
+                  "via": "fetchHtmlScrape"
+                },
+                {
+                  "line": 871,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12702,7 +12832,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 839,
+                  "line": 873,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12710,7 +12840,7 @@
                   "via": "fetchCatalogStrategy"
                 },
                 {
-                  "line": 784,
+                  "line": 817,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
@@ -12718,7 +12848,15 @@
                   "via": "fetchPlaywrightStrategy"
                 },
                 {
-                  "line": 879,
+                  "line": 832,
+                  "name": "sanitizeScrapedHtml",
+                  "target": {
+                    "file": "src/fetch-html.ts"
+                  },
+                  "via": "fetchPlaywrightStrategy"
+                },
+                {
+                  "line": 913,
                   "name": "prepare",
                   "target": null,
                   "via": "writeMarker"
@@ -12732,10 +12870,48 @@
             {
               "calls": [
                 {
-                  "line": 608,
+                  "line": 484,
+                  "name": "runGhApi",
+                  "target": {
+                    "file": "src/fetch-utils.ts"
+                  },
+                  "via": "ghReleases"
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "fetchGhReleases"
+            },
+            {
+              "calls": [
+                {
+                  "line": 484,
+                  "name": "runGhApi",
+                  "target": {
+                    "file": "src/fetch-utils.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "ghReleases"
+            },
+            {
+              "calls": [
+                {
+                  "line": 617,
                   "name": "fetchRssReleases",
                   "target": {
                     "file": "src/fetch-rss.ts"
+                  }
+                },
+                {
+                  "line": 645,
+                  "name": "sanitizeScrapedHtml",
+                  "target": {
+                    "file": "src/fetch-html.ts"
                   }
                 }
               ],
@@ -12747,14 +12923,14 @@
             {
               "calls": [
                 {
-                  "line": 668,
+                  "line": 678,
                   "name": "fetchAiderHistory",
                   "target": {
                     "file": "src/fetch-changelog.ts"
                   }
                 },
                 {
-                  "line": 671,
+                  "line": 681,
                   "name": "fetchKeepAChangelog",
                   "target": {
                     "file": "src/fetch-changelog.ts"
@@ -12769,8 +12945,15 @@
             {
               "calls": [
                 {
-                  "line": 731,
+                  "line": 758,
                   "name": "fetchHtmlReleases",
+                  "target": {
+                    "file": "src/fetch-html.ts"
+                  }
+                },
+                {
+                  "line": 778,
+                  "name": "sanitizeScrapedHtml",
                   "target": {
                     "file": "src/fetch-html.ts"
                   }
@@ -12784,10 +12967,17 @@
             {
               "calls": [
                 {
-                  "line": 784,
+                  "line": 817,
                   "name": "fetchWindsurfWithPlaywright",
                   "target": {
                     "file": "src/fetch-playwright.ts"
+                  }
+                },
+                {
+                  "line": 832,
+                  "name": "sanitizeScrapedHtml",
+                  "target": {
+                    "file": "src/fetch-html.ts"
                   }
                 }
               ],
@@ -12799,14 +12989,14 @@
             {
               "calls": [
                 {
-                  "line": 837,
+                  "line": 871,
                   "name": "fetchCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
                   }
                 },
                 {
-                  "line": 839,
+                  "line": 873,
                   "name": "writeCatalog",
                   "target": {
                     "file": "src/fetch-mcp-registry.ts"
@@ -12821,7 +13011,7 @@
             {
               "calls": [
                 {
-                  "line": 856,
+                  "line": 890,
                   "name": "prepare",
                   "target": null
                 }
@@ -12834,7 +13024,7 @@
             {
               "calls": [
                 {
-                  "line": 879,
+                  "line": 913,
                   "name": "prepare",
                   "target": null
                 }
@@ -12847,7 +13037,7 @@
             {
               "calls": [
                 {
-                  "line": 896,
+                  "line": 930,
                   "name": "prepare",
                   "target": null
                 }
@@ -12952,36 +13142,42 @@
             {
               "in": "maybeConvertHtmlToMarkdown",
               "kind": "catch",
-              "line": 34
+              "line": 35
             },
             {
               "in": "ingestAll",
               "kind": "catch",
-              "line": 181
+              "line": 182
             },
             {
               "in": "ingestAll",
               "kind": "catch",
-              "line": 235
+              "line": 236
             },
             {
               "in": "ingestAll",
               "kind": "catch",
-              "line": 322
+              "line": 323
+            },
+            {
+              "in": "ingestAll",
+              "kind": "throw",
+              "line": 324
             },
             {
               "in": "ingestSynergies",
               "kind": "catch",
-              "line": 620
+              "line": 622
             },
             {
               "in": "ingestSynergies",
               "kind": "catch",
-              "line": 829
+              "line": 831
             }
           ],
-          "hash": "49e1aad03c6a4f6add25eed75f6386db17cac56250e9cf237d2d26136ab477dd",
+          "hash": "125702bc122a855ab0a2643b6b2e16624d6dc63a7a6ef6f593f4c0f107315e5d",
           "importsFiles": [
+            "src/errors.ts",
             "src/extract.ts",
             "src/products-config.ts"
           ],
@@ -12990,17 +13186,17 @@
             {
               "calls": [
                 {
-                  "line": 192,
+                  "line": 193,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 260,
+                  "line": 261,
                   "name": "transaction",
                   "target": null
                 },
                 {
-                  "line": 316,
+                  "line": 317,
                   "name": "extractEntities",
                   "target": {
                     "file": "src/extract.ts"
@@ -13015,17 +13211,17 @@
             {
               "calls": [
                 {
-                  "line": 349,
+                  "line": 351,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 363,
+                  "line": 365,
                   "name": "transaction",
                   "target": null
                 },
                 {
-                  "line": 380,
+                  "line": 382,
                   "name": "extractEntities",
                   "target": {
                     "file": "src/extract.ts"
@@ -13040,12 +13236,12 @@
             {
               "calls": [
                 {
-                  "line": 626,
+                  "line": 628,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 681,
+                  "line": 683,
                   "name": "transaction",
                   "target": null
                 }
@@ -13063,162 +13259,162 @@
           "failurePaths": [
             {
               "kind": "catch",
-              "line": 100
+              "line": 104
             },
             {
               "in": "getDbOrThrow",
               "kind": "throw",
-              "line": 109
+              "line": 113
             },
             {
               "in": "getHasChunks",
               "kind": "catch",
-              "line": 120
+              "line": 124
             },
             {
               "in": "asRecord",
               "kind": "throw",
-              "line": 330
+              "line": 334
             },
             {
               "in": "requireString",
               "kind": "throw",
-              "line": 338
+              "line": 342
             },
             {
               "in": "optString",
               "kind": "throw",
-              "line": 347
+              "line": 351
             },
             {
               "in": "optInt",
               "kind": "throw",
-              "line": 362
+              "line": 366
             },
             {
               "in": "optBool",
               "kind": "throw",
-              "line": 374
+              "line": 378
             },
             {
               "in": "optEnum",
               "kind": "throw",
-              "line": 388
+              "line": 392
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 497
+              "line": 503
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 532
+              "line": 538
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 551
+              "line": 557
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 603
+              "line": 609
             },
             {
               "kind": "catch",
-              "line": 628
+              "line": 641
             },
             {
               "kind": "throw",
-              "line": 629
+              "line": 642
             },
             {
               "kind": "throw",
-              "line": 630
+              "line": 649
             },
             {
               "in": "dbSynergiesEmpty",
               "kind": "catch",
-              "line": 784
+              "line": 803
             },
             {
               "in": "handleListSynergies",
               "kind": "catch",
-              "line": 813
+              "line": 832
             },
             {
               "in": "listSynergiesFromDisk",
               "kind": "catch",
-              "line": 841
+              "line": 860
             },
             {
               "in": "handleReadSynergy",
               "kind": "catch",
-              "line": 863
+              "line": 882
             },
             {
               "in": "handleReadSynergy",
               "kind": "catch",
-              "line": 879
+              "line": 898
             },
             {
               "in": "handleGetChangesSince",
               "kind": "catch",
-              "line": 915
+              "line": 934
             },
             {
               "in": "handleGetChangesSince",
               "kind": "throw",
-              "line": 916
+              "line": 935
             },
             {
               "in": "handleSearchBreakingChanges",
               "kind": "catch",
-              "line": 931
+              "line": 950
             },
             {
               "in": "handleSearchBreakingChanges",
               "kind": "throw",
-              "line": 932
+              "line": 951
             },
             {
               "in": "handleSyncNow",
               "kind": "throw",
-              "line": 1010
+              "line": 1029
             },
             {
               "in": "handleSyncNow",
               "kind": "throw",
-              "line": 1031
+              "line": 1050
             },
             {
               "in": "handleSyncNow",
               "kind": "catch",
-              "line": 1042
+              "line": 1061
             },
             {
               "in": "handleSyncNow",
               "kind": "catch",
-              "line": 1088
+              "line": 1119
             },
             {
               "in": "handleCompareVersions",
               "kind": "catch",
-              "line": 1124
+              "line": 1153
             },
             {
               "in": "handleCompareVersions",
               "kind": "throw",
-              "line": 1125
+              "line": 1154
             },
             {
               "in": "shutdownMcp",
               "kind": "catch",
-              "line": 1137
+              "line": 1166
             }
           ],
-          "hash": "cc2a1efe1655b4b0e10a2b941ade0e84d594e9fecdd59901808525c52dee829f",
+          "hash": "9a57c03a67f1d197b40609f08ffcb6c3207408bb5b6c1148849329d2737b41c8",
           "importOrder": [
             "src/db.ts",
             "src/errors.ts",
@@ -13244,7 +13440,7 @@
             {
               "calls": [
                 {
-                  "line": 118,
+                  "line": 122,
                   "name": "prepare",
                   "target": null
                 }
@@ -13257,14 +13453,14 @@
             {
               "calls": [
                 {
-                  "line": 422,
+                  "line": 426,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 423,
+                  "line": 427,
                   "name": "getPartialNote",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -13272,14 +13468,14 @@
                   }
                 },
                 {
-                  "line": 424,
+                  "line": 428,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 429,
+                  "line": 433,
                   "name": "formatManualFeedWarning",
                   "target": {
                     "file": "src/query.ts"
@@ -13294,21 +13490,21 @@
             {
               "calls": [
                 {
-                  "line": 436,
-                  "name": "hasAnyReleases",
+                  "line": 440,
+                  "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 437,
+                  "line": 441,
                   "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 440,
+                  "line": 444,
                   "name": "ensureSynced",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -13316,8 +13512,8 @@
                   }
                 },
                 {
-                  "branch": "res.performedByThisCall",
-                  "line": 448,
+                  "branch": "res.performedByThisCall && res.report",
+                  "line": 454,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
@@ -13333,20 +13529,20 @@
               "calls": [
                 {
                   "branch": "mode === 'fts'",
-                  "line": 640,
+                  "line": 659,
                   "name": "searchChanges",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 118,
+                  "line": 122,
                   "name": "prepare",
                   "target": null,
                   "via": "getHasChunks"
                 },
                 {
-                  "line": 668,
+                  "line": 687,
                   "name": "hybridSearch",
                   "target": {
                     "file": "src/hybrid.ts"
@@ -13361,7 +13557,7 @@
             {
               "calls": [
                 {
-                  "line": 704,
+                  "line": 723,
                   "name": "lookupEntity",
                   "target": {
                     "file": "src/query.ts"
@@ -13376,7 +13572,7 @@
             {
               "calls": [
                 {
-                  "line": 717,
+                  "line": 736,
                   "name": "recentReleases",
                   "target": {
                     "file": "src/query.ts"
@@ -13391,7 +13587,7 @@
             {
               "calls": [
                 {
-                  "line": 749,
+                  "line": 768,
                   "name": "listProducts",
                   "target": {
                     "file": "src/query.ts"
@@ -13406,7 +13602,7 @@
             {
               "calls": [
                 {
-                  "line": 763,
+                  "line": 782,
                   "name": "entityFrequency",
                   "target": {
                     "file": "src/query.ts"
@@ -13421,7 +13617,7 @@
             {
               "calls": [
                 {
-                  "line": 793,
+                  "line": 812,
                   "name": "listSynergies",
                   "target": {
                     "file": "src/query.ts"
@@ -13436,7 +13632,7 @@
             {
               "calls": [
                 {
-                  "line": 859,
+                  "line": 878,
                   "name": "getSynergy",
                   "target": {
                     "file": "src/query.ts"
@@ -13451,7 +13647,7 @@
             {
               "calls": [
                 {
-                  "line": 908,
+                  "line": 927,
                   "name": "getChangesSince",
                   "target": {
                     "file": "src/query.ts"
@@ -13466,7 +13662,7 @@
             {
               "calls": [
                 {
-                  "line": 924,
+                  "line": 943,
                   "name": "browseChanges",
                   "target": {
                     "file": "src/query.ts"
@@ -13482,7 +13678,7 @@
               "calls": [
                 {
                   "branch": "h < 48",
-                  "line": 956,
+                  "line": 975,
                   "name": "toFixed",
                   "target": null
                 }
@@ -13495,7 +13691,7 @@
             {
               "calls": [
                 {
-                  "line": 961,
+                  "line": 980,
                   "name": "getSyncStatus",
                   "target": {
                     "file": "src/query.ts"
@@ -13503,13 +13699,13 @@
                 },
                 {
                   "branch": "h < 48",
-                  "line": 956,
+                  "line": 975,
                   "name": "toFixed",
                   "target": null,
                   "via": "formatHours"
                 },
                 {
-                  "line": 989,
+                  "line": 1008,
                   "name": "formatManualFeedWarning",
                   "target": {
                     "file": "src/query.ts"
@@ -13524,7 +13720,7 @@
             {
               "calls": [
                 {
-                  "line": 1009,
+                  "line": 1028,
                   "name": "isSyncInProgress",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -13533,44 +13729,15 @@
                 },
                 {
                   "branch": "dryRun",
-                  "line": 1028,
+                  "line": 1047,
                   "name": "listFetchTargets",
                   "target": {
                     "file": "src/fetch.ts"
                   }
                 },
                 {
-                  "line": 1051,
-                  "name": "setManualSyncActive",
-                  "receiver": "FirstUseSyncCoordinator",
-                  "target": {
-                    "file": "src/store.ts"
-                  }
-                },
-                {
-                  "line": 1055,
-                  "name": "openDb",
-                  "target": {
-                    "file": "src/db.ts"
-                  }
-                },
-                {
-                  "line": 1057,
-                  "name": "initSchema",
-                  "target": {
-                    "file": "src/db.ts"
-                  }
-                },
-                {
-                  "line": 1060,
-                  "name": "fetchAll",
-                  "target": {
-                    "file": "src/fetch.ts"
-                  }
-                },
-                {
-                  "line": 1066,
-                  "name": "clearPartialNote",
+                  "line": 1070,
+                  "name": "runManualSync",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
                     "file": "src/store.ts"
@@ -13578,24 +13745,67 @@
                 },
                 {
                   "line": 1073,
+                  "name": "openDb",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 1075,
+                  "name": "initSchema",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 1078,
+                  "name": "fetchAll",
+                  "target": {
+                    "file": "src/fetch.ts"
+                  }
+                },
+                {
+                  "line": 1085,
+                  "name": "clearPartialSyncState",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 1086,
+                  "name": "clearPartialNote",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 1087,
+                  "name": "resetCooldown",
+                  "receiver": "FirstUseSyncCoordinator",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 1092,
+                  "name": "writePartialSyncState",
+                  "target": {
+                    "file": "src/store.ts"
+                  }
+                },
+                {
+                  "line": 1104,
                   "name": "ingestAll",
                   "target": {
                     "file": "src/ingest.ts"
                   }
                 },
                 {
-                  "line": 1083,
+                  "line": 1114,
                   "name": "embedAll",
                   "target": {
                     "file": "src/embed.ts"
-                  }
-                },
-                {
-                  "line": 1112,
-                  "name": "setManualSyncActive",
-                  "receiver": "FirstUseSyncCoordinator",
-                  "target": {
-                    "file": "src/store.ts"
                   }
                 }
               ],
@@ -13607,7 +13817,7 @@
             {
               "calls": [
                 {
-                  "line": 1119,
+                  "line": 1148,
                   "name": "compareVersions",
                   "target": {
                     "file": "src/query.ts"
@@ -14121,30 +14331,40 @@
             {
               "in": "getCorpusFreshness",
               "kind": "catch",
-              "line": 95
+              "line": 97
             },
             {
               "in": "getCorpusFreshness",
               "kind": "catch",
-              "line": 132
+              "line": 105
+            },
+            {
+              "in": "getCorpusFreshness",
+              "kind": "catch",
+              "line": 127
+            },
+            {
+              "in": "getCorpusFreshness",
+              "kind": "catch",
+              "line": 167
             },
             {
               "in": "getChangesSince",
               "kind": "throw",
-              "line": 560
+              "line": 596
             },
             {
               "in": "compareVersions",
               "kind": "throw",
-              "line": 645
+              "line": 681
             },
             {
               "in": "compareVersions",
               "kind": "throw",
-              "line": 672
+              "line": 708
             }
           ],
-          "hash": "a5f087c0926fef350dfdbbc36a69d8cf404b63f4f03a1c6871359f6f002a7a40",
+          "hash": "048101c54cb7b004fa25cff4efceb2af237af2cf061302fb591bffd43371934e",
           "importsFiles": [
             "src/errors.ts",
             "src/products-config.ts"
@@ -14154,17 +14374,17 @@
             {
               "calls": [
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCFullYear",
                   "target": null
                 },
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCMonth",
                   "target": null
                 },
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCDate",
                   "target": null
                 }
@@ -14177,35 +14397,35 @@
             {
               "calls": [
                 {
-                  "line": 90,
+                  "line": 93,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCFullYear",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCMonth",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCDate",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 120,
+                  "line": 153,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 138,
+                  "line": 173,
                   "name": "loadProductsConfig",
                   "target": {
                     "file": "src/products-config.ts"
@@ -14220,19 +14440,19 @@
             {
               "calls": [
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCFullYear",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCMonth",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 63,
+                  "line": 64,
                   "name": "getUTCDate",
                   "target": null,
                   "via": "utcDaysSince"
@@ -14246,7 +14466,7 @@
             {
               "calls": [
                 {
-                  "line": 316,
+                  "line": 352,
                   "name": "prepare",
                   "target": null
                 }
@@ -14259,7 +14479,7 @@
             {
               "calls": [
                 {
-                  "line": 334,
+                  "line": 370,
                   "name": "prepare",
                   "target": null
                 }
@@ -14272,7 +14492,7 @@
             {
               "calls": [
                 {
-                  "line": 363,
+                  "line": 399,
                   "name": "prepare",
                   "target": null
                 }
@@ -14285,7 +14505,7 @@
             {
               "calls": [
                 {
-                  "line": 379,
+                  "line": 415,
                   "name": "prepare",
                   "target": null
                 }
@@ -14298,7 +14518,7 @@
             {
               "calls": [
                 {
-                  "line": 431,
+                  "line": 467,
                   "name": "prepare",
                   "target": null
                 }
@@ -14311,7 +14531,7 @@
             {
               "calls": [
                 {
-                  "line": 463,
+                  "line": 499,
                   "name": "prepare",
                   "target": null
                 }
@@ -14324,7 +14544,7 @@
             {
               "calls": [
                 {
-                  "line": 522,
+                  "line": 558,
                   "name": "prepare",
                   "target": null
                 }
@@ -14337,7 +14557,7 @@
             {
               "calls": [
                 {
-                  "line": 591,
+                  "line": 627,
                   "name": "prepare",
                   "target": null
                 }
@@ -14350,7 +14570,7 @@
             {
               "calls": [
                 {
-                  "line": 655,
+                  "line": 691,
                   "name": "prepare",
                   "target": null
                 }
@@ -14363,7 +14583,7 @@
             {
               "calls": [
                 {
-                  "line": 780,
+                  "line": 816,
                   "name": "prepare",
                   "target": null
                 }
@@ -14376,7 +14596,7 @@
             {
               "calls": [
                 {
-                  "line": 813,
+                  "line": 849,
                   "name": "prepare",
                   "target": null
                 }
@@ -14392,30 +14612,65 @@
           "entry": "runFirstUseSync",
           "entryRule": 4,
           "exports": [
+            "clearPartialSyncState",
             "formatFirstUseNotice",
             "formatPartialNote",
             "hasAnyReleases",
             "isAutoSyncDisabled",
+            "needsAutoSync",
             "printStoreResolutionOnce",
+            "readPartialSyncState",
             "resetStoreNoticeForTests",
             "resolveStorePaths",
-            "runFirstUseSync"
+            "runFirstUseSync",
+            "writePartialSyncState"
           ],
           "failurePaths": [
             {
               "in": "hasAnyReleases",
               "kind": "catch",
-              "line": 130
+              "line": 147
+            },
+            {
+              "in": "clearPartialSyncState",
+              "kind": "catch",
+              "line": 206
+            },
+            {
+              "in": "readPartialSyncState",
+              "kind": "catch",
+              "line": 229
             },
             {
               "in": "runFirstUseSync",
               "kind": "catch",
-              "line": 183
+              "line": 270
+            },
+            {
+              "in": "runFirstUseSync",
+              "kind": "throw",
+              "line": 271
+            },
+            {
+              "in": "ensureSynced",
+              "kind": "catch",
+              "line": 425
+            },
+            {
+              "in": "ensureSynced",
+              "kind": "catch",
+              "line": 482
+            },
+            {
+              "in": "ensureSynced",
+              "kind": "throw",
+              "line": 484
             }
           ],
-          "hash": "31b95f0983f2ff46c36408b617e24ac5f42911e997cc59007205567433a66465",
+          "hash": "566c45696c4fbcda07df74a5df4de42657f0ba1145c7c236df9cab25b9e4ce63",
           "importsFiles": [
             "src/db.ts",
+            "src/errors.ts",
             "src/fetch.ts",
             "src/ingest.ts",
             "src/query.ts"
@@ -14425,7 +14680,7 @@
             {
               "calls": [
                 {
-                  "line": 128,
+                  "line": 145,
                   "name": "prepare",
                   "target": null
                 }
@@ -14438,32 +14693,102 @@
             {
               "calls": [
                 {
-                  "line": 171,
+                  "line": 184,
+                  "name": "exec",
+                  "target": null
+                },
+                {
+                  "line": 196,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "writePartialSyncState"
+            },
+            {
+              "calls": [
+                {
+                  "line": 205,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "clearPartialSyncState"
+            },
+            {
+              "calls": [
+                {
+                  "line": 215,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "readPartialSyncState"
+            },
+            {
+              "calls": [
+                {
+                  "line": 145,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "hasAnyReleases"
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "needsAutoSync"
+            },
+            {
+              "calls": [
+                {
+                  "line": 258,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 172,
+                  "line": 259,
                   "name": "initSchema",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 182,
+                  "line": 269,
                   "name": "fetchAll",
                   "target": {
                     "file": "src/fetch.ts"
                   }
                 },
                 {
-                  "line": 216,
+                  "line": 304,
                   "name": "ingestAll",
                   "target": {
                     "file": "src/ingest.ts"
                   }
+                },
+                {
+                  "line": 184,
+                  "name": "exec",
+                  "target": null,
+                  "via": "writePartialSyncState"
+                },
+                {
+                  "line": 196,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "writePartialSyncState"
                 }
               ],
               "exported": true,
@@ -14474,14 +14799,14 @@
             {
               "calls": [
                 {
-                  "line": 247,
+                  "line": 341,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 248,
+                  "line": 342,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -14507,7 +14832,7 @@
       "origin": "authored",
       "outsidePlaces": [
         {
-          "reads": 46,
+          "reads": 52,
           "where": [
             "caller"
           ],
@@ -14543,7 +14868,7 @@
           "writes": 0
         }
       ],
-      "outsideReads": 54,
+      "outsideReads": 60,
       "outsideWrites": 8,
       "role": "code",
       "testRunners": [
@@ -14670,6 +14995,10 @@
         {
           "hash": "cf6730b487309ab9a6334739a39446dedc4a629662a64c11c8e9d469bc447f68",
           "path": "test/fixtures/mock-responses/gh-api-releases.json"
+        },
+        {
+          "hash": "c41db56e5c2e9d95ad391504b72bff6cf850059dbbe25e115337dd2f2fc48a31",
+          "path": "test/fixtures/mock-responses/no-date-headings.html"
         },
         {
           "hash": "4b5e6ec4de907851b8e105b46f313efcb3e854fd31098e6448c771a818cbe5fb",
@@ -14837,7 +15166,7 @@
           "path": "test/helpers/yaml-fixtures.ts"
         },
         {
-          "hash": "9fec0324edd52d34499e719746b1598f5e6d29910adae7b9d34c9fbc82d345c7",
+          "hash": "ce03f583813a816e80fd1b33603b47bde559fe3c39357703c91d2411ad495869",
           "importOrder": [
             "test/helpers/temp-db.ts",
             "test/helpers/seed-corpus.ts"
@@ -14885,13 +15214,15 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "6226a19af3f8648a333ea6600e91a9b3492083ff217cb89437eb1c1a21b93f70",
+          "hash": "03b07ef55ea4f242b04ff65e441ed0736acdcdc39dd18bb0e5d6fb2c63ab1874",
           "importOrder": [
             "test/helpers/temp-db.ts",
+            "src/db.ts",
             "test/helpers/seed-corpus.ts",
             "test/helpers/mcp-client.ts"
           ],
           "importsFiles": [
+            "src/db.ts",
             "test/helpers/mcp-client.ts",
             "test/helpers/seed-corpus.ts",
             "test/helpers/temp-db.ts"
@@ -15040,7 +15371,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "988727b5ed4bb7651336b234005169039c01272d37dfe6ef186a71494af2327e",
+          "hash": "da7e26fac5cbae6e38675278901f9b5acf360990dbd3b44dd55d36953f5a95c4",
           "importOrder": [
             "src/extract.ts",
             "src/ingest.ts",
@@ -15074,14 +15405,16 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "2c8e3c25591bb810a24442c133719055ee3839ba4cee647761432b681a7f4216",
+          "hash": "a0cd32b69933fc0043547d8732c2fc84376cbf7152d7ac95c0c1ec6355118040",
           "importOrder": [
             "src/fetch-html.ts",
+            "src/errors.ts",
             "src/ingest.ts",
             "test/helpers/temp-db.ts",
             "test/helpers/fetch-mock.ts"
           ],
           "importsFiles": [
+            "src/errors.ts",
             "src/fetch-html.ts",
             "src/ingest.ts",
             "test/helpers/fetch-mock.ts",
@@ -15130,16 +15463,18 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "f61911948b0fa3925f9256d5b430aba75ce074b1de386e4800bec5b248244834",
+          "hash": "21b176527ec6ae360af8e745fc394a5a215ebdc6870ea8bccf5a337874772939",
           "importOrder": [
             "src/fetch.ts",
             "src/ingest.ts",
             "test/helpers/temp-db.ts",
-            "test/helpers/seed-corpus.ts"
+            "test/helpers/seed-corpus.ts",
+            "test/helpers/fetch-mock.ts"
           ],
           "importsFiles": [
             "src/fetch.ts",
             "src/ingest.ts",
+            "test/helpers/fetch-mock.ts",
             "test/helpers/seed-corpus.ts",
             "test/helpers/temp-db.ts"
           ],
@@ -15346,14 +15681,16 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "0dcb97b4befa8941e69b6155f99b8881115f30e3dc9db24b2636291108539cc7",
+          "hash": "7db508323d4aada9571d70c8fea4b8b3121ac79d24de84995481362352f38251",
           "importOrder": [
             "src/query.ts",
+            "src/store.ts",
             "test/helpers/temp-db.ts",
             "test/helpers/seed-corpus.ts"
           ],
           "importsFiles": [
             "src/query.ts",
+            "src/store.ts",
             "test/helpers/seed-corpus.ts",
             "test/helpers/temp-db.ts"
           ],
@@ -15436,7 +15773,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "54a3b5029ee895d962a5e11b11f25e5621df191358446a25b2982965617fd451",
+          "hash": "25bb2513f281244728d0b3587fe6152b8044404adeabdaeeae79351594066e0b",
           "importsFiles": [
             "scripts/check-stale-sync-pr.mjs"
           ],
@@ -15447,9 +15784,10 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "970cda34f5c7f494cbc02a5339794c8c08cb8806800a531c00be6f19d3060c28",
+          "hash": "4ae41a7987e71cb59ad787932ad607ffe0e672a87aa8072a7601405a5fb7c65e",
           "importOrder": [
             "src/store.ts",
+            "src/query.ts",
             "test/helpers/temp-db.ts",
             "src/db.ts",
             "src/fetch.ts"
@@ -15457,6 +15795,7 @@
           "importsFiles": [
             "src/db.ts",
             "src/fetch.ts",
+            "src/query.ts",
             "src/store.ts",
             "test/helpers/temp-db.ts"
           ],
@@ -16473,8 +16812,8 @@
   ],
   "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "ea2170cfe8ab0c0e20c467a016a8914391b4ca5c",
-    "tracked": 2913
+    "commit": "315ce7de3fec7cb56d78f7889d5c2a0704c12cd5",
+    "tracked": 2914
   },
   "landings": [
     {
@@ -16705,6 +17044,11 @@
     },
     {
       "readers": [
+        {
+          "by": "src/extract.ts",
+          "call": "get",
+          "confidence": "ast"
+        },
         {
           "by": "src/extract.ts",
           "call": "readFileSync",
@@ -16996,6 +17340,18 @@
     {
       "readers": [
         {
+          "by": "test/unit/fetch-html.test.ts",
+          "call": "readFileSync",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "test/fixtures/mock-responses/no-date-headings.html",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
           "by": "test/helpers/seed-corpus.ts",
           "call": "literal",
           "confidence": "ast",
@@ -17009,7 +17365,7 @@
   "overlaps": [],
   "submodules": [],
   "symlinks": [],
-  "testFiles": 84,
+  "testFiles": 85,
   "testsLeftOut": [
     {
       "config": "vitest.config.ts",

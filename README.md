@@ -400,9 +400,9 @@ Each provider produces vectors of a fixed dimension (Ollama 768, Voyage 1024, Op
 
 ```bash
 rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
-hk init
-hk ingest
-hk embed --embed openai     # new provider, new dim, fresh chunks_vec
+hk init --db data/claude-synergy.db
+hk ingest --db data/claude-synergy.db
+hk embed --db data/claude-synergy.db --embed openai     # new provider, new dim, fresh chunks_vec
 ```
 
 For OpenAI Matryoshka truncation (smaller-than-native dim), set `OPENAI_EMBED_MODEL` and pass the desired dim through `hk embed`'s provider construction — see the [handbook embedding section](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/cli-reference/#embedding-providers-and-dimensions) for details.
@@ -413,9 +413,9 @@ If the DB was created with an older schema version and migration fails, or if da
 
 ```bash
 rm data/claude-synergy.db data/claude-synergy.db-wal data/claude-synergy.db-shm
-hk init
-hk ingest
-hk embed --context structured --embedding ollama   # optional, for vector search
+hk init --db data/claude-synergy.db
+hk ingest --db data/claude-synergy.db
+hk embed --db data/claude-synergy.db --context structured --embedding ollama   # optional, for vector search
 ```
 
 This is safe — the DB is a derived cache. All source data lives in `products/*/releases/*.md` files.

@@ -20,6 +20,12 @@ import { formatFreshnessStamp, getCorpusFreshness, type ClockInput } from './que
 /** Default timeout for automatic first-use sync (ms). Overridable via timeout_ms. */
 export const FIRST_USE_SYNC_TIMEOUT_MS = 120_000;
 
+/** Cooldown after a failed or empty first-use sync attempt (10 minutes). */
+export const FIRST_USE_COOLDOWN_MS = 10 * 60 * 1000;
+
+/** Metadata key in `schema_meta` storing persisted partial first-use sync state. */
+export const FIRST_USE_PARTIAL_META_KEY = 'first_use_partial';
+
 export type StoreResolutionRule =
   | 'env:CLAUDE_SYNERGY_DB'
   | 'explicit-arg'
@@ -40,11 +46,22 @@ export interface ResolveStoreOptions {
   homeDir?: string;
 }
 
-function resolveUserHome(env: NodeJS.ProcessEnv, explicitHome?: string): string {
+import { AppError } from './errors.js';
+
+function resolveUserHome(explicitHome?: string): string {
   if (explicitHome && explicitHome.trim().length > 0) return resolve(explicitHome.trim());
-  const envHome = env.HOME?.trim() || env.USERPROFILE?.trim();
-  if (envHome) return resolve(envHome);
   return homedir();
+}
+
+function resolveNowMs(now?: ClockInput): number {
+  if (typeof now === 'function') return now().getTime();
+  if (now instanceof Date) return now.getTime();
+  const envNow = process.env.CLAUDE_SYNERGY_NOW?.trim();
+  if (envNow) {
+    const parsed = Date.parse(envNow);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+  return Date.now();
 }
 
 /**
@@ -54,7 +71,7 @@ function resolveUserHome(env: NodeJS.ProcessEnv, explicitHome?: string): string 
 export function resolveStorePaths(opts: ResolveStoreOptions = {}): ResolvedStore {
   const cwd = opts.cwd ? resolve(opts.cwd) : process.cwd();
   const env = opts.env ?? process.env;
-  const home = resolveUserHome(env, opts.homeDir);
+  const home = resolveUserHome(opts.homeDir);
 
   const envDb = env.CLAUDE_SYNERGY_DB?.trim();
   const argDb = opts.explicitDb?.trim();
@@ -149,6 +166,76 @@ export interface FirstUseSyncReport {
   ingestedEntities: number;
 }
 
+export interface PartialSyncState {
+  succeeded: number;
+  total: number;
+  skipped: SkippedProductInfo[];
+  recorded_at?: string;
+}
+
+/**
+ * Persist partial first-use sync details in `schema_meta` so subsequent runs
+ * report the incomplete state and retry skipped products once cooldown expires.
+ */
+export function writePartialSyncState(
+  db: Database.Database,
+  state: PartialSyncState
+): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS schema_meta (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+  const payload: PartialSyncState = {
+    succeeded: state.succeeded,
+    total: state.total,
+    skipped: state.skipped,
+    recorded_at: state.recorded_at ?? new Date().toISOString(),
+  };
+  db.prepare(`
+    INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)
+  `).run(FIRST_USE_PARTIAL_META_KEY, JSON.stringify(payload));
+}
+
+/** Remove the persisted partial first-use marker after a full clean sync. */
+export function clearPartialSyncState(db: Database.Database | null): void {
+  if (!db) return;
+  try {
+    db.prepare(`DELETE FROM schema_meta WHERE key = ?`).run(FIRST_USE_PARTIAL_META_KEY);
+  } catch {
+    // schema_meta absent -> nothing to clear
+  }
+}
+
+/** Read any persisted partial first-use marker from `schema_meta`. */
+export function readPartialSyncState(db: Database.Database | null): PartialSyncState | null {
+  if (!db) return null;
+  try {
+    const row = db
+      .prepare(`SELECT value FROM schema_meta WHERE key = ?`)
+      .get(FIRST_USE_PARTIAL_META_KEY) as { value: string } | undefined;
+    if (!row?.value) return null;
+    const parsed = JSON.parse(row.value) as Partial<PartialSyncState>;
+    if (typeof parsed.succeeded === 'number' && typeof parsed.total === 'number') {
+      return {
+        succeeded: parsed.succeeded,
+        total: parsed.total,
+        skipped: Array.isArray(parsed.skipped) ? parsed.skipped : [],
+        recorded_at: typeof parsed.recorded_at === 'string' ? parsed.recorded_at : undefined,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** True when the DB is missing/empty OR still carries an unresolved partial marker. */
+export function needsAutoSync(db: Database.Database | null): boolean {
+  return !hasAnyReleases(db) || readPartialSyncState(db) !== null;
+}
+
 export interface FirstUseSyncOptions {
   dbPath: string;
   productsRoot: string;
@@ -162,8 +249,8 @@ export interface FirstUseSyncOptions {
 /**
  * Initialize schema (if needed) and run fetch -> ingest (NO embed) bounded by
  * `timeoutMs` (defaults to FIRST_USE_SYNC_TIMEOUT_MS). Any product whose fetcher
- * fails or is skipped due to timeout is recorded in `skipped` rather than
- * aborting the entire first-use initialization.
+ * fails or is skipped due to timeout is recorded in `skipped` and persisted in
+ * `schema_meta.first_use_partial`. Propagates configuration `AppError`s.
  */
 export async function runFirstUseSync(
   opts: FirstUseSyncOptions
@@ -181,6 +268,7 @@ export async function runFirstUseSync(
   try {
     fetchResults = await runFetch(db, opts.productsRoot, { timeoutMs });
   } catch (e: any) {
+    if (e instanceof AppError) throw e;
     skipped.push({
       product: 'fetch',
       reason: e?.message ?? String(e),
@@ -217,6 +305,12 @@ export async function runFirstUseSync(
   }
 
   const partial = skipped.length > 0 || (total > 0 && succeeded < total);
+  if (partial) {
+    writePartialSyncState(db, { succeeded, total, skipped });
+  } else if (total > 0) {
+    clearPartialSyncState(db);
+  }
+
   const report: FirstUseSyncReport = {
     dbPath: opts.dbPath,
     productsRoot: opts.productsRoot,
@@ -254,15 +348,28 @@ export function formatFirstUseNotice(
   return `first use: synced ${report.succeeded} of ${report.total} products into ${report.dbPath}; ${stamp}`;
 }
 
+export interface EnsureSyncedResult {
+  db: Database.Database | null;
+  report: FirstUseSyncReport | null;
+  performedByThisCall: boolean;
+  cooledDown: boolean;
+  waitedForManualSync: boolean;
+}
+
 /**
- * Coordinates first-use sync and manual `sync_now` calls in-process so
- * concurrent first calls run only one sync and `sync_now` never races on WAL.
+ * Coordinates first-use sync and manual `sync_now` calls in-process so:
+ * - concurrent first calls run only one sync;
+ * - first-use calls wait on an active manual `sync_now` instead of racing `fetchAll`;
+ * - failed/empty/partial first-use attempts cool down for FIRST_USE_COOLDOWN_MS (10m).
  */
 export class FirstUseSyncCoordinator {
   private inFlightFirstUse: Promise<{ db: Database.Database; report: FirstUseSyncReport }> | null = null;
   private firstUseStarting = false;
   private manualSyncActive = false;
+  private manualSyncPromise: Promise<unknown> | null = null;
+  private manualSyncResolver: (() => void) | null = null;
   private lastPartialNote: string | null = null;
+  private cooldownUntilMs: number | null = null;
 
   isSyncInProgress(): boolean {
     return this.firstUseStarting || this.inFlightFirstUse !== null || this.manualSyncActive;
@@ -276,24 +383,89 @@ export class FirstUseSyncCoordinator {
     this.lastPartialNote = null;
   }
 
-  setManualSyncActive(active: boolean): void {
-    this.manualSyncActive = active;
+  isCoolingDown(now?: ClockInput): boolean {
+    if (this.cooldownUntilMs === null) return false;
+    return resolveNowMs(now) < this.cooldownUntilMs;
   }
 
-  async ensureSynced(
-    opts: FirstUseSyncOptions
-  ): Promise<{ db: Database.Database; report: FirstUseSyncReport; performedByThisCall: boolean }> {
+  resetCooldown(): void {
+    this.cooldownUntilMs = null;
+  }
+
+  setManualSyncActive(active: boolean): void {
+    if (active) {
+      this.manualSyncActive = true;
+      if (!this.manualSyncPromise) {
+        this.manualSyncPromise = new Promise<void>((resolvePromise) => {
+          this.manualSyncResolver = resolvePromise;
+        });
+      }
+    } else {
+      this.manualSyncActive = false;
+      const done = this.manualSyncResolver;
+      this.manualSyncResolver = null;
+      this.manualSyncPromise = null;
+      done?.();
+    }
+  }
+
+  async runManualSync<T>(fn: () => Promise<T>): Promise<T> {
+    this.setManualSyncActive(true);
+    try {
+      return await fn();
+    } finally {
+      this.setManualSyncActive(false);
+    }
+  }
+
+  async ensureSynced(opts: FirstUseSyncOptions): Promise<EnsureSyncedResult> {
+    if (this.manualSyncPromise) {
+      try {
+        await this.manualSyncPromise;
+      } catch {
+        // Ignore manual sync errors here; caller checks DB state below.
+      }
+      const reopened = opts.db ?? (existsSync(opts.dbPath) ? openDb(opts.dbPath) : null);
+      return {
+        db: reopened,
+        report: null,
+        performedByThisCall: false,
+        cooledDown: false,
+        waitedForManualSync: true,
+      };
+    }
+
     if (this.inFlightFirstUse) {
       const result = await this.inFlightFirstUse;
-      return { ...result, performedByThisCall: false };
+      return {
+        ...result,
+        performedByThisCall: false,
+        cooledDown: false,
+        waitedForManualSync: false,
+      };
+    }
+
+    if (this.isCoolingDown(opts.now)) {
+      return {
+        db: opts.db ?? null,
+        report: null,
+        performedByThisCall: false,
+        cooledDown: true,
+        waitedForManualSync: false,
+      };
     }
 
     this.firstUseStarting = true;
     const run = runFirstUseSync(opts).then((res) => {
       if (res.report.partial) {
         this.lastPartialNote = formatPartialNote(res.report);
+        this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
+      } else if (!hasAnyReleases(res.db)) {
+        this.lastPartialNote = null;
+        this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
       } else {
         this.lastPartialNote = null;
+        this.cooldownUntilMs = null;
       }
       return res;
     });
@@ -301,7 +473,15 @@ export class FirstUseSyncCoordinator {
     this.inFlightFirstUse = run;
     try {
       const result = await run;
-      return { ...result, performedByThisCall: true };
+      return {
+        ...result,
+        performedByThisCall: true,
+        cooledDown: false,
+        waitedForManualSync: false,
+      };
+    } catch (e) {
+      this.cooldownUntilMs = resolveNowMs(opts.now) + FIRST_USE_COOLDOWN_MS;
+      throw e;
     } finally {
       this.firstUseStarting = false;
       this.inFlightFirstUse = null;

@@ -8,16 +8,15 @@
 //   - playwright:    headless Chromium for client-rendered pages (Windsurf)
 //   - catalog:       MCP registry snapshots (Official + Smithery)
 
-import { execFileSync } from 'node:child_process';
 import { writeFileSync, mkdirSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import type Database from 'better-sqlite3';
 import { fetchRssReleases } from './fetch-rss.js';
 import { fetchAiderHistory, fetchKeepAChangelog, type ChangelogParserName, type ChangelogItem } from './fetch-changelog.js';
-import { fetchHtmlReleases, type HtmlParserName, type HtmlItem } from './fetch-html.js';
+import { fetchHtmlReleases, sanitizeScrapedHtml, type HtmlParserName, type HtmlItem } from './fetch-html.js';
 import { fetchCatalog, writeCatalog, type CatalogType } from './fetch-mcp-registry.js';
 import { loadProductsConfig } from './products-config.js';
-import { createFetchAllController, DEFAULT_FETCH_ALL_TIMEOUT_MS } from './fetch-utils.js';
+import { createFetchAllController, DEFAULT_FETCH_ALL_TIMEOUT_MS, runGhApi } from './fetch-utils.js';
 
 // ─── Security helpers ──────────────────────────────────────────────────────
 //
@@ -208,6 +207,7 @@ export async function fetchAll(
   // H-2: Global timeout for the entire fetchAll run. Propagates AbortSignal to all
   // individual fetches so they bail if the parent is cancelled (timeout or SIGINT).
   const globalTimeoutMs = opts.timeoutMs ?? DEFAULT_FETCH_ALL_TIMEOUT_MS;
+  const deadlineMs = Date.now() + globalTimeoutMs;
   const { controller, signal } = createFetchAllController(globalTimeoutMs);
 
   const results: FetchStats[] = [];
@@ -215,7 +215,7 @@ export async function fetchAll(
     for (let i = 0; i < targets.length; i++) {
       const target = targets[i];
 
-      if (signal.aborted) {
+      if (signal.aborted || Date.now() >= deadlineMs) {
         onProgress?.({ type: 'skip', product: target.product, index: i, total, error: 'global timeout exceeded' });
         results.push({
           product: target.product,
@@ -229,7 +229,7 @@ export async function fetchAll(
 
       onProgress?.({ type: 'start', product: target.product, index: i, total });
 
-      const stats = await fetchOne(db, productsRoot, target, opts.sinceOverride, signal);
+      const stats = await fetchOne(db, productsRoot, target, opts.sinceOverride, signal, deadlineMs);
       results.push(stats);
 
       if (stats.errors.length > 0) {
@@ -329,7 +329,8 @@ async function fetchOne(
   productsRoot: string,
   target: FetchTarget,
   sinceOverride?: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  deadlineMs?: number
 ): Promise<FetchStats> {
   // F-004: validate product name shape before joining into a path. Defense-in-depth
   // against a malformed products.yaml entry or hardcoded fallback typo.
@@ -350,13 +351,13 @@ async function fetchOne(
   try {
     switch (target.strategy) {
       case 'gh-releases':
-        stats = await fetchGhReleases(db, outDir, target, since, floorSince);
+        stats = await fetchGhReleases(db, outDir, target, since, floorSince, signal, deadlineMs);
         break;
       case 'rss':
         stats = await fetchRss(db, outDir, target, since, signal);
         break;
       case 'raw-changelog':
-        stats = await fetchRawChangelog(db, outDir, target, since, signal);
+        stats = await fetchRawChangelog(db, outDir, target, since, signal, deadlineMs);
         break;
       case 'html-scrape':
         stats = await fetchHtmlScrape(db, outDir, target, since, signal);
@@ -420,11 +421,19 @@ async function fetchGhReleases(
   outDir: string,
   target: FetchTarget,
   since: string,
-  floorSince: string = since
+  floorSince: string = since,
+  signal?: AbortSignal,
+  deadlineMs?: number
 ): Promise<FetchStats> {
   if (!target.repo) throw new Error(`${target.product}: gh-releases strategy requires repo`);
 
-  const releases = ghReleases(target.repo, since, floorSince, (tag) => resolveGhReleasePaths(outDir, target, tag).exists);
+  const releases = await ghReleases(
+    target.repo,
+    since,
+    floorSince,
+    (tag) => resolveGhReleasePaths(outDir, target, tag).exists,
+    { signal, deadlineMs }
+  );
   let latest: string | null = null;
   let fetched = 0;
   const errors: string[] = [];
@@ -448,14 +457,15 @@ async function fetchGhReleases(
   return { product: target.product, fetched, newSince: since, latest, errors };
 }
 
-function ghReleases(
+async function ghReleases(
   repo: string,
   sinceIso: string,
   floorSince: string = sinceIso,
-  isSavedOnDisk: (tag: string) => boolean = () => false
-): GhRelease[] {
+  isSavedOnDisk: (tag: string) => boolean = () => false,
+  opts: { signal?: AbortSignal; deadlineMs?: number } = {}
+): Promise<GhRelease[]> {
   // F-001: validate repo shape before passing to a subprocess. Belt-and-suspenders:
-  // assertRepoShape() guards against command injection even though execFileSync's
+  // assertRepoShape() guards against command injection even though execFile's
   // argv path already prevents shell parsing of `repo`.
   assertRepoShape(repo);
 
@@ -463,18 +473,15 @@ function ghReleases(
   // (continue-dev, anthropic-sdk-typescript with multi-package tagging, etc.) need
   // multiple pages. Hard ceiling at 50 pages = 5,000 releases as a sanity cap.
   //
-  // FE-3: short-circuit pagination once we see a full page whose LAST release is
-  // older than sinceIso (and saved on disk when interior gap filling is active).
+  // FE-3 + Item 6: short-circuit pagination only when the current page had NO missing
+  // in-window releases and the last release is older than `floorSince` (or older than
+  // `sinceIso` and already saved on disk).
   const all: GhRelease[] = [];
   const MAX_PAGES = 50;
   for (let page = 1; page <= MAX_PAGES; page++) {
     let out: string;
     try {
-      out = execFileSync(
-        'gh',
-        ['api', `repos/${repo}/releases?per_page=100&page=${page}`],
-        { encoding: 'utf-8', maxBuffer: 50 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] }
-      );
+      out = await runGhApi(['api', `repos/${repo}/releases?per_page=100&page=${page}`], opts);
     } catch (e: any) {
       // 404 (repo missing/private) or rate limit — surface as empty result, not crash.
       // First-page 404 = repo unreachable; later-page 404 should not normally happen,
@@ -502,14 +509,16 @@ function ghReleases(
     if (!Array.isArray(batch) || batch.length === 0) break;
     all.push(...batch);
 
-    // FE-3 early exit — stop when the LAST release on this full page is at/before
-    // `floorSince`, or at/before `sinceIso` and already present on disk.
     if (batch.length === 100) {
       const last = batch[batch.length - 1];
-      if (
-        last?.published_at &&
-        (last.published_at <= floorSince || (last.published_at <= sinceIso && isSavedOnDisk(last.tag_name)))
-      ) {
+      const pageHadMissingInWindow = batch.some(
+        (r) => Boolean(r.published_at) && r.published_at > floorSince && !isSavedOnDisk(r.tag_name)
+      );
+      const stopPastFloor = Boolean(last?.published_at && last.published_at <= floorSince);
+      const stopSavedWindow =
+        !pageHadMissingInWindow &&
+        Boolean(last?.published_at && last.published_at <= sinceIso && isSavedOnDisk(last.tag_name));
+      if (stopPastFloor || stopSavedWindow) {
         break;
       }
     }
@@ -633,7 +642,7 @@ async function fetchRss(
         '',
         `# ${target.product} — ${item.title ?? safeSlug}`,
         '',
-        item.body ?? '(no body)',
+        item.body ? sanitizeScrapedHtml(item.body) : '(no body)',
         '',
       ].join('\n');
       writeFileSync(path, body, 'utf-8');
@@ -655,7 +664,8 @@ async function fetchRawChangelog(
   outDir: string,
   target: FetchTarget,
   since: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  deadlineMs?: number
 ): Promise<FetchStats> {
   if (!target.rawChangelogUrl) throw new Error(`${target.product}: raw-changelog requires url`);
 
@@ -665,7 +675,7 @@ async function fetchRawChangelog(
   let items: ChangelogItem[];
   switch (target.rawChangelogParser) {
     case 'aider-history':
-      items = await fetchAiderHistory(target.rawChangelogUrl, since, signal);
+      items = await fetchAiderHistory(target.rawChangelogUrl, since, signal, deadlineMs);
       break;
     case 'keep-a-changelog':
       items = await fetchKeepAChangelog(target.rawChangelogUrl, since, signal);
@@ -719,6 +729,23 @@ async function fetchRawChangelog(
 
 // ─── Strategy: html-scrape ──────────────────────────────────────────────────
 
+function collectDiskDates(outDir: string): Set<string> {
+  const dates = new Set<string>();
+  if (!existsSync(outDir)) return dates;
+  for (const entry of readdirSync(outDir)) {
+    if (!entry.endsWith('.md')) continue;
+    const prefix = entry.match(/^(\d{4}-\d{2}-\d{2})(?:-.+)?\.md$/);
+    if (prefix) dates.add(prefix[1]);
+    const raw = readFileSync(join(outDir, entry), 'utf-8');
+    const fm = raw.match(FRONTMATTER_BLOCK_RE);
+    if (fm) {
+      const m = fm[1].match(DISK_RELEASE_DATE_RE);
+      if (m) dates.add(m[1].slice(0, 10));
+    }
+  }
+  return dates;
+}
+
 async function fetchHtmlScrape(
   db: Database.Database,
   outDir: string,
@@ -729,6 +756,10 @@ async function fetchHtmlScrape(
   if (!target.htmlParser) throw new Error(`${target.product}: html-scrape requires htmlParser`);
 
   const items = await fetchHtmlReleases(target.htmlParser, since, signal);
+  const matchByDate =
+    target.htmlParser === 'anthropic-apps-release-notes' ||
+    target.htmlParser === 'claude-api-release-notes';
+  const existingDates = matchByDate ? collectDiskDates(outDir) : null;
   let latest: string | null = null;
   let fetched = 0;
   const errors: string[] = [];
@@ -739,15 +770,17 @@ async function fetchHtmlScrape(
       const safeSlug = sanitizeFilename(item.slug);
       assertSafeFilename(safeSlug, `html-scrape slug for ${JSON.stringify(item.slug)}`);
       const path = join(outDir, `${safeSlug}.md`);
-      if (existsSync(path)) {
+      const pubDay = item.pubDate.split('T')[0];
+      if (existsSync(path) || (existingDates && existingDates.has(pubDay))) {
         if (!latest || item.pubDate > latest) latest = item.pubDate;
         continue;
       }
+      const cleanBody = item.body ? sanitizeScrapedHtml(item.body) : '(no body)';
       const body = [
         '---',
         `product: ${target.product}`,
         `version: "${yamlQuote(safeSlug)}"`,
-        `released_at: "${item.pubDate.split('T')[0]}"`,
+        `released_at: "${pubDay}"`,
         `source_url: "${yamlQuote(item.link)}"`,
         `fetched_at: "${new Date().toISOString().split('T')[0]}"`,
         `title: "${yamlQuote(item.title ?? '')}"`,
@@ -755,7 +788,7 @@ async function fetchHtmlScrape(
         '',
         `# ${target.product} — ${item.title ?? safeSlug}`,
         '',
-        item.body ?? '(no body)',
+        cleanBody,
         '',
       ].join('\n');
       writeFileSync(path, body, 'utf-8');
@@ -796,6 +829,7 @@ async function fetchPlaywrightStrategy(
         if (!latest || item.pubDate > latest) latest = item.pubDate;
         continue;
       }
+      const cleanBody = item.body ? sanitizeScrapedHtml(item.body) : '(no body)';
       const body = [
         '---',
         `product: ${target.product}`,
@@ -808,7 +842,7 @@ async function fetchPlaywrightStrategy(
         '',
         `# ${target.product} — ${item.title ?? safeSlug}`,
         '',
-        item.body ?? '(no body)',
+        cleanBody,
         '',
       ].join('\n');
       writeFileSync(path, body, 'utf-8');

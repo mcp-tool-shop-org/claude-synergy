@@ -16,8 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **HTML scrapers for `claude-api` and `anthropic-apps`:** Added `fetchClaudeApiReleaseNotes` and `fetchAnthropicAppsReleaseNotes` in `src/fetch-html.ts` for the two server-rendered Anthropic release-notes pages.
 
 ### Changed
+- **`hk fetch --json` stdout shape:** `hk fetch --json` now emits only the JSON object on stdout (`{ stats, summary, data_as_of }`) without preceding per-product text lines.
 - **`claude-api` and `anthropic-apps` fetch strategy:** Switched from `manual` to `html-scrape` in `products.yaml` (`claude-api-release-notes` and `anthropic-apps-release-notes`).
 - **MCP server startup:** `claude-synergy-mcp` no longer exits when the DB file is missing; it resolves the store path and syncs lazily on the first tool call (unless `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` is set).
+- **CLI `--no-stamp` & marker-based `synced_at`:** Added `--no-stamp` (used by `.github/workflows/sync.yml` when refreshing `PRODUCTS.txt` and `LATEST.txt`), moved `synced_at` to `markers.updated_at`, restricted user-home store fallback to `os.homedir()`, added lazy memoized `model-families.yaml` compilation with clean `MODEL_FAMILIES_CONFIG_ERROR` formatting, and bounded `gh api` subprocesses with per-call + remaining-budget async timeouts.
 
 ### Fixed
 - **Disk-bounded incremental fetch window (`src/fetch.ts`):** File-backed fetch strategies clamp `since` so it never moves past the newest release file on disk (and `gh-releases` checks missing intermediate files against `oldest` on disk), preventing cached DB markers from skipping releases when a rolling sync PR has not yet merged.

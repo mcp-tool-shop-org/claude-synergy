@@ -4,6 +4,7 @@ import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
+import { openDb } from '../../src/db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
 import { withMcpServer, type McpClient } from '../helpers/mcp-client.js';
 
@@ -537,6 +538,13 @@ describe('MCP server integration', () => {
     it(
       'every registered tool in listTools() ends its text answer with the data-as-of stamp',
       async () => {
+        const db = openDb(temp.path, { loadVec: false });
+        db.prepare(
+          `INSERT INTO markers (product, name, version, updated_at)
+           VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+        ).run();
+        db.close();
+
         await withMcpServer(
           {
             dbPath: temp.path,
@@ -591,6 +599,13 @@ describe('MCP server integration', () => {
     it(
       'prefixes stamp with STALE: and refresh hint when synced_at exceeds STALE_AFTER_DAYS',
       async () => {
+        const db = openDb(temp.path, { loadVec: false });
+        db.prepare(
+          `INSERT OR REPLACE INTO markers (product, name, version, updated_at)
+           VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+        ).run();
+        db.close();
+
         await withMcpServer(
           {
             dbPath: temp.path,
@@ -714,6 +729,101 @@ describe('MCP server integration', () => {
         } finally {
           httpServer.closeAllConnections?.();
           await new Promise<void>((resolveClose) => httpServer.close(() => resolveClose()));
+          rmSync(workDir, { recursive: true, force: true });
+        }
+      },
+      35_000
+    );
+
+    it(
+      'Item 4 & Item 8: sync_now + search share lock (1 fetchAll) and broken model-families formats cleanly without raw stack',
+      async () => {
+        const workDir = mkdtempSync(join(tmpdir(), 'mcp-race-mf-'));
+        let hitCount = 0;
+        const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Lock Feed</title>
+<item><title>LockRelease 2.0.0</title><link>http://127.0.0.1/2.0.0</link><guid>lock-2-0-0</guid><pubDate>Wed, 25 Nov 2026 12:00:00 GMT</pubDate><description><![CDATA[- Added shared lock coordination feature]]></description></item>
+</channel></rss>`;
+        const srv = createServer((_req, res) => {
+          hitCount++;
+          setTimeout(() => {
+            res.writeHead(200, { 'content-type': 'application/rss+xml' });
+            res.end(rssXml);
+          }, 150);
+        });
+        await new Promise<void>((r) => srv.listen(0, '127.0.0.1', r));
+        const port = (srv.address() as { port: number }).port;
+        const customYaml = join(workDir, 'products.yaml');
+        writeFileSync(
+          customYaml,
+          `products:\n  - name: lock-prod\n    display_name: Lock Prod\n    tier: 3\n    source_url: http://127.0.0.1:${port}/feed.rss\n    fetch_strategy: rss\n    fetch:\n      type: rss\n      url: http://127.0.0.1:${port}/feed.rss\n`,
+          'utf-8'
+        );
+
+        const raceDb = join(workDir, 'store', 'data', 'claude-synergy.db');
+        const raceProducts = join(workDir, 'store', 'products');
+        const badMf = join(workDir, 'bad-mf.yaml');
+        writeFileSync(badMf, 'families: [broken\n  invalid: :\n', 'utf-8');
+
+        try {
+          // Item 4: start sync_now on empty DB, then immediately call search -> only 1 fetchAll runs.
+          await withMcpServer(
+            {
+              dbPath: raceDb,
+              synergiesDir,
+              requestTimeoutMs: 25_000,
+              env: {
+                CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+                CLAUDE_SYNERGY_PRODUCTS_ROOT: raceProducts,
+                HOME: workDir,
+                USERPROFILE: workDir,
+              },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+              const syncPromise = client.callTool('sync_now', { include_embed: false });
+              await new Promise((r) => setTimeout(r, 40));
+              const searchPromise = client.callTool('search', { query: 'coordination', mode: 'fts' });
+              const [syncRes, searchRes] = await Promise.all([syncPromise, searchPromise]);
+              expect(syncRes.isError).not.toBe(true);
+              expect(searchRes.isError).not.toBe(true);
+              expect(searchRes.content[0]?.text).toContain('coordination');
+              expect(hitCount).toBe(1);
+            }
+          );
+
+          // Item 8: broken model-families.yaml lets MCP start & listTools(), then formats MODEL_FAMILIES_CONFIG_ERROR without stack.
+          const mfDb = join(workDir, 'mf', 'data', 'claude-synergy.db');
+          const mfProducts = join(workDir, 'mf', 'products');
+          await withMcpServer(
+            {
+              dbPath: mfDb,
+              synergiesDir,
+              requestTimeoutMs: 25_000,
+              env: {
+                CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+                CLAUDE_SYNERGY_PRODUCTS_ROOT: mfProducts,
+                CLAUDE_SYNERGY_MODEL_FAMILIES: badMf,
+                HOME: workDir,
+                USERPROFILE: workDir,
+              },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+              const tools = await client.listTools();
+              expect(tools.length).toBe(13);
+              const errRes = await client.callTool('sync_now', { include_embed: false });
+              expect(errRes.isError).toBe(true);
+              const errText = errRes.content[0]?.text ?? '';
+              expect(errText).toContain('[MODEL_FAMILIES_CONFIG_ERROR]');
+              expect(errText).not.toMatch(/^\s+at\s+/m);
+            }
+          );
+        } finally {
+          srv.closeAllConnections?.();
+          await new Promise<void>((r) => srv.close(() => r()));
           rmSync(workDir, { recursive: true, force: true });
         }
       },

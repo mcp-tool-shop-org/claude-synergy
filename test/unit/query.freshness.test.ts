@@ -6,6 +6,7 @@ import {
   formatManualFeedWarning,
   utcDaysSince,
 } from '../../src/query.js';
+import { clearPartialSyncState, writePartialSyncState } from '../../src/store.js';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
 
@@ -52,12 +53,19 @@ describe('getCorpusFreshness & formatFreshnessStamp', () => {
     expect(formatFreshnessStamp(fromEmpty)).toMatch(/^STALE:/);
   });
 
-  it('returns non-stale stamp within STALE_AFTER_DAYS and STALE beyond it', () => {
+  it('returns non-stale stamp within STALE_AFTER_DAYS and STALE beyond it using markers.updated_at', () => {
     seedSampleProducts(temp.db);
-    // Fixture releases have fetched_at = 2026-05-21 and max released_at = 2026-04-10.
+    // Item 12: synced_at comes from markers.updated_at, not releases.fetched_at.
+    temp.db
+      .prepare(
+        `INSERT INTO markers (product, name, version, updated_at)
+         VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+      )
+      .run();
+
     const freshClock = new Date('2026-05-28T12:00:00Z'); // 7 days after 2026-05-21
     const fresh = getCorpusFreshness(temp.db, { now: freshClock });
-    expect(fresh.synced_at).toBe('2026-05-21');
+    expect(fresh.synced_at).toBe('2026-05-21T10:00:00Z');
     expect(fresh.newest_release).toBe('2026-04-10');
     expect(fresh.synced_age_days).toBe(7);
     expect(fresh.age_days).toBe(48);
@@ -74,8 +82,46 @@ describe('getCorpusFreshness & formatFreshnessStamp', () => {
     expect(staleLine).toMatch(/^STALE: data as of: synced 2026-05-21, newest release 2026-04-10 \(49 days old\) — refresh with sync_now or hk sync$/);
   });
 
+  it('derives synced_at from markers.updated_at even when releases.fetched_at differs, and surfaces first_use_partial', () => {
+    seedSampleProducts(temp.db);
+    // Without markers, synced_at is null and stamps STALE even though releases.fetched_at is seeded.
+    const noMarkers = getCorpusFreshness(temp.db, { now: new Date('2026-05-21T12:00:00Z') });
+    expect(noMarkers.synced_at).toBeNull();
+    expect(noMarkers.newest_release).toBe('2026-04-10');
+    expect(noMarkers.stale).toBe(true);
+    expect(formatFreshnessStamp(noMarkers)).toMatch(/^STALE: data as of: synced never/);
+
+    // Marker updated later than releases.fetched_at (2026-05-21) drives synced_at.
+    temp.db
+      .prepare(
+        `INSERT INTO markers (product, name, version, updated_at)
+         VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-06-10T08:00:00Z')`
+      )
+      .run();
+    writePartialSyncState(temp.db, {
+      succeeded: 1,
+      total: 2,
+      skipped: [{ product: 'windsurf', reason: 'timeout' }],
+    });
+    const updated = getCorpusFreshness(temp.db, { now: new Date('2026-06-12T12:00:00Z') });
+    expect(updated.synced_at).toBe('2026-06-10T08:00:00Z');
+    expect(updated.stale).toBe(false);
+    expect(formatFreshnessStamp(updated)).toContain('partial corpus: synced 1 of 2 products (skipped: windsurf (timeout))');
+
+    clearPartialSyncState(temp.db);
+    const cleared = getCorpusFreshness(temp.db, { now: new Date('2026-06-12T12:00:00Z') });
+    expect(cleared.partial_note).toBeUndefined();
+    expect(formatFreshnessStamp(cleared)).not.toContain('partial corpus');
+  });
+
   it('supports injectable clock function and CLAUDE_SYNERGY_NOW env', () => {
     seedSampleProducts(temp.db);
+    temp.db
+      .prepare(
+        `INSERT INTO markers (product, name, version, updated_at)
+         VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+      )
+      .run();
     const fnRes = getCorpusFreshness(temp.db, { now: () => new Date('2026-05-22T00:00:00Z') });
     expect(fnRes.stale).toBe(false);
 
@@ -90,6 +136,12 @@ describe('getCorpusFreshness & formatFreshnessStamp', () => {
     temp.db
       .prepare(`UPDATE products SET fetch_strategy = 'manual' WHERE name = 'test-apps'`)
       .run();
+    temp.db
+      .prepare(
+        `INSERT INTO markers (product, name, version, updated_at)
+         VALUES ('test-apps', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+      )
+      .run();
 
     const scoped = getCorpusFreshness(temp.db, {
       product: 'test-apps',
@@ -97,7 +149,7 @@ describe('getCorpusFreshness & formatFreshnessStamp', () => {
     });
     expect(scoped.product).toEqual({
       product: 'test-apps',
-      synced_at: '2026-05-21',
+      synced_at: '2026-05-21T10:00:00Z',
       newest_release: '2026-04-10',
       fetch_strategy: 'manual',
     });
@@ -110,9 +162,15 @@ describe('getCorpusFreshness & formatFreshnessStamp', () => {
 
   it('handles default clock, non-ISO date strings, partial notes, and uninitialized DB fallback', () => {
     seedSampleProducts(temp.db);
+    temp.db
+      .prepare(
+        `INSERT INTO markers (product, name, version, updated_at)
+         VALUES ('test-cli', 'last_fetched_release_at', '2026-04-10', '2026-05-21T10:00:00Z')`
+      )
+      .run();
     delete process.env.CLAUDE_SYNERGY_NOW;
     const defaultClockRes = getCorpusFreshness(temp.db);
-    expect(defaultClockRes.synced_at).toBe('2026-05-21');
+    expect(defaultClockRes.synced_at).toBe('2026-05-21T10:00:00Z');
 
     expect(utcDaysSince('November 23, 2026', new Date('2026-11-26T12:00:00Z'))).toBe(3);
 

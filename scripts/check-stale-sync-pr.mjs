@@ -1,9 +1,10 @@
-#!/usr/bin/env node
 // Pure staleness check + CLI helper for the rolling daily sync PR.
 // Called by .github/workflows/sync.yml before refreshing an open sync/daily PR.
 
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+
+export const STALE_SYNC_COMMENT_MARKER = '<!-- claude-synergy:sync-stale -->';
 
 const MS_PER_DAY = 86_400_000;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
