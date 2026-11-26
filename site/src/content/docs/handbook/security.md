@@ -112,7 +112,7 @@ All MCP tool inputs are validated before processing:
 Release notes and catalog entries are written by third parties, so they are treated as quoted data, never as instructions.
 
 - **At ingest,** the text is screened: hidden Unicode controls are removed, images and `javascript:`/`data:`/`vbscript:` links become plain text, emails and home-path usernames are redacted, and lines shaped like instructions to the reader are flagged (not deleted). `hk ingest --rescreen` applies the current rules to stored rows.
-- **In MCP answers,** the six tools that return release text (`search`, `lookup_entity`, `get_release`, `get_changes_since`, `search_breaking_changes`, `compare_versions`) wrap it in a frame marked as quoted data. The frame's header and footer carry a fresh random token on every answer, so stored text cannot fake the end of the frame, and flagged lines show `[flagged: …]`.
+- **In MCP answers,** the seven tools that return release text (`search`, `lookup_entity`, `get_release`, `get_changes_since`, `search_breaking_changes`, `compare_versions`, `workspace_relevance`) wrap it in a frame marked as quoted data. The frame's header and footer carry a fresh random token on every answer, so stored text cannot fake the end of the frame, and flagged lines show `[flagged: …]`.
 - **Never written into instruction files:** the tool does not edit `CLAUDE.md`, skills or settings.
 
 ## Reporting vulnerabilities

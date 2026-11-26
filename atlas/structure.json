@@ -10981,7 +10981,7 @@
           "path": ".gitignore"
         },
         {
-          "hash": "4a80f1bc95c44267afae4f20991ae601c193ff07afbed0de2772197643e995b3",
+          "hash": "5345fa7650102c4901ff376e609f8944694669fcc885d31e6dbef6f91700854d",
           "path": "CHANGELOG.md"
         },
         {
@@ -11001,35 +11001,35 @@
           "path": "PRODUCTS.txt"
         },
         {
-          "hash": "f08660f8105facca3367cde8facde3685c816b37e0c27b34798992264bf29e61",
+          "hash": "e9baa4fb87a3e76d63b06af2566844a77099ee255333325c70879eeb1b56fb88",
           "path": "README.es.md"
         },
         {
-          "hash": "6e3ce5ff1bca081c21573e6438eb1044e7f3d165238a191f20c4fbfcf1411732",
+          "hash": "703b3b020192806c24d14cce750017324e2ec4bdcd9f4aa5672895e807dce40f",
           "path": "README.fr.md"
         },
         {
-          "hash": "987907144e0a23f83cac3ce6d690524140a6f7bcc34b608bdd2734a73c116f3f",
+          "hash": "9517fa77e87c509fec08dd8fa8cd59626ed6de3d251ffb85ddd6cd929e0cb911",
           "path": "README.hi.md"
         },
         {
-          "hash": "29556e25547c2b25cba52cb316c34aa8f38f9f27d81a3ae840b5a865e3989470",
+          "hash": "0ba9f05bd45a8a6007638c0c16349dc1c035c6bc5d6e209d127bee05a513b760",
           "path": "README.it.md"
         },
         {
-          "hash": "70917671beb80351f466b9351c93304cc6625730fa544fd31a9d747dcadd505d",
+          "hash": "1ab30eb975d9dc789cc1f97af37babcd81359c924c93ee85d91b5b87be9bdac8",
           "path": "README.ja.md"
         },
         {
-          "hash": "1f8b5c8b9eb917bc91a10a21e1a58287464ad198c58204eed9590aab0ac70e55",
+          "hash": "bda43bfbbbd3f13334747bc5240d214d57b14c30ee222721ee0a1b919641a4ff",
           "path": "README.md"
         },
         {
-          "hash": "5751f27602f822629f3ad1abaa643c98e0f8b3bf69e8bbc081260cfc2a8fd0b6",
+          "hash": "2c0eca368ab3a85942803280a00cda38cbad217647a4d22370efa5d161c67d90",
           "path": "README.pt-BR.md"
         },
         {
-          "hash": "bec06dcd5f55c996513289bdeb64d9c2afbb42eda3bcea018449a38d413fe23c",
+          "hash": "c4e1201817e73f60e92e6014c0d236a66dee9af417aaa11fed858c95a8ef5972",
           "path": "README.zh.md"
         },
         {
@@ -11037,7 +11037,7 @@
           "path": "SCORECARD.md"
         },
         {
-          "hash": "e595763f9474b9d1ad4f8aad4037088fa00d2201a2ef77137773674e2ed097b6",
+          "hash": "8da77ef546d0e163e75db01b70bf5690cee26aaa820319ca36efd116c593503d",
           "path": "SECURITY.md"
         },
         {
@@ -11065,7 +11065,7 @@
           "path": "model-families.yaml"
         },
         {
-          "hash": "ab528d0a41974784b2ac982c98cbe4d08dfb94b6a2794763911de687ea066b3f",
+          "hash": "d154db9b7975e50f89d0d9dfa9894c5891fac7c129d7a6ba7ad24a20a11355fc",
           "path": "package.json"
         },
         {
@@ -11073,7 +11073,7 @@
           "path": "pnpm-lock.yaml"
         },
         {
-          "hash": "fe1c092f748ec88019d0f9970a3f50f228a8d6bf0e662547c4e308f0b3fa1182",
+          "hash": "bcd112dfc8af13d5a543b2bf7a0150a42426cec54289b7a36e7d33e216a06d4d",
           "path": "products.yaml"
         },
         {
@@ -11355,11 +11355,11 @@
           "path": "site/src/content.config.ts"
         },
         {
-          "hash": "85cfa9cf4356cfcc95e70ed486f9a66f53267c485f92be3f69e020fad8cb0108",
+          "hash": "98779f541fd802bfe32956490d60a40cb8cbe3476991034e1dbbf5202386eb58",
           "path": "site/src/content/docs/handbook/architecture.md"
         },
         {
-          "hash": "a9729f1f4516401fbe0e9709db0b8eda114733d07b1df1c276cc432625a2b23a",
+          "hash": "51d8727a18beaaab525989e2b13701691483f0e62ebd7bdfe39b34e151ee7703",
           "path": "site/src/content/docs/handbook/cli-reference.md"
         },
         {
@@ -11367,19 +11367,19 @@
           "path": "site/src/content/docs/handbook/cs-actions-v1.md"
         },
         {
-          "hash": "f97ed7125ea0b6b8549b2d96f8a472ffc504e5417d76fdbb89e2f427a7d0b43e",
+          "hash": "ff58b3074b44f554afbe60c1a95fe742193052f1e96c8da9c29fd6e22977041b",
           "path": "site/src/content/docs/handbook/getting-started.md"
         },
         {
-          "hash": "b9780db489fd173aff7f3a5da61c03ce8f997665ab951882bc7610faf8af96fb",
+          "hash": "c3a014e50a7a46ef93ef67468ccc2f9af266db6f1fb54289310abe9c2171acdd",
           "path": "site/src/content/docs/handbook/index.md"
         },
         {
-          "hash": "5ddb42262452935244587fcb22d6ffe7a41a1006c87af63c9b9a419d0d992c07",
+          "hash": "486aac3d7e42b7a8124c7f08d1c53e6a85158a6fa54594c85697ec2c5c49be8a",
           "path": "site/src/content/docs/handbook/mcp-server.md"
         },
         {
-          "hash": "ac91e5b40a1ebeeb7f0571753f75141182a6da6d17460101afb57102a1037865",
+          "hash": "4bf86573b5f26236e62d36b8946eb67e9f7e9718c2628d057bef44986dfebf07",
           "path": "site/src/content/docs/handbook/security.md"
         },
         {
@@ -11396,7 +11396,7 @@
         },
         {
           "constantOnly": true,
-          "hash": "cea6f557730da7f7c0cc2dc8ea55f06852eed828d33b78ebe9fe214004bf7610",
+          "hash": "fd149694c22d277e1f7e80eda29387f264c632b645ff545096575d6adee10917",
           "path": "site/src/site-config.ts"
         },
         {
@@ -11443,32 +11443,27 @@
             {
               "in": "shutdown",
               "kind": "catch",
-              "line": 81
+              "line": 83
             },
             {
               "in": "parseRelativeDate",
               "kind": "throw",
-              "line": 140
+              "line": 142
             },
             {
               "in": "parseRelativeDate",
               "kind": "throw",
-              "line": 152
+              "line": 154
             },
             {
               "in": "parseRelativeDate",
               "kind": "throw",
-              "line": 170
+              "line": 172
             },
             {
               "in": "resolveDateOrExit",
               "kind": "catch",
-              "line": 186
-            },
-            {
-              "in": "openQueryDbOrFirstUse",
-              "kind": "catch",
-              "line": 238
+              "line": 188
             },
             {
               "in": "openQueryDbOrFirstUse",
@@ -11477,43 +11472,52 @@
             },
             {
               "in": "openQueryDbOrFirstUse",
+              "kind": "catch",
+              "line": 242
+            },
+            {
+              "in": "openQueryDbOrFirstUse",
               "kind": "throw",
-              "line": 244
+              "line": 246
             },
             {
               "kind": "catch",
-              "line": 462
+              "line": 464
             },
             {
               "kind": "catch",
-              "line": 547
+              "line": 549
             },
             {
               "kind": "catch",
-              "line": 821
+              "line": 823
             },
             {
               "kind": "catch",
-              "line": 901
+              "line": 903
             },
             {
               "kind": "catch",
-              "line": 1011
+              "line": 1013
             },
             {
               "kind": "catch",
-              "line": 1135
+              "line": 1137
             },
             {
               "kind": "catch",
-              "line": 1209
+              "line": 1211
             },
             {
               "kind": "catch",
-              "line": 1304
+              "line": 1296
+            },
+            {
+              "kind": "catch",
+              "line": 1354
             }
           ],
-          "hash": "6b21e2c0d933319583ea5f26e14609c0aeddf514ed7fdbb2080f4d496fe1d300",
+          "hash": "128b389cb99498e2c2c0b23121358e3e50c27207e26ed6539de4583516873d29",
           "importOrder": [
             "src/db.ts",
             "src/ingest.ts",
@@ -11521,6 +11525,8 @@
             "src/embed.ts",
             "src/hybrid.ts",
             "src/fetch.ts",
+            "src/workspace.ts",
+            "src/relevance.ts",
             "src/errors.ts",
             "src/store.ts"
           ],
@@ -11532,21 +11538,23 @@
             "src/hybrid.ts",
             "src/ingest.ts",
             "src/query.ts",
-            "src/store.ts"
+            "src/relevance.ts",
+            "src/store.ts",
+            "src/workspace.ts"
           ],
           "path": "src/cli.ts",
           "sequences": [
             {
               "calls": [
                 {
-                  "line": 93,
+                  "line": 95,
                   "name": "resolveStorePaths",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 97,
+                  "line": 99,
                   "name": "printStoreResolutionOnce",
                   "target": {
                     "file": "src/store.ts"
@@ -11561,7 +11569,7 @@
             {
               "calls": [
                 {
-                  "line": 122,
+                  "line": 124,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
@@ -11576,7 +11584,7 @@
             {
               "calls": [
                 {
-                  "line": 191,
+                  "line": 193,
                   "name": "formatError",
                   "target": {
                     "file": "src/errors.ts"
@@ -11591,7 +11599,7 @@
             {
               "calls": [
                 {
-                  "line": 93,
+                  "line": 95,
                   "name": "resolveStorePaths",
                   "target": {
                     "file": "src/store.ts"
@@ -11599,7 +11607,7 @@
                   "via": "resolveCliStore"
                 },
                 {
-                  "line": 97,
+                  "line": 99,
                   "name": "printStoreResolutionOnce",
                   "target": {
                     "file": "src/store.ts"
@@ -11607,7 +11615,7 @@
                   "via": "resolveCliStore"
                 },
                 {
-                  "line": 122,
+                  "line": 124,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
@@ -11615,35 +11623,35 @@
                   "via": "openTrackedDb"
                 },
                 {
-                  "line": 237,
+                  "line": 239,
                   "name": "initSchema",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 239,
+                  "line": 241,
                   "name": "isReadonlyDbError",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 241,
+                  "line": 243,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 250,
+                  "line": 252,
                   "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 254,
+                  "line": 256,
                   "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
@@ -11651,14 +11659,14 @@
                 },
                 {
                   "branch": "isAutoSyncDisabled()",
-                  "line": 255,
+                  "line": 257,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 264,
+                  "line": 266,
                   "name": "ensureSynced",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -11667,7 +11675,7 @@
                 },
                 {
                   "branch": "synced.cooledDown",
-                  "line": 272,
+                  "line": 274,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
@@ -11675,7 +11683,7 @@
                 },
                 {
                   "branch": "!hasAnyReleases(synced.db)",
-                  "line": 274,
+                  "line": 276,
                   "name": "getEmptyCorpusReason",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -11683,21 +11691,21 @@
                   }
                 },
                 {
-                  "line": 286,
+                  "line": 288,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 292,
+                  "line": 294,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 293,
+                  "line": 295,
                   "name": "formatPartialNote",
                   "target": {
                     "file": "src/store.ts"
@@ -11712,7 +11720,7 @@
             {
               "calls": [
                 {
-                  "line": 303,
+                  "line": 305,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11727,14 +11735,14 @@
             {
               "calls": [
                 {
-                  "line": 318,
+                  "line": 320,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 319,
+                  "line": 321,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11749,7 +11757,7 @@
             {
               "calls": [
                 {
-                  "line": 303,
+                  "line": 305,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11757,7 +11765,7 @@
                   "via": "emitArrayJson"
                 },
                 {
-                  "line": 319,
+                  "line": 321,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11773,7 +11781,7 @@
             {
               "calls": [
                 {
-                  "line": 343,
+                  "line": 345,
                   "name": "toLocaleString",
                   "target": null
                 }
@@ -11786,7 +11794,7 @@
             {
               "calls": [
                 {
-                  "line": 343,
+                  "line": 345,
                   "name": "toLocaleString",
                   "target": null,
                   "via": "fmtNum"
@@ -11800,7 +11808,7 @@
             {
               "calls": [
                 {
-                  "line": 93,
+                  "line": 95,
                   "name": "resolveStorePaths",
                   "target": {
                     "file": "src/store.ts"
@@ -11808,7 +11816,7 @@
                   "via": "resolveCliStore"
                 },
                 {
-                  "line": 97,
+                  "line": 99,
                   "name": "printStoreResolutionOnce",
                   "target": {
                     "file": "src/store.ts"
@@ -11816,7 +11824,7 @@
                   "via": "resolveCliStore"
                 },
                 {
-                  "line": 122,
+                  "line": 124,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
@@ -11824,7 +11832,7 @@
                   "via": "openTrackedDb"
                 },
                 {
-                  "line": 237,
+                  "line": 239,
                   "name": "initSchema",
                   "target": {
                     "file": "src/db.ts"
@@ -11832,7 +11840,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 239,
+                  "line": 241,
                   "name": "isReadonlyDbError",
                   "target": {
                     "file": "src/db.ts"
@@ -11840,7 +11848,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 241,
+                  "line": 243,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
@@ -11848,7 +11856,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 250,
+                  "line": 252,
                   "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
@@ -11856,7 +11864,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 254,
+                  "line": 256,
                   "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
@@ -11865,7 +11873,7 @@
                 },
                 {
                   "branch": "isAutoSyncDisabled()",
-                  "line": 255,
+                  "line": 257,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
@@ -11873,7 +11881,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 264,
+                  "line": 266,
                   "name": "ensureSynced",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -11883,7 +11891,7 @@
                 },
                 {
                   "branch": "synced.cooledDown",
-                  "line": 272,
+                  "line": 274,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
@@ -11892,7 +11900,7 @@
                 },
                 {
                   "branch": "!hasAnyReleases(synced.db)",
-                  "line": 274,
+                  "line": 276,
                   "name": "getEmptyCorpusReason",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -11901,7 +11909,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 286,
+                  "line": 288,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
@@ -11909,7 +11917,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 292,
+                  "line": 294,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
@@ -11917,7 +11925,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 293,
+                  "line": 295,
                   "name": "formatPartialNote",
                   "target": {
                     "file": "src/store.ts"
@@ -11926,7 +11934,7 @@
                 },
                 {
                   "branch": "session.emptyOptOut || !session.db",
-                  "line": 303,
+                  "line": 305,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11935,7 +11943,7 @@
                 },
                 {
                   "branch": "session.emptyOptOut || !session.db",
-                  "line": 319,
+                  "line": 321,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11943,14 +11951,14 @@
                   "via": "emitTextStamp"
                 },
                 {
-                  "line": 602,
+                  "line": 604,
                   "name": "lookupEntity",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 1294,
+                  "line": 1344,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -11966,7 +11974,7 @@
             {
               "calls": [
                 {
-                  "line": 1294,
+                  "line": 1344,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -13863,182 +13871,199 @@
           "failurePaths": [
             {
               "kind": "catch",
-              "line": 115
-            },
-            {
-              "kind": "catch",
               "line": 117
             },
             {
+              "kind": "catch",
+              "line": 119
+            },
+            {
               "kind": "throw",
-              "line": 120
+              "line": 122
             },
             {
               "kind": "catch",
-              "line": 125
+              "line": 127
             },
             {
               "in": "getDbOrThrow",
               "kind": "throw",
-              "line": 143
+              "line": 146
             },
             {
               "in": "getHasChunks",
               "kind": "catch",
-              "line": 154
+              "line": 157
             },
             {
               "in": "asRecord",
               "kind": "throw",
-              "line": 364
+              "line": 380
             },
             {
               "in": "requireString",
               "kind": "throw",
-              "line": 372
+              "line": 388
             },
             {
               "in": "optString",
               "kind": "throw",
-              "line": 381
+              "line": 397
             },
             {
               "in": "optInt",
               "kind": "throw",
-              "line": 396
+              "line": 412
             },
             {
               "in": "optBool",
               "kind": "throw",
-              "line": 408
+              "line": 424
             },
             {
               "in": "optEnum",
               "kind": "throw",
-              "line": 422
+              "line": 438
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 544
+              "line": 560
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 579
+              "line": 595
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 598
+              "line": 614
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 640
+              "line": 659
             },
             {
+              "in": "runTool",
               "kind": "catch",
+              "line": 668
+            },
+            {
+              "in": "runTool",
+              "kind": "throw",
+              "line": 669
+            },
+            {
+              "in": "runTool",
+              "kind": "throw",
               "line": 677
             },
             {
-              "kind": "throw",
-              "line": 678
+              "kind": "catch",
+              "line": 714
             },
             {
               "kind": "throw",
-              "line": 685
+              "line": 715
+            },
+            {
+              "kind": "throw",
+              "line": 722
             },
             {
               "in": "dbSynergiesEmpty",
               "kind": "catch",
-              "line": 851
+              "line": 888
             },
             {
               "in": "handleListSynergies",
               "kind": "catch",
-              "line": 880
+              "line": 917
             },
             {
               "in": "listSynergiesFromDisk",
               "kind": "catch",
-              "line": 908
+              "line": 945
             },
             {
               "in": "handleReadSynergy",
               "kind": "catch",
-              "line": 930
+              "line": 967
             },
             {
               "in": "handleReadSynergy",
               "kind": "catch",
-              "line": 946
+              "line": 983
             },
             {
               "in": "handleGetChangesSince",
               "kind": "catch",
-              "line": 984
+              "line": 1021
             },
             {
               "in": "handleGetChangesSince",
               "kind": "throw",
-              "line": 985
+              "line": 1022
             },
             {
               "in": "handleSearchBreakingChanges",
               "kind": "catch",
-              "line": 1000
+              "line": 1037
             },
             {
               "in": "handleSearchBreakingChanges",
               "kind": "throw",
-              "line": 1001
+              "line": 1038
             },
             {
               "in": "handleSyncStatus",
               "kind": "catch",
-              "line": 1045
+              "line": 1082
             },
             {
               "in": "handleSyncNow",
               "kind": "throw",
-              "line": 1092
+              "line": 1129
             },
             {
               "in": "handleSyncNow",
               "kind": "throw",
-              "line": 1110
+              "line": 1147
             },
             {
               "in": "handleSyncNow",
               "kind": "catch",
-              "line": 1121
+              "line": 1158
             },
             {
               "in": "handleSyncNow",
               "kind": "catch",
-              "line": 1182
+              "line": 1219
             },
             {
               "in": "handleCompareVersions",
               "kind": "catch",
-              "line": 1216
+              "line": 1253
             },
             {
               "in": "handleCompareVersions",
               "kind": "throw",
-              "line": 1217
+              "line": 1254
             },
             {
               "in": "shutdownMcp",
               "kind": "catch",
-              "line": 1229
+              "line": 1271
             }
           ],
-          "hash": "017993590e512556d25047d47771bc4d38e4c65631fbf7d4fe22e3ce6885fcd1",
+          "hash": "b6975d2a3e443696352458e9bb653f22eacf038f2db67d16f030e5db676e5816",
           "importOrder": [
             "src/db.ts",
             "src/errors.ts",
+            "src/workspace.ts",
+            "src/relevance.ts",
             "src/query.ts",
             "src/hybrid.ts",
             "src/store.ts",
@@ -14054,14 +14079,16 @@
             "src/hybrid.ts",
             "src/ingest.ts",
             "src/query.ts",
-            "src/store.ts"
+            "src/relevance.ts",
+            "src/store.ts",
+            "src/workspace.ts"
           ],
           "path": "src/mcp-server.ts",
           "sequences": [
             {
               "calls": [
                 {
-                  "line": 152,
+                  "line": 155,
                   "name": "prepare",
                   "target": null
                 }
@@ -14074,14 +14101,14 @@
             {
               "calls": [
                 {
-                  "line": 456,
+                  "line": 472,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 457,
+                  "line": 473,
                   "name": "getPartialNote",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14089,14 +14116,14 @@
                   }
                 },
                 {
-                  "line": 458,
+                  "line": 474,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 463,
+                  "line": 479,
                   "name": "formatManualFeedWarning",
                   "target": {
                     "file": "src/query.ts"
@@ -14111,21 +14138,21 @@
             {
               "calls": [
                 {
-                  "line": 470,
+                  "line": 486,
                   "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 471,
+                  "line": 487,
                   "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 474,
+                  "line": 490,
                   "name": "ensureSynced",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14134,7 +14161,7 @@
                 },
                 {
                   "branch": "res.performedByThisCall && res.report",
-                  "line": 485,
+                  "line": 501,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
@@ -14150,7 +14177,7 @@
               "calls": [
                 {
                   "branch": "mode === 'fts'",
-                  "line": 695,
+                  "line": 732,
                   "name": "searchChanges",
                   "target": {
                     "file": "src/query.ts"
@@ -14158,7 +14185,7 @@
                 },
                 {
                   "branch": "mode === 'fts'",
-                  "line": 751,
+                  "line": 788,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14167,27 +14194,27 @@
                 },
                 {
                   "branch": "mode === 'fts'",
-                  "line": 703,
+                  "line": 740,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 152,
+                  "line": 155,
                   "name": "prepare",
                   "target": null,
                   "via": "getHasChunks"
                 },
                 {
-                  "line": 724,
+                  "line": 761,
                   "name": "hybridSearch",
                   "target": {
                     "file": "src/hybrid.ts"
                   }
                 },
                 {
-                  "line": 733,
+                  "line": 770,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14202,7 +14229,7 @@
             {
               "calls": [
                 {
-                  "line": 751,
+                  "line": 788,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14217,7 +14244,7 @@
             {
               "calls": [
                 {
-                  "line": 763,
+                  "line": 800,
                   "name": "lookupEntity",
                   "target": {
                     "file": "src/query.ts"
@@ -14225,21 +14252,21 @@
                 },
                 {
                   "branch": "results.length === 0",
-                  "line": 764,
+                  "line": 801,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 767,
+                  "line": 804,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 773,
+                  "line": 810,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14254,7 +14281,7 @@
             {
               "calls": [
                 {
-                  "line": 778,
+                  "line": 815,
                   "name": "recentReleases",
                   "target": {
                     "file": "src/query.ts"
@@ -14270,35 +14297,35 @@
               "calls": [
                 {
                   "branch": "!release",
-                  "line": 790,
+                  "line": 827,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 791,
+                  "line": 828,
                   "name": "hasChangesFlagsColumn",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 807,
+                  "line": 844,
                   "name": "resolveRowScreening",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 808,
+                  "line": 845,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 812,
+                  "line": 849,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14313,7 +14340,7 @@
             {
               "calls": [
                 {
-                  "line": 816,
+                  "line": 853,
                   "name": "listProducts",
                   "target": {
                     "file": "src/query.ts"
@@ -14328,7 +14355,7 @@
             {
               "calls": [
                 {
-                  "line": 830,
+                  "line": 867,
                   "name": "entityFrequency",
                   "target": {
                     "file": "src/query.ts"
@@ -14343,7 +14370,7 @@
             {
               "calls": [
                 {
-                  "line": 860,
+                  "line": 897,
                   "name": "listSynergies",
                   "target": {
                     "file": "src/query.ts"
@@ -14358,7 +14385,7 @@
             {
               "calls": [
                 {
-                  "line": 926,
+                  "line": 963,
                   "name": "getSynergy",
                   "target": {
                     "file": "src/query.ts"
@@ -14373,7 +14400,7 @@
             {
               "calls": [
                 {
-                  "line": 963,
+                  "line": 1000,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14388,14 +14415,14 @@
             {
               "calls": [
                 {
-                  "line": 977,
+                  "line": 1014,
                   "name": "getChangesSince",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 963,
+                  "line": 1000,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14403,7 +14430,7 @@
                   "via": "formatChangesSinceResults"
                 },
                 {
-                  "line": 987,
+                  "line": 1024,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14418,7 +14445,7 @@
             {
               "calls": [
                 {
-                  "line": 993,
+                  "line": 1030,
                   "name": "browseChanges",
                   "target": {
                     "file": "src/query.ts"
@@ -14426,21 +14453,21 @@
                 },
                 {
                   "branch": "results.length === 0",
-                  "line": 1004,
+                  "line": 1041,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 1008,
+                  "line": 1045,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 1015,
+                  "line": 1052,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14456,7 +14483,7 @@
               "calls": [
                 {
                   "branch": "h < 48",
-                  "line": 1027,
+                  "line": 1064,
                   "name": "toFixed",
                   "target": null
                 }
@@ -14469,14 +14496,14 @@
             {
               "calls": [
                 {
-                  "line": 1033,
+                  "line": 1070,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 1040,
+                  "line": 1077,
                   "name": "getSyncStatus",
                   "target": {
                     "file": "src/query.ts"
@@ -14484,13 +14511,13 @@
                 },
                 {
                   "branch": "h < 48",
-                  "line": 1027,
+                  "line": 1064,
                   "name": "toFixed",
                   "target": null,
                   "via": "formatHours"
                 },
                 {
-                  "line": 1071,
+                  "line": 1108,
                   "name": "formatManualFeedWarning",
                   "target": {
                     "file": "src/query.ts"
@@ -14505,7 +14532,7 @@
             {
               "calls": [
                 {
-                  "line": 1091,
+                  "line": 1128,
                   "name": "isSyncInProgress",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14514,14 +14541,14 @@
                 },
                 {
                   "branch": "dryRun",
-                  "line": 1107,
+                  "line": 1144,
                   "name": "listFetchTargets",
                   "target": {
                     "file": "src/fetch.ts"
                   }
                 },
                 {
-                  "line": 1132,
+                  "line": 1169,
                   "name": "runManualSync",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14529,35 +14556,35 @@
                   }
                 },
                 {
-                  "line": 1136,
+                  "line": 1173,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 1138,
+                  "line": 1175,
                   "name": "initSchema",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 1141,
+                  "line": 1178,
                   "name": "fetchAll",
                   "target": {
                     "file": "src/fetch.ts"
                   }
                 },
                 {
-                  "line": 1148,
+                  "line": 1185,
                   "name": "clearPartialSyncState",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 1149,
+                  "line": 1186,
                   "name": "clearPartialNote",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14565,7 +14592,7 @@
                   }
                 },
                 {
-                  "line": 1150,
+                  "line": 1187,
                   "name": "resetCooldown",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14573,21 +14600,21 @@
                   }
                 },
                 {
-                  "line": 1156,
+                  "line": 1193,
                   "name": "writePartialSyncState",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 1167,
+                  "line": 1204,
                   "name": "ingestAll",
                   "target": {
                     "file": "src/ingest.ts"
                   }
                 },
                 {
-                  "line": 1177,
+                  "line": 1214,
                   "name": "embedAll",
                   "target": {
                     "file": "src/embed.ts"
@@ -14602,7 +14629,7 @@
             {
               "calls": [
                 {
-                  "line": 1211,
+                  "line": 1248,
                   "name": "compareVersions",
                   "target": {
                     "file": "src/query.ts"
@@ -14610,14 +14637,14 @@
                 },
                 {
                   "branch": "results.length === 0",
-                  "line": 1220,
+                  "line": 1257,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 963,
+                  "line": 1000,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14625,7 +14652,7 @@
                   "via": "formatChangesSinceResults"
                 },
                 {
-                  "line": 1222,
+                  "line": 1259,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14636,112 +14663,165 @@
               "invokedAtTopLevel": false,
               "isDefaultExport": false,
               "name": "handleCompareVersions"
+            },
+            {
+              "calls": [
+                {
+                  "line": 1263,
+                  "name": "evaluateWorkspaceRelevance",
+                  "target": {
+                    "file": "src/relevance.ts"
+                  }
+                },
+                {
+                  "line": 1264,
+                  "name": "formatRelevanceReport",
+                  "target": {
+                    "file": "src/relevance.ts"
+                  }
+                },
+                {
+                  "line": 1264,
+                  "name": "frameVendorText",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "handleWorkspaceRelevance"
             }
           ]
         },
         {
           "exports": [
             "loadProductsConfig",
-            "resetWarnedFlag"
+            "resetWarnedFlag",
+            "validateProductPackages"
           ],
           "failurePaths": [
             {
               "in": "loadProductsConfig",
               "kind": "catch",
-              "line": 108
+              "line": 127
             },
             {
               "in": "loadProductsConfig",
               "kind": "catch",
-              "line": 119
+              "line": 138
             },
             {
               "in": "loadProductsConfig",
               "kind": "throw",
-              "line": 120
+              "line": 139
             },
             {
               "in": "loadProductsConfig",
               "kind": "throw",
-              "line": 124
+              "line": 143
             },
             {
               "in": "loadProductsConfig",
               "kind": "throw",
-              "line": 132
+              "line": 151
             },
             {
               "in": "loadProductsConfig",
               "kind": "throw",
-              "line": 135
+              "line": 154
             },
             {
               "in": "loadProductsConfig",
               "kind": "throw",
-              "line": 155
+              "line": 176
             },
             {
-              "in": "buildFetchTarget",
+              "in": "validateProductPackages",
               "kind": "throw",
-              "line": 174
+              "line": 195
             },
             {
-              "in": "buildFetchTarget",
-              "kind": "throw",
-              "line": 180
-            },
-            {
-              "in": "buildFetchTarget",
-              "kind": "catch",
-              "line": 185
-            },
-            {
-              "in": "buildFetchTarget",
-              "kind": "throw",
-              "line": 186
-            },
-            {
-              "in": "buildFetchTarget",
-              "kind": "throw",
-              "line": 192
-            },
-            {
-              "in": "buildFetchTarget",
-              "kind": "throw",
-              "line": 193
-            },
-            {
-              "in": "buildFetchTarget",
-              "kind": "throw",
-              "line": 197
-            },
-            {
-              "in": "buildFetchTarget",
+              "in": "validateProductPackages",
               "kind": "throw",
               "line": 206
             },
             {
-              "in": "buildFetchTarget",
+              "in": "validateProductPackages",
               "kind": "throw",
               "line": 215
             },
             {
-              "in": "buildFetchTarget",
+              "in": "validateProductPackages",
               "kind": "throw",
               "line": 224
             },
             {
               "in": "buildFetchTarget",
               "kind": "throw",
-              "line": 235
+              "line": 242
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 248
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "catch",
+              "line": 253
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 254
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 260
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 261
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 265
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 274
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 283
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 292
+            },
+            {
+              "in": "buildFetchTarget",
+              "kind": "throw",
+              "line": 303
             },
             {
               "in": "resolveYamlPath",
               "kind": "catch",
-              "line": 253
+              "line": 321
             }
           ],
-          "hash": "5ff64f6c248b346cd69bf8c5e3fef8dbbd7d7be3f0993c72fa71a4c0236da66a",
+          "hash": "976f6abbf61b8fe950962b5c4ca6f2389806caa66efe8315d053fccd53528b75",
+          "importsFiles": [
+            "src/errors.ts"
+          ],
           "path": "src/products-config.ts"
         },
         {
@@ -15658,6 +15738,207 @@
           ]
         },
         {
+          "entry": "evaluateWorkspaceRelevance",
+          "entryRule": 4,
+          "exports": [
+            "evaluateWorkspaceRelevance",
+            "formatRelevanceReport"
+          ],
+          "failurePaths": [
+            {
+              "in": "hasTable",
+              "kind": "catch",
+              "line": 92
+            }
+          ],
+          "hash": "68befca28cf6f00eca2680f2942559b7cac8294330090e78cce2cd670c53680d",
+          "importsFiles": [
+            "src/products-config.ts",
+            "src/query.ts",
+            "src/workspace.ts"
+          ],
+          "path": "src/relevance.ts",
+          "sequences": [
+            {
+              "calls": [
+                {
+                  "line": 88,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "hasTable"
+            },
+            {
+              "calls": [
+                {
+                  "line": 104,
+                  "name": "loadProductsConfig",
+                  "target": {
+                    "file": "src/products-config.ts"
+                  }
+                },
+                {
+                  "line": 88,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "hasTable"
+                },
+                {
+                  "branch": "hasTable(db, 'products')",
+                  "line": 109,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "loadProductCatalog"
+            },
+            {
+              "calls": [
+                {
+                  "line": 153,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "findMirrorRelease"
+            },
+            {
+              "calls": [
+                {
+                  "line": 167,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "findNewestMirrorRelease"
+            },
+            {
+              "calls": [
+                {
+                  "line": 189,
+                  "name": "prepare",
+                  "target": null
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "mergeEmptyReleases"
+            },
+            {
+              "calls": [
+                {
+                  "line": 153,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "findMirrorRelease"
+                },
+                {
+                  "line": 290,
+                  "name": "compareVersions",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                },
+                {
+                  "line": 189,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "mergeEmptyReleases"
+                }
+              ],
+              "exported": false,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "evaluateMatchedEntry"
+            },
+            {
+              "calls": [
+                {
+                  "line": 104,
+                  "name": "loadProductsConfig",
+                  "target": {
+                    "file": "src/products-config.ts"
+                  },
+                  "via": "loadProductCatalog"
+                },
+                {
+                  "line": 88,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "hasTable"
+                },
+                {
+                  "branch": "hasTable(db, 'products')",
+                  "line": 109,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "loadProductCatalog"
+                },
+                {
+                  "line": 397,
+                  "name": "normalizePackageName",
+                  "target": {
+                    "file": "src/workspace.ts"
+                  }
+                },
+                {
+                  "line": 153,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "findMirrorRelease"
+                },
+                {
+                  "line": 290,
+                  "name": "compareVersions",
+                  "target": {
+                    "file": "src/query.ts"
+                  },
+                  "via": "evaluateMatchedEntry"
+                },
+                {
+                  "line": 189,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "mergeEmptyReleases"
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "evaluateWorkspaceRelevance"
+            },
+            {
+              "calls": [
+                {
+                  "line": 477,
+                  "name": "formatFlagMarker",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "formatRelevanceReport"
+            }
+          ]
+        },
+        {
           "exports": [
             "formatFlagMarker",
             "frameVendorText",
@@ -15897,6 +16178,240 @@
               "name": "formatFirstUseNotice"
             }
           ]
+        },
+        {
+          "exports": [
+            "normalizePackageName",
+            "readWorkspace"
+          ],
+          "failurePaths": [
+            {
+              "in": "readWorkspace",
+              "kind": "throw",
+              "line": 119
+            },
+            {
+              "in": "readWorkspace",
+              "kind": "catch",
+              "line": 133
+            },
+            {
+              "in": "readWorkspace",
+              "kind": "throw",
+              "line": 134
+            },
+            {
+              "in": "readWorkspace",
+              "kind": "throw",
+              "line": 143
+            },
+            {
+              "in": "readWorkspace",
+              "kind": "catch",
+              "line": 159
+            },
+            {
+              "in": "readWorkspace",
+              "kind": "catch",
+              "line": 199
+            },
+            {
+              "in": "readWorkspace",
+              "kind": "catch",
+              "line": 236
+            },
+            {
+              "in": "parsePackageLock",
+              "kind": "catch",
+              "line": 261
+            },
+            {
+              "in": "parsePackageLock",
+              "kind": "throw",
+              "line": 262
+            },
+            {
+              "in": "parsePackageLock",
+              "kind": "throw",
+              "line": 266
+            },
+            {
+              "in": "parsePackageLock",
+              "kind": "throw",
+              "line": 276
+            },
+            {
+              "in": "parsePnpmLock",
+              "kind": "catch",
+              "line": 329
+            },
+            {
+              "in": "parsePnpmLock",
+              "kind": "throw",
+              "line": 330
+            },
+            {
+              "in": "parsePnpmLock",
+              "kind": "throw",
+              "line": 334
+            },
+            {
+              "in": "parsePnpmLock",
+              "kind": "throw",
+              "line": 338
+            },
+            {
+              "in": "parsePnpmLock",
+              "kind": "throw",
+              "line": 348
+            },
+            {
+              "in": "parsePnpmLock",
+              "kind": "throw",
+              "line": 357
+            },
+            {
+              "in": "parsePackages",
+              "kind": "throw",
+              "line": 410
+            },
+            {
+              "in": "expectLineEnd",
+              "kind": "throw",
+              "line": 482
+            },
+            {
+              "in": "parseTableHeader",
+              "kind": "throw",
+              "line": 492
+            },
+            {
+              "in": "parseTableHeader",
+              "kind": "throw",
+              "line": 497
+            },
+            {
+              "in": "parseKeySegment",
+              "kind": "throw",
+              "line": 525
+            },
+            {
+              "in": "parseValue",
+              "kind": "throw",
+              "line": 532
+            },
+            {
+              "in": "parseValue",
+              "kind": "throw",
+              "line": 552
+            },
+            {
+              "in": "parseValue",
+              "kind": "throw",
+              "line": 559
+            },
+            {
+              "in": "parseBasicString",
+              "kind": "throw",
+              "line": 569
+            },
+            {
+              "in": "parseBasicString",
+              "kind": "throw",
+              "line": 572
+            },
+            {
+              "in": "parseBasicString",
+              "kind": "throw",
+              "line": 586
+            },
+            {
+              "in": "parseLiteralString",
+              "kind": "throw",
+              "line": 596
+            },
+            {
+              "in": "parseLiteralString",
+              "kind": "throw",
+              "line": 599
+            },
+            {
+              "in": "parseMultilineBasicString",
+              "kind": "throw",
+              "line": 619
+            },
+            {
+              "in": "parseMultilineLiteralString",
+              "kind": "throw",
+              "line": 635
+            },
+            {
+              "in": "parseArray",
+              "kind": "throw",
+              "line": 643
+            },
+            {
+              "in": "parseArray",
+              "kind": "throw",
+              "line": 658
+            },
+            {
+              "in": "parseInlineTable",
+              "kind": "throw",
+              "line": 675
+            },
+            {
+              "in": "parseInlineTable",
+              "kind": "throw",
+              "line": 694
+            },
+            {
+              "in": "parseTomlLock",
+              "kind": "throw",
+              "line": 707
+            },
+            {
+              "in": "parseTomlLock",
+              "kind": "throw",
+              "line": 713
+            },
+            {
+              "in": "normalizeGoVersion",
+              "kind": "throw",
+              "line": 789
+            },
+            {
+              "in": "parseGoMod",
+              "kind": "throw",
+              "line": 811
+            },
+            {
+              "in": "parseGoMod",
+              "kind": "throw",
+              "line": 825
+            },
+            {
+              "in": "parseGoMod",
+              "kind": "throw",
+              "line": 831
+            },
+            {
+              "in": "parseGoMod",
+              "kind": "throw",
+              "line": 841
+            },
+            {
+              "in": "parseGoMod",
+              "kind": "throw",
+              "line": 854
+            }
+          ],
+          "hash": "e4c4666b3be71192a1af122a2d9eeaa4c93e4ba8e560b796e8ee8b73e385df0b",
+          "importsFiles": [
+            "src/errors.ts",
+            "src/products-config.ts"
+          ],
+          "path": "src/workspace.ts"
         }
       ],
       "frameworks": [
@@ -15910,7 +16425,7 @@
       "origin": "authored",
       "outsidePlaces": [
         {
-          "reads": 57,
+          "reads": 64,
           "where": [
             "caller"
           ],
@@ -15921,6 +16436,13 @@
           "where": [
             "caller",
             "cwd:data/"
+          ],
+          "writes": 0
+        },
+        {
+          "reads": 1,
+          "where": [
+            "cwd:pnpm-lock.yaml"
           ],
           "writes": 0
         },
@@ -15946,13 +16468,13 @@
           "writes": 0
         }
       ],
-      "outsideReads": 65,
+      "outsideReads": 73,
       "outsideWrites": 8,
       "role": "code",
       "testRunners": [
         "vitest"
       ],
-      "testedBy": 49,
+      "testedBy": 52,
       "unresolvedSites": 0
     },
     {
@@ -16289,6 +16811,22 @@
           "testFramework": "vitest"
         },
         {
+          "hash": "f157b87779c6cb9d4f32e9de211b399c73c697d00142377368a950b09307dbda",
+          "importOrder": [
+            "test/helpers/temp-db.ts",
+            "src/ingest.ts"
+          ],
+          "importsFiles": [
+            "src/ingest.ts",
+            "test/helpers/temp-db.ts"
+          ],
+          "path": "test/integration/cli-relevance.test.ts",
+          "spawns": [
+            "src/cli.ts"
+          ],
+          "testFramework": "vitest"
+        },
+        {
           "hash": "f4caa30b0f23a9c6aef8dbdad2e3db66d118f7a55b623faa80d4b9c515378ea9",
           "importOrder": [
             "test/helpers/temp-db.ts",
@@ -16305,7 +16843,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "85c6896f630fe5837f10f10ad6892f7cf392efb4a8de601791cc20849839e6c7",
+          "hash": "3690841fb3c8149c89ac00a9084a26ce6a3f43f1de5fa7bad9aa032a7c2226f5",
           "importOrder": [
             "test/helpers/temp-db.ts",
             "src/db.ts",
@@ -16644,7 +17182,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "fc80e203c6dd9fa6790f8721b717098f700c0e2f781199b69d0094b8b21c1d55",
+          "hash": "b728f288a76f007fb9845f38f62a5498f7deffddeaecea41d9fa13b75b2c38c8",
           "importsFiles": [
             "src/products-config.ts",
             "test/helpers/yaml-fixtures.ts"
@@ -16856,6 +17394,25 @@
           "testFramework": "vitest"
         },
         {
+          "hash": "20eadeb8e34ec97e43c4fd54d7da936c24e3b6b266e14b6500845958e1c5b962",
+          "importOrder": [
+            "test/helpers/temp-db.ts",
+            "src/ingest.ts",
+            "src/products-config.ts",
+            "src/workspace.ts",
+            "src/relevance.ts"
+          ],
+          "importsFiles": [
+            "src/ingest.ts",
+            "src/products-config.ts",
+            "src/relevance.ts",
+            "src/workspace.ts",
+            "test/helpers/temp-db.ts"
+          ],
+          "path": "test/unit/relevance.test.ts",
+          "testFramework": "vitest"
+        },
+        {
           "hash": "b81aa655594db14589de2d5f1e97f9c1638299aae1c11ee408421b016d6e4468",
           "importOrder": [
             "test/helpers/temp-db.ts",
@@ -16926,6 +17483,15 @@
             "test/helpers/temp-db.ts"
           ],
           "path": "test/unit/store.test.ts",
+          "testFramework": "vitest"
+        },
+        {
+          "hash": "7ae5b5c5c73b884ba80296241ae90502a86eb42bcf1ee0312f5afbcc83a89adb",
+          "importsFiles": [
+            "src/errors.ts",
+            "src/workspace.ts"
+          ],
+          "path": "test/unit/workspace.test.ts",
           "testFramework": "vitest"
         }
       ],
@@ -17217,12 +17783,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 32
+          "files": 34
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 55
+          "files": 58
         },
         {
           "boundary": "scripts",
@@ -17300,7 +17866,7 @@
       "tests": [
         {
           "config": "vitest.config.ts",
-          "files": 47,
+          "files": 50,
           "job": "release",
           "runner": "vitest",
           "step": "Run tests",
@@ -17495,7 +18061,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 31
+          "files": 33
         }
       ],
       "readers": [],
@@ -17674,12 +18240,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 32
+          "files": 34
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 55
+          "files": 58
         },
         {
           "boundary": "scripts",
@@ -17743,7 +18309,7 @@
         {
           "config": "vitest.config.ts",
           "coverage": true,
-          "files": 47,
+          "files": 50,
           "job": "test",
           "runner": "vitest",
           "step": "Run tests with coverage",
@@ -17794,7 +18360,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 31
+          "files": 33
         }
       ],
       "readers": [],
@@ -17844,7 +18410,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 32
         }
       ],
       "readers": [],
@@ -17889,7 +18455,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 32
         }
       ],
       "readers": [],
@@ -17938,8 +18504,8 @@
   ],
   "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "99831f620c012fa027714334866c7e6b63cc6773",
-    "tracked": 2916
+    "commit": "a3a42b76a033614df3c51f15ec0ffde2b7c8ce9e",
+    "tracked": 2921
   },
   "landings": [
     {
@@ -18197,6 +18763,24 @@
     {
       "readers": [
         {
+          "by": "test/unit/relevance.test.ts",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        },
+        {
+          "by": "test/unit/workspace.test.ts",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "pnpm-lock.yaml",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
           "by": "scripts/verify-citations-sample.mjs",
           "call": "existsSync",
           "confidence": "ast"
@@ -18204,6 +18788,11 @@
         {
           "by": "scripts/verify-citations-sample.mjs",
           "call": "readFileSync",
+          "confidence": "ast"
+        },
+        {
+          "by": "src/relevance.ts",
+          "call": "get",
           "confidence": "ast"
         },
         {
@@ -18227,6 +18816,12 @@
           "by": "src/products-config.ts",
           "call": "readFileSync",
           "confidence": "ast"
+        },
+        {
+          "by": "test/integration/mcp-server.test.ts",
+          "call": "readFileSync",
+          "confidence": "ast",
+          "fromTests": true
         }
       ],
       "target": "products.yaml",
@@ -18310,6 +18905,12 @@
         },
         {
           "by": "test/integration/cli-json.test.ts",
+          "call": "literal",
+          "confidence": "ast",
+          "fromTests": true
+        },
+        {
+          "by": "test/integration/cli-relevance.test.ts",
           "call": "literal",
           "confidence": "ast",
           "fromTests": true
@@ -18503,7 +19104,7 @@
   "overlaps": [],
   "submodules": [],
   "symlinks": [],
-  "testFiles": 86,
+  "testFiles": 89,
   "testsLeftOut": [
     {
       "config": "vitest.config.ts",

@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Claude Synergy includes an 11-tool MCP server that runs over **stdio**. Any MCP-compatible harness — Claude Code, Cline, Cursor, or custom Agent SDK agents — can query the changelog corpus in real time.
+Claude Synergy includes a 14-tool MCP server that runs over **stdio**. Any MCP-compatible harness — Claude Code, Cline, Cursor, or custom Agent SDK agents — can query the changelog corpus in real time.
 
 ## Wiring
 
@@ -193,10 +193,52 @@ All changes between two versions of one product. Useful for migration planning w
 
 Returns every change recorded across `(0.94.0, 0.95.1]` for `anthropic-sdk-typescript`, in the same `ChangesSinceResult[]` shape — grouped by release version. A single call replaces N+1 `get_release` lookups when planning an upgrade.
 
+### `sync_status`
+
+Per-product sync freshness: last fetch timestamp, hours since last fetch, and ingested release count.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `product` | string | no | Limit to one product |
+| `stale_only` | boolean | no | Only return products older than `stale_hours` (or never fetched) |
+| `stale_hours` | number | no | Threshold in hours for `stale_only` (default: 24) |
+
+### `sync_now`
+
+Refresh the corpus on demand (`fetch` → `ingest` → `embed`). Rejects with `InvalidParams` if another `sync_now` is already in flight.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `product` | string | no | Limit to one product |
+| `dry_run` | boolean | no | Preview targets without writing (default: false) |
+| `include_ingest` | boolean | no | Run ingest after fetch (default: true) |
+| `include_embed` | boolean | no | Run embed after ingest (default: true) |
+| `timeout_ms` | number | no | Hard timeout in milliseconds (default: 300000) |
+
+### `workspace_relevance`
+
+Match a workspace directory's installed dependencies against mirrored releases to answer which updates matter and what changed.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `workspace_path` | string | yes | Absolute path to the workspace directory |
+| `include_all` | boolean | no | Include the list of unused product names in addition to the count (default: false) |
+
+**Example call:**
+
+```json
+{
+  "name": "workspace_relevance",
+  "arguments": { "workspace_path": "/path/to/project" }
+}
+```
+
+**How matching works:** `workspace_relevance` and `hk relevance` read only exact, known lockfile names at the top level of the named directory (`package-lock.json`, `pnpm-lock.yaml`, `uv.lock`, `poetry.lock`, `requirements.txt`, `Cargo.lock`, `go.mod`) without recursing, globbing, or executing anything. "No action" is the default answer for products the workspace does not use or already runs at the newest mirrored release; only older installed versions return a release list, ordered newest-first with breaking changes listed first. Nothing is written to the database, and zero model calls are made.
+
 ## Safety properties
 
 - **Network** — queries read the local SQLite database; `search` in hybrid mode (the default) also calls a local Ollama on localhost to embed the query. The server goes out to the internet only for the `sync_now` tool and for the sync on its first call against an empty store (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off).
-- **Vendor text framed** — the six tools that return release text (`search`, `lookup_entity`, `get_release`, `get_changes_since`, `search_breaking_changes`, `compare_versions`) wrap it in a frame marked as quoted data, with a fresh random token in its header and footer on every answer, and mark instruction-shaped lines `[flagged: …]`.
+- **Vendor text framed** — the seven tools that return release text (`search`, `lookup_entity`, `get_release`, `get_changes_since`, `search_breaking_changes`, `compare_versions`, `workspace_relevance`) wrap it in a frame marked as quoted data, with a fresh random token in its header and footer on every answer, and mark instruction-shaped lines `[flagged: …]`.
 - **Freshness stamp** — every answer ends with `data as of: …`, prefixed `STALE:` once the data is more than 7 days old.
 - **No code execution** — accepts JSON-RPC queries, returns structured JSON results. Never executes user input.
 - **Structured errors only** — all exceptions are caught and returned as `McpError` with error code and message. Stack traces are never exposed.

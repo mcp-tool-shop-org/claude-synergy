@@ -128,6 +128,6 @@ The provider's vector dimension is stamped into `schema_meta.embedding_dim` on f
 
 ## Next steps
 
-- [CLI Reference](./cli-reference/) — all 17 commands
+- [CLI Reference](./cli-reference/) — all 18 commands
 - [MCP Server](./mcp-server/) — wire into your agent harness
 - [Architecture](./architecture/) — understand the data model

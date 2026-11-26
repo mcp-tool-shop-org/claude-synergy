@@ -130,13 +130,15 @@ The hybrid pipeline uses **Contextual Retrieval** — each chunk carries context
 ```
 claude-synergy/
   src/
-    cli.ts          # Commander-based CLI (17 commands)
-    mcp-server.ts   # MCP server (11 tools over stdio)
+    cli.ts          # Commander-based CLI (18 commands)
+    mcp-server.ts   # MCP server (14 tools over stdio)
     db.ts           # SQLite schema + migrations
     fetch.ts        # Fetch orchestrator
     fetch-utils.ts  # fetchWithRetry, global timeout controller
     ingest.ts       # Markdown parser + entity extractor
     query.ts        # FTS5 search + formatting
+    workspace.ts    # Top-level lockfile scanner
+    relevance.ts    # Deterministic workspace relevance evaluator
     embed.ts        # Contextual chunking + embedding
     hybrid.ts       # RRF fusion + reranking
     errors.ts       # Structured AppError class

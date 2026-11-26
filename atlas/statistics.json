@@ -134,7 +134,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "src",
-      "qualifyingSourceCommits": 6,
+      "qualifyingSourceCommits": 3,
       "rebaseline": null
     },
     {
@@ -166,7 +166,7 @@
       "confidence": "low",
       "highWater": null,
       "name": "test",
-      "qualifyingSourceCommits": 7,
+      "qualifyingSourceCommits": 4,
       "rebaseline": null
     }
   ],
@@ -199,8 +199,8 @@
         "path": ".github/workflows/test.yml"
       },
       {
-        "commits": 6,
-        "lines": 77,
+        "commits": 5,
+        "lines": 82,
         "path": "CHANGELOG.md"
       },
       {
@@ -219,44 +219,49 @@
         "path": "PRODUCTS.txt"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 270,
         "path": "README.es.md"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 288,
         "path": "README.fr.md"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 274,
         "path": "README.hi.md"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 264,
         "path": "README.it.md"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 284,
         "path": "README.ja.md"
       },
       {
-        "commits": 3,
-        "lines": 34,
+        "commits": 4,
+        "lines": 42,
         "path": "README.md"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 258,
         "path": "README.pt-BR.md"
       },
       {
-        "commits": 1,
-        "lines": 2,
+        "commits": 2,
+        "lines": 278,
         "path": "README.zh.md"
+      },
+      {
+        "commits": 1,
+        "lines": 6,
+        "path": "SECURITY.md"
       },
       {
         "commits": 1,
@@ -264,8 +269,8 @@
         "path": "SHIP_GATE.md"
       },
       {
-        "commits": 12,
-        "lines": 497,
+        "commits": 10,
+        "lines": 483,
         "path": "atlas/README.md"
       },
       {
@@ -274,18 +279,18 @@
         "path": "atlas/boundaries.yaml"
       },
       {
-        "commits": 12,
-        "lines": 2001,
+        "commits": 10,
+        "lines": 1951,
         "path": "atlas/page.json"
       },
       {
-        "commits": 12,
-        "lines": 43166,
+        "commits": 10,
+        "lines": 42943,
         "path": "atlas/statistics.json"
       },
       {
-        "commits": 12,
-        "lines": 42970,
+        "commits": 10,
+        "lines": 42490,
         "path": "atlas/structure.json"
       },
       {
@@ -389,8 +394,8 @@
         "path": "model-families.yaml"
       },
       {
-        "commits": 10,
-        "lines": 32,
+        "commits": 11,
+        "lines": 34,
         "path": "package.json"
       },
       {
@@ -4349,8 +4354,8 @@
         "path": "products/claude-code/releases/2.1.217.md"
       },
       {
-        "commits": 3,
-        "lines": 54,
+        "commits": 2,
+        "lines": 52,
         "path": "products/claude-code/releases/2.1.218.md"
       },
       {
@@ -6450,16 +6455,31 @@
       },
       {
         "commits": 1,
-        "lines": 3,
+        "lines": 8,
+        "path": "site/src/content/docs/handbook/cli-reference.md"
+      },
+      {
+        "commits": 2,
+        "lines": 7,
         "path": "site/src/content/docs/handbook/getting-started.md"
       },
       {
-        "commits": 3,
-        "lines": 879,
+        "commits": 1,
+        "lines": 18,
+        "path": "site/src/content/docs/handbook/mcp-server.md"
+      },
+      {
+        "commits": 1,
+        "lines": 24,
+        "path": "site/src/content/docs/handbook/security.md"
+      },
+      {
+        "commits": 2,
+        "lines": 877,
         "path": "src/cli.ts"
       },
       {
-        "commits": 3,
+        "commits": 2,
         "lines": 264,
         "path": "src/db.ts"
       },
@@ -6479,8 +6499,8 @@
         "path": "src/fetch-html.ts"
       },
       {
-        "commits": 2,
-        "lines": 15,
+        "commits": 1,
+        "lines": 11,
         "path": "src/fetch-mcp-registry.ts"
       },
       {
@@ -6494,18 +6514,18 @@
         "path": "src/fetch.ts"
       },
       {
-        "commits": 2,
-        "lines": 25,
+        "commits": 1,
+        "lines": 17,
         "path": "src/hybrid.ts"
       },
       {
-        "commits": 3,
-        "lines": 196,
+        "commits": 2,
+        "lines": 184,
         "path": "src/ingest.ts"
       },
       {
-        "commits": 4,
-        "lines": 677,
+        "commits": 3,
+        "lines": 667,
         "path": "src/mcp-server.ts"
       },
       {
@@ -6514,13 +6534,13 @@
         "path": "src/products-config.ts"
       },
       {
-        "commits": 3,
-        "lines": 490,
+        "commits": 2,
+        "lines": 462,
         "path": "src/query.ts"
       },
       {
-        "commits": 4,
-        "lines": 557,
+        "commits": 1,
+        "lines": 321,
         "path": "src/screen.ts"
       },
       {
@@ -6569,8 +6589,8 @@
         "path": "test/integration/cli-freshness.test.ts"
       },
       {
-        "commits": 3,
-        "lines": 242,
+        "commits": 1,
+        "lines": 236,
         "path": "test/integration/cli-json.test.ts"
       },
       {
@@ -6579,8 +6599,8 @@
         "path": "test/integration/cli.test.ts"
       },
       {
-        "commits": 4,
-        "lines": 591,
+        "commits": 2,
+        "lines": 588,
         "path": "test/integration/mcp-server.test.ts"
       },
       {
@@ -6594,8 +6614,8 @@
         "path": "test/unit/db.binding.test.ts"
       },
       {
-        "commits": 3,
-        "lines": 306,
+        "commits": 1,
+        "lines": 300,
         "path": "test/unit/db.dim-config.test.ts"
       },
       {
@@ -6619,12 +6639,12 @@
         "path": "test/unit/fetch-utils.test.ts"
       },
       {
-        "commits": 5,
-        "lines": 496,
+        "commits": 2,
+        "lines": 484,
         "path": "test/unit/fetch.test.ts"
       },
       {
-        "commits": 2,
+        "commits": 1,
         "lines": 142,
         "path": "test/unit/ingest.test.ts"
       },
@@ -6639,8 +6659,8 @@
         "path": "test/unit/query.freshness.test.ts"
       },
       {
-        "commits": 3,
-        "lines": 577,
+        "commits": 1,
+        "lines": 505,
         "path": "test/unit/screen.test.ts"
       },
       {
@@ -6669,66 +6689,59 @@
     "level": "low",
     "reason": "fewer than 25 source files reach 10 revisions in the window"
   },
-  "generatedAt": "2026-11-26T12:37:54.715Z",
+  "generatedAt": "2026-11-26T14:58:45.022Z",
   "generatedFrom": {
-    "commit": "99831f620c012fa027714334866c7e6b63cc6773"
+    "commit": "a3a42b76a033614df3c51f15ec0ffde2b7c8ce9e"
   },
   "pairs": [
     {
-      "a": "CHANGELOG.md",
-      "b": "test/unit/fetch.test.ts",
-      "either": 7,
-      "shared": 4,
-      "strength": 0.571429
-    },
-    {
       "a": "atlas/README.md",
       "b": "atlas/page.json",
-      "either": 8,
-      "shared": 8,
+      "either": 6,
+      "shared": 6,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/statistics.json",
-      "either": 8,
-      "shared": 8,
+      "either": 6,
+      "shared": 6,
       "strength": 1
     },
     {
       "a": "atlas/README.md",
       "b": "atlas/structure.json",
-      "either": 8,
-      "shared": 8,
+      "either": 6,
+      "shared": 6,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/statistics.json",
-      "either": 8,
-      "shared": 8,
+      "either": 6,
+      "shared": 6,
       "strength": 1
     },
     {
       "a": "atlas/page.json",
       "b": "atlas/structure.json",
-      "either": 8,
-      "shared": 8,
+      "either": 6,
+      "shared": 6,
       "strength": 1
     },
     {
       "a": "atlas/statistics.json",
       "b": "atlas/structure.json",
-      "either": 8,
-      "shared": 8,
+      "either": 6,
+      "shared": 6,
       "strength": 1
     },
     {
       "a": "package.json",
       "b": "pnpm-lock.yaml",
-      "either": 12,
+      "either": 13,
       "shared": 7,
-      "strength": 0.583333
+      "strength": 0.538462
     }
   ],
   "parameters": {
@@ -6741,16 +6754,16 @@
     "floor": "fallen",
     "floorHeld": false,
     "floorTrigger": "revision-depth",
-    "headDate": "2026-11-26T07:22:48-05:00",
-    "inScopeFiles": 2921,
+    "headDate": "2026-11-26T08:59:01-05:00",
+    "inScopeFiles": 2926,
     "pinnedStart": null,
     "priorFloor": "fallen",
-    "qualifyingCommits": 36,
+    "qualifyingCommits": 33,
     "qualifyingMinimum": 30,
     "revisions": 5,
     "shared": 10,
     "sharedFloorUsed": 3,
-    "since": "2026-05-30T12:22:48.000Z",
+    "since": "2026-05-30T13:59:01.000Z",
     "sourceExtensions": [
       ".js",
       ".mjs",

@@ -30,6 +30,8 @@
 #
 #   OPTIONAL:
 #     notes           string   Free-text notes (e.g., platform requirements).
+#     packages        list     Package identities matched against workspace lockfiles:
+#                              each entry is { ecosystem: npm|pypi|crates|go, name: <pkg> }.
 #     fetch           object   Fetcher configuration. Omit if the product's
 #                              corpus is seeded manually (no automated fetch).
 #
@@ -75,6 +77,9 @@ products:
     tier: 1
     source_url: https://github.com/anthropics/claude-code
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@anthropic-ai/claude-code"
     fetch:
       type: gh-releases
       repo: anthropics/claude-code
@@ -106,6 +111,9 @@ products:
     tier: 1
     source_url: https://github.com/anthropics/claude-agent-sdk-python
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: pypi
+        name: claude-agent-sdk
     fetch:
       type: gh-releases
       repo: anthropics/claude-agent-sdk-python
@@ -115,6 +123,9 @@ products:
     tier: 1
     source_url: https://github.com/anthropics/claude-agent-sdk-typescript
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@anthropic-ai/claude-agent-sdk"
     fetch:
       type: gh-releases
       repo: anthropics/claude-agent-sdk-typescript
@@ -124,6 +135,11 @@ products:
     tier: 1
     source_url: https://github.com/anthropics/anthropic-cli
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: go
+        name: github.com/anthropics/anthropic-cli
+      - ecosystem: go
+        name: github.com/anthropics/anthropic-cli/v2
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-cli
@@ -133,6 +149,9 @@ products:
     tier: 1
     source_url: https://github.com/anthropics/anthropic-sdk-python
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: pypi
+        name: anthropic
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-python
@@ -142,6 +161,19 @@ products:
     tier: 1
     source_url: https://github.com/anthropics/anthropic-sdk-typescript
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@anthropic-ai/sdk"
+      - ecosystem: npm
+        name: "@anthropic-ai/aws-sdk"
+      - ecosystem: npm
+        name: "@anthropic-ai/bedrock-sdk"
+      - ecosystem: npm
+        name: "@anthropic-ai/foundry-sdk"
+      - ecosystem: npm
+        name: "@anthropic-ai/google-cloud-sdk"
+      - ecosystem: npm
+        name: "@anthropic-ai/vertex-sdk"
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-typescript
@@ -152,6 +184,11 @@ products:
     tier: 1
     source_url: https://github.com/anthropics/anthropic-sdk-go
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: go
+        name: github.com/anthropics/anthropic-sdk-go
+      - ecosystem: go
+        name: github.com/anthropics/anthropic-sdk-go/v2
     fetch:
       type: gh-releases
       repo: anthropics/anthropic-sdk-go
@@ -242,6 +279,9 @@ products:
     tier: 1
     source_url: https://github.com/modelcontextprotocol/python-sdk
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: pypi
+        name: mcp
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/python-sdk
@@ -251,6 +291,17 @@ products:
     tier: 1
     source_url: https://github.com/modelcontextprotocol/typescript-sdk
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@modelcontextprotocol/sdk"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/client"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/server"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/core"
+      - ecosystem: npm
+        name: "@modelcontextprotocol/server-legacy"
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/typescript-sdk
@@ -261,6 +312,9 @@ products:
     tier: 1
     source_url: https://github.com/modelcontextprotocol/go-sdk
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: go
+        name: github.com/modelcontextprotocol/go-sdk
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/go-sdk
@@ -315,6 +369,11 @@ products:
     tier: 1
     source_url: https://github.com/modelcontextprotocol/rust-sdk
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: crates
+        name: rmcp
+      - ecosystem: crates
+        name: rmcp-macros
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/rust-sdk
@@ -342,6 +401,9 @@ products:
     tier: 1
     source_url: https://github.com/modelcontextprotocol/inspector
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@modelcontextprotocol/inspector"
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/inspector
@@ -351,6 +413,9 @@ products:
     tier: 1
     source_url: https://github.com/modelcontextprotocol/registry
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: go
+        name: github.com/modelcontextprotocol/registry
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/registry
@@ -360,6 +425,9 @@ products:
     tier: 1
     source_url: https://github.com/modelcontextprotocol/mcpb
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@anthropic-ai/mcpb"
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/mcpb
@@ -369,6 +437,9 @@ products:
     tier: 1
     source_url: https://github.com/modelcontextprotocol/conformance
     fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@modelcontextprotocol/conformance"
     fetch:
       type: gh-releases
       repo: modelcontextprotocol/conformance
