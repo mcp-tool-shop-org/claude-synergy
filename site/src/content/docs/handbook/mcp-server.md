@@ -17,10 +17,7 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "claude-synergy": {
-      "command": "claude-synergy-mcp",
-      "env": {
-        "HK_DB": "/path/to/data/claude-synergy.db"
-      }
+      "command": "claude-synergy-mcp"
     }
   }
 }
@@ -35,14 +32,13 @@ Add to your project's `.mcp.json`:
   "mcpServers": {
     "claude-synergy": {
       "command": "claude-synergy-mcp",
-      "args": [],
-      "env": {
-        "HK_DB": "/path/to/data/claude-synergy.db"
-      }
+      "args": []
     }
   }
 }
 ```
+
+With no `env`, the server uses `./data/claude-synergy.db` if that file already exists, otherwise `~/.claude-synergy/data/claude-synergy.db`, and fills an empty store once on its first tool call. Set `CLAUDE_SYNERGY_DB` to choose the path, or `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` to stop the first-use sync.
 
 ### Programmatic (Agent SDK)
 
@@ -51,7 +47,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 const transport = new StdioClientTransport({
   command: 'claude-synergy-mcp',
-  env: { HK_DB: '/path/to/data/claude-synergy.db' },
+  env: { CLAUDE_SYNERGY_DB: '/path/to/data/claude-synergy.db' },
 });
 ```
 
@@ -199,7 +195,9 @@ Returns every change recorded across `(0.94.0, 0.95.1]` for `anthropic-sdk-types
 
 ## Safety properties
 
-- **No network calls** — the MCP server reads only from the local SQLite database. No HTTP, no DNS, no egress.
+- **Network only to sync** — queries read only the local SQLite database. The server goes online only for the `sync_now` tool and for the one-time sync on its first call against an empty store (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off).
+- **Vendor text framed** — the six tools that return release text (`search`, `lookup_entity`, `get_release`, `get_changes_since`, `search_breaking_changes`, `compare_versions`) wrap it in a frame marked as quoted data, with a fresh random token in its header and footer on every answer, and mark instruction-shaped lines `[flagged: …]`.
+- **Freshness stamp** — every answer ends with `data as of: …`, prefixed `STALE:` once the data is more than 7 days old.
 - **No code execution** — accepts JSON-RPC queries, returns structured JSON results. Never executes user input.
 - **Structured errors only** — all exceptions are caught and returned as `McpError` with error code and message. Stack traces are never exposed.
 - **Timeout protection** — every query has a 30-second timeout guard. Hung providers cannot block the server.

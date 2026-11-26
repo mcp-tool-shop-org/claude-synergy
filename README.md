@@ -100,9 +100,9 @@ Roadmap beyond v1.3: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and iss
 
 ## Security & data model
 
-This tool runs locally. **Data touched:** a derived SQLite database and markdown release files — all re-creatable. **Network:** outbound HTTPS only when you run `hk fetch`/`hk sync` (GitHub API, RSS feeds, changelog pages, MCP registries) or `hk embed` with a remote provider (Voyage, Cohere). **Secrets:** reads `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` from env vars — never logged, never stored to disk. **No telemetry.** See [SECURITY.md](SECURITY.md) for reporting policy.
+This tool runs locally. **Data touched:** a derived SQLite database and markdown release files — all re-creatable. **Network:** outbound HTTPS when you run `hk fetch`/`hk sync`, when an agent calls the MCP `sync_now` tool, and once on first use: a query command or MCP tool run against an empty store syncs on its own (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off). Destinations are the GitHub API, RSS feeds, changelog pages and MCP registries, plus Voyage or Cohere only for `hk embed` with a remote provider. **Secrets:** reads `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` from env vars — never logged, never stored to disk. **No telemetry.** See [SECURITY.md](SECURITY.md) for reporting policy.
 
-**Vendor text:** Third-party release notes and catalog entries are treated strictly as quoted data, never standing instructions. Release text is deterministically screened at ingest (stripping hidden Unicode controls, neutralising image/unsafe links, redacting emails and home paths, and flagging instruction-shaped patterns), wrapped in a fixed data frame in MCP answers with inline `[flagged: …]` markers, and never written into instruction files.
+**Vendor text:** Third-party release notes and catalog entries are treated strictly as quoted data, never standing instructions. Release text is deterministically screened at ingest (stripping hidden Unicode controls, neutralising image/unsafe links, redacting emails and home paths, and flagging instruction-shaped patterns), wrapped in a fixed data frame by the six MCP tools that return release text, with inline `[flagged: …]` markers, and never written into instruction files.
 
 ---
 
