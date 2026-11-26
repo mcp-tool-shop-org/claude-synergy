@@ -360,7 +360,7 @@ CI：`.github/workflows/test.yml`は、`pnpm test:coverage`をpushおよびプ�
 
 `sqlite-vec`ネイティブ拡張のロードに失敗しました。一般的な原因：
 
-1. **Nodeのバージョンが古い**：`claude-synergy`はNode 22以降が必要です。`node -v`で確認してください。
+1. **Nodeのバージョンが古い**：`claude-synergy`はWindows、macOS、Linux（glibc または musl）の x64 または arm64 上で Node 22.12 以降が必要です。32 ビット ARM には対応していません。`node -v`で確認してください。
 2. **ネイティブモジュールの再ビルドが必要**：`npm rebuild better-sqlite3`（または`pnpm rebuild better-sqlite3`）を実行してください。
 3. **プラットフォームの不一致**：Windows/ARMでは、`better-sqlite3`にC++のビルドツールチェーンが必要です。 [windows-build-tools](https://github.com/nicedoc/windows-build-tools)またはVisual Studio Build Toolsを「C++によるデスクトップ開発」オプションでインストールしてください。
 

@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-11-26
+
+The first published release of the 2.x line: the `v2.0.0` tag exists, but its release run failed in the test step and published nothing, so 2.0.0 is not on npm. 2.0.1 ships the same package with one test fix. Read the 2.0.0 notes below for what changed since 1.2.2.
+
+### Fixed
+- **Integration tests under a newer npm:** the CLI tests drop `npx`'s own `npm warn` lines before checking the CLI's stderr; under the release job's newer npm, `npx` warned about pnpm's `npm_config_*` variables and the tests mistook that for a CLI error.
+
+## [2.0.0] - 2026-11-25
+
+**Current runtime dependencies, Node 22.12 or newer, and no 32-bit ARM.** The published package now depends on better-sqlite3 13, commander 15 and fast-xml-parser 5. No CLI command, MCP tool or schema changes.
+
+### Breaking
+- **Node 22.12 or newer:** commander 15 needs it, so `engines.node` is now `>=22.12.0` (it was `>=22.0.0`; npm only warns on an older Node).
+- **32-bit ARM Linux is no longer supported:** better-sqlite3 13 ships prebuilt drivers only for Windows, macOS and Linux (glibc and musl) on x64 and arm64, where 11 also covered 32-bit ARM.
+
+### Added
+- **`SQLITE_BINDING_ERROR`:** when the SQLite driver is missing or was built for another Node, the CLI and MCP server now say so, with the supported platforms in the hint, instead of a raw module-not-found stack; when native addons are disabled (`--no-addons`, or `--permission` without `--allow-addons`), the hint says so.
+
+### Changed
+- **Runtime dependencies:** `better-sqlite3` `^11.5.0` → `^13.2.0`, `commander` `^12.1.0` → `^15.0.0`, `fast-xml-parser` `^4.5.0` → `^5.11.1`.
+- **Supported platforms stated:** README (8 languages), the handbook and CONTRIBUTING name Node 22.12 and the supported platforms.
+- **Synergies:** a local home path removed from `synergies/03`, `04` and `05`.
+
+### Security
+- **Lockfile advisories cleared:** `js-yaml` 3.15.2, `undici` 7.30.0, `fast-uri` 3.1.8 and `ip-address` 10.7.2.
+
+### Repository (not in the npm package)
+- A `typecheck` gate in CI; coverage and test results upload to Codecov through OIDC; the Atlas map is checked in CI (Atlas 1.26.0).
+- The site moved to Astro 7, which carries the sharp patch, and its lockfile takes `devalue` 5.9.3+ (GHSA-j22f-vq7h-c4qm, GHSA-mcm9-63f2-9j32).
+- The daily changelog sync opens a pull request on `sync/daily` instead of pushing to the protected `main`.
+
 ## [1.2.2] - 2026-05-25
 
 Docs-only patch. No code, schema, or behavior change. The `dist/` tarball is byte-identical to 1.2.1.

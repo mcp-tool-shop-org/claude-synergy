@@ -360,7 +360,7 @@ Another `hk` process (or a stale MCP server) is holding the SQLite database open
 
 The `sqlite-vec` native extension failed to load. Common causes:
 
-1. **Node version too old** — `claude-synergy` requires Node 22+. Check with `node -v`.
+1. **Node version too old** — `claude-synergy` requires Node 22.12 or newer on Windows, macOS or Linux (glibc or musl), x64 or arm64; 32-bit ARM is not supported. Check with `node -v`.
 2. **Native module needs rebuild** — run `npm rebuild better-sqlite3` (or `pnpm rebuild better-sqlite3`).
 3. **Platform mismatch** — on Windows/ARM, `better-sqlite3` needs a C++ build toolchain. Install the [windows-build-tools](https://github.com/nicedoc/windows-build-tools) or Visual Studio Build Tools with "Desktop development with C++".
 

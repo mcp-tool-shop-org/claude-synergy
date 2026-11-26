@@ -48,17 +48,17 @@
 - [x] `[all]` Dependency scanning runs in CI (ecosystem-appropriate) (2026-05-22 — pnpm audit in test.yml)
 - [x] `[all]` Automated dependency update mechanism exists (2026-05-22 — .github/dependabot.yml)
 - [x] `[npm]` `npm pack --dry-run` includes: dist/, README.md, CHANGELOG.md, LICENSE (2026-05-22 — CHANGELOG.md added to files field)
-- [x] `[npm]` `engines.node` set (2026-05-22 — >=22.0.0)
+- [x] `[npm]` `engines.node` set (2026-11-25 — >=22.12.0)
 - [x] `[npm]` Lockfile committed (2026-05-22 — pnpm-lock.yaml tracked)
 - [x] `[vsix]` SKIP: not a VS Code extension
 - [x] `[desktop]` SKIP: not a desktop app
 
 ## E. Identity (soft gate — does not block ship)
 
-- [ ] `[all]` Logo in README header
-- [ ] `[all]` Translations (polyglot-mcp, 8 languages)
-- [ ] `[org]` Landing page (@mcptoolshop/site-theme)
-- [ ] `[all]` GitHub repo metadata: description, homepage, topics
+- [x] `[all]` Logo in README header (2026-11-25)
+- [x] `[all]` Translations (polyglot-mcp, 8 languages) (2026-11-25: README.md + 7 translations)
+- [x] `[org]` Landing page (@mcptoolshop/site-theme) (2026-11-25: live, HTTP 200)
+- [x] `[all]` GitHub repo metadata: description, homepage, topics (2026-11-25: homepage set, 13 topics)
 
 ---
 
