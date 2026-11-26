@@ -73,8 +73,6 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**最新の数値（v1.2.1時点）：** 44個の製品/1,171個のリリースファイル/6,573個の変更/1,260個のエンティティ/12個のシナジー/519個のテスト/13個のMCPツール/17個のCLIコマンド。（2026年5月24日に`sync_now`を通じて更新されたコーパス。）
-
 ---
 
 ## ステータス - すべての階層がリリース済み
@@ -84,7 +82,7 @@ claude-synergy/
 | **1 - ブートストラップ（マークダウンコーパス）** | ✅ リリース済み | Study-swarmは、2026年1月から5月にかけて706個のリリースファイルを収集し、Tier 4dで1,186個に拡張しました。 |
 | **2a - SQLite + FTS5 + CLI** | ✅ リリース済み | `hk` CLI、15個のサブコマンド、sub-300ms インジェスト |
 | **2b - sqlite-vec + コンテキスト検索** | ✅ リリース済み | プロバイダープラグ可能（なし/構造化/ollama/claude-haikuコンテキスト × ollama/voyage埋め込み × なし/ollama-judge/voyage/cohere再ランキング） |
-| **3 - 同期 + MCPサーバー** | ✅ リリース済み | `hk fetch / sync / seed-markers`、`claude-synergy-mcp`は、標準出力経由で13個のツールを公開します（元のTier-3リリース時の8個、v1.1で3個追加、v1.2で2個追加） |
+| **3 — 同期 + MCPサーバー** | ✅ リリース済み | `hk fetch / sync / seed-markers`、`claude-synergy-mcp` はstdio経由で14個のツールを公開（元のティア3リリース時に8個、v1.1で3個追加、v1.2で2個追加、1個のワークスペース関連ツール） |
 | **4a - Anthropicを超えて拡張** | ✅ リリース済み | +15個のMCP SDK、Cursor（RSS）、Aider（HISTORY.md）、Continue.dev、Cody Enterprise（RSSでフィルタリング） |
 | **4b - HTMLスクレイプフェッチャー** | ✅ リリース済み | GitHub Copilot + VS Code Chat（WindsurfにはPlaywrightが必要 - v0.7） |
 | **4c - HTMLからマークダウンへの変換によるインジェスト** | ✅ リリース済み | HTML本文（Copilot/VS Code/Cursor）は、現在、FTS5とエンティティ抽出のために、箇条書きごとの行を生成します。 |
@@ -100,9 +98,9 @@ v1.3以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)と課
 
 ## セキュリティとデータモデル
 
-このツールはローカルで実行されます。**アクセスするデータ:** 派生したSQLiteデータベースと、リリース用のマークダウンファイル。これらはすべて再作成可能です。**ネットワーク:** `hk fetch`/`hk sync`を実行したとき、エージェントがMCPの`sync_now`ツールを呼び出したとき、および初回使用時に、アウトバウンドHTTPS通信が発生します。空のストアに対してクエリコマンドまたはMCPツールを実行すると、自動的に同期されます（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1`で無効にできます）。宛先は、GitHub API、RSSフィード、変更履歴ページ、MCPレジストリです。リモートのAIプロバイダーは、選択した場合にのみ使用されます：`hk embed`（Voyageの埋め込み、コンテキスト生成にはAnthropic）、または`hk hybrid -e voyage` / `-r voyage|cohere`。それ以外の場合、ハイブリッド検索（MCPの`search`ツールの既定モードを含む）は、クエリの埋め込みにlocalhost上のローカルOllamaを呼び出します。**機密情報:** 環境変数から`GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY`を読み込みます。ログに記録したり、ディスクに保存したりすることはありません。**テレメトリーは行いません。**報告ポリシーについては、[SECURITY.md](SECURITY.md)を参照してください。
+このツールはローカルで実行されます。**アクセスされるデータ：**派生した SQLite データベースとマークダウンのリリースファイル — これらはすべて再作成できます。ワークスペース関連性は、呼び出し者が指定するディレクトリの先頭にある最大7つの名前付きロックファイルを読み取ります。**ネットワーク：** `hk fetch` / `hk sync` を実行する場合、エージェントがMCP `sync_now` ツールを呼び出す場合、および初回使用時にアウトバウンドHTTPSを使用します。コマンドまたはMCPツールを空のストアに対して実行すると、それ自体で同期されます（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` はこれを無効にします）。宛先は、GitHub API、RSSフィード、変更履歴ページ、およびMCPレジストリです。さらに、リモートAIプロバイダーは、選択した場合にのみ使用されます。`hk embed`（Voyage埋め込み、Anthropicによるコンテキスト生成）、または`hk hybrid -e voyage` / `-r voyage|cohere`。それ以外の場合、ハイブリッド検索（MCP `search` のデフォルトモードを含む）はクエリの埋め込みに localhost のローカル Ollama を呼び出します。**シークレット：** `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` を環境変数から読み取ります。これらはログに記録されず、ディスクに保存されません。**テレメトリはありません。** 報告ポリシーについては、[SECURITY.md](SECURITY.md) を参照してください。
 
-**ベンダーのテキスト:** サードパーティのリリースノートとカタログエントリは、引用されたデータとして厳密に扱われ、指示として解釈されることはありません。リリーステキストは、取り込み時に決定的にスクリーニングされます（隠された Unicode 制御文字の削除、画像/安全でないリンクの中和、メールアドレスとホームパスの伏せ字化、および指示のようなパターンにフラグを立てる）。リリーステキストを返す 6 つの MCP ツールでは固定データフレームにラップされ、インラインの `[flagged: …]` マーカーが付きます。リリーステキストは、指示ファイルには書き込まれません。
+**ベンダーのテキスト:** サードパーティのリリースノートとカタログエントリは、引用されたデータとして厳密に扱われ、決して指示として解釈されることはありません。リリーステキストは、取り込み時に決定的にスクリーニングされます（隠れた Unicode 制御文字の削除、画像/安全でないリンクの中和、メールアドレスとホームパスの削除、および指示のようなパターンにフラグを立てる）。その後、7つのMCPツールによって固定データフレームにラップされ、インラインの`[flagged: …]`マーカーが追加され、決して指示ファイルに書き込まれることはありません。
 
 ---
 
@@ -131,7 +129,7 @@ npm link         # makes `hk` and `claude-synergy-mcp` available globally
 
 ---
 
-## CLI のインターフェース — 17 個のコマンド
+## CLIインターフェース — 18個のコマンド
 
 ```
 # DB lifecycle
@@ -143,12 +141,12 @@ hk sync                              # combined fetch → ingest → embed (cron
 hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 keyword search (+ --until <date>)
-hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --rerank, --until)
+hk query "managed agents"            # FTS5 keyword search (+ --package, --until)
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --package, --rerank, --until)
 
 # Windowed change browsing
-hk diff [product] --since 7d         # what changed in a window, grouped by product+version
-hk breaking --since 30d              # filter-browse of breaking changes (no search term)
+hk diff [product] --since 7d         # what changed in a window (+ --package; grouped per package on multi-package products)
+hk breaking --since 30d              # filter-browse of breaking changes (+ --package; grouped per package when omitted)
 
 # Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
@@ -157,12 +155,13 @@ hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases (+ --since <date>)
+hk latest [--product X] [--limit N]  # recent releases (+ --package, --since; grouped per package when --package omitted)
 hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
                                      #  hook_event, setting_key)
+hk relevance <dir> [--all] [--json]  # check which mirrored products matter to a workspace
 ```
 
 **v1.1 での新機能:** `hk diff` と `hk breaking` は、検索語句を必要とせずに、「最近何が変わったのか？」に答えます。日付の範囲は一貫しています。すべてのブラウジングコマンドは、`--since` と `--until` を `YYYY-MM-DD` (または完全な ISO 8601) で受け取るか、相対的な形式 (`7d`、`2w`、`3m`、`1y`) を受け取ります。
@@ -237,7 +236,7 @@ $ hk breaking --since 30d --limit 5
 
 ## MCP サーバー — エージェントにこのコーパスへのアクセス権を与えます
 
-`claude-synergy-mcp` は、stdio を介して 13 個のツールを公開します。Claude Code (または任意の MCP ホスト) に、`~/.claude/.mcp.json` またはプロジェクトの `.mcp.json` を介して接続します。
+`claude-synergy-mcp`は、stdio経由で14個のツールを公開します。Claude Code（または任意のMCPホスト）に、`~/.claude/.mcp.json`またはプロジェクトの`.mcp.json`を介して接続します。
 
 ```json
 {
@@ -257,19 +256,22 @@ GitHub Copilotの`.vscode/mcp.json`については、`mcpServers`の代わりに
 
 | ツール | 目的 |
 |---|---|
-| `search` | ハイブリッド FTS5 + vec。オプションのリランキング。自然言語クエリのデフォルトモード。（+ `until` 上限日付） |
+| `search` | ハイブリッドのFTS5 + vec。オプションで再ランキングを行います。`package?`を受け入れます（省略時は複数パッケージ製品でパッケージごとにグループ化）。また、複数のパッケージの結果に`product (package)@version`のラベルを付けます。 |
 | `lookup_entity` | 正確なエンティティ履歴：環境変数、スラッシュコマンド、モデル ID、CVE など。 |
-| `latest_releases` | 製品（または 1 つの製品）における最近のリリース。（+ `since` 下限日付） |
-| `get_release` | 1 つのリリースの完全なコンテンツ |
+| `latest_releases` | 製品（または1つ）における最近のリリース。`package?`と`since?`を受け入れ、`package`を省略した場合、複数パッケージ製品ではパッケージごとにグループ化します。 |
+| `get_release` | 1つのリリースの完全なコンテンツ（複数のパッケージを持つ製品では、`package`が必要です）。 |
 | `list_products` | カウントと最新バージョンを含む列挙 |
 | `top_entities` | タイプ別の最も頻繁に言及されるエンティティ |
 | `list_synergies` | キュレーションされたクロス製品のワークフロー。（+ オプションの `product` フィルター） |
 | `read_synergy` | 1 つのシナジーファイルの完全なテキスト |
-| `get_changes_since` | **新機能。** 時間ウィンドウ内の変更を、製品とバージョンごとにグループ化します。入力：`since`（必須）、`until?`、`product?`、`kind?`、`limit?`。 |
-| `search_breaking_changes` | **新機能。** 破壊的変更のフラットリスト — 検索語句は必要ありません。入力：`product?`、`since?`、`until?`、`limit?`。 |
-| `compare_versions` | **v1.1。** 1 つの製品の 2 つのバージョン間のすべての変更。入力：`product`、`from_version`、`to_version`。 |
+| `get_changes_since` | 時間ウィンドウ内の変更。リリースごとにグループ化（複数のパッケージを持つ製品では、パッケージごとにグループ化）。入力：`since`（必須）、`until?`、`product?`、`package?`、`kind?`、`limit?`。 |
+| `search_breaking_changes` | 検索語句なしの互換性のない変更。入力：`product?`、`package?`、`since?`、`until?`、`limit?`（`package`を省略した場合、複数パッケージ製品ではパッケージごとにグループ化）。 |
+| `compare_versions` | 1つのパッケージ/製品の2つのバージョン間のすべての変更。入力：`product`、`package?`（複数のパッケージを持つ製品では必須）、`from_version`、`to_version`。 |
 | `sync_status` | **v1.2。** 製品ごとの同期の鮮度 — 最後のフェッチのタイムスタンプ、フェッチからの経過時間、取り込まれたリリースの数。入力：`product?`、`stale_only?`、`stale_hours?`。コーパスが古いかどうかを確認するために `latest_releases` を信頼する前に使用してください。 |
 | `sync_now` | **v1.2.** 必要に応じて更新（`hk sync`をミラーリング）。入力：`product?`、`dry_run?`、`include_ingest?`、`include_embed?`、`timeout_ms?`。別の`sync_now`がすでに実行中の場合、`InvalidParams`で拒否します。Gitにはコミットしません。 |
+| `workspace_relevance` | ワークスペースディレクトリの最上位レベルのロックファイルを、ミラーリングされたリリースに対して照合します。入力：`workspace_path`（必須、絶対ディレクトリパス）、`include_all?`（ブール値、使用されていない製品名をリストします）。読み取り専用です。アクションが必要な製品から始まり、互換性のない変更を最初にリストします。 |
+
+**照合の仕組み:** `hk relevance`と`workspace_relevance`は、名前が指定されたディレクトリの最上位レベルにある正確な、既知のロックファイル名のみを読み取ります（`package-lock.json`、`pnpm-lock.yaml`、`uv.lock`、`poetry.lock`、`requirements.txt`、`Cargo.lock`、`go.mod`）。再帰、グロビング、または外部コマンドの実行は行いません。「アクションなし」は、ワークスペースが使用していない製品、またはすでに最新のミラーリングされたリリースで実行されている製品に対するデフォルトの答えです。アクションリストを返すのは、古いインストールバージョンのみで、互換性のない変更から始まり、最新のものから順に並べられます。チェックは読み取り専用であり（データベースには何も書き込まれません）、決定論的です（モデルの呼び出しはありません）。
 
 v1.1のツールは、以前はスクリプトが必要だった`hk diff`/`hk breaking`の機能を再現し、バージョン比較のワークフローを実現します。v1.2の同期ツールは、セッションがコーパスを検索できるものの、更新できないという問題を解決します。具体的には、`sync_status`がデータの古さを検出し、`sync_now`がパイプラインを実行します。完全な入力スキーマについては、[ハンドブック → MCPサーバー](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/)を参照してください。
 
@@ -350,7 +352,7 @@ pnpm test:smoke         # opt-in full-corpus smoke (RUN_SMOKE=1)
 | ディレクトリ | 対象範囲 |
 |-----|----------------|
 | `test/unit/` | モジュールごと — 抽出、取り込み、クエリ (`until` / 参照 / 以降 / 比較を含む)、データベース (次元構成 v3 の移行を含む)、埋め込み、ハイブリッド、フェッチ + すべてのプロバイダー (Ollama / Voyage / **OpenAI**) + フェッチ RSS/変更ログ (keep-a-changelog パーサーを含む) / HTML + フェッチ MCP レジストリ + フェッチ Playwright + 製品構成 + シナジー取り込み/クエリ |
-| `test/integration/` | エンドツーエンド — パイプライン、同期、MCP サーバー (stdio JSON-RPC、13 のツールを含む `sync_status` / `sync_now`)、CLI (`hk diff`、`hk breaking` を含む) |
+| `test/integration/` | エンドツーエンド — パイプライン、同期、MCPサーバー（stdio JSON-RPC、14のツールを含む、`sync_status` / `sync_now` / `workspace_relevance`）、CLI（`hk diff`、`hk breaking`、`hk relevance`を含む） |
 | `test/regression/` | §8.1–§8.19 — それぞれは、開発中に修正された実際のバグに対する保護を提供します (§8.19: ghReleases の早期終了ページネーションにより、ウィンドウ内のアイテムが保持されます) |
 | `test/smoke/` | 実際の `products/` (1,143 ファイル) に対して、オプトインで完全なコーパスを使用 |
 | `test/fixtures/` | 3 つの偽の製品 + モック HTTP レスポンス (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / 公式 MCP レジストリ) |

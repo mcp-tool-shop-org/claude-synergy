@@ -73,8 +73,6 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Dados em tempo real (a partir de v1.2.1):** 44 produtos / 1.171 arquivos de lançamento / 6.573 alterações / 1.260 entidades / 12 sinergias / 519 testes / 13 ferramentas MCP / 17 comandos CLI. (O corpus é atualizado via `sync_now` em 24 de maio de 2026.)
-
 ---
 
 ## Status — todas as camadas foram lançadas
@@ -84,7 +82,7 @@ claude-synergy/
 | **1 — bootstrap (corpus markdown)** | ✅ lançado | Um conjunto de 706 arquivos de lançamento foi criado de janeiro a maio de 2026; expandido para 1.186 na Camada 4d |
 | **2a — SQLite + FTS5 + CLI** | ✅ lançado | CLI `hk`; 15 subcomandos; ingestão sub-300ms |
 | **2b — sqlite-vec + Recuperação Contextual** | ✅ lançado | Adaptável ao provedor (nenhum/estruturado/ollama/contexto claude-haiku × incorporação ollama/voyage × nenhum/ollama-judge/voyage/cohere rerank) |
-| **3 — sincronização + servidor MCP** | ✅ lançado | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` expõe 13 ferramentas via stdio (8 no lançamento original da Camada 3, 3 adicionadas em v1.1, 2 adicionadas em v1.2) |
+| **3 — sincronização + servidor MCP** | ✅ lançado | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` expõe 14 ferramentas via stdio (8 no lançamento original da Camada 3, 3 adicionadas em v1.1, 2 adicionadas em v1.2, 1 ferramenta de relevância do espaço de trabalho) |
 | **4a — expansão além da Anthropic** | ✅ lançado | +15 SDKs MCP, Cursor (RSS), Aider (HISTORY.md), Continue.dev, Cody Enterprise (RSS filtrado) |
 | **4b — coletor de raspagem HTML** | ✅ lançado | GitHub Copilot + VS Code Chat (Windsurf precisa de Playwright — v0.7) |
 | **4c — ingestão de conversão de HTML para markdown** | ✅ lançado | Os corpos HTML (Copilot/VS Code/Cursor) agora produzem linhas por item para FTS5 + extração de entidades |
@@ -100,9 +98,9 @@ Roteiro além de v1.3: rastreado em [URGENT_FINDINGS.md](URGENT_FINDINGS.md) e p
 
 ## Segurança e modelo de dados
 
-Esta ferramenta é executada localmente. **Dados acessados:** um banco de dados derivado SQLite e arquivos de lançamento markdown — todos podem ser recriados. **Rede:** HTTPS de saída quando você executa `hk fetch`/`hk sync`, quando um agente chama a ferramenta MCP `sync_now` e no primeiro uso: um comando de consulta ou uma ferramenta MCP executados em um armazenamento vazio sincronizam por conta própria (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` desativa isso). Os destinos são a API do GitHub, feeds RSS, páginas de changelog e registros MCP, além de um provedor de IA remoto apenas quando você escolhe um: `hk embed` (embeddings Voyage, Anthropic para geração de contexto) ou `hk hybrid -e voyage` / `-r voyage|cohere`. Caso contrário, a busca híbrida, incluindo o modo padrão da ferramenta MCP `search`, chama um Ollama local em localhost para gerar o embedding da consulta. **Segredos:** lê `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` de variáveis de ambiente — nunca são registrados, nunca são armazenados em disco. **Sem telemetria.** Consulte [SECURITY.md](SECURITY.md) para obter a política de relatórios.
+Esta ferramenta é executada localmente. **Dados acessados:** um banco de dados SQLite derivado e arquivos de lançamento markdown — todos podem ser recriados. A relevância do espaço de trabalho lê até sete arquivos de bloqueio nomeados no topo de um diretório especificado pelo usuário. **Rede:** HTTPS de saída quando você executa `hk fetch`/`hk sync`, quando um agente chama a ferramenta MCP `sync_now` e na primeira utilização: um comando de consulta ou uma ferramenta MCP executada em um armazenamento vazio são sincronizadas por conta própria (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` desativa isso). Os destinos são a API GitHub, feeds RSS, páginas de registro de alterações e registros MCP, além de um provedor de IA remoto somente quando você escolher um: `hk embed` (incorporações Voyage, Anthropic para geração de contexto) ou `hk hybrid -e voyage` / `-r voyage|cohere`. Caso contrário, a pesquisa híbrida, incluindo o modo padrão da ferramenta MCP `search`, chama um Ollama local no localhost para incorporar a consulta. **Segredos:** lê `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` de variáveis de ambiente — nunca são registrados, nunca são armazenados em disco. **Sem telemetria.** Consulte [SECURITY.md](SECURITY.md) para obter a política de relatórios.
 
-**Texto do fornecedor:** As notas de lançamento e as entradas do catálogo de terceiros são tratadas estritamente como dados citados, nunca como instruções permanentes. O texto do lançamento é examinado de forma determinística durante a ingestão (removendo controles Unicode ocultos, neutralizando links de imagem/não seguros, removendo endereços de e-mail e caminhos de diretório, e marcando padrões semelhantes a instruções), encapsulado em uma estrutura de dados fixa pelas seis ferramentas MCP que retornam o texto do lançamento, com marcadores `[flagged: …]` embutidos, e nunca gravado em arquivos de instrução.
+**Texto do fornecedor:** As notas de lançamento e as entradas do catálogo de terceiros são tratadas estritamente como dados citados, nunca como instruções permanentes. O texto do lançamento é examinado de forma determinística durante a ingestão (removendo controles Unicode ocultos, neutralizando links de imagem/não seguros, removendo endereços de e-mail e caminhos de diretório, e marcando padrões que se assemelham a instruções), encapsulado em uma estrutura de dados fixa pelas sete ferramentas MCP que retornam o texto do lançamento, com marcadores `[flagged: …]` embutidos, e nunca gravado em arquivos de instrução.
 
 ---
 
@@ -131,7 +129,7 @@ Para desenvolvimento sem compilação, use `npx tsx src/cli.ts ...` diretamente.
 
 ---
 
-## Interface da CLI — 17 comandos
+## Interface da CLI — 18 comandos
 
 ```
 # DB lifecycle
@@ -143,12 +141,12 @@ hk sync                              # combined fetch → ingest → embed (cron
 hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 keyword search (+ --until <date>)
-hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --rerank, --until)
+hk query "managed agents"            # FTS5 keyword search (+ --package, --until)
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --package, --rerank, --until)
 
 # Windowed change browsing
-hk diff [product] --since 7d         # what changed in a window, grouped by product+version
-hk breaking --since 30d              # filter-browse of breaking changes (no search term)
+hk diff [product] --since 7d         # what changed in a window (+ --package; grouped per package on multi-package products)
+hk breaking --since 30d              # filter-browse of breaking changes (+ --package; grouped per package when omitted)
 
 # Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
@@ -157,12 +155,13 @@ hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases (+ --since <date>)
+hk latest [--product X] [--limit N]  # recent releases (+ --package, --since; grouped per package when --package omitted)
 hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
                                      #  hook_event, setting_key)
+hk relevance <dir> [--all] [--json]  # check which mirrored products matter to a workspace
 ```
 
 **Novo em v1.1:** `hk diff` e `hk breaking` respondem a "o que mudou recentemente?" sem precisar de um termo de pesquisa. Os limites de data são uniformes: cada comando de navegação recebe `--since` e `--until` em `YYYY-MM-DD` (ou ISO 8601 completo) ou uma forma relativa (`7d`, `2w`, `3m`, `1y`).
@@ -237,7 +236,7 @@ Nenhum termo de pesquisa é necessário — `hk breaking` é a resposta para "al
 
 ## Servidor MCP — dê aos seus agentes acesso a este corpus
 
-`claude-synergy-mcp` expõe 13 ferramentas via stdio. Integre ao Claude Code (ou qualquer host MCP) via `~/.claude/.mcp.json` ou o `.mcp.json` do seu projeto:
+`claude-synergy-mcp` expõe 14 ferramentas via stdio. Integre ao Claude Code (ou qualquer host MCP) via `~/.claude/.mcp.json` ou o `.mcp.json` do seu projeto:
 
 ```json
 {
@@ -257,19 +256,22 @@ Ferramentas expostas:
 
 | Ferramenta | Finalidade |
 |---|---|
-| `search` | Híbrido FTS5 + vec; reclassificação opcional. Modo padrão para consultas em linguagem natural. (+ limite superior de data `until`) |
+| `search` | Híbrido FTS5 + vetorial; reclassificação opcional. Aceita `package?` (grupos por pacote em produtos de vários pacotes quando omitido) e rotula os resultados de vários pacotes com `product (package)@version`. |
 | `lookup_entity` | Histórico exato de entidades: variáveis de ambiente, comandos de barra, IDs de modelo, CVEs, etc. |
-| `latest_releases` | Lançamentos recentes em produtos (ou um). (+ limite inferior de data `since`) |
-| `get_release` | Conteúdo completo de um lançamento |
+| `latest_releases` | Lançamentos recentes em produtos (ou um). Aceita `package?` e `since?`; agrupa por pacote quando `package` é omitido em produtos de vários pacotes. |
+| `get_release` | Conteúdo completo de um lançamento (`package` obrigatório em produtos de vários pacotes). |
 | `list_products` | Enumeração com contagens + versão mais recente |
 | `top_entities` | Entidades mais mencionadas por tipo |
 | `list_synergies` | Fluxos de trabalho selecionados entre produtos. (+ filtro opcional `product`) |
 | `read_synergy` | Texto completo de um arquivo de sinergia |
-| `get_changes_since` | **Novo.** Alterações em uma janela de tempo, agrupadas por produto+versão. Entradas: `since` (obrigatório), `until?`, `product?`, `kind?`, `limit?`. |
-| `search_breaking_changes` | **Novo.** Lista simples de alterações incompatíveis — nenhum termo de pesquisa é necessário. Entradas: `product?`, `since?`, `until?`, `limit?`. |
-| `compare_versions` | **v1.1.** Todas as alterações entre duas versões de um produto. Entradas: `product`, `from_version`, `to_version`. |
+| `get_changes_since` | Alterações em um período de tempo, agrupadas por lançamento (e por pacote em produtos de vários pacotes). Entradas: `since` (obrigatório), `until?`, `product?`, `package?`, `kind?`, `limit?`. |
+| `search_breaking_changes` | Alterações incompatíveis sem um termo de pesquisa. Entradas: `product?`, `package?`, `since?`, `until?`, `limit?` (agrupado por pacote em produtos de vários pacotes quando `package` é omitido). |
+| `compare_versions` | Todas as alterações entre duas versões de um pacote/produto. Entradas: `product`, `package?` (obrigatório em produtos de vários pacotes), `from_version`, `to_version`. |
 | `sync_status` | **v1.2.** Sincronização por produto — último carimbo de data de busca, horas desde a busca, contagem de lançamentos ingeridos. Entradas: `product?`, `stale_only?`, `stale_hours?`. Use ANTES de confiar em `latest_releases` para saber se o corpus está desatualizado. |
 | `sync_now` | **v1.2.** Atualização sob demanda (espelha `hk sync`). Entradas: `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Rejeita com `InvalidParams` se outra `sync_now` já estiver em andamento. NÃO se compromete com o git. |
+| `workspace_relevance` | Compare os arquivos de bloqueio de nível superior de um diretório de espaço de trabalho com os lançamentos espelhados. Entradas: `workspace_path` (obrigatório, caminho absoluto do diretório), `include_all?` (booleano, lista nomes de produtos não utilizados). Somente leitura; começa com os produtos que precisam de ação e lista as alterações incompatíveis primeiro. |
+
+**Como a correspondência funciona:** `hk relevance` e `workspace_relevance` leem apenas os nomes de arquivos de bloqueio exatos e conhecidos no nível superior do diretório nomeado (`package-lock.json`, `pnpm-lock.yaml`, `uv.lock`, `poetry.lock`, `requirements.txt`, `Cargo.lock`, `go.mod`) sem recursão, globbing ou execução de comandos externos. "Nenhuma ação" é a resposta padrão para produtos que o espaço de trabalho não usa ou que já estão na versão mais recente do lançamento espelhado; apenas as versões instaladas mais antigas retornam uma lista de ações, ordenadas da mais recente para a mais antiga, com as alterações incompatíveis primeiro. A verificação é somente leitura (nada é gravado no banco de dados) e determinística (sem chamadas de modelo).
 
 As v1.1 ferramentas espelham `hk diff` / `hk breaking` e o fluxo de trabalho de comparação de versões que anteriormente exigia scripts. As ferramentas de sincronização v1.2 fecham a lacuna onde uma sessão poderia consultar o corpus, mas não atualizá-lo — `sync_status` relata a desatualização, `sync_now` executa o pipeline. Consulte [manual → servidor MCP](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) para os esquemas de entrada completos.
 
@@ -350,7 +352,7 @@ Layout:
 | Diretório | O que ele cobre |
 |-----|----------------|
 | `test/unit/` | por módulo — extração, ingestão, consulta (incluindo `until` / navegação / desde / comparação), banco de dados (incluindo migração de configuração de dimensão v3), incorporação, híbrido, busca + todos os provedores (Ollama / Voyage / **OpenAI**) + busca-rss/changelog (incluindo o analisador **keep-a-changelog**) / html + busca-registro-mcp + busca-playwright + configuração de produtos + ingestão/consulta de sinergia |
-| `test/integration/` | de ponta a ponta — pipeline, sincronização, servidor MCP (stdio JSON-RPC, 13 ferramentas incluindo `sync_status` / `sync_now`), CLI (incluindo `hk diff`, `hk breaking`) |
+| `test/integration/` | de ponta a ponta — pipeline, sincronização, servidor MCP (stdio JSON-RPC, 14 ferramentas, incluindo `sync_status` / `sync_now` / `workspace_relevance`), CLI (incl. `hk diff`, `hk breaking`, `hk relevance`) |
 | `test/regression/` | §8.1–§8.19 — cada um protege contra um bug real corrigido durante o desenvolvimento (§8.19: a paginação de saída antecipada ghReleases preserva os itens na janela) |
 | `test/smoke/` | opcional, corpus completo contra `products/` real (1.143 arquivos) |
 | `test/fixtures/` | 3 produtos falsos + respostas HTTP simuladas (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Registro oficial do MCP) |
