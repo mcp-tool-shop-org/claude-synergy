@@ -1,14 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createServer } from 'node:http';
-import { chmodSync, mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createTempDb, type TempDb } from '../helpers/temp-db.js';
 import { openDb } from '../../src/db.js';
 import { ingestAll } from '../../src/ingest.js';
 import { VENDOR_TEXT_FRAME } from '../../src/screen.js';
 import { seedSampleProducts } from '../helpers/seed-corpus.js';
 import { withMcpServer, type McpClient } from '../helpers/mcp-client.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const REPO_PRODUCTS_YAML = resolve(__dirname, '..', '..', 'products.yaml');
 
 let temp: TempDb;
 let synergiesDir: string;
@@ -44,7 +48,7 @@ afterEach(() => {
 
 describe('MCP server integration', () => {
   it(
-    'completes initialize handshake and lists the expected tool set (Wave 2: 13 tools)',
+    'completes initialize handshake and lists the expected tool set (14 tools)',
     async () => {
       await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
         const init = await client.initialize();
@@ -58,6 +62,7 @@ describe('MCP server integration', () => {
         const names = tools.map((t) => t.name).sort();
         // Wave 1 added: get_changes_since, search_breaking_changes, compare_versions
         // Wave 2 added: sync_status, sync_now
+        // Step 3 added: workspace_relevance
         expect(names).toEqual([
           'compare_versions',
           'get_changes_since',
@@ -72,6 +77,7 @@ describe('MCP server integration', () => {
           'sync_now',
           'sync_status',
           'top_entities',
+          'workspace_relevance',
         ]);
         for (const t of tools) {
           expect(t.name).toBeTruthy();
@@ -547,53 +553,59 @@ describe('MCP server integration', () => {
         ).run();
         db.close();
 
-        await withMcpServer(
-          {
-            dbPath: temp.path,
-            synergiesDir,
-            env: { CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z' },
-          },
-          async (client: McpClient) => {
-            await client.initialize();
-            await client.notifyInitialized();
-            const tools = await client.listTools();
-            expect(tools.length).toBe(13);
+        const stampWsDir = mkdtempSync(join(tmpdir(), 'mcp-stamp-ws-'));
+        try {
+          await withMcpServer(
+            {
+              dbPath: temp.path,
+              synergiesDir,
+              env: { CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z' },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+              const tools = await client.listTools();
+              expect(tools.length).toBe(14);
 
-            const toolArgs: Record<string, Record<string, unknown>> = {
-              search: { query: 'workflow', mode: 'fts', limit: 2 },
-              lookup_entity: { type: 'env_var', value: 'ANTHROPIC_API_KEY' },
-              latest_releases: { limit: 2 },
-              get_release: { product: 'test-cli', version: '1.0.0' },
-              list_products: {},
-              top_entities: { type: 'env_var', limit: 2 },
-              list_synergies: {},
-              read_synergy: { name: 'test-synergy' },
-              get_changes_since: { since: '2026-01-01', limit: 5 },
-              search_breaking_changes: { limit: 5 },
-              compare_versions: { product: 'test-cli', from_version: '1.0.0', to_version: '1.1.0' },
-              sync_status: { product: 'test-cli' },
-              sync_now: { dry_run: true, product: 'claude-code' },
-            };
+              const toolArgs: Record<string, Record<string, unknown>> = {
+                search: { query: 'workflow', mode: 'fts', limit: 2 },
+                lookup_entity: { type: 'env_var', value: 'ANTHROPIC_API_KEY' },
+                latest_releases: { limit: 2 },
+                get_release: { product: 'test-cli', version: '1.0.0' },
+                list_products: {},
+                top_entities: { type: 'env_var', limit: 2 },
+                list_synergies: {},
+                read_synergy: { name: 'test-synergy' },
+                get_changes_since: { since: '2026-01-01', limit: 5 },
+                search_breaking_changes: { limit: 5 },
+                compare_versions: { product: 'test-cli', from_version: '1.0.0', to_version: '1.1.0' },
+                sync_status: { product: 'test-cli' },
+                sync_now: { dry_run: true, product: 'claude-code' },
+                workspace_relevance: { workspace_path: stampWsDir },
+              };
 
-            for (const tool of tools) {
-              const args = toolArgs[tool.name];
-              expect(args, `missing test args for tool ${tool.name}`).toBeDefined();
-              const res = await client.callTool(tool.name, args);
-              const text = res.content[0]?.text ?? '';
-              const lastLine = text.trimEnd().split('\n').pop() ?? '';
-              expect(
-                lastLine,
-                `tool ${tool.name} should end with data as of stamp`
-              ).toMatch(/^data as of: synced 2026-05-21, newest release 2026-04-10 \(44 days old\)/);
+              for (const tool of tools) {
+                const args = toolArgs[tool.name];
+                expect(args, `missing test args for tool ${tool.name}`).toBeDefined();
+                const res = await client.callTool(tool.name, args);
+                const text = res.content[0]?.text ?? '';
+                const lastLine = text.trimEnd().split('\n').pop() ?? '';
+                expect(
+                  lastLine,
+                  `tool ${tool.name} should end with data as of stamp`
+                ).toMatch(/^data as of: synced 2026-05-21, newest release 2026-04-10 \(44 days old\)/);
+              }
+
+              // Unembedded hybrid search error also ends with the stamp line
+              const hybridErr = await client.callTool('search', { query: 'workflow', mode: 'hybrid' });
+              expect(hybridErr.isError).toBe(true);
+              const errLastLine = (hybridErr.content[0]?.text ?? '').trimEnd().split('\n').pop() ?? '';
+              expect(errLastLine).toMatch(/^data as of: synced 2026-05-21/);
             }
-
-            // Unembedded hybrid search error also ends with the stamp line
-            const hybridErr = await client.callTool('search', { query: 'workflow', mode: 'hybrid' });
-            expect(hybridErr.isError).toBe(true);
-            const errLastLine = (hybridErr.content[0]?.text ?? '').trimEnd().split('\n').pop() ?? '';
-            expect(errLastLine).toMatch(/^data as of: synced 2026-05-21/);
-          }
-        );
+          );
+        } finally {
+          rmSync(stampWsDir, { recursive: true, force: true });
+        }
       },
       30_000
     );
@@ -630,12 +642,42 @@ describe('MCP server integration', () => {
           ingestAll(db, dir);
           db.close();
 
+          const wsScreenDir = join(dir, 'workspace');
+          mkdirSync(wsScreenDir, { recursive: true });
+          writeFileSync(
+            join(wsScreenDir, 'package-lock.json'),
+            JSON.stringify({
+              lockfileVersion: 3,
+              packages: { 'node_modules/@test/cli': { version: '1.1.0' } },
+            }),
+            'utf-8'
+          );
+          const customYamlPath = join(dir, 'products.yaml');
+          writeFileSync(
+            customYamlPath,
+            `${readFileSync(REPO_PRODUCTS_YAML, 'utf-8')}
+  - name: test-cli
+    display_name: Test CLI
+    tier: 1
+    source_url: https://example.invalid/test-cli
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@test/cli"
+        release_prefix: ""
+`,
+            'utf-8'
+          );
+
           const observedTokens: string[] = [];
           await withMcpServer(
             {
               dbPath: temp.path,
               synergiesDir,
-              env: { CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z' },
+              env: {
+                CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z',
+                CLAUDE_SYNERGY_PRODUCTS_YAML: customYamlPath,
+              },
             },
             async (client: McpClient) => {
               await client.initialize();
@@ -675,6 +717,7 @@ describe('MCP server integration', () => {
                 get_changes_since: { since: '2026-04-01', product: 'test-cli', limit: 10 },
                 search_breaking_changes: { product: 'test-cli', limit: 10 },
                 compare_versions: { product: 'test-cli', from_version: '1.1.0', to_version: '1.2.0' },
+                workspace_relevance: { workspace_path: wsScreenDir },
               };
               const unframedCalls: Record<string, Record<string, unknown>> = {
                 list_synergies: {},
@@ -1052,7 +1095,7 @@ describe('MCP server integration', () => {
               await client.initialize();
               await client.notifyInitialized();
               const tools = await client.listTools();
-              expect(tools.length).toBe(13);
+              expect(tools.length).toBe(14);
               const errRes = await client.callTool('sync_now', { include_embed: false });
               expect(errRes.isError).toBe(true);
               const errText = errRes.content[0]?.text ?? '';
@@ -1112,6 +1155,126 @@ describe('MCP server integration', () => {
         } finally {
           try { chmodSync(roDbPath, 0o666); } catch { /* ignore */ }
           rmSync(roDir, { recursive: true, force: true });
+        }
+      },
+      25_000
+    );
+  });
+
+  describe('workspace_relevance tool', () => {
+    it(
+      'rejects invalid workspace_path and non-boolean include_all with InvalidParams',
+      async () => {
+        const tmpDir = mkdtempSync(join(tmpdir(), 'mcp-rel-bad-'));
+        const filePath = join(tmpDir, 'file.txt');
+        writeFileSync(filePath, 'not a dir', 'utf-8');
+        try {
+          await withMcpServer({ dbPath: temp.path, synergiesDir }, async (client: McpClient) => {
+            await client.initialize();
+            await client.notifyInitialized();
+            await expect(
+              client.callTool('workspace_relevance', { workspace_path: '' })
+            ).rejects.toThrow(/workspace_path must be a non-empty string/i);
+            await expect(
+              client.callTool('workspace_relevance', { workspace_path: 'relative/path' })
+            ).rejects.toThrow(/must be an absolute path/i);
+            for (const unc of ['\\\\192.0.2.1\\share', '//192.0.2.1/share', '\\\\?\\UNC\\192.0.2.1\\share', '\\\\.\\device']) {
+              await expect(
+                client.callTool('workspace_relevance', { workspace_path: unc })
+              ).rejects.toThrow(/must be an absolute path/i);
+            }
+            await expect(
+              client.callTool('workspace_relevance', { workspace_path: join(tmpDir, 'missing') })
+            ).rejects.toThrow(/not found or unreadable/i);
+            await expect(
+              client.callTool('workspace_relevance', { workspace_path: filePath })
+            ).rejects.toThrow(/not a directory/i);
+            await expect(
+              client.callTool('workspace_relevance', {
+                workspace_path: tmpDir,
+                include_all: 'yes' as unknown as boolean,
+              })
+            ).rejects.toThrow(/include_all must be a boolean/i);
+          });
+        } finally {
+          rmSync(tmpDir, { recursive: true, force: true });
+        }
+      },
+      25_000
+    );
+
+    it(
+      'evaluates a workspace directory, supports include_all, frames vendor text, and appends stamp',
+      async () => {
+        const tmpDir = mkdtempSync(join(tmpdir(), 'mcp-rel-ok-'));
+        const wsDir = join(tmpDir, 'ws');
+        mkdirSync(wsDir, { recursive: true });
+        writeFileSync(
+          join(wsDir, 'package-lock.json'),
+          JSON.stringify({
+            lockfileVersion: 3,
+            packages: { 'node_modules/@test/cli': { version: '1.0.0' } },
+          }),
+          'utf-8'
+        );
+        const customYaml = join(tmpDir, 'products.yaml');
+        writeFileSync(
+          customYaml,
+          `products:
+  - name: test-cli
+    display_name: Test CLI
+    tier: 1
+    source_url: https://example.invalid/test-cli
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@test/cli"
+        release_prefix: ""
+  - name: test-sdk
+    display_name: Test SDK
+    tier: 1
+    source_url: https://example.invalid/test-sdk
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@test/sdk"
+        release_prefix: "sdk-"
+`,
+          'utf-8'
+        );
+        try {
+          await withMcpServer(
+            {
+              dbPath: temp.path,
+              synergiesDir,
+              env: {
+                CLAUDE_SYNERGY_NOW: '2026-05-24T12:00:00Z',
+                CLAUDE_SYNERGY_PRODUCTS_YAML: customYaml,
+              },
+            },
+            async (client: McpClient) => {
+              await client.initialize();
+              await client.notifyInitialized();
+
+              const res = await client.callTool('workspace_relevance', { workspace_path: wsDir });
+              const text = res.content[0]?.text ?? '';
+              expect(text).toMatch(VENDOR_TEXT_FRAME.headerPattern);
+              expect(text).toMatch(VENDOR_TEXT_FRAME.footerPattern);
+              expect(text).toContain('1 product needing action');
+              expect(text).toContain('`--old-flag` is now removed entirely');
+              expect(text).toContain('no action: not used (1 product)');
+              expect(text).not.toContain('not used: test-sdk');
+              expect(text.trimEnd().split('\n').pop()).toMatch(/data as of:/);
+
+              const resAll = await client.callTool('workspace_relevance', {
+                workspace_path: wsDir,
+                include_all: true,
+              });
+              expect(resAll.content[0]?.text ?? '').toContain('not used: test-sdk');
+            }
+          );
+        } finally {
+          rmSync(tmpDir, { recursive: true, force: true });
         }
       },
       25_000

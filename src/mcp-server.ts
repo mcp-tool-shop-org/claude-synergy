@@ -24,12 +24,14 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
-import { join, dirname, basename } from 'node:path';
+import { join, dirname, basename, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import matter from 'gray-matter';
 import { openDb, initSchema, isReadonlyDbError, hasChangesFlagsColumn } from './db.js';
 import { AppError, formatError } from './errors.js';
+import { isUncOrDevicePath, readWorkspace, type WorkspaceScanResult } from './workspace.js';
+import { evaluateWorkspaceRelevance, formatRelevanceReport } from './relevance.js';
 import {
   searchChanges,
   lookupEntity,
@@ -136,6 +138,7 @@ export const VENDOR_TEXT_MCP_TOOLS = [
   'get_changes_since',
   'search_breaking_changes',
   'compare_versions',
+  'workspace_relevance',
 ] as const;
 
 function getDbOrThrow(): ReturnType<typeof openDb> {
@@ -334,6 +337,19 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           include_embed: { type: 'boolean', description: 'Run embed step after ingest (requires Ollama; default true)', default: true },
           timeout_ms: { type: 'number', description: 'Hard timeout for the entire sync (default 300000 = 5 min, max 600000)', default: 300000 },
         },
+      },
+    },
+    {
+      name: 'workspace_relevance',
+      description:
+        'Check which mirrored products matter to a local workspace directory by reading top-level lockfiles. Read-only and deterministic: returns "no action" when up to date or unused, and lists newer releases (breaking changes first) when behind.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          workspace_path: { type: 'string', description: 'Absolute path to the workspace directory' },
+          include_all: { type: 'boolean', description: 'Include the list of unused product names in addition to the count (default false)', default: false },
+        },
+        required: ['workspace_path'],
       },
     },
   ],
@@ -634,6 +650,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           to_version: requireString(r, 'to_version', 'compare_versions'),
         };
         parsedCall = async () => ({ text: handleCompareVersions(params) });
+        break;
+      }
+      case 'workspace_relevance': {
+        const r = asRecord(args, 'workspace_relevance');
+        const workspacePath = requireString(r, 'workspace_path', 'workspace_relevance');
+        if (!isAbsolute(workspacePath) || workspacePath.includes('\0') || isUncOrDevicePath(workspacePath)) {
+          throw new McpError(
+            ErrorCode.InvalidParams,
+            'workspace_relevance: workspace_path must be an absolute path to a directory'
+          );
+        }
+        const includeAll = optBool(r, 'include_all', 'workspace_relevance');
+        let workspace: WorkspaceScanResult;
+        try {
+          workspace = readWorkspace(workspacePath);
+        } catch (e: any) {
+          throw new McpError(ErrorCode.InvalidParams, `workspace_relevance: ${e.message}`);
+        }
+        parsedCall = async () => ({
+          text: handleWorkspaceRelevance(workspace, includeAll),
+        });
         break;
       }
       default:
@@ -1220,6 +1257,11 @@ function handleCompareVersions(args: { product: string; from_version: string; to
     return frameVendorText(`(no intermediate releases between ${args.product}@${args.from_version} and ${args.product}@${args.to_version})`);
   }
   return frameVendorText(formatChangesSinceResults(results));
+}
+
+function handleWorkspaceRelevance(workspace: WorkspaceScanResult, includeAll?: boolean): string {
+  const report = evaluateWorkspaceRelevance(getDbOrThrow(), workspace, { includeAll });
+  return frameVendorText(formatRelevanceReport(report));
 }
 
 // ── Graceful shutdown ────────────────────────────────────────────────────────

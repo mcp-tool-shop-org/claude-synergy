@@ -29,6 +29,8 @@ import { embedAll } from './embed.js';
 import { hybridSearch } from './hybrid.js';
 import { fetchAll, seedMarkersFromDb } from './fetch.js';
 import type { FetchProgressEvent, FetchAllSummary } from './fetch.js';
+import { readWorkspace, type WorkspaceScanResult } from './workspace.js';
+import { evaluateWorkspaceRelevance, formatRelevanceReport } from './relevance.js';
 import { AppError, formatError } from './errors.js';
 import {
   FIRST_USE_SYNC_TIMEOUT_MS,
@@ -1278,6 +1280,54 @@ program
     }
     db.close();
     activeDb = null;
+  });
+
+program
+  .command('relevance <dir>')
+  .description('Check which mirrored products matter to a workspace directory')
+  .option('-d, --db <path>', 'database path')
+  .option('-a, --all', 'include list of unused product names')
+  .option('--json', 'output result as a single JSON object')
+  .action(async (dir: string, opts: { db?: string; all?: boolean; json?: boolean; stamp?: boolean }) => {
+    const isJson = Boolean(program.opts().json || opts.json);
+    let workspace: WorkspaceScanResult;
+    try {
+      workspace = readWorkspace(dir);
+    } catch (e: any) {
+      const appErr =
+        e instanceof AppError
+          ? e
+          : new AppError({
+              code: 'WORKSPACE_INVALID_DIR',
+              message: e?.message ?? String(e),
+              hint: 'Pass a valid directory path containing workspace lockfiles.',
+            });
+      if (isJson) {
+        console.log(JSON.stringify(appErr.toJSON()));
+      } else {
+        console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      }
+      process.exit(1);
+    }
+
+    const session = await openQueryDbOrFirstUse(opts);
+    try {
+      const report = evaluateWorkspaceRelevance(session.db, workspace, {
+        includeAll: Boolean(opts.all),
+      });
+      const dataAsOf = getCorpusFreshness(session.db);
+      if (isJson) {
+        console.log(JSON.stringify({ ...report, data_as_of: dataAsOf }));
+      } else {
+        console.log(formatRelevanceReport(report));
+        emitTextStamp(session.db, undefined, session.partialNote, opts);
+      }
+    } finally {
+      if (session.db) {
+        session.db.close();
+        activeDb = null;
+      }
+    }
   });
 
 for (const cmd of program.commands) {

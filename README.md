@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v1.2.1):** 44 products / 1,171 release files / 6,573 changes / 1,260 entities / 12 synergies / 519 tests / 13 MCP tools / 17 CLI commands. (Corpus refreshed via `sync_now` on 2026-05-24.)
+**Live numbers:** 44 products / 1,171 release files / 6,573 changes / 1,260 entities / 12 synergies / 519 tests / 14 MCP tools / 18 CLI commands. (Corpus refreshed via `sync_now` on 2026-05-24.)
 
 ---
 
@@ -84,7 +84,7 @@ claude-synergy/
 | **1 — bootstrap (markdown corpus)** | ✅ shipped | Study-swarm seeded 706 release files Jan→May 2026; extended to 1,186 by Tier 4d |
 | **2a — SQLite + FTS5 + CLI** | ✅ shipped | `hk` CLI; 15 subcommands; sub-300ms ingest |
 | **2b — sqlite-vec + Contextual Retrieval** | ✅ shipped | Provider-pluggable (none/structured/ollama/claude-haiku context × ollama/voyage embed × none/ollama-judge/voyage/cohere rerank) |
-| **3 — sync + MCP server** | ✅ shipped | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` exposes 13 tools over stdio (8 at original Tier-3 ship, 3 added in v1.1, 2 added in v1.2) |
+| **3 — sync + MCP server** | ✅ shipped | `hk fetch / sync / seed-markers`; `claude-synergy-mcp` exposes 14 tools over stdio (8 at original Tier-3 ship, 3 added in v1.1, 2 added in v1.2, 1 workspace relevance tool) |
 | **4a — extend beyond Anthropic** | ✅ shipped | +15 MCP SDKs, Cursor (RSS), Aider (HISTORY.md), Continue.dev, Cody Enterprise (RSS filtered) |
 | **4b — HTML-scrape fetcher** | ✅ shipped | GitHub Copilot + VS Code Chat (Windsurf needs Playwright — v0.7) |
 | **4c — turndown HTML→markdown ingest** | ✅ shipped | HTML bodies (Copilot/VS Code/Cursor) now produce per-bullet rows for FTS5 + entity extraction |
@@ -100,9 +100,9 @@ Roadmap beyond v1.3: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and iss
 
 ## Security & data model
 
-This tool runs locally. **Data touched:** a derived SQLite database and markdown release files — all re-creatable. **Network:** outbound HTTPS when you run `hk fetch`/`hk sync`, when an agent calls the MCP `sync_now` tool, and on first use: a query command or MCP tool run against an empty store syncs on its own (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off). Destinations are the GitHub API, RSS feeds, changelog pages and MCP registries, plus a remote AI provider only when you choose one: `hk embed` (Voyage embeddings, Anthropic for context generation), or `hk hybrid -e voyage` / `-r voyage|cohere`. Otherwise hybrid search, including the MCP `search` tool's default mode, calls a local Ollama on localhost to embed the query. **Secrets:** reads `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` from env vars — never logged, never stored to disk. **No telemetry.** See [SECURITY.md](SECURITY.md) for reporting policy.
+This tool runs locally. **Data touched:** a derived SQLite database and markdown release files — all re-creatable. Workspace relevance reads up to seven named lockfiles at the top of a directory the caller names. **Network:** outbound HTTPS when you run `hk fetch`/`hk sync`, when an agent calls the MCP `sync_now` tool, and on first use: a query command or MCP tool run against an empty store syncs on its own (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off). Destinations are the GitHub API, RSS feeds, changelog pages and MCP registries, plus a remote AI provider only when you choose one: `hk embed` (Voyage embeddings, Anthropic for context generation), or `hk hybrid -e voyage` / `-r voyage|cohere`. Otherwise hybrid search, including the MCP `search` tool's default mode, calls a local Ollama on localhost to embed the query. **Secrets:** reads `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` from env vars — never logged, never stored to disk. **No telemetry.** See [SECURITY.md](SECURITY.md) for reporting policy.
 
-**Vendor text:** Third-party release notes and catalog entries are treated strictly as quoted data, never standing instructions. Release text is deterministically screened at ingest (stripping hidden Unicode controls, neutralising image/unsafe links, redacting emails and home paths, and flagging instruction-shaped patterns), wrapped in a fixed data frame by the six MCP tools that return release text, with inline `[flagged: …]` markers, and never written into instruction files.
+**Vendor text:** Third-party release notes and catalog entries are treated strictly as quoted data, never standing instructions. Release text is deterministically screened at ingest (stripping hidden Unicode controls, neutralising image/unsafe links, redacting emails and home paths, and flagging instruction-shaped patterns), wrapped in a fixed data frame by the seven MCP tools that return release text, with inline `[flagged: …]` markers, and never written into instruction files.
 
 ---
 
@@ -131,7 +131,7 @@ For dev without building, use `npx tsx src/cli.ts ...` directly. **pnpm 10 quirk
 
 ---
 
-## CLI surface — 17 commands
+## CLI surface — 18 commands
 
 ```
 # DB lifecycle
@@ -163,6 +163,7 @@ hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
                                      #  model_id, beta_header, cve, ghsa,
                                      #  hook_event, setting_key)
+hk relevance <dir> [--all] [--json]  # check which mirrored products matter to a workspace
 ```
 
 **New in v1.1:** `hk diff` and `hk breaking` answer "what changed lately?" without needing a search term. Date bounds are uniform: every browsing command takes `--since` and `--until` in `YYYY-MM-DD` (or full ISO 8601), or a relative form (`7d`, `2w`, `3m`, `1y`).
@@ -237,7 +238,7 @@ No search term needed — `hk breaking` is the answer to "did anything load-bear
 
 ## MCP server — give your agents access to this corpus
 
-`claude-synergy-mcp` exposes 13 tools over stdio. Wire into Claude Code (or any MCP host) via `~/.claude/.mcp.json` or your project's `.mcp.json`:
+`claude-synergy-mcp` exposes 14 tools over stdio. Wire into Claude Code (or any MCP host) via `~/.claude/.mcp.json` or your project's `.mcp.json`:
 
 ```json
 {
@@ -270,6 +271,9 @@ Tools exposed:
 | `compare_versions` | **v1.1.** All changes between two versions of one product. Inputs: `product`, `from_version`, `to_version`. |
 | `sync_status` | **v1.2.** Per-product sync freshness — last fetch timestamp, hours since fetch, ingested release count. Inputs: `product?`, `stale_only?`, `stale_hours?`. Use BEFORE trusting `latest_releases` to know if the corpus is stale. |
 | `sync_now` | **v1.2.** On-demand refresh (mirrors `hk sync`). Inputs: `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Rejects with `InvalidParams` if another `sync_now` is already in flight. Does NOT commit to git. |
+| `workspace_relevance` | Match a workspace directory's top-level lockfiles against mirrored releases. Inputs: `workspace_path` (required, absolute directory path), `include_all?` (boolean, list unused product names). Read-only; leads with products needing action and lists breaking changes first. |
+
+**How matching works:** `hk relevance` and `workspace_relevance` read only exact, known lockfile names at the top level of the named directory (`package-lock.json`, `pnpm-lock.yaml`, `uv.lock`, `poetry.lock`, `requirements.txt`, `Cargo.lock`, `go.mod`) without recursing, globbing, or running external commands. "No action" is the default answer for products the workspace does not use or already runs at the newest mirrored release; only older installed versions return an action list, ordered newest-first with breaking changes first. The check is read-only (nothing is written to the database) and deterministic (no model calls).
 
 The v1.1 tools mirror `hk diff` / `hk breaking` and the version-comparison workflow that previously required scripting. The v1.2 sync tools close the seam where a session could query the corpus but not refresh it — `sync_status` reports staleness, `sync_now` runs the pipeline. See [handbook → MCP server](https://mcp-tool-shop-org.github.io/claude-synergy/handbook/mcp-server/) for full input schemas.
 
@@ -350,7 +354,7 @@ Layout:
 | Dir | What it covers |
 |-----|----------------|
 | `test/unit/` | per-module — extract, ingest, query (incl. `until` / browse / since / compare), db (incl. dim-config v3 migration), embed, hybrid, fetch + every provider (Ollama / Voyage / **OpenAI**) + fetch-rss/changelog (incl. **keep-a-changelog** parser)/html + fetch-mcp-registry + fetch-playwright + products-config + synergy ingest/query |
-| `test/integration/` | end-to-end — pipeline, sync, MCP server (stdio JSON-RPC, 13 tools incl. `sync_status` / `sync_now`), CLI (incl. `hk diff`, `hk breaking`) |
+| `test/integration/` | end-to-end — pipeline, sync, MCP server (stdio JSON-RPC, 14 tools incl. `sync_status` / `sync_now` / `workspace_relevance`), CLI (incl. `hk diff`, `hk breaking`, `hk relevance`) |
 | `test/regression/` | §8.1–§8.19 — each protects against a real bug fixed during development (§8.19: ghReleases early-exit pagination preserves in-window items) |
 | `test/smoke/` | opt-in full-corpus against real `products/` (1,143 files) |
 | `test/fixtures/` | 3 fake products + mock HTTP responses (RSS / GH / Voyage / Cohere / Ollama / Anthropic / Smithery / Official MCP Registry) |

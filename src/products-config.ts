@@ -10,6 +10,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
+import { AppError } from './errors.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -27,6 +28,23 @@ const PRODUCT_NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
  */
 const GH_REPO_RE = /^[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+$/;
 
+export const PRODUCTS_PACKAGES_CONFIG_ERROR = 'PRODUCTS_PACKAGES_CONFIG_ERROR';
+
+export type PackageEcosystem = 'npm' | 'pypi' | 'crates' | 'go';
+
+export const VALID_PACKAGE_ECOSYSTEMS: ReadonlySet<PackageEcosystem> = new Set([
+  'npm',
+  'pypi',
+  'crates',
+  'go',
+]);
+
+export interface PackageIdentity {
+  ecosystem: PackageEcosystem;
+  name: string;
+  release_prefix: string;
+}
+
 export interface ProductMeta {
   /** Slug used as filesystem dir name + DB key. */
   name: string;
@@ -35,6 +53,7 @@ export interface ProductMeta {
   source_url: string;
   fetch_strategy: string;
   notes: string | null;
+  packages?: PackageIdentity[];
 }
 
 export type FetchType = 'gh-releases' | 'rss' | 'raw-changelog' | 'html-scrape' | 'catalog' | 'playwright';
@@ -73,6 +92,7 @@ interface RawYaml {
     source_url: string;
     fetch_strategy: string;
     notes?: string;
+    packages?: unknown;
     fetch?: {
       type: FetchType;
       repo?: string;
@@ -136,6 +156,7 @@ export function loadProductsConfig(yamlPath?: string): ProductsConfig | null {
         `[claude-synergy] products.yaml: invalid product name '${p.name}' — must match /^[a-z0-9][a-z0-9-]*$/ (lowercase alphanumeric + hyphens, no leading hyphen)`
       );
     }
+    const packages = p.packages !== undefined ? validateProductPackages(p.name, p.packages) : undefined;
     productMeta[p.name] = {
       name: p.name,
       display_name: p.display_name,
@@ -143,6 +164,7 @@ export function loadProductsConfig(yamlPath?: string): ProductsConfig | null {
       source_url: p.source_url ?? '',
       fetch_strategy: p.fetch_strategy ?? 'gh-releases',
       notes: p.notes ?? null,
+      ...(packages !== undefined ? { packages } : {}),
     };
 
     if (p.fetch) {
@@ -162,6 +184,73 @@ export function loadProductsConfig(yamlPath?: string): ProductsConfig | null {
   }
 
   return { productMeta, fetchTargets };
+}
+
+/**
+ * Validate optional `packages:` entries on a product in `products.yaml`.
+ * Throws a named AppError (`PRODUCTS_PACKAGES_CONFIG_ERROR`) on unknown
+ * ecosystems, empty/whitespace package names, or malformed entry shapes.
+ */
+export function validateProductPackages(productName: string, rawPackages: unknown): PackageIdentity[] {
+  if (!Array.isArray(rawPackages)) {
+    throw new AppError({
+      code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+      message: `[claude-synergy] products.yaml: ${productName}: 'packages' must be an array`,
+      hint: 'Use packages: [{ ecosystem: "npm", name: "@scope/pkg" }] with ecosystem in npm|pypi|crates|go.',
+    });
+  }
+
+  const out: PackageIdentity[] = [];
+  for (let i = 0; i < rawPackages.length; i++) {
+    const entry = rawPackages[i];
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new AppError({
+        code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] must be an object with ecosystem and name`,
+        hint: 'Each packages entry requires { ecosystem: npm|pypi|crates|go, name: "<package>" }.',
+      });
+    }
+    const rec = entry as Record<string, unknown>;
+    const eco = rec.ecosystem;
+    if (typeof eco !== 'string' || !VALID_PACKAGE_ECOSYSTEMS.has(eco as PackageEcosystem)) {
+      throw new AppError({
+        code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] has unknown ecosystem ${JSON.stringify(eco)} (expected one of: npm, pypi, crates, go)`,
+        hint: 'Supported package ecosystems are: npm, pypi, crates, go.',
+      });
+    }
+    const rawName = rec.name;
+    const trimmed = typeof rawName === 'string' ? rawName.trim() : '';
+    if (!trimmed || /\s/.test(trimmed)) {
+      throw new AppError({
+        code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] name must be a non-empty string without whitespace`,
+        hint: 'Provide the exact package name from the package manifest (e.g., "@anthropic-ai/sdk").',
+      });
+    }
+    const rawPrefix = rec.release_prefix;
+    if (typeof rawPrefix !== 'string') {
+      throw new AppError({
+        code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] release_prefix is required and must be a string`,
+        hint: 'Set release_prefix (use "" when release filenames have no prefix).',
+      });
+    }
+    if (
+      rawPrefix.includes('/') ||
+      rawPrefix.includes('\\') ||
+      rawPrefix.includes('.') ||
+      /\s|\0/.test(rawPrefix)
+    ) {
+      throw new AppError({
+        code: PRODUCTS_PACKAGES_CONFIG_ERROR,
+        message: `[claude-synergy] products.yaml: ${productName}: packages[${i}] release_prefix ${JSON.stringify(rawPrefix)} must not contain "/", ".", or whitespace`,
+        hint: 'Declare only the exact filename prefix before the version digits (e.g., "sdk-" or "").',
+      });
+    }
+    out.push({ ecosystem: eco as PackageEcosystem, name: trimmed, release_prefix: rawPrefix });
+  }
+  return out;
 }
 
 function buildFetchTarget(name: string, fetch: NonNullable<RawYaml['products']>[number]['fetch']): FetchTarget | null {

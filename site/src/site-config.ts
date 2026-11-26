@@ -40,7 +40,7 @@ export const config: SiteConfig = {
         },
         {
           title: 'MCP server',
-          desc: '11-tool MCP server over stdio. Wire it into Claude Code, Cline, or any MCP-compatible harness for live changelog queries.',
+          desc: '14-tool MCP server over stdio. Wire it into Claude Code, Cline, or any MCP-compatible harness for live changelog queries.',
         },
         {
           title: '12 synergies',

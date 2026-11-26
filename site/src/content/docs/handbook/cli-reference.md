@@ -1,11 +1,11 @@
 ---
 title: CLI Reference
-description: Complete reference for all 17 hk commands — flags, options, and examples.
+description: Complete reference for all 18 hk commands — flags, options, and examples.
 sidebar:
   order: 2
 ---
 
-The `hk` CLI provides 17 commands organized into five groups: **setup**, **search**, **windowed browsing**, **sync**, and **analysis**.
+The `hk` CLI provides 18 commands organized into five groups: **setup**, **search**, **windowed browsing**, **sync**, and **analysis**.
 
 ## Global flags
 
@@ -281,6 +281,25 @@ hk top model_id --limit 10
 ```
 
 Entity types: `env_var`, `slash_command`, `cli_option`, `model_id`, `beta_header`, `cve`, `ghsa`, `hook_event`, `setting_key`.
+
+### `hk relevance <dir>`
+
+Check which mirrored products matter to a workspace directory based on its top-level lockfiles.
+
+```bash
+hk relevance /path/to/project
+hk relevance . --all
+hk relevance . --json
+```
+
+| Flag | Description |
+|------|-------------|
+| `-a, --all` | Include the list of unused product names in addition to the count |
+| `--json` | Emit one JSON object (including `data_as_of`) |
+| `-d, --db <path>` | Override DB path |
+| `--no-stamp` | Omit trailing `data as of:` line in text mode |
+
+**How matching works:** `hk relevance` and `workspace_relevance` read only exact, known lockfile names at the top level of `<dir>` (`package-lock.json`, `pnpm-lock.yaml`, `uv.lock`, `poetry.lock`, `requirements.txt`, `Cargo.lock`, `go.mod`) without recursing, globbing, or running subprocesses. "No action" is the default answer for unused or up-to-date products; only older installed versions get a release list, ordered newest-first with breaking changes listed first. The command is read-only (nothing is written to the database) and makes zero model calls.
 
 ## Exit codes
 

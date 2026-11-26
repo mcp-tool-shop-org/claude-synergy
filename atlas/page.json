@@ -61,33 +61,63 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 0,
-      "changed": 4,
+      "added": 5,
+      "changed": 24,
       "moved": 0,
-      "parts": 3,
+      "parts": 4,
       "removed": 0
     },
     "items": [
       {
+        "kind": "landing",
+        "sentence": "pnpm-lock.yaml is now read by test/unit/relevance.test.ts and test/unit/workspace.test.ts.",
+        "subjects": [
+          "pnpm-lock.yaml",
+          "test/unit/relevance.test.ts",
+          "test/unit/workspace.test.ts"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "products/ is now also read by src/relevance.ts.",
+        "subjects": [
+          "products/",
+          "src/relevance.ts"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "products.yaml is now also read by test/integration/mcp-server.test.ts.",
+        "subjects": [
+          "products.yaml",
+          "test/integration/mcp-server.test.ts"
+        ]
+      },
+      {
+        "kind": "landing",
+        "sentence": "And 1 more new writer or reader of a place.",
+        "subjects": []
+      },
+      {
         "kind": "counts",
-        "sentence": "Nothing structural changed since 2026-11-26; 4 files changed content.",
+        "sentence": "5 files added and 24 changed content, across 4 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "4f63048dee1d42cd1025735809ba538971a58079",
-      "generatedAt": "2026-11-26T12:22:25.731Z"
+      "commit": "99831f620c012fa027714334866c7e6b63cc6773",
+      "generatedAt": "2026-11-26T12:37:54.715Z"
     },
-    "unchanged": true
+    "unchanged": false
   },
   "changesTogether": [],
   "changesTogetherNote": [
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "99831f620c012fa027714334866c7e6b63cc6773",
+  "commit": "a3a42b76a033614df3c51f15ec0ffde2b7c8ce9e",
   "defaultBranch": "main",
-  "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (91), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
+  "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (96), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
     {
       "checks": [
@@ -104,12 +134,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 32
+          "files": 34
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 55
+          "files": 58
         },
         {
           "boundary": "scripts",
@@ -151,12 +181,12 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 32
+          "files": 34
         },
         {
           "boundary": "test",
           "depth": 0,
-          "files": 55
+          "files": 58
         },
         {
           "boundary": "scripts",
@@ -209,7 +239,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 31
+          "files": 33
         }
       ],
       "runs": [
@@ -284,7 +314,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 31
+          "files": 33
         }
       ],
       "runs": [
@@ -315,7 +345,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 32
         }
       ],
       "runs": [
@@ -344,7 +374,7 @@
         {
           "boundary": "src",
           "depth": 0,
-          "files": 30
+          "files": 32
         }
       ],
       "runs": [
@@ -429,12 +459,12 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-26T12:37:54.715Z",
+  "generatedAt": "2026-11-26T14:58:45.022Z",
   "limits": [
     "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
     "1 write and 5 reads use paths built at run time and are not named here.",
-    "9 writes and 57 reads go to a path their caller passes, not to this repository.",
-    "7 reads go to the directory the command is run in (products.yaml, schema-vec.sql and schema.sql), not to this repository.",
+    "9 writes and 64 reads go to a path their caller passes, not to this repository.",
+    "8 reads go to the directory the command is run in (pnpm-lock.yaml, products.yaml, schema-vec.sql and 1 more place), not to this repository.",
     "1 read goes to the directory the command is run in (data/) or a path its caller passes, not to this repository.",
     "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."
   ],
@@ -474,10 +504,10 @@
   "startReason": "This path follows claude-synergy-mcp (a command people run) from its entry, since Tests runs only tests and checks.",
   "summary": null,
   "summaryFrom": null,
-  "testFiles": 86,
+  "testFiles": 89,
   "testedBy": {
     "scripts": 1,
-    "src": 49
+    "src": 52
   },
   "testedCodeParts": 2,
   "unnamedWrites": 1,
