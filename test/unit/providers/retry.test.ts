@@ -1,6 +1,6 @@
 // Unit tests for the shared retry utility used by paid providers.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { withRetry } from '../../../src/providers/retry.js';
 
 describe('withRetry — success paths', () => {
@@ -84,6 +84,11 @@ describe('withRetry — failure paths', () => {
 });
 
 describe('withRetry — cancellation via AbortSignal', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
   it('throws immediately when signal is already aborted', async () => {
     const controller = new AbortController();
     controller.abort();
@@ -93,6 +98,9 @@ describe('withRetry — cancellation via AbortSignal', () => {
   });
 
   it('throws when signal aborts during retry delay', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
     const controller = new AbortController();
     let calls = 0;
     const promise = withRetry(
@@ -102,9 +110,20 @@ describe('withRetry — cancellation via AbortSignal', () => {
       },
       { maxAttempts: 5, baseDelayMs: 500, signal: controller.signal }
     );
-    // Abort after the first attempt fails and enters the retry delay
-    setTimeout(() => controller.abort(), 10);
-    await expect(promise).rejects.toThrow(/cancelled/i);
+    const rejected = expect(promise).rejects.toThrow(/cancelled/i);
+
+    // Let the first attempt fail and enter the 250 ms jittered retry delay
+    await vi.advanceTimersByTimeAsync(0);
+    expect(calls).toBe(1);
+
+    // Advance 100 ms (still inside the 250 ms delay), abort, and verify cancellation
+    await vi.advanceTimersByTimeAsync(100);
+    controller.abort();
+    await rejected;
+    expect(calls).toBe(1);
+
+    // Advance past 500 ms and confirm no attempt ran after the abort
+    await vi.advanceTimersByTimeAsync(600);
     expect(calls).toBe(1);
   });
 });
