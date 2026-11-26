@@ -113,15 +113,19 @@ export function readPartialSyncState(db: Database.Database | null): PartialSyncS
     if (legacyRow?.value) {
       if (!rawValue) {
         rawValue = legacyRow.value;
-        if (!db.readonly) {
+      }
+      try {
+        if (!newRow?.value && !db.readonly) {
           db.prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`).run(
             LAST_SYNC_PARTIAL_META_KEY,
             legacyRow.value
           );
         }
-      }
-      if (!db.readonly) {
-        db.prepare(`DELETE FROM schema_meta WHERE key = ?`).run(LEGACY_FIRST_USE_PARTIAL_META_KEY);
+        if (!db.readonly) {
+          db.prepare(`DELETE FROM schema_meta WHERE key = ?`).run(LEGACY_FIRST_USE_PARTIAL_META_KEY);
+        }
+      } catch {
+        // Migration write failed (e.g. SQLITE_BUSY or read-only); still return read state.
       }
     }
     if (!rawValue) return null;

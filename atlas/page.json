@@ -62,7 +62,7 @@
   "changes": {
     "fileCounts": {
       "added": 0,
-      "changed": 14,
+      "changed": 7,
       "moved": 0,
       "parts": 2,
       "removed": 0
@@ -70,22 +70,100 @@
     "items": [
       {
         "kind": "counts",
-        "sentence": "Nothing structural changed since 2026-11-26; 14 files changed content.",
+        "sentence": "Nothing structural changed since 2026-11-26; 7 files changed content.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "10857e2e38a510a9c211a5080d899c1b3b5706b6",
-      "generatedAt": "2026-11-26T10:09:26.638Z"
+      "commit": "7ebf55ca383109caee1fe06014fe53e8076a747c",
+      "generatedAt": "2026-11-26T10:28:13.528Z"
     },
     "unchanged": true
   },
-  "changesTogether": [],
+  "changesTogether": [
+    {
+      "a": "src/fetch-html.ts",
+      "b": "test/unit/store.test.ts",
+      "either": 5,
+      "partLabels": [
+        "src",
+        "test"
+      ],
+      "parts": [
+        "src",
+        "test"
+      ],
+      "relation": "b-imports-a",
+      "shared": 5
+    },
+    {
+      "a": "test/unit/fetch-html.test.ts",
+      "b": "test/unit/store.test.ts",
+      "either": 5,
+      "partLabels": [
+        "test",
+        "test"
+      ],
+      "parts": [
+        "test",
+        "test"
+      ],
+      "relation": "inside",
+      "shared": 5
+    },
+    {
+      "a": "src/fetch-html.ts",
+      "b": "src/fetch.ts",
+      "either": 6,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 4
+    },
+    {
+      "a": "src/fetch-html.ts",
+      "b": "src/mcp-server.ts",
+      "either": 6,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 4
+    },
+    {
+      "a": "src/fetch.ts",
+      "b": "src/mcp-server.ts",
+      "either": 6,
+      "partLabels": [
+        "src",
+        "src"
+      ],
+      "parts": [
+        "src",
+        "src"
+      ],
+      "relation": "inside",
+      "shared": 4
+    }
+  ],
   "changesTogetherNote": [
+    "1 file changed together with its own test, as expected.",
+    "Confidence is low: fewer than 25 source files reach 10 revisions in the window.",
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
-  "changesTogetherWithTests": 0,
-  "commit": "7ebf55ca383109caee1fe06014fe53e8076a747c",
+  "changesTogetherWithTests": 1,
+  "commit": "e57a6d57b5063f7ba1a55e83b4b08333c2cd1ce2",
   "defaultBranch": "main",
   "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (89), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
@@ -429,7 +507,7 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-26T10:28:13.528Z",
+  "generatedAt": "2026-11-26T10:38:24.358Z",
   "limits": [
     "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
     "1 write and 5 reads use paths built at run time and are not named here.",

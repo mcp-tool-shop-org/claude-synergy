@@ -270,7 +270,7 @@ export interface FirstUseSyncOptions {
  * Initialize schema (if needed) and run fetch -> ingest (NO embed) bounded by
  * `timeoutMs` (defaults to FIRST_USE_SYNC_TIMEOUT_MS). Any product whose fetcher
  * fails or is skipped due to timeout is recorded in `skipped` and persisted in
- * `schema_meta.first_use_partial`. Propagates configuration `AppError`s.
+ * `schema_meta.last_sync_partial`. Propagates configuration `AppError`s.
  */
 export async function runFirstUseSync(
   opts: FirstUseSyncOptions

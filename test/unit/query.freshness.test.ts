@@ -141,6 +141,35 @@ describe('getCorpusFreshness & formatFreshnessStamp', () => {
       .get(LAST_SYNC_PARTIAL_META_KEY) as { value: string } | undefined;
     expect(oldRow).toBeUndefined();
     expect(newRow?.value).toContain('aider');
+
+    // FIX-4 Item 2: failed migration writes (e.g. SQLITE_BUSY) still return the read state.
+    temp.db
+      .prepare(`DELETE FROM schema_meta WHERE key IN (?, ?)`)
+      .run(LAST_SYNC_PARTIAL_META_KEY, LEGACY_FIRST_USE_PARTIAL_META_KEY);
+    temp.db
+      .prepare(`INSERT OR REPLACE INTO schema_meta (key, value) VALUES (?, ?)`)
+      .run(
+        LEGACY_FIRST_USE_PARTIAL_META_KEY,
+        JSON.stringify({ succeeded: 2, total: 3, skipped: [{ product: 'aider', reason: 'timeout' }] })
+      );
+    const origPrepare = temp.db.prepare.bind(temp.db);
+    (temp.db as any).prepare = (sql: string) => {
+      if (/^\s*(?:INSERT|DELETE)\b/i.test(sql)) {
+        throw new Error('SQLITE_BUSY');
+      }
+      return origPrepare(sql);
+    };
+    try {
+      const busyRead = readPartialSyncState(temp.db);
+      expect(busyRead).toEqual({
+        succeeded: 2,
+        total: 3,
+        skipped: [{ product: 'aider', reason: 'timeout' }],
+        recorded_at: undefined,
+      });
+    } finally {
+      (temp.db as any).prepare = origPrepare;
+    }
   });
 
   it('supports injectable clock function and CLAUDE_SYNERGY_NOW env', () => {

@@ -31,9 +31,8 @@ afterEach(() => {
  * on the first page and an empty array on subsequent pages (so the
  * pagination loop terminates cleanly).
  *
- * src/fetch.ts now uses execFileSync('gh', ['api', ...]) instead of execSync —
- * the mock provides BOTH for backward compat with any callers that still use
- * execSync; the executable is the first arg, the argv array is the second.
+ * src/fetch-utils.ts uses async execFile('gh', ['api', ...]); createExecFileMock
+ * stubs node:child_process.execFile so pagination and fetch tests run offline.
  */
 function mockGhApi(releases: any[]) {
   let callCount = 0;

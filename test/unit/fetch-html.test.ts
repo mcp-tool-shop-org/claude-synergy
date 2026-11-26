@@ -432,5 +432,9 @@ describe('fetchAnthropicAppsReleaseNotes', () => {
     expect(escapedAndLive).not.toMatch(/<script/i);
     expect(escapedAndLive).not.toMatch(/onclick/i);
     expect(escapedAndLive).toContain('<p>ok</p>');
+
+    // FIX-4 Item 1: text with no '<' returns unchanged, while HTML keeps its entities.
+    expect(sanitizeScrapedHtml('a && b')).toBe('a && b');
+    expect(sanitizeScrapedHtml('<p>a &amp;&amp; b</p>')).toBe('<p>a &amp;&amp; b</p>');
   });
 });

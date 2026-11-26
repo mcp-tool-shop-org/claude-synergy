@@ -206,10 +206,10 @@ interface QueryDbSession {
 const cliSyncCoordinator = new FirstUseSyncCoordinator();
 
 /**
- * Open the resolved DB for query commands. If missing/empty or carrying a
- * `first_use_partial` marker:
- * - when CLAUDE_SYNERGY_NO_AUTO_SYNC=1, emit guidance (if empty) without auto-syncing;
+ * Open the resolved DB for query commands. If missing or empty (0 releases):
+ * - when CLAUDE_SYNERGY_NO_AUTO_SYNC=1, emit guidance without auto-syncing;
  * - otherwise run first-use sync (fetch -> ingest, no embed) subject to the 10-minute cooldown.
+ * Any `last_sync_partial` marker in `schema_meta` drives the freshness stamp only.
  */
 async function openQueryDbOrFirstUse(
   opts: { db?: string },

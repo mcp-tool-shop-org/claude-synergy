@@ -11498,7 +11498,7 @@
               "line": 1256
             }
           ],
-          "hash": "99e64559ea63e63b77d178a8cfe695210f2732b43fe68a11e7e652c079b938a5",
+          "hash": "475c79a9f1a1f429e9f8aa470eff9fc99effda65309ad818331a09d3a65ac6af",
           "importOrder": [
             "src/db.ts",
             "src/ingest.ts",
@@ -12404,7 +12404,7 @@
               "line": 596
             }
           ],
-          "hash": "891c6d5e4bc48a69cae249ffd2cbcf57d9c393eeb7abe04e1237ac85762fce28",
+          "hash": "6a0ca65e472437cc52f101614b334ec582cfbf883da7c0209625f2bfea9dbde5",
           "importsFiles": [
             "src/errors.ts",
             "src/fetch-utils.ts"
@@ -14397,40 +14397,45 @@
             {
               "in": "readPartialSyncState",
               "kind": "catch",
-              "line": 139
+              "line": 127
+            },
+            {
+              "in": "readPartialSyncState",
+              "kind": "catch",
+              "line": 143
             },
             {
               "in": "getCorpusFreshness",
               "kind": "catch",
-              "line": 211
+              "line": 215
             },
             {
               "in": "getCorpusFreshness",
               "kind": "catch",
-              "line": 219
+              "line": 223
             },
             {
               "in": "getCorpusFreshness",
               "kind": "catch",
-              "line": 263
+              "line": 267
             },
             {
               "in": "getChangesSince",
               "kind": "throw",
-              "line": 692
+              "line": 696
             },
             {
               "in": "compareVersions",
               "kind": "throw",
-              "line": 777
+              "line": 781
             },
             {
               "in": "compareVersions",
               "kind": "throw",
-              "line": 804
+              "line": 808
             }
           ],
-          "hash": "f13e5e2fa3a9ec7ed6a820a5deda64d0d979b8f52ead2fb94d36655115f76d0d",
+          "hash": "aa369688c3fd977ddb3ee570bdb43808ed77780304669b15e0afae2196165c49",
           "importsFiles": [
             "src/errors.ts",
             "src/products-config.ts"
@@ -14484,17 +14489,17 @@
             {
               "calls": [
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCFullYear",
                   "target": null
                 },
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCMonth",
                   "target": null
                 },
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCDate",
                   "target": null
                 }
@@ -14507,35 +14512,35 @@
             {
               "calls": [
                 {
-                  "line": 207,
+                  "line": 211,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCFullYear",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCMonth",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCDate",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 249,
+                  "line": 253,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 269,
+                  "line": 273,
                   "name": "loadProductsConfig",
                   "target": {
                     "file": "src/products-config.ts"
@@ -14550,19 +14555,19 @@
             {
               "calls": [
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCFullYear",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCMonth",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 178,
+                  "line": 182,
                   "name": "getUTCDate",
                   "target": null,
                   "via": "utcDaysSince"
@@ -14576,7 +14581,7 @@
             {
               "calls": [
                 {
-                  "line": 448,
+                  "line": 452,
                   "name": "prepare",
                   "target": null
                 }
@@ -14589,7 +14594,7 @@
             {
               "calls": [
                 {
-                  "line": 466,
+                  "line": 470,
                   "name": "prepare",
                   "target": null
                 }
@@ -14602,7 +14607,7 @@
             {
               "calls": [
                 {
-                  "line": 495,
+                  "line": 499,
                   "name": "prepare",
                   "target": null
                 }
@@ -14615,7 +14620,7 @@
             {
               "calls": [
                 {
-                  "line": 511,
+                  "line": 515,
                   "name": "prepare",
                   "target": null
                 }
@@ -14628,7 +14633,7 @@
             {
               "calls": [
                 {
-                  "line": 563,
+                  "line": 567,
                   "name": "prepare",
                   "target": null
                 }
@@ -14641,7 +14646,7 @@
             {
               "calls": [
                 {
-                  "line": 595,
+                  "line": 599,
                   "name": "prepare",
                   "target": null
                 }
@@ -14654,7 +14659,7 @@
             {
               "calls": [
                 {
-                  "line": 654,
+                  "line": 658,
                   "name": "prepare",
                   "target": null
                 }
@@ -14667,7 +14672,7 @@
             {
               "calls": [
                 {
-                  "line": 723,
+                  "line": 727,
                   "name": "prepare",
                   "target": null
                 }
@@ -14680,7 +14685,7 @@
             {
               "calls": [
                 {
-                  "line": 787,
+                  "line": 791,
                   "name": "prepare",
                   "target": null
                 }
@@ -14693,7 +14698,7 @@
             {
               "calls": [
                 {
-                  "line": 912,
+                  "line": 916,
                   "name": "prepare",
                   "target": null
                 }
@@ -14706,7 +14711,7 @@
             {
               "calls": [
                 {
-                  "line": 945,
+                  "line": 949,
                   "name": "prepare",
                   "target": null
                 }
@@ -14773,7 +14778,7 @@
               "line": 530
             }
           ],
-          "hash": "2177141d70a3ba643d3df469a36af4a060ff8062c9166958dae4485cbef9d93c",
+          "hash": "51ea2eff4ae9a1570972e1ce29b6f4c5a6d2b13473fb024b335448019410c426",
           "importsFiles": [
             "src/db.ts",
             "src/errors.ts",
@@ -15528,7 +15533,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "0e75a561294045f9ad19948d9ab7d1d9cfccd9bf64e70784c047511c7c38699b",
+          "hash": "9ccf1ded7062bcda76ca87910d871db9d94539db6a81eb41c9f9b6698ecf7523",
           "importOrder": [
             "src/fetch-html.ts",
             "src/errors.ts",
@@ -15586,7 +15591,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "1a3fffa6c30027bfa19b08da42c63a3ab6f05219cf675f870dbd9af4ee4075a3",
+          "hash": "f49986824b2c5cb563ddf1962b329dbfe9cef2ad4d00e3c8fe53640d92978298",
           "importOrder": [
             "src/fetch.ts",
             "src/ingest.ts",
@@ -15806,7 +15811,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "3ae0bbb80e612e21c08419338900ca0262eea9aa3fc48e0e49a51d4d533007d1",
+          "hash": "080504c7ec22d3aeb22870e77b800e62f2bb81d890309ea1a87c79627a6992a2",
           "importOrder": [
             "src/query.ts",
             "src/store.ts",
@@ -16939,7 +16944,7 @@
   ],
   "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "7ebf55ca383109caee1fe06014fe53e8076a747c",
+    "commit": "e57a6d57b5063f7ba1a55e83b4b08333c2cd1ce2",
     "tracked": 2914
   },
   "landings": [

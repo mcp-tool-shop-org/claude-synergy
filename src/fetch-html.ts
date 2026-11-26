@@ -371,7 +371,7 @@ function sanitizeCheerioDom($: cheerio.CheerioAPI): void {
  * from scraped HTML bodies before storing them, serializing all nodes escaped.
  */
 export function sanitizeScrapedHtml(rawHtml: string): string {
-  if (!rawHtml || (!rawHtml.includes('<') && !rawHtml.includes('&'))) return rawHtml;
+  if (!rawHtml || !rawHtml.includes('<')) return rawHtml;
   const $ = cheerio.load(rawHtml, null, false);
   sanitizeCheerioDom($);
   return $.root()

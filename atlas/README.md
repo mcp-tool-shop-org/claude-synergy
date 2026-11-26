@@ -1,14 +1,14 @@
 # claude-synergy: how it works
 
-Mapped at 2026-11-26 from commit 7ebf55c by Atlas 1.26.0.
+Mapped at 2026-11-26 from commit e57a6d5 by Atlas 1.26.0.
 
 ## What this is
 
 10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (89), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.
 
-## What changed since 2026-11-26 (10857e2)
+## What changed since 2026-11-26 (7ebf55c)
 
-Nothing structural changed since 2026-11-26; 14 files changed content.
+Nothing structural changed since 2026-11-26; 7 files changed content.
 
 ## What comes in
 
@@ -54,7 +54,15 @@ Tests writes nothing in the files this map could read; 1 file could not be.
 
 ## What tends to change together
 
-No two source files changed together often enough to name.
+- **src/fetch-html.ts** and **test/unit/store.test.ts** changed together in 5 of 5 commits, and the test part imports the src part.
+- **test/unit/fetch-html.test.ts** and **test/unit/store.test.ts** changed together in 5 of 5 commits, inside the test part.
+- **src/fetch-html.ts** and **src/fetch.ts** changed together in 4 of 6 commits, inside the src part.
+- **src/fetch-html.ts** and **src/mcp-server.ts** changed together in 4 of 6 commits, inside the src part.
+- **src/fetch.ts** and **src/mcp-server.ts** changed together in 4 of 6 commits, inside the src part.
+
+1 file changed together with its own test, as expected.
+
+Confidence is low: fewer than 25 source files reach 10 revisions in the window.
 
 Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do.
 
