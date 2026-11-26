@@ -269,7 +269,7 @@ $ hk breaking --since 30d --limit 5
 | `compare_versions` | 单个包/产品的两个版本之间的所有更改。输入：`product`、`package?`（多包产品需要）、`from_version`、`to_version`。 |
 | `sync_status` | **v1.2。** 每个产品的同步新鲜度——上次提取的时间戳、距离上次提取的小时数、提取的发布数量。输入：`product?`、`stale_only?`、`stale_hours?`。在使用 `latest_releases` 之前，请使用此功能来确定语料库是否过时。 |
 | `sync_now` | **v1.2。** 按照需求进行刷新（镜像 `hk sync`）。输入：`product?`、`dry_run?`、`include_ingest?`、`include_embed?`、`timeout_ms?`。如果另一个 `sync_now` 已经开始执行，则会拒绝，并显示 `InvalidParams`。不会提交到 git。 |
-| `workspace_relevance` | 将工作区目录的顶级 lockfile 与镜像的发布进行匹配。输入：`workspace_path`（必需，绝对目录路径）、`include_all?`（布尔值，列出未使用的产品名称）。只读；首先列出需要操作的产品，然后列出破坏性变更。 |
+| `workspace_relevance` | 将工作区目录的顶级 lockfile 与镜像的发布进行匹配。输入：`workspace_path`（必需，绝对目录路径）、`include_all?`（布尔值，列出未使用的产品名称）。只读；以需要操作的产品开头，并优先列出破坏性变更。 |
 
 **匹配方式：** `hk relevance` 和 `workspace_relevance` 仅读取命名目录（`package-lock.json`、`pnpm-lock.yaml`、`uv.lock`、`poetry.lock`、`requirements.txt`、`Cargo.lock`、`go.mod`）顶部的精确的、已知的 lockfile 名称，不进行递归、通配符匹配或运行外部命令。“无操作”是默认答案，适用于工作区不使用或已运行最新镜像发布的产品；只有较旧的已安装版本才会返回操作列表，按最新版本优先排序，破坏性变更优先。检查是只读的（不会向数据库写入任何内容），并且是确定性的（不进行模型调用）。
 

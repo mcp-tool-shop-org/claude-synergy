@@ -98,7 +98,7 @@ v1.3以降のロードマップ：[URGENT_FINDINGS.md](URGENT_FINDINGS.md)と課
 
 ## セキュリティとデータモデル
 
-このツールはローカルで実行されます。**アクセスされるデータ：**派生した SQLite データベースとマークダウンのリリースファイル — これらはすべて再作成できます。ワークスペース関連性は、呼び出し者が指定するディレクトリの先頭にある最大7つの名前付きロックファイルを読み取ります。**ネットワーク：** `hk fetch` / `hk sync` を実行する場合、エージェントがMCP `sync_now` ツールを呼び出す場合、および初回使用時にアウトバウンドHTTPSを使用します。コマンドまたはMCPツールを空のストアに対して実行すると、それ自体で同期されます（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` はこれを無効にします）。宛先は、GitHub API、RSSフィード、変更履歴ページ、およびMCPレジストリです。さらに、リモートAIプロバイダーは、選択した場合にのみ使用されます。`hk embed`（Voyage埋め込み、Anthropicによるコンテキスト生成）、または`hk hybrid -e voyage` / `-r voyage|cohere`。それ以外の場合は、ハイブリッド検索を使用します。これには、MCP `search` ツールのデフォルトモードが含まれており、ローカルのOllamaをlocalhostで呼び出して、クエリを埋め込みます。**シークレット：** `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` を環境変数から読み取ります。これらはログに記録されず、ディスクに保存されません。**テレメトリはありません。** 報告ポリシーについては、[SECURITY.md](SECURITY.md) を参照してください。
+このツールはローカルで実行されます。**アクセスされるデータ：**派生した SQLite データベースとマークダウンのリリースファイル — これらはすべて再作成できます。ワークスペース関連性は、呼び出し者が指定するディレクトリの先頭にある最大7つの名前付きロックファイルを読み取ります。**ネットワーク：** `hk fetch` / `hk sync` を実行する場合、エージェントがMCP `sync_now` ツールを呼び出す場合、および初回使用時にアウトバウンドHTTPSを使用します。コマンドまたはMCPツールを空のストアに対して実行すると、それ自体で同期されます（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` はこれを無効にします）。宛先は、GitHub API、RSSフィード、変更履歴ページ、およびMCPレジストリです。さらに、リモートAIプロバイダーは、選択した場合にのみ使用されます。`hk embed`（Voyage埋め込み、Anthropicによるコンテキスト生成）、または`hk hybrid -e voyage` / `-r voyage|cohere`。それ以外の場合、ハイブリッド検索（MCP `search` のデフォルトモードを含む）はクエリの埋め込みに localhost のローカル Ollama を呼び出します。**シークレット：** `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` を環境変数から読み取ります。これらはログに記録されず、ディスクに保存されません。**テレメトリはありません。** 報告ポリシーについては、[SECURITY.md](SECURITY.md) を参照してください。
 
 **ベンダーのテキスト:** サードパーティのリリースノートとカタログエントリは、引用されたデータとして厳密に扱われ、決して指示として解釈されることはありません。リリーステキストは、取り込み時に決定的にスクリーニングされます（隠れた Unicode 制御文字の削除、画像/安全でないリンクの中和、メールアドレスとホームパスの削除、および指示のようなパターンにフラグを立てる）。その後、7つのMCPツールによって固定データフレームにラップされ、インラインの`[flagged: …]`マーカーが追加され、決して指示ファイルに書き込まれることはありません。
 
@@ -256,16 +256,16 @@ GitHub Copilotの`.vscode/mcp.json`については、`mcpServers`の代わりに
 
 | ツール | 目的 |
 |---|---|
-| `search` | ハイブリッドのFTS5 + vec。オプションで再ランキングを行います。省略された場合、`package?`（複数のパッケージを持つ製品で、パッケージごとにグループ化）を受け入れ、複数のパッケージの結果に`product (package)@version`のラベルを付けます。 |
+| `search` | ハイブリッドのFTS5 + vec。オプションで再ランキングを行います。`package?`を受け入れます（省略時は複数パッケージ製品でパッケージごとにグループ化）。また、複数のパッケージの結果に`product (package)@version`のラベルを付けます。 |
 | `lookup_entity` | 正確なエンティティ履歴：環境変数、スラッシュコマンド、モデル ID、CVE など。 |
-| `latest_releases` | 製品（または1つ）における最近のリリース。`package?`と`since?`を受け入れ、複数のパッケージを持つ製品で、省略された`package`に基づいてパッケージごとにグループ化します。 |
+| `latest_releases` | 製品（または1つ）における最近のリリース。`package?`と`since?`を受け入れ、`package`を省略した場合、複数パッケージ製品ではパッケージごとにグループ化します。 |
 | `get_release` | 1つのリリースの完全なコンテンツ（複数のパッケージを持つ製品では、`package`が必要です）。 |
 | `list_products` | カウントと最新バージョンを含む列挙 |
 | `top_entities` | タイプ別の最も頻繁に言及されるエンティティ |
 | `list_synergies` | キュレーションされたクロス製品のワークフロー。（+ オプションの `product` フィルター） |
 | `read_synergy` | 1 つのシナジーファイルの完全なテキスト |
 | `get_changes_since` | 時間ウィンドウ内の変更。リリースごとにグループ化（複数のパッケージを持つ製品では、パッケージごとにグループ化）。入力：`since`（必須）、`until?`、`product?`、`package?`、`kind?`、`limit?`。 |
-| `search_breaking_changes` | 検索語句なしの互換性のない変更。入力：`product?`、`package?`、`since?`、`until?`、`limit?`（複数のパッケージを持つ製品では、省略された`package`に基づいてパッケージごとにグループ化）。 |
+| `search_breaking_changes` | 検索語句なしの互換性のない変更。入力：`product?`、`package?`、`since?`、`until?`、`limit?`（`package`を省略した場合、複数パッケージ製品ではパッケージごとにグループ化）。 |
 | `compare_versions` | 1つのパッケージ/製品の2つのバージョン間のすべての変更。入力：`product`、`package?`（複数のパッケージを持つ製品では必須）、`from_version`、`to_version`。 |
 | `sync_status` | **v1.2。** 製品ごとの同期の鮮度 — 最後のフェッチのタイムスタンプ、フェッチからの経過時間、取り込まれたリリースの数。入力：`product?`、`stale_only?`、`stale_hours?`。コーパスが古いかどうかを確認するために `latest_releases` を信頼する前に使用してください。 |
 | `sync_now` | **v1.2.** 必要に応じて更新（`hk sync`をミラーリング）。入力：`product?`、`dry_run?`、`include_ingest?`、`include_embed?`、`timeout_ms?`。別の`sync_now`がすでに実行中の場合、`InvalidParams`で拒否します。Gitにはコミットしません。 |
