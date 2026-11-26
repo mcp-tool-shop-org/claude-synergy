@@ -2,7 +2,7 @@
 
 **Source:** smithery
 **Entries:** 200
-**Fetched:** 2026-11-25
+**Fetched:** 2026-11-26
 
 | Name | Description | Popularity | Created | Homepage |
 |------|-------------|------------|---------|----------|
@@ -51,7 +51,6 @@
 | AI Research Assistant | The server provides immediate access to millions of academic papers through Semantic Scholar and arXiv, enabling AI-powered research with comprehensive search,  | 10296 | 2025-05-30 | [link](http://lit-review-assistant.streamlit.app) |
 | Polymarket | Discover and filter Polymarket prediction markets and events by tags, volume, liquidity, and activity. Analyze individual markets with probabilities, market hea | 10102 | 2025-11-08 | [link](https://github.com/aryankeluskar/polymarket-mcp) |
 | Your-Echo-Agent- | Built by a PR tech publicist, Your Echo Agent delivers truly personalized cold emails tied to LinkedIn campaigns for SaaS, agencies, e-commerce, founders, local | 10070 | 2026-06-20 | [link](https://yourechoagent.com) |
-|  Gapup MCP — 270+ Agent-payable AI Tools | 270+ agent-payable C-suite expertises (competitive intel, SEC filings, sanctions multi-jurisdiction, KYC, | 10042 | 2026-05-23 | [link](https://hub.gapup.io/agents-api) |
 | lad-lviv-ua | Lviv (Ukraine) public transport MCP server — live arrivals, vehicle positions, stop discovery, route shapes, and static timetables. No API key required. | 9780 | 2026-04-29 | [link](https://lad.lviv.ua/) |
 | social-superpowers | Live X/Twitter and Reddit research. 10 read-only MCP tools, Google/GitHub sign-in. Free tier. | 9761 | 2026-05-03 | [link](https://superpowers.social) |
 | Developer Utilities | Streamline technical workflows with a comprehensive suite of data transformation and validation utilities. Convert between diverse formats like JSON, CSV, and M | 9739 | 2026-03-05 | [link](https://smithery.ai/servers/aparajithn/agent-utils) |
@@ -142,6 +141,7 @@
 | Govbase | Govbase provides U.S. federal policy data — search bills, executive orders, look up Congress members and voting records, browse narrative story bundles, and get | 5784 | 2026-03-27 | [link](https://govbase.com) |
 | URL Safety Validator MCP | URL safety checker for AI agents. Detects phishing and malware before your agent visits any link. | 5626 | 2026-04-22 | [link](https://kordagencies.com) |
 | Context7 | Fetch up-to-date, version-specific documentation and code examples directly into your prompts. Enhance your coding experience by eliminating outdated informatio | 5563 | 2025-04-12 | [link](https://github.com/upstash/context7#readme) |
+| Clinical Trials Data Server | Provide structured access to ClinicalTrials.gov data for searching, retrieving, and analyzing clinical trial information. Enable multi-parameter searches, detai | 5541 | 2025-08-04 | [link](https://github.com/yourusername/clintrials-mcp#readme) |
 | openfda-mcp-server | Query FDA data on drugs, food, devices, and recalls via openFDA. STDIO or Streamable HTTP. | 5433 | 2026-07-10 | [link](https://openfda.caseyjhand.com/mcp) |
 | DomainKits MCP - the domain name intelligence | # DomainKits MCP | 5388 | 2026-05-11 | [link](https://domainkits.com/) |
 | kdata-gate | Korean market data for AI agents and e-commerce sellers sourcing from Korea — K-beauty/K-food/K-pop product search, Naver search trends, Korean stocks with Engl | 5352 | 2026-06-12 | [link](https://kdata-gate.vercel.app) |
@@ -157,7 +157,6 @@
 | Geppetto-Robot-Directory | Geppetto is the platform where people, AI agents and physical robots find each other - 800+ robots across 30+ categories and 300+ brands. Tools: search_robots ( | 4913 | 2026-07-13 | [link](https://geppettorobotdirectory.com) |
 | e3d.ai | Blockchain analytics and AI agent platform for Ethereum. Query live token prices, on-chain stories, investment theses, and the E3D autonomous agent system — all | 4880 | 2026-05-26 | [link](https://e3d.ai) |
 | xpoz | Social media intelligence for AI agents: search and analyze Twitter/X, Instagram, Reddit, and TikTok through natural language. Billions of posts indexed, includ | 4846 | 2025-11-17 | [link](https://xpoz.ai) |
-| hsk-mcp | A remote Model Context Protocol (MCP) server that gives AI assistants structured access to the complete HSK Chinese vocabulary dataset. It exposes 13 tools and  | 4831 | 2026-04-13 | [link](https://github.com/kuibinlin/hsk-mcp-server) |
 | mcp-graphql-enhanced | Federated GraphQL-to-MCP bridge. Enables seamless execution of GraphQL queries with built-in introspection and schema evolution tracking. | 4795 | 2026-06-20 | [link](https://smithery.ai/servers/letoribo/mcp-graphql-enhanced) |
 | tls-radar | Run SSL/TLS scans, issue free Let's Encrypt certificates (private key stays local), and monitor certificate expiry from inside Claude Code or Cowork - through a | 4755 | 2026-06-17 | [link](https://tlsradar.com/cli) |
 | NEXUS Intelligence API | 58-endpoint utility hub - DNS lookup, web scraping, CVE scanning, AI translation, PII detection, domain health audit, company intelligence. Pay per call via x40 | 4735 | 2026-05-12 | [link](https://nexus-agent-xa12.onrender.com) |
@@ -206,3 +205,4 @@
 | Synmerco — Confidential Escrow for AI Agent Commerce | The only MCP server with Confidential Escrow Mode — HIPAA/GDPR-ready encrypted transactions for regulated AI agents. 46 tools for the full agent commerce lifecy | 3239 | 2026-04-25 | [link](https://synmerco.com/enterprise) |
 | Summiz | Find videos and podcasts in the Summiz catalog with concise keyword searches. Skim key insights with Quick Takes, then dive deeper with full summaries and compl | 3232 | 2025-10-12 | [link](https://summiz.ai/mcp) |
 | Danbooru Tags | Extract tags from any Danbooru post and explore categories at a glance. Analyze character-specific tag frequencies to surface top traits and clothing patterns.  | 3216 | 2025-10-12 | [link](https://github.com/gamzadongza/danbooru-tags-mcp) |
+| pubchem-mcp-server | Search PubChem compounds, properties, safety data, bioactivity, and cross-references. | 3212 | 2026-07-10 | [link](https://pubchem.caseyjhand.com/mcp) |
