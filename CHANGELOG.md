@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-11-26
+
+The first published release of the 2.x line: the `v2.0.0` tag exists, but its release run failed in the test step and published nothing, so 2.0.0 is not on npm. 2.0.1 ships the same package with one test fix. Read the 2.0.0 notes below for what changed since 1.2.2.
+
+### Fixed
+- **Integration tests under a newer npm:** the CLI tests drop `npx`'s own `npm warn` lines before checking the CLI's stderr; under the release job's newer npm, `npx` warned about pnpm's `npm_config_*` variables and the tests mistook that for a CLI error.
+
 ## [2.0.0] - 2026-11-25
 
 **Current runtime dependencies, Node 22.12 or newer, and no 32-bit ARM.** The published package now depends on better-sqlite3 13, commander 15 and fast-xml-parser 5. No CLI command, MCP tool or schema changes.
