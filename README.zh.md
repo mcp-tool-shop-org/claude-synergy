@@ -100,7 +100,7 @@ v1.3 之后的路线图：在 [URGENT_FINDINGS.md](URGENT_FINDINGS.md) 和问题
 
 ## 安全性和数据模型
 
-此工具在本地运行。**涉及的数据：**一个派生的 SQLite 数据库和 markdown 发布文件——所有这些都可以重新创建。**网络：**在您运行 `hk fetch`/`hk sync` 时、代理调用 MCP `sync_now` 工具时，以及首次使用时，会发出出站 HTTPS 请求：对空存储运行查询命令或 MCP 工具会自动同步（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` 可关闭此功能）。目标是 GitHub API、RSS 订阅源、变更日志页面和 MCP 注册表；只有在您选择时才会使用远程 AI 提供商：`hk embed`（Voyage 或 OpenAI 嵌入，上下文生成使用 Anthropic），或 `hk hybrid -e voyage|openai` / `-r voyage|cohere`。否则，混合搜索（包括 MCP `search` 工具的默认模式）会调用 localhost 上的本地 Ollama 来嵌入查询。**密钥：**从环境变量 `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` 中读取——绝不会记录，绝不会存储到磁盘上。**没有遥测数据。**请参阅 [SECURITY.md](SECURITY.md) 以了解报告策略。
+此工具在本地运行。**涉及的数据：**一个派生的 SQLite 数据库和 markdown 发布文件——所有这些都可以重新创建。**网络：**在您运行 `hk fetch`/`hk sync` 时、代理调用 MCP `sync_now` 工具时，以及首次使用时，会发出出站 HTTPS 请求：对空存储运行查询命令或 MCP 工具会自动同步（`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` 可关闭此功能）。目标是 GitHub API、RSS 订阅源、变更日志页面和 MCP 注册表；只有在您选择时才会使用远程 AI 提供商：`hk embed`（Voyage 嵌入，上下文生成使用 Anthropic），或 `hk hybrid -e voyage` / `-r voyage|cohere`。否则，混合搜索（包括 MCP `search` 工具的默认模式）会调用 localhost 上的本地 Ollama 来嵌入查询。**密钥：**从环境变量 `GITHUB_TOKEN`、`VOYAGE_API_KEY`、`COHERE_API_KEY`、`ANTHROPIC_API_KEY` 中读取——绝不会记录，绝不会存储到磁盘上。**没有遥测数据。**请参阅 [SECURITY.md](SECURITY.md) 以了解报告策略。
 
 **供应商文本：** 第三方发布说明和目录条目被严格视为引用的数据，绝不能作为指令使用。发布文本会在摄取时进行确定性筛选（去除隐藏的 Unicode 控制字符，消除图像/不安全的链接，隐去电子邮件和主目录路径，并标记类似指令的模式），然后由六个 MCP 工具将其封装在一个固定的数据框架中，这些工具会返回发布文本，并带有内联 `[flagged: …]` 标记，并且绝不会将其写入指令文件。
 

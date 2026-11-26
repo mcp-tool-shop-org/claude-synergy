@@ -38,11 +38,11 @@ All data is **derived** from public sources. Deleting the database and re-runnin
 | MCP `sync_now` tool | Same as `hk sync` | Refresh the corpus when an agent asks |
 | First query or MCP tool call on an empty store | Same as `hk fetch` | Fetch and ingest (no embedding), retried after a 10-minute cooldown while the store stays empty; `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns it off |
 | `hk hybrid`, MCP `search` (hybrid mode, the default) | `localhost:11434` (Ollama) | Embed the query locally |
-| `hk hybrid -e voyage\|openai` / `-r voyage\|cohere` | Voyage AI, OpenAI, Cohere APIs | Remote query embedding or reranking, only when chosen |
-| `hk embed` (remote) | Voyage AI, Cohere APIs | Generate embeddings/reranking |
+| `hk hybrid -e voyage` / `-r voyage\|cohere` | Voyage AI, Cohere APIs | Remote query embedding or reranking, only when chosen |
+| `hk embed` (remote) | Voyage AI (`-e voyage`), Anthropic (`-c claude-haiku`) | Generate embeddings and chunk context |
 | `hk embed` (local) | `localhost:11434` (Ollama) | Local embedding generation |
 
-**Network calls happen only in the cases above.** Queries read the local database; hybrid search also calls a local Ollama on localhost to embed the query, and Voyage, OpenAI or Cohere only when you choose them on the CLI. Once the store has data, nothing goes out to the internet until you run a sync command, choose a remote provider, or an agent calls `sync_now`; set `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` to keep even the first use offline.
+**Network calls happen only in the cases above.** Queries read the local database; hybrid search also calls a local Ollama on localhost to embed the query, and Voyage or Cohere only when you choose them on the CLI. Once the store has data, nothing goes out to the internet until you run a sync command, choose a remote provider, or an agent calls `sync_now`; set `CLAUDE_SYNERGY_NO_AUTO_SYNC=1` to keep even the first use offline.
 
 ### Permissions required
 
