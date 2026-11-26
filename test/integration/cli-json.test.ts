@@ -3,7 +3,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -208,12 +208,50 @@ describe('CLI --json output mode', () => {
       const bArr = parseJson(bJson.stdout) as Array<{ flags: string[] }>;
       expect(bArr.some((r) => r.flags.includes('ignore_instructions') && r.flags.includes('pii_email'))).toBe(true);
 
-      // hk ingest --rescreen works without -p products dir
+      // hk ingest --rescreen works without -p products dir and clears stale old-pattern flags
+      const fixDb = openDb(temp.path, { loadVec: false });
+      fixDb.prepare(`UPDATE changes SET text = ?, flags = ? WHERE product = 'test-cli' AND version = '1.2.0'`).run(
+        'Updated system prompts note (<email>)',
+        '["system_prompt","pii_email"]'
+      );
+      fixDb.close();
+
       const rescreenOut = runCli(['--json', 'ingest', '--db', temp.path, '--rescreen']);
       expect(rescreenOut.code).toBe(0);
       const rescreenObj = parseJson(rescreenOut.stdout) as { rescreen: { changesScanned: number; changesFlagged: number } };
       expect(rescreenObj.rescreen.changesScanned).toBeGreaterThan(0);
       expect(rescreenObj.rescreen.changesFlagged).toBe(1);
+
+      const postRescreen = parseJson(runCli(['--json', 'query', 'prompts', '--db', temp.path, '--product', 'test-cli']).stdout) as Array<{ flags: string[] }>;
+      expect(postRescreen[0].flags).toEqual(['pii_email']);
+
+      // Unwritable DB still answers CLI queries
+      const roPath = join(dir, 'ro-cli.db');
+      const roDb = openDb(roPath, { loadVec: false });
+      roDb.exec(`
+        CREATE TABLE schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+        INSERT INTO schema_meta (key, value) VALUES ('schema_version', '3');
+        CREATE TABLE products (name TEXT PRIMARY KEY, display_name TEXT NOT NULL, source_tier INTEGER NOT NULL, source_url TEXT NOT NULL, fetch_strategy TEXT NOT NULL, notes TEXT);
+        CREATE TABLE releases (product TEXT NOT NULL, version TEXT NOT NULL, released_at DATE, notes_path TEXT NOT NULL, fetched_at DATETIME NOT NULL, source_url TEXT NOT NULL, bundle_size_kb REAL, notes_hash TEXT, PRIMARY KEY (product, version));
+        CREATE TABLE changes (id INTEGER PRIMARY KEY, product TEXT NOT NULL, version TEXT NOT NULL, ordinal INTEGER NOT NULL, kind TEXT NOT NULL, text TEXT NOT NULL);
+        CREATE TABLE markers (product TEXT NOT NULL, name TEXT NOT NULL, version TEXT NOT NULL, updated_at DATETIME NOT NULL, PRIMARY KEY (product, name));
+        CREATE VIRTUAL TABLE changes_fts USING fts5(text, content='changes', content_rowid='id');
+        INSERT INTO products VALUES ('ro-cli', 'RO CLI', 1, '', 'gh-releases', NULL);
+        INSERT INTO releases VALUES ('ro-cli', '1.0.0', '2026-11-25', 'ro-cli/releases/1.0.0.md', '2026-11-26', '', NULL, 'h');
+        INSERT INTO markers VALUES ('ro-cli', 'last_fetched_release_at', '2026-11-25', '2026-11-26T10:00:00Z');
+        INSERT INTO changes (id, product, version, ordinal, kind, text) VALUES (1, 'ro-cli', '1.0.0', 1, 'added', 'CliRoCheck feature');
+        INSERT INTO changes_fts(rowid, text) VALUES (1, 'CliRoCheck feature');
+      `);
+      roDb.close();
+      chmodSync(roPath, 0o444);
+      try {
+        const roOut = runCli(['query', 'CliRoCheck', '--db', roPath]);
+        expect(roOut.code).toBe(0);
+        expect(roOut.stdout).toContain('[[CliRoCheck]] feature');
+        expect(roOut.stdout).toContain('old schema (v3 < v4, read-only)');
+      } finally {
+        chmodSync(roPath, 0o666);
+      }
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

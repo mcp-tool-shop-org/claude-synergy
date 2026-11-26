@@ -4,8 +4,9 @@ import { OllamaJudgeRerankProvider } from './providers/rerank/ollama-judge.js';
 import { VoyageRerankProvider } from './providers/rerank/voyage.js';
 import { CohereRerankProvider } from './providers/rerank/cohere.js';
 import type { RerankProvider, RerankCandidate } from './providers/types.js';
-import { getEmbeddingDim } from './db.js';
-import { parseFlagsJson } from './screen.js';
+import { getEmbeddingDim, hasChangesFlagsColumn } from './db.js';
+import { resolveRowScreening } from './query.js';
+import { screenVendorText } from './screen.js';
 
 /** Hard upper bound on any user-supplied row-pull parameter. */
 const MAX_LIMIT = 500;
@@ -208,9 +209,11 @@ export async function hybridSearch(
   // Pull rows for candidates
   const candidateIds = rrfRanked.map(([id]) => id);
   const placeholders = candidateIds.map(() => '?').join(',');
+  const hasFlagsCol = hasChangesFlagsColumn(db);
+  const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
   const rowsSql = `
     SELECT ch.id AS chunk_id, ch.change_id, ch.product, ch.release_version AS version,
-           ch.released_at, c.kind, c.text, c.flags AS flags_json, ch.contextualized
+           ch.released_at, c.kind, c.text, ${flagsExpr} AS flags_json, ch.contextualized
     FROM chunks ch
     JOIN changes c ON c.id = ch.change_id
     WHERE ch.id IN (${placeholders})
@@ -256,10 +259,14 @@ export async function hybridSearch(
     .map((entry) => {
       const r = byId.get(entry.id);
       if (!r) return null;
-      const { flags_json, ...rest } = r;
+      const { flags_json, text, contextualized, ...rest } = r;
+      const screened = resolveRowScreening(text, flags_json, hasFlagsCol);
+      const cleanContext = hasFlagsCol ? contextualized : screenVendorText(contextualized).text;
       return {
         ...rest,
-        flags: parseFlagsJson(flags_json),
+        text: screened.text,
+        contextualized: cleanContext,
+        flags: screened.flags,
         bm25_rank: entry.bm25,
         vec_rank: entry.vec,
         rrf_score: entry.rrf,

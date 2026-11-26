@@ -61,31 +61,39 @@
   ],
   "changes": {
     "fileCounts": {
-      "added": 2,
-      "changed": 20,
+      "added": 0,
+      "changed": 16,
       "moved": 0,
       "parts": 4,
       "removed": 0
     },
     "items": [
       {
+        "kind": "landing",
+        "sentence": "products/claude-code/releases/2.1.218.md is now read by test/unit/screen.test.ts.",
+        "subjects": [
+          "products/claude-code/releases/2.1.218.md",
+          "test/unit/screen.test.ts"
+        ]
+      },
+      {
         "kind": "counts",
-        "sentence": "Nothing structural changed since 2026-11-26; 2 files added and 20 changed content.",
+        "sentence": "16 files changed content, across 4 parts.",
         "subjects": []
       }
     ],
     "since": {
-      "commit": "e57a6d57b5063f7ba1a55e83b4b08333c2cd1ce2",
-      "generatedAt": "2026-11-26T10:38:24.358Z"
+      "commit": "6233b8e9fef3d2e94ef79ea2ec1ae88e0826bfe1",
+      "generatedAt": "2026-11-26T11:06:55.675Z"
     },
-    "unchanged": true
+    "unchanged": false
   },
   "changesTogether": [],
   "changesTogetherNote": [
     "Window: 180 days; a pair counts from 3 shared commits, since 0 source files reach 10 revisions; the floor rises to 10 when 25 do."
   ],
   "changesTogetherWithTests": 0,
-  "commit": "6233b8e9fef3d2e94ef79ea2ec1ae88e0826bfe1",
+  "commit": "6576cd6c81a08f4be64835f7b4ee17f5913b5208",
   "defaultBranch": "main",
   "derived": "10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (91), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.",
   "doors": [
@@ -429,11 +437,11 @@
       ]
     }
   ],
-  "generatedAt": "2026-11-26T11:06:55.675Z",
+  "generatedAt": "2026-11-26T11:55:53.292Z",
   "limits": [
     "1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.",
     "1 write and 5 reads use paths built at run time and are not named here.",
-    "9 writes and 53 reads go to a path their caller passes, not to this repository.",
+    "9 writes and 57 reads go to a path their caller passes, not to this repository.",
     "7 reads go to the directory the command is run in (products.yaml, schema-vec.sql and schema.sql), not to this repository.",
     "1 read goes to the directory the command is run in (data/) or a path its caller passes, not to this repository.",
     "Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window."

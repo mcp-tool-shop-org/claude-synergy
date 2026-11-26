@@ -1,14 +1,32 @@
 import type Database from 'better-sqlite3';
 import { AppError } from './errors.js';
+import { SCHEMA_VERSION, getSchemaVersion, hasChangesFlagsColumn } from './db.js';
 import { loadProductsConfig } from './products-config.js';
 import {
   VENDOR_TEXT_FRAME,
   formatFlagMarker,
   frameVendorText,
   parseFlagsJson,
+  screenVendorText,
 } from './screen.js';
 
 export { VENDOR_TEXT_FRAME, formatFlagMarker, frameVendorText, parseFlagsJson };
+
+/**
+ * Resolve text and screening flags for a row fetched from `changes`:
+ * uses stored `flags` when the column exists, and falls back to query-time
+ * screening when serving an unmigrated read-only pre-v4 DB.
+ */
+export function resolveRowScreening(
+  rawText: string,
+  flagsJson: string | null | undefined,
+  hasFlagsCol: boolean,
+): { text: string; flags: string[] } {
+  if (hasFlagsCol) {
+    return { text: rawText, flags: parseFlagsJson(flagsJson) };
+  }
+  return screenVendorText(rawText);
+}
 
 // ─── Corpus freshness (Part 1) ────────────────────────────────────────────
 
@@ -30,6 +48,7 @@ export interface CorpusFreshness {
   stale: boolean;
   stale_after_days: number;
   partial_note?: string;
+  schema_note?: string;
   product?: ProductFreshness;
 }
 
@@ -213,8 +232,22 @@ export function getCorpusFreshness(
   let syncedAt: string | null = null;
   let newestRelease: string | null = null;
   let partialNote: string | undefined;
+  let schemaNote: string | undefined;
 
   if (db) {
+    try {
+      const hasProducts = db
+        .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='products'`)
+        .get();
+      if (hasProducts) {
+        const schemaVersion = getSchemaVersion(db);
+        if (schemaVersion < SCHEMA_VERSION) {
+          schemaNote = `old schema (v${schemaVersion} < v${SCHEMA_VERSION}${db.readonly ? ', read-only' : ''})`;
+        }
+      }
+    } catch {
+      // Ignore uninitialized DB
+    }
     try {
       const markerRow = db
         .prepare(`SELECT MAX(updated_at) AS synced_at FROM markers`)
@@ -249,6 +282,7 @@ export function getCorpusFreshness(
     stale,
     stale_after_days: STALE_AFTER_DAYS,
     ...(partialNote ? { partial_note: partialNote } : {}),
+    ...(schemaNote ? { schema_note: schemaNote } : {}),
   };
 
   if (opts.product) {
@@ -325,6 +359,9 @@ export function formatFreshnessStamp(
   const partial = opts.partialNote ?? freshness.partial_note;
   if (partial) {
     parts.push(partial);
+  }
+  if (freshness.schema_note) {
+    parts.push(freshness.schema_note);
   }
 
   const base = parts.join('; ');
@@ -446,10 +483,12 @@ export function searchChanges(
   }
 
   const where = filters.length > 0 ? `AND ${filters.join(' AND ')}` : '';
+  const hasFlagsCol = hasChangesFlagsColumn(db);
+  const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
 
   const sql = `
     SELECT c.product, c.version, r.released_at,
-           c.ordinal, c.kind, c.text AS body, c.flags AS flags_json,
+           c.ordinal, c.kind, c.text AS body, ${flagsExpr} AS flags_json,
            snippet(changes_fts, 0, '[[', ']]', '…', 16) AS snippet
     FROM changes_fts
     JOIN changes c ON changes_fts.rowid = c.id
@@ -464,8 +503,10 @@ export function searchChanges(
     Omit<QueryResult, 'text' | 'flags'> & { body: string; flags_json?: string | null }
   >;
   return rows.map((r) => {
-    const { body, flags_json, ...rest } = r;
-    return { ...rest, text: body, flags: parseFlagsJson(flags_json) };
+    const { body, flags_json, snippet, ...rest } = r;
+    const screened = resolveRowScreening(body, flags_json, hasFlagsCol);
+    const cleanSnippet = hasFlagsCol ? snippet : screenVendorText(snippet).text;
+    return { ...rest, snippet: cleanSnippet, text: screened.text, flags: screened.flags };
   });
 }
 
@@ -474,9 +515,11 @@ export function lookupEntity(
   type: string,
   value: string
 ): QueryResult[] {
+  const hasFlagsCol = hasChangesFlagsColumn(db);
+  const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
   const sql = `
     SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text,
-           c.flags AS flags_json, '' AS snippet
+           ${flagsExpr} AS flags_json, '' AS snippet
     FROM entities e
     JOIN changes c ON e.change_id = c.id
     JOIN releases r ON c.product = r.product AND c.version = r.version
@@ -487,8 +530,9 @@ export function lookupEntity(
     Omit<QueryResult, 'flags'> & { flags_json?: string | null }
   >;
   return rows.map((r) => {
-    const { flags_json, ...rest } = r;
-    return { ...rest, flags: parseFlagsJson(flags_json) };
+    const { flags_json, text, ...rest } = r;
+    const screened = resolveRowScreening(text, flags_json, hasFlagsCol);
+    return { ...rest, text: screened.text, flags: screened.flags };
   });
 }
 
@@ -665,10 +709,12 @@ export function browseChanges(
   }
 
   const where = filters.length > 0 ? `WHERE ${filters.join(' AND ')}` : '';
+  const hasFlagsCol = hasChangesFlagsColumn(db);
+  const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
 
   const sql = `
     SELECT c.product, c.version, r.released_at,
-           c.ordinal, c.kind, c.text AS body, c.flags AS flags_json,
+           c.ordinal, c.kind, c.text AS body, ${flagsExpr} AS flags_json,
            '' AS snippet
     FROM changes c
     JOIN releases r ON c.product = r.product AND c.version = r.version
@@ -682,7 +728,8 @@ export function browseChanges(
   >;
   return rows.map((r) => {
     const { body, flags_json, ...rest } = r;
-    return { ...rest, text: body, flags: parseFlagsJson(flags_json) };
+    const screened = resolveRowScreening(body, flags_json, hasFlagsCol);
+    return { ...rest, text: screened.text, flags: screened.flags };
   });
 }
 
@@ -742,10 +789,12 @@ export function getChangesSince(
     params.kind = opts.kind;
   }
   const where = `WHERE ${filters.join(' AND ')}`;
+  const hasFlagsCol = hasChangesFlagsColumn(db);
+  const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
 
   // Pull rows; group in JS so we can honor the change-count cap across releases.
   const sql = `
-    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text, c.flags AS flags_json
+    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text, ${flagsExpr} AS flags_json
     FROM changes c
     JOIN releases r ON c.product = r.product AND c.version = r.version
     ${where}
@@ -776,11 +825,12 @@ export function getChangesSince(
       };
       grouped.set(key, bucket);
     }
+    const screened = resolveRowScreening(r.text, r.flags_json, hasFlagsCol);
     bucket.changes.push({
       ordinal: r.ordinal,
       kind: r.kind,
-      text: r.text,
-      flags: parseFlagsJson(r.flags_json),
+      text: screened.text,
+      flags: screened.flags,
     });
     total++;
   }
@@ -845,8 +895,10 @@ export function compareVersions(
     });
   }
 
+  const hasFlagsCol = hasChangesFlagsColumn(db);
+  const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
   const sql = `
-    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text, c.flags AS flags_json
+    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text, ${flagsExpr} AS flags_json
     FROM changes c
     JOIN releases r ON c.product = r.product AND c.version = r.version
     WHERE c.product = @product
@@ -881,11 +933,12 @@ export function compareVersions(
       };
       grouped.set(key, bucket);
     }
+    const screened = resolveRowScreening(r.text, r.flags_json, hasFlagsCol);
     bucket.changes.push({
       ordinal: r.ordinal,
       kind: r.kind,
-      text: r.text,
-      flags: parseFlagsJson(r.flags_json),
+      text: screened.text,
+      flags: screened.flags,
     });
   }
   return Array.from(grouped.values());

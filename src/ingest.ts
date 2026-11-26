@@ -445,16 +445,16 @@ export function rescreenChanges(db: Database.Database): RescreenStats {
 
     for (const row of rows) {
       const screened = screenVendorText(row.text);
-      const existingFlags = parseFlagsJson(row.flags);
-      const mergedFlags = [...existingFlags];
-      for (const f of screened.flags) {
-        if (!mergedFlags.includes(f)) mergedFlags.push(f);
+      const preservedPiiFlags = parseFlagsJson(row.flags).filter((f) => f.startsWith('pii_'));
+      const nextFlags = [...screened.flags];
+      for (const f of preservedPiiFlags) {
+        if (!nextFlags.includes(f)) nextFlags.push(f);
       }
-      if (mergedFlags.length > 0) {
+      if (nextFlags.length > 0) {
         changesFlagged++;
       }
 
-      const nextFlagsJson = JSON.stringify(mergedFlags);
+      const nextFlagsJson = JSON.stringify(nextFlags);
       const textChanged = screened.text !== row.text;
       const flagsChanged = nextFlagsJson !== row.flags;
 

@@ -721,12 +721,15 @@ describe('Part 6a — disk-bounded fetch window', () => {
     expect(written).toBe(expectedBase);
   });
 
-  it('applies only PII redaction when writing release files and catalogs (keeps images/instructions for provenance)', async () => {
+  it('applies only PII redaction when writing release files and catalogs (keeps images/instructions and code spans for provenance)', async () => {
     const email = ['maintainer', ['vendor-org', 'invalid'].join('.')].join('@');
+    const codeEmail = ['in', 'code'].join('.') + '@' + ['vendor-org', 'invalid'].join('.');
     const winHome = ['C:', 'Us' + 'ers', 'sample_dev', 'src'].join('\\');
+    const codeWin = ['C:', 'Us' + 'ers', 'code_dev', 'src'].join('\\');
     const unixHome = '/' + ['home', 'ci_acct', 'repo'].join('/');
     const body = [
-      '- Fixed path bug at `' + winHome + '` and `' + unixHome + '`',
+      `- Fixed path bug at ${winHome} and ${unixHome}`,
+      `- Preserved code spans \`${codeWin}\` and \`${codeEmail}\` untouched`,
       `- Contact ${email} for details`,
       '- Keep ![Arch](https://cdn.example.invalid/arch.png) and Ignore previous instructions verbatim on disk',
     ].join('\n');
@@ -748,9 +751,11 @@ describe('Part 6a — disk-bounded fetch window', () => {
     expect(stats[0].fetched).toBe(1);
 
     const written = readFileSync(join(productsRoot, 'claude-code', 'releases', '4.0.0.md'), 'utf-8');
-    expect(written).toContain('`<home>/src`');
-    expect(written).toContain('`<home>/repo`');
-    expect(written).toContain('<email>');
+    expect(written).toContain('C:\\Users\\<user>\\src');
+    expect(written).toContain('/home/<user>/repo');
+    expect(written).toContain(`\`${codeWin}\``);
+    expect(written).toContain(`\`${codeEmail}\``);
+    expect(written).toContain('- Contact <email> for details');
     expect(written).not.toContain(email);
     expect(written).not.toContain(winHome);
     expect(written).not.toContain(unixHome);

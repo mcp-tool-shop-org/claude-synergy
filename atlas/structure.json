@@ -7478,7 +7478,7 @@
           "path": "products/claude-code/releases/2.1.217.md"
         },
         {
-          "hash": "25b613b129deb74364eba0fbeca34d6b01cb094ae7ee54c8fc9a96b934d8056a",
+          "hash": "1b3313db0c0a6b156f57eaa45705d6b4ee7274193968d4db56978386026d966d",
           "path": "products/claude-code/releases/2.1.218.md"
         },
         {
@@ -10981,7 +10981,7 @@
           "path": ".gitignore"
         },
         {
-          "hash": "a7ae8a5696208fd011069ccc2f703e4a0dcfc8a409355942f061318e19b732de",
+          "hash": "1d29529386c58365912b4d18c85fe73273427941cd73ef559606eb715b009a72",
           "path": "CHANGELOG.md"
         },
         {
@@ -11466,39 +11466,54 @@
               "line": 186
             },
             {
+              "in": "openQueryDbOrFirstUse",
               "kind": "catch",
-              "line": 452
+              "line": 238
+            },
+            {
+              "in": "openQueryDbOrFirstUse",
+              "kind": "catch",
+              "line": 240
+            },
+            {
+              "in": "openQueryDbOrFirstUse",
+              "kind": "throw",
+              "line": 244
             },
             {
               "kind": "catch",
-              "line": 537
+              "line": 462
             },
             {
               "kind": "catch",
-              "line": 811
+              "line": 547
             },
             {
               "kind": "catch",
-              "line": 891
+              "line": 821
             },
             {
               "kind": "catch",
-              "line": 1001
+              "line": 901
             },
             {
               "kind": "catch",
-              "line": 1125
+              "line": 1011
             },
             {
               "kind": "catch",
-              "line": 1199
+              "line": 1135
             },
             {
               "kind": "catch",
-              "line": 1294
+              "line": 1209
+            },
+            {
+              "kind": "catch",
+              "line": 1304
             }
           ],
-          "hash": "43ccd23b5c112af23eb7f9afc031c7683c24eb97fafb2e9440bbf9bf7b8622a0",
+          "hash": "6b21e2c0d933319583ea5f26e14609c0aeddf514ed7fdbb2080f4d496fe1d300",
           "importOrder": [
             "src/db.ts",
             "src/ingest.ts",
@@ -11600,21 +11615,35 @@
                   "via": "openTrackedDb"
                 },
                 {
-                  "line": 236,
+                  "line": 237,
                   "name": "initSchema",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 240,
+                  "line": 239,
+                  "name": "isReadonlyDbError",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 241,
+                  "name": "openDb",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 250,
                   "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 244,
+                  "line": 254,
                   "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
@@ -11622,14 +11651,14 @@
                 },
                 {
                   "branch": "isAutoSyncDisabled()",
-                  "line": 245,
+                  "line": 255,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 254,
+                  "line": 264,
                   "name": "ensureSynced",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -11638,7 +11667,7 @@
                 },
                 {
                   "branch": "synced.cooledDown",
-                  "line": 262,
+                  "line": 272,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
@@ -11646,7 +11675,7 @@
                 },
                 {
                   "branch": "!hasAnyReleases(synced.db)",
-                  "line": 264,
+                  "line": 274,
                   "name": "getEmptyCorpusReason",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -11654,21 +11683,21 @@
                   }
                 },
                 {
-                  "line": 276,
+                  "line": 286,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 282,
+                  "line": 292,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 283,
+                  "line": 293,
                   "name": "formatPartialNote",
                   "target": {
                     "file": "src/store.ts"
@@ -11683,7 +11712,7 @@
             {
               "calls": [
                 {
-                  "line": 293,
+                  "line": 303,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11698,14 +11727,14 @@
             {
               "calls": [
                 {
-                  "line": 308,
+                  "line": 318,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 309,
+                  "line": 319,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11720,7 +11749,7 @@
             {
               "calls": [
                 {
-                  "line": 293,
+                  "line": 303,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11728,7 +11757,7 @@
                   "via": "emitArrayJson"
                 },
                 {
-                  "line": 309,
+                  "line": 319,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11744,7 +11773,7 @@
             {
               "calls": [
                 {
-                  "line": 333,
+                  "line": 343,
                   "name": "toLocaleString",
                   "target": null
                 }
@@ -11757,7 +11786,7 @@
             {
               "calls": [
                 {
-                  "line": 333,
+                  "line": 343,
                   "name": "toLocaleString",
                   "target": null,
                   "via": "fmtNum"
@@ -11795,7 +11824,7 @@
                   "via": "openTrackedDb"
                 },
                 {
-                  "line": 236,
+                  "line": 237,
                   "name": "initSchema",
                   "target": {
                     "file": "src/db.ts"
@@ -11803,7 +11832,23 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 240,
+                  "line": 239,
+                  "name": "isReadonlyDbError",
+                  "target": {
+                    "file": "src/db.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 241,
+                  "name": "openDb",
+                  "target": {
+                    "file": "src/db.ts"
+                  },
+                  "via": "openQueryDbOrFirstUse"
+                },
+                {
+                  "line": 250,
                   "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
@@ -11811,7 +11856,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 244,
+                  "line": 254,
                   "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
@@ -11820,7 +11865,7 @@
                 },
                 {
                   "branch": "isAutoSyncDisabled()",
-                  "line": 245,
+                  "line": 255,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
@@ -11828,7 +11873,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 254,
+                  "line": 264,
                   "name": "ensureSynced",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -11838,7 +11883,7 @@
                 },
                 {
                   "branch": "synced.cooledDown",
-                  "line": 262,
+                  "line": 272,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
@@ -11847,7 +11892,7 @@
                 },
                 {
                   "branch": "!hasAnyReleases(synced.db)",
-                  "line": 264,
+                  "line": 274,
                   "name": "getEmptyCorpusReason",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -11856,7 +11901,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 276,
+                  "line": 286,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
@@ -11864,7 +11909,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 282,
+                  "line": 292,
                   "name": "hasAnyReleases",
                   "target": {
                     "file": "src/store.ts"
@@ -11872,7 +11917,7 @@
                   "via": "openQueryDbOrFirstUse"
                 },
                 {
-                  "line": 283,
+                  "line": 293,
                   "name": "formatPartialNote",
                   "target": {
                     "file": "src/store.ts"
@@ -11881,7 +11926,7 @@
                 },
                 {
                   "branch": "session.emptyOptOut || !session.db",
-                  "line": 293,
+                  "line": 303,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
@@ -11890,7 +11935,7 @@
                 },
                 {
                   "branch": "session.emptyOptOut || !session.db",
-                  "line": 309,
+                  "line": 319,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
@@ -11898,14 +11943,14 @@
                   "via": "emitTextStamp"
                 },
                 {
-                  "line": 592,
+                  "line": 602,
                   "name": "lookupEntity",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 1284,
+                  "line": 1294,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -11921,7 +11966,7 @@
             {
               "calls": [
                 {
-                  "line": 1284,
+                  "line": 1294,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -11941,7 +11986,9 @@
           "exports": [
             "getEmbeddingDim",
             "getSchemaVersion",
+            "hasChangesFlagsColumn",
             "initSchema",
+            "isReadonlyDbError",
             "openDb",
             "openSqlite",
             "setEmbeddingDim"
@@ -11963,47 +12010,92 @@
               "line": 73
             },
             {
+              "in": "hasChangesFlagsColumn",
+              "kind": "catch",
+              "line": 112
+            },
+            {
               "in": "openDb",
               "kind": "catch",
-              "line": 86
+              "line": 126
+            },
+            {
+              "in": "openDb",
+              "kind": "throw",
+              "line": 128
+            },
+            {
+              "in": "openDb",
+              "kind": "catch",
+              "line": 147
+            },
+            {
+              "in": "openDb",
+              "kind": "catch",
+              "line": 149
+            },
+            {
+              "in": "openDb",
+              "kind": "throw",
+              "line": 152
+            },
+            {
+              "in": "openDb",
+              "kind": "catch",
+              "line": 163
             },
             {
               "in": "ensureSchemaVersion",
               "kind": "throw",
-              "line": 139
+              "line": 216
+            },
+            {
+              "in": "ensureSchemaVersion",
+              "kind": "catch",
+              "line": 224
+            },
+            {
+              "in": "ensureSchemaVersion",
+              "kind": "throw",
+              "line": 226
+            },
+            {
+              "in": "ensureSchemaVersion",
+              "kind": "throw",
+              "line": 247
             },
             {
               "in": "getSchemaVersion",
               "kind": "catch",
-              "line": 214
+              "line": 322
             },
             {
               "in": "getEmbeddingDim",
               "kind": "catch",
-              "line": 233
+              "line": 341
             },
             {
               "in": "setEmbeddingDim",
               "kind": "throw",
-              "line": 245
+              "line": 353
             },
             {
               "in": "setEmbeddingDim",
               "kind": "throw",
-              "line": 271
+              "line": 379
             },
             {
               "in": "resolveSchemaPath",
               "kind": "catch",
-              "line": 294
+              "line": 402
             },
             {
               "in": "resolveSchemaPath",
               "kind": "throw",
-              "line": 298
+              "line": 406
             }
           ],
-          "hash": "0264887e157537a44cbb6b084cdd8e7a25b200bf759c8cf753ac9748c64985f4",
+          "hash": "f5c6c22ab6abd2d96e44afd89fa8fb1c8e0a14efe706b1f5b2226e5b4f3ee616",
           "importsFiles": [
             "src/errors.ts",
             "src/ingest.ts"
@@ -12013,55 +12105,82 @@
             {
               "calls": [
                 {
-                  "line": 104,
+                  "line": 106,
+                  "name": "pragma",
+                  "target": null
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "hasChangesFlagsColumn"
+            },
+            {
+              "calls": [
+                {
+                  "line": 185,
                   "name": "prepare",
                   "target": null
                 },
                 {
                   "branch": "existing",
-                  "line": 125,
+                  "line": 211,
+                  "name": "prepare",
+                  "target": null,
+                  "via": "ensureSchemaVersion"
+                },
+                {
+                  "branch": "existing",
+                  "line": 232,
+                  "name": "transaction",
+                  "target": null,
+                  "via": "ensureSchemaVersion"
+                },
+                {
+                  "branch": "existing",
+                  "line": 233,
                   "name": "exec",
                   "target": null,
                   "via": "ensureSchemaVersion"
                 },
                 {
                   "branch": "existing",
-                  "line": 132,
+                  "line": 240,
                   "name": "prepare",
                   "target": null,
                   "via": "ensureSchemaVersion"
                 },
                 {
                   "branch": "existing",
-                  "line": 184,
+                  "line": 292,
                   "name": "pragma",
                   "target": null,
                   "via": "migrateSchema"
                 },
                 {
                   "branch": "existing",
-                  "line": 186,
+                  "line": 294,
                   "name": "exec",
                   "target": null,
                   "via": "migrateSchema"
                 },
                 {
                   "branch": "existing",
-                  "line": 188,
+                  "line": 296,
                   "name": "prepare",
                   "target": null,
                   "via": "migrateSchema"
                 },
                 {
                   "branch": "existing",
-                  "line": 192,
+                  "line": 300,
                   "name": "exec",
                   "target": null,
                   "via": "migrateSchema"
                 },
                 {
                   "branch": "existing",
-                  "line": 199,
+                  "line": 307,
                   "name": "rescreenChanges",
                   "target": {
                     "file": "src/ingest.ts"
@@ -12070,13 +12189,13 @@
                 },
                 {
                   "branch": "existing",
-                  "line": 150,
+                  "line": 256,
                   "name": "prepare",
                   "target": null,
                   "via": "ensureSchemaVersion"
                 },
                 {
-                  "line": 114,
+                  "line": 195,
                   "name": "exec",
                   "target": null
                 }
@@ -12089,41 +12208,51 @@
             {
               "calls": [
                 {
-                  "line": 125,
-                  "name": "exec",
-                  "target": null
-                },
-                {
-                  "line": 132,
+                  "line": 211,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 184,
+                  "line": 232,
+                  "name": "transaction",
+                  "target": null
+                },
+                {
+                  "line": 233,
+                  "name": "exec",
+                  "target": null
+                },
+                {
+                  "line": 240,
+                  "name": "prepare",
+                  "target": null
+                },
+                {
+                  "line": 292,
                   "name": "pragma",
                   "target": null,
                   "via": "migrateSchema"
                 },
                 {
-                  "line": 186,
+                  "line": 294,
                   "name": "exec",
                   "target": null,
                   "via": "migrateSchema"
                 },
                 {
-                  "line": 188,
+                  "line": 296,
                   "name": "prepare",
                   "target": null,
                   "via": "migrateSchema"
                 },
                 {
-                  "line": 192,
+                  "line": 300,
                   "name": "exec",
                   "target": null,
                   "via": "migrateSchema"
                 },
                 {
-                  "line": 199,
+                  "line": 307,
                   "name": "rescreenChanges",
                   "target": {
                     "file": "src/ingest.ts"
@@ -12131,7 +12260,7 @@
                   "via": "migrateSchema"
                 },
                 {
-                  "line": 150,
+                  "line": 256,
                   "name": "prepare",
                   "target": null
                 }
@@ -12144,32 +12273,32 @@
             {
               "calls": [
                 {
-                  "line": 168,
+                  "line": 276,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 184,
+                  "line": 292,
                   "name": "pragma",
                   "target": null
                 },
                 {
-                  "line": 186,
+                  "line": 294,
                   "name": "exec",
                   "target": null
                 },
                 {
-                  "line": 188,
+                  "line": 296,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 192,
+                  "line": 300,
                   "name": "exec",
                   "target": null
                 },
                 {
-                  "line": 199,
+                  "line": 307,
                   "name": "rescreenChanges",
                   "target": {
                     "file": "src/ingest.ts"
@@ -12184,7 +12313,7 @@
             {
               "calls": [
                 {
-                  "line": 210,
+                  "line": 318,
                   "name": "prepare",
                   "target": null
                 }
@@ -12197,7 +12326,7 @@
             {
               "calls": [
                 {
-                  "line": 227,
+                  "line": 335,
                   "name": "prepare",
                   "target": null
                 }
@@ -12210,12 +12339,12 @@
             {
               "calls": [
                 {
-                  "line": 252,
+                  "line": 360,
                   "name": "exec",
                   "target": null
                 },
                 {
-                  "line": 227,
+                  "line": 335,
                   "name": "prepare",
                   "target": null,
                   "via": "getEmbeddingDim"
@@ -12577,7 +12706,7 @@
               "line": 145
             }
           ],
-          "hash": "83bb18cf01d6d191162ca20c489ecc24b190e1f328c2af13dcbb79faf7d34e33",
+          "hash": "e243e587cdffbb74a2c3444b47a8363a93bc68257a90cfd0a0fe0f6f6be577a4",
           "importsFiles": [
             "src/fetch-utils.ts",
             "src/screen.ts"
@@ -13453,25 +13582,25 @@
             {
               "in": "clampLimit",
               "kind": "throw",
-              "line": 21
+              "line": 22
             },
             {
               "in": "hasVecTable",
               "kind": "catch",
-              "line": 38
+              "line": 39
             },
             {
               "in": "hybridSearch",
               "kind": "throw",
-              "line": 102
+              "line": 103
             },
             {
               "in": "hybridSearch",
               "kind": "catch",
-              "line": 144
+              "line": 145
             }
           ],
-          "hash": "4ec3d44409c07ae817d0f1922a37d23db394b73399e9fc63ce5f6d7cd811eade",
+          "hash": "9b3d7095d472fbe276e4a05a321a35d79523dedee87133b44f0cce18ba818b59",
           "importsFiles": [
             "src/db.ts",
             "src/embed.ts",
@@ -13479,6 +13608,7 @@
             "src/providers/rerank/ollama-judge.ts",
             "src/providers/rerank/voyage.ts",
             "src/providers/types.ts",
+            "src/query.ts",
             "src/screen.ts"
           ],
           "path": "src/hybrid.ts",
@@ -13486,7 +13616,7 @@
             {
               "calls": [
                 {
-                  "line": 36,
+                  "line": 37,
                   "name": "prepare",
                   "target": null
                 }
@@ -13499,27 +13629,46 @@
             {
               "calls": [
                 {
-                  "line": 107,
+                  "line": 108,
                   "name": "getEmbeddingDim",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 108,
+                  "line": 109,
                   "name": "makeEmbeddingProvider",
                   "target": {
                     "file": "src/embed.ts"
                   }
                 },
                 {
-                  "line": 143,
+                  "line": 144,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 262,
-                  "name": "parseFlagsJson",
+                  "line": 212,
+                  "name": "hasChangesFlagsColumn",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 221,
+                  "name": "prepare",
+                  "target": null
+                },
+                {
+                  "line": 263,
+                  "name": "resolveRowScreening",
+                  "target": {
+                    "file": "src/query.ts"
+                  }
+                },
+                {
+                  "line": 264,
+                  "name": "screenVendorText",
                   "target": {
                     "file": "src/screen.ts"
                   }
@@ -13578,7 +13727,7 @@
               "line": 931
             }
           ],
-          "hash": "9fbe7a2eb5ffcfd4f228997ecc5e7ab1fc12e6bb12f32b98fd84c391c0188451",
+          "hash": "d95ac44a3421bc481176880d44353c0ec99ac363be65c1b232f41a642f0cd9b0",
           "importsFiles": [
             "src/errors.ts",
             "src/extract.ts",
@@ -13714,167 +13863,179 @@
           "failurePaths": [
             {
               "kind": "catch",
-              "line": 116
+              "line": 115
+            },
+            {
+              "kind": "catch",
+              "line": 117
+            },
+            {
+              "kind": "throw",
+              "line": 120
+            },
+            {
+              "kind": "catch",
+              "line": 125
             },
             {
               "in": "getDbOrThrow",
               "kind": "throw",
-              "line": 134
+              "line": 143
             },
             {
               "in": "getHasChunks",
               "kind": "catch",
-              "line": 145
+              "line": 154
             },
             {
               "in": "asRecord",
               "kind": "throw",
-              "line": 355
+              "line": 364
             },
             {
               "in": "requireString",
               "kind": "throw",
-              "line": 363
+              "line": 372
             },
             {
               "in": "optString",
               "kind": "throw",
-              "line": 372
+              "line": 381
             },
             {
               "in": "optInt",
               "kind": "throw",
-              "line": 387
+              "line": 396
             },
             {
               "in": "optBool",
               "kind": "throw",
-              "line": 399
+              "line": 408
             },
             {
               "in": "optEnum",
               "kind": "throw",
-              "line": 413
+              "line": 422
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 535
+              "line": 544
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 570
+              "line": 579
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 589
+              "line": 598
             },
             {
               "in": "runTool",
               "kind": "throw",
-              "line": 631
+              "line": 640
             },
             {
               "kind": "catch",
-              "line": 668
+              "line": 677
             },
             {
               "kind": "throw",
-              "line": 669
+              "line": 678
             },
             {
               "kind": "throw",
-              "line": 676
+              "line": 685
             },
             {
               "in": "dbSynergiesEmpty",
               "kind": "catch",
-              "line": 838
+              "line": 851
             },
             {
               "in": "handleListSynergies",
               "kind": "catch",
-              "line": 867
+              "line": 880
             },
             {
               "in": "listSynergiesFromDisk",
               "kind": "catch",
-              "line": 895
+              "line": 908
             },
             {
               "in": "handleReadSynergy",
               "kind": "catch",
-              "line": 917
+              "line": 930
             },
             {
               "in": "handleReadSynergy",
               "kind": "catch",
-              "line": 933
+              "line": 946
             },
             {
               "in": "handleGetChangesSince",
               "kind": "catch",
-              "line": 971
+              "line": 984
             },
             {
               "in": "handleGetChangesSince",
               "kind": "throw",
-              "line": 972
+              "line": 985
             },
             {
               "in": "handleSearchBreakingChanges",
               "kind": "catch",
-              "line": 987
+              "line": 1000
             },
             {
               "in": "handleSearchBreakingChanges",
               "kind": "throw",
-              "line": 988
+              "line": 1001
             },
             {
               "in": "handleSyncStatus",
               "kind": "catch",
-              "line": 1032
+              "line": 1045
             },
             {
               "in": "handleSyncNow",
               "kind": "throw",
-              "line": 1079
+              "line": 1092
             },
             {
               "in": "handleSyncNow",
               "kind": "throw",
-              "line": 1097
+              "line": 1110
             },
             {
               "in": "handleSyncNow",
               "kind": "catch",
-              "line": 1108
+              "line": 1121
             },
             {
               "in": "handleSyncNow",
               "kind": "catch",
-              "line": 1169
+              "line": 1182
             },
             {
               "in": "handleCompareVersions",
               "kind": "catch",
-              "line": 1203
+              "line": 1216
             },
             {
               "in": "handleCompareVersions",
               "kind": "throw",
-              "line": 1204
+              "line": 1217
             },
             {
               "in": "shutdownMcp",
               "kind": "catch",
-              "line": 1216
+              "line": 1229
             }
           ],
-          "hash": "e8760bd37dcc26e6f45e99843c74755fe5ffd9c029d8990f0a8d08641ef155f1",
+          "hash": "017993590e512556d25047d47771bc4d38e4c65631fbf7d4fe22e3ce6885fcd1",
           "importOrder": [
             "src/db.ts",
             "src/errors.ts",
@@ -13900,7 +14061,7 @@
             {
               "calls": [
                 {
-                  "line": 143,
+                  "line": 152,
                   "name": "prepare",
                   "target": null
                 }
@@ -13913,14 +14074,14 @@
             {
               "calls": [
                 {
-                  "line": 447,
+                  "line": 456,
                   "name": "getCorpusFreshness",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 448,
+                  "line": 457,
                   "name": "getPartialNote",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -13928,14 +14089,14 @@
                   }
                 },
                 {
-                  "line": 449,
+                  "line": 458,
                   "name": "formatFreshnessStamp",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 454,
+                  "line": 463,
                   "name": "formatManualFeedWarning",
                   "target": {
                     "file": "src/query.ts"
@@ -13950,21 +14111,21 @@
             {
               "calls": [
                 {
-                  "line": 461,
+                  "line": 470,
                   "name": "needsAutoSync",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 462,
+                  "line": 471,
                   "name": "isAutoSyncDisabled",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 465,
+                  "line": 474,
                   "name": "ensureSynced",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -13973,7 +14134,7 @@
                 },
                 {
                   "branch": "res.performedByThisCall && res.report",
-                  "line": 476,
+                  "line": 485,
                   "name": "formatFirstUseNotice",
                   "target": {
                     "file": "src/store.ts"
@@ -13989,7 +14150,7 @@
               "calls": [
                 {
                   "branch": "mode === 'fts'",
-                  "line": 686,
+                  "line": 695,
                   "name": "searchChanges",
                   "target": {
                     "file": "src/query.ts"
@@ -13997,7 +14158,7 @@
                 },
                 {
                   "branch": "mode === 'fts'",
-                  "line": 742,
+                  "line": 751,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14006,27 +14167,27 @@
                 },
                 {
                   "branch": "mode === 'fts'",
-                  "line": 694,
+                  "line": 703,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 143,
+                  "line": 152,
                   "name": "prepare",
                   "target": null,
                   "via": "getHasChunks"
                 },
                 {
-                  "line": 715,
+                  "line": 724,
                   "name": "hybridSearch",
                   "target": {
                     "file": "src/hybrid.ts"
                   }
                 },
                 {
-                  "line": 724,
+                  "line": 733,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14041,7 +14202,7 @@
             {
               "calls": [
                 {
-                  "line": 742,
+                  "line": 751,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14056,7 +14217,7 @@
             {
               "calls": [
                 {
-                  "line": 754,
+                  "line": 763,
                   "name": "lookupEntity",
                   "target": {
                     "file": "src/query.ts"
@@ -14064,21 +14225,21 @@
                 },
                 {
                   "branch": "results.length === 0",
-                  "line": 755,
+                  "line": 764,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 758,
+                  "line": 767,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 764,
+                  "line": 773,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14093,7 +14254,7 @@
             {
               "calls": [
                 {
-                  "line": 769,
+                  "line": 778,
                   "name": "recentReleases",
                   "target": {
                     "file": "src/query.ts"
@@ -14109,28 +14270,35 @@
               "calls": [
                 {
                   "branch": "!release",
-                  "line": 781,
+                  "line": 790,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 795,
-                  "name": "parseFlagsJson",
+                  "line": 791,
+                  "name": "hasChangesFlagsColumn",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 807,
+                  "name": "resolveRowScreening",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 795,
+                  "line": 808,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 799,
+                  "line": 812,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14145,7 +14313,7 @@
             {
               "calls": [
                 {
-                  "line": 803,
+                  "line": 816,
                   "name": "listProducts",
                   "target": {
                     "file": "src/query.ts"
@@ -14160,7 +14328,7 @@
             {
               "calls": [
                 {
-                  "line": 817,
+                  "line": 830,
                   "name": "entityFrequency",
                   "target": {
                     "file": "src/query.ts"
@@ -14175,7 +14343,7 @@
             {
               "calls": [
                 {
-                  "line": 847,
+                  "line": 860,
                   "name": "listSynergies",
                   "target": {
                     "file": "src/query.ts"
@@ -14190,7 +14358,7 @@
             {
               "calls": [
                 {
-                  "line": 913,
+                  "line": 926,
                   "name": "getSynergy",
                   "target": {
                     "file": "src/query.ts"
@@ -14205,7 +14373,7 @@
             {
               "calls": [
                 {
-                  "line": 950,
+                  "line": 963,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14220,14 +14388,14 @@
             {
               "calls": [
                 {
-                  "line": 964,
+                  "line": 977,
                   "name": "getChangesSince",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 950,
+                  "line": 963,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14235,7 +14403,7 @@
                   "via": "formatChangesSinceResults"
                 },
                 {
-                  "line": 974,
+                  "line": 987,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14250,7 +14418,7 @@
             {
               "calls": [
                 {
-                  "line": 980,
+                  "line": 993,
                   "name": "browseChanges",
                   "target": {
                     "file": "src/query.ts"
@@ -14258,21 +14426,21 @@
                 },
                 {
                   "branch": "results.length === 0",
-                  "line": 991,
+                  "line": 1004,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 995,
+                  "line": 1008,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 1002,
+                  "line": 1015,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14288,7 +14456,7 @@
               "calls": [
                 {
                   "branch": "h < 48",
-                  "line": 1014,
+                  "line": 1027,
                   "name": "toFixed",
                   "target": null
                 }
@@ -14301,14 +14469,14 @@
             {
               "calls": [
                 {
-                  "line": 1020,
+                  "line": 1033,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 1027,
+                  "line": 1040,
                   "name": "getSyncStatus",
                   "target": {
                     "file": "src/query.ts"
@@ -14316,13 +14484,13 @@
                 },
                 {
                   "branch": "h < 48",
-                  "line": 1014,
+                  "line": 1027,
                   "name": "toFixed",
                   "target": null,
                   "via": "formatHours"
                 },
                 {
-                  "line": 1058,
+                  "line": 1071,
                   "name": "formatManualFeedWarning",
                   "target": {
                     "file": "src/query.ts"
@@ -14337,7 +14505,7 @@
             {
               "calls": [
                 {
-                  "line": 1078,
+                  "line": 1091,
                   "name": "isSyncInProgress",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14346,14 +14514,14 @@
                 },
                 {
                   "branch": "dryRun",
-                  "line": 1094,
+                  "line": 1107,
                   "name": "listFetchTargets",
                   "target": {
                     "file": "src/fetch.ts"
                   }
                 },
                 {
-                  "line": 1119,
+                  "line": 1132,
                   "name": "runManualSync",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14361,35 +14529,35 @@
                   }
                 },
                 {
-                  "line": 1123,
+                  "line": 1136,
                   "name": "openDb",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 1125,
+                  "line": 1138,
                   "name": "initSchema",
                   "target": {
                     "file": "src/db.ts"
                   }
                 },
                 {
-                  "line": 1128,
+                  "line": 1141,
                   "name": "fetchAll",
                   "target": {
                     "file": "src/fetch.ts"
                   }
                 },
                 {
-                  "line": 1135,
+                  "line": 1148,
                   "name": "clearPartialSyncState",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 1136,
+                  "line": 1149,
                   "name": "clearPartialNote",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14397,7 +14565,7 @@
                   }
                 },
                 {
-                  "line": 1137,
+                  "line": 1150,
                   "name": "resetCooldown",
                   "receiver": "FirstUseSyncCoordinator",
                   "target": {
@@ -14405,21 +14573,21 @@
                   }
                 },
                 {
-                  "line": 1143,
+                  "line": 1156,
                   "name": "writePartialSyncState",
                   "target": {
                     "file": "src/store.ts"
                   }
                 },
                 {
-                  "line": 1154,
+                  "line": 1167,
                   "name": "ingestAll",
                   "target": {
                     "file": "src/ingest.ts"
                   }
                 },
                 {
-                  "line": 1164,
+                  "line": 1177,
                   "name": "embedAll",
                   "target": {
                     "file": "src/embed.ts"
@@ -14434,7 +14602,7 @@
             {
               "calls": [
                 {
-                  "line": 1198,
+                  "line": 1211,
                   "name": "compareVersions",
                   "target": {
                     "file": "src/query.ts"
@@ -14442,14 +14610,14 @@
                 },
                 {
                   "branch": "results.length === 0",
-                  "line": 1207,
+                  "line": 1220,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
                   }
                 },
                 {
-                  "line": 950,
+                  "line": 963,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/query.ts"
@@ -14457,7 +14625,7 @@
                   "via": "formatChangesSinceResults"
                 },
                 {
-                  "line": 1209,
+                  "line": 1222,
                   "name": "frameVendorText",
                   "target": {
                     "file": "src/query.ts"
@@ -14966,6 +15134,7 @@
             "productColWidth",
             "readPartialSyncState",
             "recentReleases",
+            "resolveRowScreening",
             "searchChanges",
             "truncate",
             "utcDaysSince",
@@ -14975,51 +15144,57 @@
             {
               "in": "clearPartialSyncState",
               "kind": "catch",
-              "line": 101
+              "line": 120
             },
             {
               "in": "readPartialSyncState",
               "kind": "catch",
-              "line": 135
+              "line": 154
             },
             {
               "in": "readPartialSyncState",
               "kind": "catch",
-              "line": 151
+              "line": 170
             },
             {
               "in": "getCorpusFreshness",
               "kind": "catch",
-              "line": 223
+              "line": 248
             },
             {
               "in": "getCorpusFreshness",
               "kind": "catch",
-              "line": 231
+              "line": 256
             },
             {
               "in": "getCorpusFreshness",
               "kind": "catch",
-              "line": 275
+              "line": 264
+            },
+            {
+              "in": "getCorpusFreshness",
+              "kind": "catch",
+              "line": 309
             },
             {
               "in": "getChangesSince",
               "kind": "throw",
-              "line": 723
+              "line": 770
             },
             {
               "in": "compareVersions",
               "kind": "throw",
-              "line": 814
+              "line": 864
             },
             {
               "in": "compareVersions",
               "kind": "throw",
-              "line": 841
+              "line": 891
             }
           ],
-          "hash": "c0f754ca583c6223a9bcf6318c791cb604e939aab2fe8c877dd03403e7c40607",
+          "hash": "4092d6b99221b5b3b275f1b5e3df4394eff31e4898775d13ecaefe1b7dd41d13",
           "importsFiles": [
+            "src/db.ts",
             "src/errors.ts",
             "src/products-config.ts",
             "src/screen.ts"
@@ -15029,12 +15204,35 @@
             {
               "calls": [
                 {
-                  "line": 75,
+                  "branch": "hasFlagsCol",
+                  "line": 26,
+                  "name": "parseFlagsJson",
+                  "target": {
+                    "file": "src/screen.ts"
+                  }
+                },
+                {
+                  "line": 28,
+                  "name": "screenVendorText",
+                  "target": {
+                    "file": "src/screen.ts"
+                  }
+                }
+              ],
+              "exported": true,
+              "invokedAtTopLevel": false,
+              "isDefaultExport": false,
+              "name": "resolveRowScreening"
+            },
+            {
+              "calls": [
+                {
+                  "line": 94,
                   "name": "exec",
                   "target": null
                 },
                 {
-                  "line": 87,
+                  "line": 106,
                   "name": "prepare",
                   "target": null
                 }
@@ -15047,7 +15245,7 @@
             {
               "calls": [
                 {
-                  "line": 97,
+                  "line": 116,
                   "name": "prepare",
                   "target": null
                 }
@@ -15060,7 +15258,7 @@
             {
               "calls": [
                 {
-                  "line": 113,
+                  "line": 132,
                   "name": "prepare",
                   "target": null
                 }
@@ -15073,17 +15271,17 @@
             {
               "calls": [
                 {
-                  "line": 190,
+                  "line": 209,
                   "name": "getUTCFullYear",
                   "target": null
                 },
                 {
-                  "line": 190,
+                  "line": 209,
                   "name": "getUTCMonth",
                   "target": null
                 },
                 {
-                  "line": 190,
+                  "line": 209,
                   "name": "getUTCDate",
                   "target": null
                 }
@@ -15096,35 +15294,47 @@
             {
               "calls": [
                 {
-                  "line": 219,
+                  "line": 239,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 190,
+                  "line": 243,
+                  "name": "getSchemaVersion",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 252,
+                  "name": "prepare",
+                  "target": null
+                },
+                {
+                  "line": 209,
                   "name": "getUTCFullYear",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 190,
+                  "line": 209,
                   "name": "getUTCMonth",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 190,
+                  "line": 209,
                   "name": "getUTCDate",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 261,
+                  "line": 295,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 281,
+                  "line": 315,
                   "name": "loadProductsConfig",
                   "target": {
                     "file": "src/products-config.ts"
@@ -15139,19 +15349,19 @@
             {
               "calls": [
                 {
-                  "line": 190,
+                  "line": 209,
                   "name": "getUTCFullYear",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 190,
+                  "line": 209,
                   "name": "getUTCMonth",
                   "target": null,
                   "via": "utcDaysSince"
                 },
                 {
-                  "line": 190,
+                  "line": 209,
                   "name": "getUTCDate",
                   "target": null,
                   "via": "utcDaysSince"
@@ -15165,7 +15375,7 @@
             {
               "calls": [
                 {
-                  "line": 380,
+                  "line": 417,
                   "name": "formatFlagMarker",
                   "target": {
                     "file": "src/screen.ts"
@@ -15180,16 +15390,33 @@
             {
               "calls": [
                 {
-                  "line": 463,
+                  "line": 486,
+                  "name": "hasChangesFlagsColumn",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 502,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 468,
+                  "branch": "hasFlagsCol",
+                  "line": 26,
                   "name": "parseFlagsJson",
                   "target": {
                     "file": "src/screen.ts"
-                  }
+                  },
+                  "via": "resolveRowScreening"
+                },
+                {
+                  "line": 28,
+                  "name": "screenVendorText",
+                  "target": {
+                    "file": "src/screen.ts"
+                  },
+                  "via": "resolveRowScreening"
                 }
               ],
               "exported": true,
@@ -15200,16 +15427,33 @@
             {
               "calls": [
                 {
-                  "line": 486,
+                  "line": 518,
+                  "name": "hasChangesFlagsColumn",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 529,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 491,
+                  "branch": "hasFlagsCol",
+                  "line": 26,
                   "name": "parseFlagsJson",
                   "target": {
                     "file": "src/screen.ts"
-                  }
+                  },
+                  "via": "resolveRowScreening"
+                },
+                {
+                  "line": 28,
+                  "name": "screenVendorText",
+                  "target": {
+                    "file": "src/screen.ts"
+                  },
+                  "via": "resolveRowScreening"
                 }
               ],
               "exported": true,
@@ -15220,7 +15464,7 @@
             {
               "calls": [
                 {
-                  "line": 521,
+                  "line": 565,
                   "name": "prepare",
                   "target": null
                 }
@@ -15233,7 +15477,7 @@
             {
               "calls": [
                 {
-                  "line": 537,
+                  "line": 581,
                   "name": "prepare",
                   "target": null
                 }
@@ -15246,7 +15490,7 @@
             {
               "calls": [
                 {
-                  "line": 589,
+                  "line": 633,
                   "name": "prepare",
                   "target": null
                 }
@@ -15259,7 +15503,7 @@
             {
               "calls": [
                 {
-                  "line": 621,
+                  "line": 665,
                   "name": "prepare",
                   "target": null
                 }
@@ -15272,16 +15516,33 @@
             {
               "calls": [
                 {
-                  "line": 680,
+                  "line": 712,
+                  "name": "hasChangesFlagsColumn",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 726,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 685,
+                  "branch": "hasFlagsCol",
+                  "line": 26,
                   "name": "parseFlagsJson",
                   "target": {
                     "file": "src/screen.ts"
-                  }
+                  },
+                  "via": "resolveRowScreening"
+                },
+                {
+                  "line": 28,
+                  "name": "screenVendorText",
+                  "target": {
+                    "file": "src/screen.ts"
+                  },
+                  "via": "resolveRowScreening"
                 }
               ],
               "exported": true,
@@ -15292,16 +15553,33 @@
             {
               "calls": [
                 {
-                  "line": 754,
+                  "line": 792,
+                  "name": "hasChangesFlagsColumn",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 803,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 783,
+                  "branch": "hasFlagsCol",
+                  "line": 26,
                   "name": "parseFlagsJson",
                   "target": {
                     "file": "src/screen.ts"
-                  }
+                  },
+                  "via": "resolveRowScreening"
+                },
+                {
+                  "line": 28,
+                  "name": "screenVendorText",
+                  "target": {
+                    "file": "src/screen.ts"
+                  },
+                  "via": "resolveRowScreening"
                 }
               ],
               "exported": true,
@@ -15312,16 +15590,38 @@
             {
               "calls": [
                 {
-                  "line": 824,
+                  "line": 874,
                   "name": "prepare",
                   "target": null
                 },
                 {
-                  "line": 888,
+                  "line": 898,
+                  "name": "hasChangesFlagsColumn",
+                  "target": {
+                    "file": "src/db.ts"
+                  }
+                },
+                {
+                  "line": 909,
+                  "name": "prepare",
+                  "target": null
+                },
+                {
+                  "branch": "hasFlagsCol",
+                  "line": 26,
                   "name": "parseFlagsJson",
                   "target": {
                     "file": "src/screen.ts"
-                  }
+                  },
+                  "via": "resolveRowScreening"
+                },
+                {
+                  "line": 28,
+                  "name": "screenVendorText",
+                  "target": {
+                    "file": "src/screen.ts"
+                  },
+                  "via": "resolveRowScreening"
                 }
               ],
               "exported": true,
@@ -15332,7 +15632,7 @@
             {
               "calls": [
                 {
-                  "line": 955,
+                  "line": 1008,
                   "name": "prepare",
                   "target": null
                 }
@@ -15345,7 +15645,7 @@
             {
               "calls": [
                 {
-                  "line": 988,
+                  "line": 1041,
                   "name": "prepare",
                   "target": null
                 }
@@ -15369,10 +15669,10 @@
             {
               "in": "parseFlagsJson",
               "kind": "catch",
-              "line": 48
+              "line": 59
             }
           ],
-          "hash": "f3291eb1ddb701b6fe6bacbaef8d61a0907f896665d2ee8b10c44ab81c3ef4e2",
+          "hash": "263a777bd30a6285f3df84c23c821f8cdf193a06f76ad71b755b6ef7ad000b40",
           "path": "src/screen.ts"
         },
         {
@@ -15605,7 +15905,7 @@
       "origin": "authored",
       "outsidePlaces": [
         {
-          "reads": 53,
+          "reads": 57,
           "where": [
             "caller"
           ],
@@ -15641,7 +15941,7 @@
           "writes": 0
         }
       ],
-      "outsideReads": 61,
+      "outsideReads": 65,
       "outsideWrites": 8,
       "role": "code",
       "testRunners": [
@@ -15960,7 +16260,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "4121d92f1a8a67bc9603fa6c1ef43b9f02daf7960f5a73a745c30a0a09ec6d82",
+          "hash": "0675eb994c2af9c694f04970a8a83519446577dde8541aebf7693b6f2660b203",
           "importOrder": [
             "src/db.ts",
             "src/ingest.ts",
@@ -15996,7 +16296,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "2e2d3c4d1cc172213ca127ae99e0381ab3684d40a40e0cf41b86a185a11af604",
+          "hash": "49a679d160f2465b306edfa3ba7fd6105dc0a7314b1d75a711405012c4962b2f",
           "importOrder": [
             "test/helpers/temp-db.ts",
             "src/db.ts",
@@ -16104,10 +16404,11 @@
           "path": "test/unit/db.binding.test.ts"
         },
         {
-          "hash": "29be9365b1549ad0503040392c6e14916c47c0f823dba9aad2c8e610a4037d41",
+          "hash": "a0bb905e72b8b061333425ebffd64f7aac511de483eec3fd7fc02dd3a2e7bca8",
           "importsFiles": [
             "src/db.ts",
-            "src/embed.ts"
+            "src/embed.ts",
+            "src/query.ts"
           ],
           "path": "test/unit/db.dim-config.test.ts",
           "testFramework": "vitest"
@@ -16251,7 +16552,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "98f6f5c05f9401e8d9d0e841d1aac2aa220495cf0c253d9ee3a0f1d28bc707a6",
+          "hash": "fcb1a18b3bc47b2a8fc42d54ff9a2cea045bc7e975fb2da2c922fa0dadd94b7f",
           "importOrder": [
             "src/fetch.ts",
             "src/ingest.ts",
@@ -16310,7 +16611,7 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "48f6277d3424b8c09d9ede159cc4a2edaa5ef954142b78cced966c00140c14a2",
+          "hash": "93cc5a72537bfb74d24e9b63f08b5607f631278e01f333d46c04d1b11dfbcfd7",
           "importOrder": [
             "src/ingest.ts",
             "src/embed.ts",
@@ -16554,8 +16855,13 @@
           "testFramework": "vitest"
         },
         {
-          "hash": "290e137ccc8275a1e4be929edca23bc61592020b8333b8b616b9c9541f20359c",
+          "hash": "f19ce04301d4b704b1152ac5b8d38d82a102a8caf55a84a0c2b8f0b964060661",
+          "importOrder": [
+            "src/screen.ts",
+            "src/query.ts"
+          ],
           "importsFiles": [
+            "src/query.ts",
             "src/screen.ts"
           ],
           "path": "test/unit/screen.test.ts",
@@ -17616,7 +17922,7 @@
   ],
   "engine": "1.26.0",
   "generatedFrom": {
-    "commit": "6233b8e9fef3d2e94ef79ea2ec1ae88e0826bfe1",
+    "commit": "6576cd6c81a08f4be64835f7b4ee17f5913b5208",
     "tracked": 2916
   },
   "landings": [
@@ -17908,6 +18214,18 @@
         }
       ],
       "target": "products.yaml",
+      "writers": []
+    },
+    {
+      "readers": [
+        {
+          "by": "test/unit/screen.test.ts",
+          "call": "readFileSync",
+          "confidence": "ast",
+          "fromTests": true
+        }
+      ],
+      "target": "products/claude-code/releases/2.1.218.md",
       "writers": []
     },
     {

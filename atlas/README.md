@@ -1,14 +1,15 @@
 # claude-synergy: how it works
 
-Mapped at 2026-11-26 from commit 6233b8e by Atlas 1.26.0.
+Mapped at 2026-11-26 from commit 6576cd6 by Atlas 1.26.0.
 
 ## What this is
 
 10 parts, mostly Markdown (2470 files) and JSON data (317); code in TypeScript (91), JavaScript (10), HTML (3), CSS (2), Python (2), Astro (1) and shell (1). Work enters through 7 doors; Tests and Release each reach 3 parts, and Tests is followed because a pull request goes through it. It publishes to npm. It deploys a site to GitHub Pages. People run claude-synergy-mcp and hk.
 
-## What changed since 2026-11-26 (e57a6d5)
+## What changed since 2026-11-26 (6233b8e)
 
-Nothing structural changed since 2026-11-26; 2 files added and 20 changed content.
+- products/claude-code/releases/2.1.218.md is now read by test/unit/screen.test.ts.
+- 16 files changed content, across 4 parts.
 
 ## What comes in
 
@@ -107,7 +108,7 @@ Beside the path, src/ingest.ts also calls src/screen.ts.
 
 - 1 file uses syntax the parser cannot read (test/unit/db.binding.test.ts), so what it imports is not known.
 - 1 write and 5 reads use paths built at run time and are not named here.
-- 9 writes and 53 reads go to a path their caller passes, not to this repository.
+- 9 writes and 57 reads go to a path their caller passes, not to this repository.
 - 7 reads go to the directory the command is run in (products.yaml, schema-vec.sql and schema.sql), not to this repository.
 - 1 read goes to the directory the command is run in (data/) or a path its caller passes, not to this repository.
 - Statistics confidence is low: fewer than 25 source files reach 10 revisions in the window.

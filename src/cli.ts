@@ -3,7 +3,7 @@ import { Command, Option } from 'commander';
 import { join, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { openDb, initSchema } from './db.js';
+import { openDb, initSchema, isReadonlyDbError } from './db.js';
 import {
   ingestAll,
   reextractEntities,
@@ -233,7 +233,17 @@ async function openQueryDbOrFirstUse(
       .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='products'`)
       .get();
     if (hasProducts) {
-      initSchema(db);
+      try {
+        initSchema(db);
+      } catch (migErr) {
+        if (isReadonlyDbError(migErr)) {
+          try { db.close(); } catch { /* ignore */ }
+          db = openDb(store.dbPath, { readonly: true });
+          activeDb = db;
+        } else {
+          throw migErr;
+        }
+      }
     }
   }
 

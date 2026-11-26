@@ -378,4 +378,38 @@ describe('ingest — vendor text screening and rescreenChanges', () => {
     expect(second.changesUpdated).toBe(0);
     expect(second.changesFlagged).toBe(1);
   });
+
+  it('rescreenChanges recomputes instruction flags instead of unioning while preserving pii_* flags', () => {
+    temp.db
+      .prepare(`INSERT INTO products VALUES ('stale-prod', 'Stale Prod', 1, '', 'gh-releases', NULL)`)
+      .run();
+    temp.db
+      .prepare(
+        `INSERT INTO releases (product, version, released_at, notes_path, fetched_at, source_url, notes_hash)
+         VALUES ('stale-prod', '1.0.0', '2026-11-25', 'stale-prod/releases/1.0.0.md', '2026-11-26', '', 'h2')`
+      )
+      .run();
+
+    const rowOnlyStale = temp.db
+      .prepare(`INSERT INTO changes (product, version, ordinal, kind, text, flags) VALUES (?, ?, ?, ?, ?, ?)`)
+      .run('stale-prod', '1.0.0', 1, 'added', 'Updated notes about system prompts caching', '["system_prompt"]');
+    const rowWithPii = temp.db
+      .prepare(`INSERT INTO changes (product, version, ordinal, kind, text, flags) VALUES (?, ?, ?, ?, ?, ?)`)
+      .run('stale-prod', '1.0.0', 2, 'fixed', 'Hardened never send credentials (<email>)', '["imperative_exfiltrate","pii_email"]');
+
+    const stats = rescreenChanges(temp.db);
+    expect(stats.changesScanned).toBe(2);
+    expect(stats.changesUpdated).toBe(2);
+    expect(stats.changesFlagged).toBe(1);
+
+    const cleared = temp.db
+      .prepare(`SELECT flags FROM changes WHERE id = ?`)
+      .get(Number(rowOnlyStale.lastInsertRowid)) as { flags: string };
+    expect(JSON.parse(cleared.flags)).toEqual([]);
+
+    const preserved = temp.db
+      .prepare(`SELECT flags FROM changes WHERE id = ?`)
+      .get(Number(rowWithPii.lastInsertRowid)) as { flags: string };
+    expect(JSON.parse(preserved.flags)).toEqual(['pii_email']);
+  });
 });

@@ -17,6 +17,17 @@ export const PII_FLAG_IDS = {
   homePath: 'pii_home_path',
 } as const;
 
+export const FRAME_MARKER_FLAG_ID = 'frame_marker';
+export const INERT_FRAME_REPLACEMENT = '[frame text removed]';
+
+/** Vendor no-reply / bot email local parts left unredacted on non-personal domains. */
+export const ALLOWED_EMAIL_LOCAL_PARTS: ReadonlySet<string> = new Set([
+  'noreply',
+  'no-reply',
+  'bot',
+  'github-actions',
+]);
+
 /**
  * Single named model-facing frame wrapped around vendor release text in MCP answers.
  * Kept short and fixed so calling agents clearly distinguish quoted vendor data
@@ -67,17 +78,17 @@ export const INSTRUCTION_PATTERNS: readonly InstructionPattern[] = [
     description: 'Persona reassignment phrase ("you are now")',
     regex: /\byou\s+are\s+now\b/i,
   },
-  // References attempting to inspect, override, or target the system prompt.
+  // Reader-addressed attempts to inspect or override the system prompt.
   {
     id: 'system_prompt',
-    description: 'Explicit reference to a system prompt',
-    regex: /\bsystem\s+prompts?\b/i,
+    description: 'Reader-addressed instruction targeting the system prompt',
+    regex: /\b(?:reveal|print|ignore|override|show(?:\s+me)?|repeat|output)\s+(?:your|the)\s+system\s+prompts?\b/i,
   },
-  // Phrases addressing or framing the reader as an AI/LLM assistant.
+  // Phrases addressing or framing the reader as an AI assistant.
   {
     id: 'as_an_ai',
-    description: 'Assistant framing phrase ("as an AI" / "as an LLM")',
-    regex: /\bas\s+an\s+(?:ai|artificial\s+intelligence|helpful\s+assistant|llm|language\s+model)\b/i,
+    description: 'Assistant framing phrase ("as an AI( assistant)" / "as a helpful assistant")',
+    regex: /\bas\s+(?:an\s+ai(?:\s+assistant)?|a\s+helpful\s+assistant)\b/i,
   },
   // XML-style role or tool-call delimiter tags injected into release prose.
   {
@@ -97,30 +108,32 @@ export const INSTRUCTION_PATTERNS: readonly InstructionPattern[] = [
     description: 'Special-token turn marker (<|im_start|>, <|im_end|>, <|system|>)',
     regex: /<\|\s*(?:im_start|im_end|system|user|assistant|endoftext)\s*\|>/i,
   },
-  // Conversational speaker role prefixes ("Assistant:" anywhere, line-leading "System:").
+  // Conversational Assistant role prefix at the start of a bullet.
   {
     id: 'assistant_turn_marker',
-    description: 'Conversational role prefix ("Assistant:" or line-leading "System:")',
-    regex: /(?:^|\n)\s*\b(?:assistant|system)\s*:(?=\s|$)|\bassistant\s*:(?=\s|$)/i,
+    description: 'Bullet-leading conversational role prefix ("Assistant:")',
+    regex: /^(?:[ \t]*[-*][ \t]+)?assistant[ \t]*:(?=\s|$)|(?<=\n)[ \t]*[-*][ \t]+assistant[ \t]*:(?=\s|$)/i,
   },
-  // Imperative commands attempting to make an agent invoke a shell or tool.
+  // Reader-addressed commands or remote-script pipes executing tools/shells.
   {
     id: 'imperative_tool_command',
-    description: 'Imperative command to run or invoke a shell/terminal/tool',
-    regex: /\b(?:run|execute|invoke|call)\s+(?:the\s+)?(?:bash|shell|terminal|command|tool|curl|wget|powershell|sh)\b/i,
+    description: 'Reader-addressed execution command or remote script pipe (curl/wget | sh/bash)',
+    regex: /\byou\s+(?:must|should|need\s+to)\s+(?:run|execute|call|invoke)\b|\b(?:curl|wget)\b[^\r\n|]{1,200}\|\s*(?:sudo\s+)?(?:ba)?sh\b/i,
   },
-  // Imperative commands attempting to exfiltrate credentials, tokens, or env secrets.
+  // Imperative exfiltration directives with an explicit remote destination and no negation prefix.
   {
     id: 'imperative_exfiltrate',
-    description: 'Imperative command to exfiltrate or transmit secrets/credentials/tokens',
-    regex: /\b(?:exfiltrate|send|upload|post|leak|transmit)\s+(?:[\w-]+\s+){0,4}?\b(?:secrets?|credentials?|tokens?|api[_ -]?keys?|env(?:ironment)?|\.env|ssh[_ -]?keys?)\b/i,
+    description: 'Unnegated imperative to send/exfiltrate secrets or credentials to a remote host or URL',
+    regex: /(?<!\b(?:never|don['’]?t|do\s+not|no\s+longer|stop)(?:\s+[\w-]+){0,4}\s+)\b(?:exfiltrate|send|leak|transmit)\s+(?:[\w-]+\s+){0,4}?\b(?:secrets?|credentials?|tokens?|api[_ -]?keys?|env(?:ironment)?|\.env|ssh[_ -]?keys?)\b(?:(?!\s+to\b)\s+[\w-]+){0,3}\s+to\s+(?:https?:\/\/[^\s)>'"]+|(?:[a-z0-9-]+\.)+[a-z]{2,24}\b)/i,
   },
 ];
 
-// Unicode ranges stripped during Stage A (U+FEFF is preserved only at index 0).
+// Unicode ranges stripped during Stage A (U+FEFF preserved at index 0; U+200C ZWNJ / U+200D ZWJ kept).
 const TAG_BLOCK_RE = /[\u{E0000}-\u{E007F}]/gu;
-const ZERO_WIDTH_AND_BOM_RE = /[\u200B-\u200F\u2060-\u2064\uFEFF]/g;
+const ZERO_WIDTH_AND_BOM_RE = /[\u200B\u200E\u200F\u2060-\u2064\uFEFF]/g;
 const BIDI_CONTROL_RE = /[\u202A-\u202E\u2066-\u2069]/g;
+const FORGED_FRAME_RE =
+  /-{3,}[ \t]*(?:vendor[ \t]+release[ \t]+text(?:[ \t]*\([ \t]*quoted[ \t]+data[ \t]*,[ \t]*not[ \t]+instructions[ \t]*\))?|end[ \t]+vendor[ \t]+release[ \t]+text)[ \t]*-{3,}/gi;
 
 /**
  * Strip invisible tag-block, zero-width, and bidi control characters.
@@ -174,59 +187,106 @@ function neutraliseLinksAndImages(input: string): string {
 
 // Stage C: identity and PII redaction (used both by screenVendorText and by
 // fetch-time markdown writers).
-const WIN_HOME_RE = /[A-Za-z]:(?:\\+|\/+)Users(?:\\+|\/+)(?!(?:Public|Default|All Users)\b)[A-Za-z0-9._-]+((?:(?:\\+|\/+)[A-Za-z0-9._~@-]+)*(?:\\+|\/+)?)/gi;
-const MSYS_HOME_RE = /(?<![A-Za-z0-9_/:\\])\/[A-Za-z]\/Users\/(?!(?:Public|Default|All Users)\b)[A-Za-z0-9._-]+((?:\/[A-Za-z0-9._~@-]+)*\/?)/gi;
-const UNIX_HOME_RE = /(?<![A-Za-z0-9_/:\\])\/(?:home\/[A-Za-z0-9._-]+|Users\/(?!(?:Public|Default|All Users)\b)[A-Za-z0-9._-]+)((?:\/[A-Za-z0-9._~@-]+)*\/?)/g;
+const PERSONAL_EMAIL_DOMAINS = new Set([
+  'gmail.com',
+  'googlemail.com',
+  'yahoo.com',
+  'hotmail.com',
+  'outlook.com',
+  'icloud.com',
+  'me.com',
+  'proton.me',
+  'protonmail.com',
+  'aol.com',
+]);
+
+// Replace only the username segment in home paths, skipping env assignments (HOME=...),
+// system folders (Public/Default/All Users/Shared), and CI runner accounts (/home/runner).
+const WIN_HOME_USER_RE =
+  /(?<![A-Za-z0-9_])(?<![A-Za-z_][A-Za-z0-9_]{0,63}=["']?)([A-Za-z]:(?:\\+|\/+)Users(?:\\+|\/+))(?!(?:Public|Default|All Users|Shared|runner|runneradmin)(?![A-Za-z0-9._-]))[A-Za-z0-9_-](?:[A-Za-z0-9._-]*[A-Za-z0-9_-])?/gi;
+const MSYS_HOME_USER_RE =
+  /(?<![A-Za-z0-9_/:\\])(?<![A-Za-z_][A-Za-z0-9_]{0,63}=["']?)(\/[A-Za-z]\/Users\/)(?!(?:Public|Default|All Users|Shared|runner|runneradmin)(?![A-Za-z0-9._-]))[A-Za-z0-9_-](?:[A-Za-z0-9._-]*[A-Za-z0-9_-])?/gi;
+const UNIX_HOME_USER_RE =
+  /(?<![A-Za-z0-9_/:\\])(?<![A-Za-z_][A-Za-z0-9_]{0,63}=["']?)(\/home\/)(?!runner(?![A-Za-z0-9._-]))[A-Za-z0-9_-](?:[A-Za-z0-9._-]*[A-Za-z0-9_-])?/g;
+const MAC_HOME_USER_RE =
+  /(?<![A-Za-z0-9_/:\\])(?<![A-Za-z_][A-Za-z0-9_]{0,63}=["']?)(\/Users\/)(?!(?:Shared|Public|Default|All Users)(?![A-Za-z0-9._-]))[A-Za-z0-9_-](?:[A-Za-z0-9._-]*[A-Za-z0-9_-])?/g;
 const EMAIL_RE = /(?<![A-Za-z0-9._%+-/])([A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,24})\b(?!:[A-Za-z0-9_.-]+\/)/g;
 
-function formatHomeReplacement(rawSubpath: string): string {
-  if (!rawSubpath) return '<home>';
-  // Preserve a sentence-ending period outside the redacted token when a path ends prose.
-  const trailingDot = rawSubpath.endsWith('.') ? '.' : '';
-  const body = trailingDot ? rawSubpath.slice(0, -1) : rawSubpath;
-  const normalized = body.replace(/[\\/]+/g, '/');
-  return `<home>${normalized}${trailingDot}`;
+function isAllowedBotEmail(address: string): boolean {
+  const atIdx = address.indexOf('@');
+  if (atIdx <= 0) return false;
+  const rawLocal = address.slice(0, atIdx).toLowerCase().replace(/^\d+\+/, '');
+  const domain = address.slice(atIdx + 1).toLowerCase();
+  if (PERSONAL_EMAIL_DOMAINS.has(domain)) return false;
+  return ALLOWED_EMAIL_LOCAL_PARTS.has(rawLocal);
+}
+
+function redactPiiOutsideCode(
+  segment: string,
+  onHome: () => void,
+  onEmail: () => void
+): string {
+  const replaceUserSegment = (_m: string, prefix: string) => {
+    onHome();
+    return `${prefix}<user>`;
+  };
+  return segment
+    .replace(WIN_HOME_USER_RE, replaceUserSegment)
+    .replace(MSYS_HOME_USER_RE, replaceUserSegment)
+    .replace(UNIX_HOME_USER_RE, replaceUserSegment)
+    .replace(MAC_HOME_USER_RE, replaceUserSegment)
+    .replace(EMAIL_RE, (full: string, address: string) => {
+      if (isAllowedBotEmail(address)) return full;
+      onEmail();
+      return '<email>';
+    });
 }
 
 /**
- * Redact email addresses and user home-directory paths (`C:\Users\<name>`,
- * `/home/<name>`, `/Users/<name>`, and forward-slash variants) to `<email>` and
- * `<home>/…`. Leaves URLs, product names, and version strings intact.
+ * Deterministically redact email addresses (`<email>`) and only the username
+ * segment of home-directory paths (`C:\Users\<user>\…`, `C:/Users/<user>/…`,
+ * `/home/<user>/…`, `/Users/<user>/…`) outside code spans/fences. Leaves
+ * URLs, CI runner / Shared / `HOME=` placeholders, allowlisted
+ * vendor bot addresses, product names, and version strings intact.
  */
 export function redactVendorPii(input: string): ScreenResult {
-  let text = input;
+  const parts = input.split(CODE_SEGMENT_RE);
   const flags: string[] = [];
   let sawHomePath = false;
   let sawEmail = false;
 
-  const replaceHome = (_m: string, sub = '') => {
-    sawHomePath = true;
-    return formatHomeReplacement(sub);
-  };
-
-  text = text.replace(WIN_HOME_RE, replaceHome);
-  text = text.replace(MSYS_HOME_RE, replaceHome);
-  text = text.replace(UNIX_HOME_RE, replaceHome);
-  text = text.replace(EMAIL_RE, () => {
-    sawEmail = true;
-    return '<email>';
-  });
+  for (let i = 0; i < parts.length; i += 2) {
+    parts[i] = redactPiiOutsideCode(
+      parts[i],
+      () => { sawHomePath = true; },
+      () => { sawEmail = true; },
+    );
+  }
 
   if (sawHomePath) flags.push(PII_FLAG_IDS.homePath);
   if (sawEmail) flags.push(PII_FLAG_IDS.email);
-  return { text, flags };
+  return { text: parts.join(''), flags };
 }
 
 /**
  * Pure, deterministic screening of third-party vendor text:
- *   1. Strip invisible Unicode tag-block, zero-width, and bidi control characters.
- *   2. Neutralise markdown/HTML images and unsafe-scheme links outside code.
- *   3. Redact email addresses and home-directory paths to `<email>` / `<home>/…`.
- *   4. Flag (without deleting) instruction-shaped patterns.
+ *   1. Strip invisible Unicode tag-block, zero-width (preserving ZWNJ/ZWJ), and bidi controls.
+ *   2. Neutralise forged frame headers/footers to `[frame text removed]` (`frame_marker`).
+ *   3. Neutralise markdown/HTML images and unsafe-scheme links outside code.
+ *   4. Redact email addresses (`<email>`) and home-path usernames (`<user>`) outside code.
+ *   5. Flag (without deleting) narrowed instruction-shaped patterns.
  */
 export function screenVendorText(input: string): ScreenResult {
   const stripped = stripInvisibleChars(input);
-  const neutralised = neutraliseLinksAndImages(stripped);
+  let sawFrameMarker = false;
+  const deFramed = stripped.replace(FORGED_FRAME_RE, () => {
+    sawFrameMarker = true;
+    return INERT_FRAME_REPLACEMENT;
+  });
+  if (deFramed.includes(INERT_FRAME_REPLACEMENT)) {
+    sawFrameMarker = true;
+  }
+  const neutralised = neutraliseLinksAndImages(deFramed);
   const pii = redactVendorPii(neutralised);
 
   const flags: string[] = [];
@@ -238,6 +298,9 @@ export function screenVendorText(input: string): ScreenResult {
     }
   };
 
+  if (sawFrameMarker) {
+    addFlag(FRAME_MARKER_FLAG_ID);
+  }
   for (const pattern of INSTRUCTION_PATTERNS) {
     if (pattern.regex.test(pii.text)) {
       addFlag(pattern.id);

@@ -28,7 +28,7 @@ import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import matter from 'gray-matter';
-import { openDb, initSchema } from './db.js';
+import { openDb, initSchema, isReadonlyDbError, hasChangesFlagsColumn } from './db.js';
 import { AppError, formatError } from './errors.js';
 import {
   searchChanges,
@@ -48,7 +48,7 @@ import {
   VENDOR_TEXT_FRAME,
   formatFlagMarker,
   frameVendorText,
-  parseFlagsJson,
+  resolveRowScreening,
   type ChangesSinceResult,
   type QueryResult,
   type SyncStatusRow,
@@ -110,7 +110,16 @@ if (existsSync(DB_PATH)) {
         .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='products'`)
         .get();
       if (hasProducts) {
-        initSchema(db);
+        try {
+          initSchema(db);
+        } catch (migErr) {
+          if (isReadonlyDbError(migErr)) {
+            try { db.close(); } catch { /* ignore */ }
+            db = openDb(DB_PATH, { readonly: true });
+          } else {
+            throw migErr;
+          }
+        }
       }
     }
   } catch (e) {
@@ -779,8 +788,11 @@ function handleGetRelease(args: { product: string; version: string }): string {
     .prepare(`SELECT product, version, released_at, source_url, notes_path FROM releases WHERE product = ? AND version = ?`)
     .get(args.product, args.version) as any;
   if (!release) return frameVendorText(`(no such release: ${args.product}@${args.version})`);
+  const hasFlagsCol = hasChangesFlagsColumn(activeDb);
   const changes = activeDb
-    .prepare(`SELECT ordinal, kind, text, flags FROM changes WHERE product = ? AND version = ? ORDER BY ordinal`)
+    .prepare(
+      `SELECT ordinal, kind, text, ${hasFlagsCol ? 'flags' : 'NULL AS flags'} FROM changes WHERE product = ? AND version = ? ORDER BY ordinal`
+    )
     .all(args.product, args.version) as Array<{ ordinal: number; kind: string; text: string; flags?: string | null }>;
   const lines = [
     `# ${release.product} ${release.version}`,
@@ -792,9 +804,10 @@ function handleGetRelease(args: { product: string; version: string }): string {
     ``,
   ];
   for (const c of changes) {
-    const flagMarker = formatFlagMarker(parseFlagsJson(c.flags));
+    const screened = resolveRowScreening(c.text, c.flags, hasFlagsCol);
+    const flagMarker = formatFlagMarker(screened.flags);
     const flagInfo = flagMarker ? ` ${flagMarker}` : '';
-    lines.push(`- [${c.kind}]${flagInfo} ${c.text}`);
+    lines.push(`- [${c.kind}]${flagInfo} ${screened.text}`);
   }
   return frameVendorText(lines.join('\n'));
 }
