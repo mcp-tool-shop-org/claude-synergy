@@ -6,7 +6,7 @@ import TurndownService from 'turndown';
 import type Database from 'better-sqlite3';
 import { AppError } from './errors.js';
 import { extractEntities } from './extract.js';
-import { loadProductsConfig } from './products-config.js';
+import { deriveReleaseIdentity, loadProductsConfig, type ProductsConfig } from './products-config.js';
 import { parseFlagsJson, screenVendorText } from './screen.js';
 
 // Turndown converts HTML release bodies (github-copilot, vscode-copilot-chat) to markdown
@@ -166,7 +166,107 @@ const PRODUCT_META: Record<string, { tier: number; strategy: string; url: string
   return out;
 })();
 
-export function ingestAll(db: Database.Database, productsRoot: string): IngestStats {
+export interface IngestOptions {
+  productsConfig?: ProductsConfig | null;
+  yamlPath?: string;
+}
+
+/**
+ * Remove or re-point all child rows referencing `changeIds` across
+ * `entities`, `chunks` (including `chunks_vec` and `chunks_fts`),
+ * `relevance`, and `synergy_change_refs`. Safe on partial schemas and when
+ * `sqlite-vec` (`vec0`) is not loaded in the current connection.
+ */
+export function deleteChangeChildren(
+  db: Database.Database,
+  changeIds: number[],
+  rePointByChangeId?: ReadonlyMap<number, number>,
+): void {
+  if (changeIds.length === 0) return;
+
+  const hasTable = (name: string): boolean =>
+    db.prepare(`SELECT 1 FROM sqlite_master WHERE type='table' AND name = ?`).get(name) !== undefined;
+
+  if (hasTable('relevance')) {
+    const updateRel = rePointByChangeId
+      ? db.prepare(`UPDATE relevance SET change_id = ? WHERE change_id = ?`)
+      : null;
+    const deleteRel = db.prepare(`DELETE FROM relevance WHERE change_id = ?`);
+    for (const oldId of changeIds) {
+      const winId = rePointByChangeId?.get(oldId);
+      if (winId !== undefined && winId !== oldId && updateRel) {
+        updateRel.run(winId, oldId);
+      }
+      deleteRel.run(oldId);
+    }
+  }
+
+  if (hasTable('synergy_change_refs')) {
+    const copyRef = rePointByChangeId
+      ? db.prepare(
+          `INSERT OR IGNORE INTO synergy_change_refs (synergy_id, change_id)
+           SELECT synergy_id, ? FROM synergy_change_refs WHERE change_id = ?`,
+        )
+      : null;
+    const deleteRef = db.prepare(`DELETE FROM synergy_change_refs WHERE change_id = ?`);
+    for (const oldId of changeIds) {
+      const winId = rePointByChangeId?.get(oldId);
+      if (winId !== undefined && winId !== oldId && copyRef) {
+        copyRef.run(winId, oldId);
+      }
+      deleteRef.run(oldId);
+    }
+  }
+
+  if (hasTable('entities')) {
+    const deleteEnt = db.prepare(`DELETE FROM entities WHERE change_id = ?`);
+    for (const oldId of changeIds) {
+      deleteEnt.run(oldId);
+    }
+  }
+
+  if (hasTable('chunks')) {
+    const selectChunks = db.prepare(`SELECT id, contextualized FROM chunks WHERE change_id = ?`);
+    const deleteChunk = db.prepare(`DELETE FROM chunks WHERE id = ?`);
+    const hasChunksVec = hasTable('chunks_vec');
+    const hasChunksFts = hasTable('chunks_fts');
+    const hasChunksFtsDeleteTrigger =
+      db.prepare(`SELECT 1 FROM sqlite_master WHERE type='trigger' AND name='chunks_fts_delete'`).get() !==
+      undefined;
+
+    let deleteVec: Database.Statement | null = null;
+    if (hasChunksVec) {
+      try {
+        deleteVec = db.prepare(`DELETE FROM chunks_vec WHERE rowid = ?`);
+      } catch (err) {
+        if (!/no such module:\s*vec0/i.test(String(err))) throw err;
+      }
+    }
+    const deleteChunkFts =
+      hasChunksFts && !hasChunksFtsDeleteTrigger
+        ? db.prepare(`INSERT INTO chunks_fts(chunks_fts, rowid, contextualized) VALUES('delete', ?, ?)`)
+        : null;
+
+    for (const oldId of changeIds) {
+      const chunkRows = selectChunks.all(oldId) as Array<{ id: number; contextualized: string }>;
+      for (const ch of chunkRows) {
+        if (deleteVec) {
+          deleteVec.run(ch.id);
+        }
+        if (deleteChunkFts) {
+          deleteChunkFts.run(ch.id, ch.contextualized);
+        }
+        deleteChunk.run(ch.id);
+      }
+    }
+  }
+}
+
+export function ingestAll(
+  db: Database.Database,
+  productsRoot: string,
+  opts: IngestOptions = {}
+): IngestStats {
   const stats: IngestStats = {
     productsCount: 0,
     releasesAdded: 0,
@@ -176,6 +276,25 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
     total: 0,
     errors: [],
   };
+
+  const cfg =
+    opts.productsConfig !== undefined
+      ? opts.productsConfig
+      : loadProductsConfig(opts.yamlPath);
+
+  const productMetaMap: Record<string, { tier: number; strategy: string; url: string; display: string }> = cfg
+    ? Object.fromEntries(
+        Object.entries(cfg.productMeta).map(([name, meta]) => [
+          name,
+          {
+            tier: meta.source_tier,
+            strategy: meta.fetch_strategy,
+            url: meta.source_url,
+            display: meta.display_name,
+          },
+        ])
+      )
+    : PRODUCT_META;
 
   const productDirs = readdirSync(productsRoot).filter((name) => {
     try {
@@ -203,25 +322,82 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
   `);
 
   const insertRelease = db.prepare(`
-    INSERT OR REPLACE INTO releases (product, version, released_at, notes_path, fetched_at, source_url, bundle_size_kb, notes_hash)
-    VALUES (@product, @version, @released_at, @notes_path, @fetched_at, @source_url, @bundle_size_kb, @notes_hash)
+    INSERT INTO releases (product, package, version, released_at, notes_path, fetched_at, source_url, bundle_size_kb, notes_hash)
+    VALUES (@product, @package, @version, @released_at, @notes_path, @fetched_at, @source_url, @bundle_size_kb, @notes_hash)
+    ON CONFLICT(product, package, version) DO UPDATE SET
+      released_at    = excluded.released_at,
+      notes_path     = excluded.notes_path,
+      fetched_at     = excluded.fetched_at,
+      source_url     = excluded.source_url,
+      bundle_size_kb = excluded.bundle_size_kb,
+      notes_hash     = excluded.notes_hash
   `);
 
   const insertChange = db.prepare(`
-    INSERT INTO changes (product, version, ordinal, kind, text, flags)
-    VALUES (@product, @version, @ordinal, @kind, @text, @flags)
+    INSERT INTO changes (product, package, version, ordinal, kind, text, flags)
+    VALUES (@product, @package, @version, @ordinal, @kind, @text, @flags)
   `);
 
-  const deleteChanges = db.prepare(`DELETE FROM changes WHERE product = ? AND version = ?`);
+  const deleteChanges = db.prepare(
+    `DELETE FROM changes WHERE product = ? AND package = ? AND version = ?`
+  );
 
   const selectExistingHash = db.prepare(
-    `SELECT notes_hash FROM releases WHERE product = ? AND version = ?`
+    `SELECT notes_hash, notes_path FROM releases WHERE product = ? AND package = ? AND version = ?`
+  );
+
+  const updateReleaseNotesPath = db.prepare(
+    `UPDATE releases SET notes_path = ? WHERE product = ? AND package = ? AND version = ?`
+  );
+
+  const selectStaleByNotesPath = db.prepare(
+    `SELECT package, version FROM releases WHERE product = ? AND notes_path = ? AND (package != ? OR version != ?)`
+  );
+
+  const selectChangeIdsForRelease = db.prepare(
+    `SELECT id FROM changes WHERE product = ? AND package = ? AND version = ?`
+  );
+
+  const deleteReleaseByKey = db.prepare(
+    `DELETE FROM releases WHERE product = ? AND package = ? AND version = ?`
   );
 
   const insertEntity = db.prepare(`
     INSERT INTO entities (change_id, entity_type, entity_value)
     VALUES (?, ?, ?)
   `);
+
+  interface ParsedReleaseCandidate {
+    file: string;
+    notesPath: string;
+    supersededNotesPaths: string[];
+    pkg: string;
+    version: string;
+    released_at: string | null;
+    source_url: string;
+    rawFetchedAt: string;
+    fetched_at: string;
+    bundle_size_kb: number | null;
+    hash: string;
+    content: string;
+    isLegacyErtex: boolean;
+  }
+
+  const isPreferredCandidate = (
+    candidate: ParsedReleaseCandidate,
+    incumbent: ParsedReleaseCandidate,
+  ): boolean => {
+    if (candidate.isLegacyErtex !== incumbent.isLegacyErtex) {
+      return !candidate.isLegacyErtex;
+    }
+    if (candidate.rawFetchedAt !== incumbent.rawFetchedAt) {
+      return candidate.rawFetchedAt > incumbent.rawFetchedAt;
+    }
+    if (candidate.hash !== incumbent.hash) {
+      return candidate.hash > incumbent.hash;
+    }
+    return candidate.notesPath < incumbent.notesPath;
+  };
 
   for (const product of productDirs) {
     const releasesDir = join(productsRoot, product, 'releases');
@@ -233,7 +409,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
 
     let releaseFiles: string[];
     try {
-      releaseFiles = readdirSync(releasesDir).filter((f) => f.endsWith('.md'));
+      releaseFiles = readdirSync(releasesDir).filter((f) => f.endsWith('.md')).sort();
     } catch {
       continue;
     }
@@ -244,7 +420,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
 
     stats.productsCount++;
 
-    const meta = PRODUCT_META[product] ?? {
+    const meta = productMetaMap[product] ?? {
       tier: 1,
       strategy: 'gh-releases',
       url: '',
@@ -260,6 +436,9 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
     });
 
     const ingestTransaction = db.transaction(() => {
+      const winnerByKey = new Map<string, ParsedReleaseCandidate>();
+      const fallbackDate = new Date().toISOString().split('T')[0];
+
       for (const file of releaseFiles) {
         try {
           stats.total++;
@@ -271,44 +450,114 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
           // For multi-product feeds (anthropic-apps) compose version with sub_product
           // to keep each Help Center entry as a distinct release row
           const baseVersion = fmTyped.version ?? basename(file, '.md');
-          const version = fmTyped.sub_product
+          const rawVersion = fmTyped.sub_product
             ? `${baseVersion}-${fmTyped.sub_product}`
             : baseVersion;
+          const notesPath = relative(productsRoot, path).replace(/\\/g, '/');
+          const source_url = fmTyped.source_url ?? '';
+          const { pkg, version } = deriveReleaseIdentity(product, rawVersion, notesPath, cfg, source_url);
+
+          const candidate: ParsedReleaseCandidate = {
+            file,
+            notesPath,
+            supersededNotesPaths: [],
+            pkg,
+            version,
+            released_at: fmTyped.released_at ?? null,
+            source_url,
+            rawFetchedAt: fmTyped.fetched_at ?? '',
+            fetched_at: fmTyped.fetched_at ?? fallbackDate,
+            bundle_size_kb: fmTyped.bundle_size_kb_delta ?? null,
+            hash: contentHash(raw),
+            content,
+            isLegacyErtex: /^ertex-/i.test(basename(file, '.md')),
+          };
+
+          const dedupKey = `${pkg}\0${version}`;
+          const incumbent = winnerByKey.get(dedupKey);
+          if (!incumbent) {
+            winnerByKey.set(dedupKey, candidate);
+          } else if (isPreferredCandidate(candidate, incumbent)) {
+            candidate.supersededNotesPaths.push(incumbent.notesPath, ...incumbent.supersededNotesPaths);
+            winnerByKey.set(dedupKey, candidate);
+            stats.skipped++;
+            console.error(
+              `[ingest] skipping duplicate release ${incumbent.notesPath} for ${product} (${pkg || 'unassigned'})@${version}; keeping ${candidate.notesPath}`,
+            );
+          } else {
+            incumbent.supersededNotesPaths.push(candidate.notesPath);
+            stats.skipped++;
+            console.error(
+              `[ingest] skipping duplicate release ${candidate.notesPath} for ${product} (${pkg || 'unassigned'})@${version}; keeping ${incumbent.notesPath}`,
+            );
+          }
+        } catch (e: any) {
+          if (e instanceof AppError) throw e;
+          stats.errors.push({ file, error: e.message });
+        }
+      }
+
+      for (const cand of winnerByKey.values()) {
+        try {
+          // Evict any prior release row stored for the same (product, notes_path) under a
+          // different (package, version) (e.g. after products.yaml adds/renames a release_prefix)
+          // BEFORE checking notes_hash so a release is never stored twice.
+          for (const candidatePath of [cand.notesPath, ...cand.supersededNotesPaths]) {
+            const staleRows = selectStaleByNotesPath.all(product, candidatePath, cand.pkg, cand.version) as Array<{
+              package: string;
+              version: string;
+            }>;
+            for (const stale of staleRows) {
+              const staleChangeIds = (
+                selectChangeIdsForRelease.all(product, stale.package, stale.version) as Array<{ id: number }>
+              ).map((r) => r.id);
+              deleteChangeChildren(db, staleChangeIds);
+              deleteChanges.run(product, stale.package, stale.version);
+              deleteReleaseByKey.run(product, stale.package, stale.version);
+            }
+          }
 
           // Dedup: skip re-processing if content hash has not changed
-          const hash = contentHash(raw);
-          const existingRow = selectExistingHash.get(product, version) as { notes_hash: string | null } | undefined;
-          if (existingRow?.notes_hash === hash) {
+          const existingRow = selectExistingHash.get(product, cand.pkg, cand.version) as
+            | { notes_hash: string | null; notes_path: string }
+            | undefined;
+          if (existingRow?.notes_hash === cand.hash) {
+            if (existingRow.notes_path !== cand.notesPath) {
+              updateReleaseNotesPath.run(cand.notesPath, product, cand.pkg, cand.version);
+            }
             stats.skipped++;
             continue;
           }
 
-          const released_at = fmTyped.released_at ?? null;
-          const source_url = fmTyped.source_url ?? '';
-          const fetched_at = fmTyped.fetched_at ?? new Date().toISOString().split('T')[0];
-          const bundle_size_kb = fmTyped.bundle_size_kb_delta ?? null;
-
-          deleteChanges.run(product, version);
+          if (existingRow) {
+            const existingChangeIds = (
+              selectChangeIdsForRelease.all(product, cand.pkg, cand.version) as Array<{ id: number }>
+            ).map((r) => r.id);
+            deleteChangeChildren(db, existingChangeIds);
+          }
+          deleteChanges.run(product, cand.pkg, cand.version);
 
           insertRelease.run({
             product,
-            version,
-            released_at,
-            notes_path: relative(productsRoot, path).replace(/\\/g, '/'),
-            fetched_at,
-            source_url,
-            bundle_size_kb,
-            notes_hash: hash,
+            package: cand.pkg,
+            version: cand.version,
+            released_at: cand.released_at,
+            notes_path: cand.notesPath,
+            fetched_at: cand.fetched_at,
+            source_url: cand.source_url,
+            bundle_size_kb: cand.bundle_size_kb,
+            notes_hash: cand.hash,
           });
           stats.releasesAdded++;
 
-          const bullets = compactCommitDumpBody(parseBullets(maybeConvertHtmlToMarkdown(content)));
+          const bullets = compactCommitDumpBody(parseBullets(maybeConvertHtmlToMarkdown(cand.content)));
           bullets.forEach((rawBullet, i) => {
             const screened = screenVendorText(rawBullet);
             const kind = classifyKind(screened.text);
             const result = insertChange.run({
               product,
-              version,
+              package: cand.pkg,
+              version: cand.version,
               ordinal: i + 1,
               kind,
               text: screened.text,
@@ -325,7 +574,7 @@ export function ingestAll(db: Database.Database, productsRoot: string): IngestSt
           });
         } catch (e: any) {
           if (e instanceof AppError) throw e;
-          stats.errors.push({ file, error: e.message });
+          stats.errors.push({ file: cand.file, error: e.message });
         }
       }
     });

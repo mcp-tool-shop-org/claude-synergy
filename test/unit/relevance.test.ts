@@ -178,7 +178,7 @@ function seedRelevanceCorpus(): { yamlPath: string } {
     '- Added unused feature',
   ]);
 
-  ingestAll(tempDb.db, productsRoot);
+  ingestAll(tempDb.db, productsRoot, { yamlPath });
   return { yamlPath };
 }
 
@@ -385,7 +385,7 @@ describe('evaluateWorkspaceRelevance — all 7 lockfile formats', () => {
     const yamlPath = buildTestProductsYaml(root);
     writeRelease(productsRoot, 'sdk-npm', '1.0.0', '1.0.0', '2026-10-01', ['- Initial']);
     writeRelease(productsRoot, 'sdk-npm', '1.1.0', '1.1.0', '2026-11-01', []);
-    ingestAll(tempDb.db, productsRoot);
+    ingestAll(tempDb.db, productsRoot, { yamlPath });
 
     const cfg = loadProductsConfig(yamlPath)!;
     const wsDir = makeDir('cs-ws-empty-rel-');
@@ -472,7 +472,7 @@ describe('evaluateWorkspaceRelevance — all 7 lockfile formats', () => {
     writeRelease(productsRoot, 'sdk-npm', '0.97.0', '0.97.0', '2026-05-19', ['- Added 0.97.0']);
     writeRelease(productsRoot, 'sdk-npm', '0.97.1', '0.97.1', '2026-05-19', ['- Fixed 0.97.1']);
     writeRelease(productsRoot, 'sdk-npm', '0.98.0', '0.98.0', '2026-05-21', ['- Added 0.98.0']);
-    ingestAll(tempDb.db, productsRoot);
+    ingestAll(tempDb.db, productsRoot, { yamlPath });
 
     const cfg = loadProductsConfig(yamlPath)!;
     const wsA = makeDir('cs-ws-sameday-newest-');
@@ -630,7 +630,7 @@ require example.invalid/tool-go v1.9.1
       '- Unprefixed file must never match rmcp-v',
     ]);
 
-    ingestAll(tempDb.db, productsRoot);
+    ingestAll(tempDb.db, productsRoot, { yamlPath });
     const cfg = loadProductsConfig(yamlPath)!;
 
     // 1. sdk- vs bedrock-sdk/vertex-sdk; "" vs other-pkg/server; rmcp-v vs rmcp-macros-v/9.9.9
@@ -717,5 +717,83 @@ replace example.invalid/sdk-go => ../local-sdk
     const report = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(wsDir), { productsConfig: cfg });
     const text = formatRelevanceReport(report);
     expect(text).toContain('files read: go.mod (1 read, 1 skipped: targeted by replace directive)');
+  });
+
+  it('uses stored releases.package rather than filename prefix and reports unknown when release or installed row lacks date', () => {
+    const dir = makeDir('cs-rel-stored-');
+    const productsRoot = join(dir, 'products');
+    const yamlPath = join(dir, 'products.yaml');
+    writeFileSync(
+      yamlPath,
+      `products:
+  - name: multi-pkg
+    display_name: Multi Pkg
+    tier: 1
+    source_url: https://example.invalid/multi
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@scope/core"
+        release_prefix: "core-"
+      - ecosystem: npm
+        name: "@scope/aws"
+        release_prefix: "aws-"
+`,
+      'utf-8'
+    );
+    const cfg = loadProductsConfig(yamlPath)!;
+
+    // 1. Insert stored releases where notes_path doesn't encode @scope/aws, proving relevance reads releases.package
+    tempDb.db
+      .prepare(`INSERT INTO products (name, display_name, source_tier, source_url, fetch_strategy) VALUES ('multi-pkg', 'Multi Pkg', 1, '', 'gh-releases')`)
+      .run();
+    tempDb.db
+      .prepare(
+        `INSERT INTO releases (product, package, version, released_at, notes_path, fetched_at, source_url, notes_hash)
+         VALUES ('multi-pkg', '@scope/aws', '1.0.0', '2026-04-01', 'multi-pkg/releases/custom-a.md', '2026-04-01', '', 'h1'),
+                ('multi-pkg', '@scope/aws', '1.1.0', '2026-04-10', 'multi-pkg/releases/custom-b.md', '2026-04-10', '', 'h2'),
+                ('multi-pkg', '@scope/core', '1.1.0', NULL, 'multi-pkg/releases/core-1.1.0.md', '2026-04-11', '', 'h3')`
+      )
+      .run();
+    tempDb.db
+      .prepare(
+        `INSERT INTO changes (product, package, version, ordinal, kind, text)
+         VALUES ('multi-pkg', '@scope/aws', '1.1.0', 1, 'added', 'AWS update')`
+      )
+      .run();
+
+    const wsAws = makeDir('cs-rel-aws-');
+    writeFileSync(
+      join(wsAws, 'package-lock.json'),
+      JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/@scope/aws': { version: '1.0.0' } } }),
+      'utf-8'
+    );
+    const resAws = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(wsAws), { productsConfig: cfg });
+    expect(resAws.products[0].status).toBe('action_needed');
+    expect(resAws.products[0].installed.name).toBe('@scope/aws');
+    expect(resAws.products[0].releases.map((r) => r.version)).toEqual(['1.1.0']);
+
+    // 2. Installed row exists in mirror with NULL released_at -> "installed <v> in mirror has no date"
+    const wsCoreUndated = makeDir('cs-rel-core-undated-');
+    writeFileSync(
+      join(wsCoreUndated, 'package-lock.json'),
+      JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/@scope/core': { version: '1.1.0' } } }),
+      'utf-8'
+    );
+    const resCoreUndated = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(wsCoreUndated), { productsConfig: cfg });
+    expect(resCoreUndated.products[0].status).toBe('unknown');
+    expect(resCoreUndated.products[0].summary).toBe('unknown: installed 1.1.0 in mirror has no date');
+
+    // 3. Matched dated installed row + newer undated row in same package -> "release in mirror has no date"
+    tempDb.db
+      .prepare(
+        `INSERT INTO releases (product, package, version, released_at, notes_path, fetched_at, source_url, notes_hash)
+         VALUES ('multi-pkg', '@scope/aws', '1.2.0', NULL, 'multi-pkg/releases/aws-1.2.0.md', '2026-04-12', '', 'h4')`
+      )
+      .run();
+    const resNewerUndated = evaluateWorkspaceRelevance(tempDb.db, readWorkspace(wsAws), { productsConfig: cfg });
+    expect(resNewerUndated.products[0].status).toBe('unknown');
+    expect(resNewerUndated.products[0].summary).toBe('unknown: release in mirror has no date');
+    void productsRoot;
   });
 });

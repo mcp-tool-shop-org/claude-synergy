@@ -413,7 +413,13 @@ function resolveGhReleasePaths(
   assertSafeFilename(vName, `gh-releases vName for tag ${JSON.stringify(tagName)}`);
   const path = join(outDir, `${filename}.md`);
   const vPath = join(outDir, `${vName}.md`);
-  return { path, exists: existsSync(path) || existsSync(vPath) };
+  let legacyErtexExists = false;
+  if (/^vertex-sdk-\d/i.test(filename)) {
+    const ertexName = sanitizeFilename(filename.replace(/^vertex-sdk-/i, 'ertex-sdk-'));
+    assertSafeFilename(ertexName, `gh-releases legacy ertexName for tag ${JSON.stringify(tagName)}`);
+    legacyErtexExists = existsSync(join(outDir, `${ertexName}.md`));
+  }
+  return { path, exists: existsSync(path) || existsSync(vPath) || legacyErtexExists };
 }
 
 async function fetchGhReleases(
@@ -558,6 +564,7 @@ function filenameFor(target: FetchTarget, tag: string): string {
   if (target.multiPackage) {
     // Handle multiple multi-package formats:
     //   "sdk-v0.98.0"                                → "sdk-0.98.0"                                 (Anthropic-style)
+    //   "vertex-sdk-v0.17.0"                         → "vertex-sdk-0.17.0"                          (only strip v before digits)
     //   "@modelcontextprotocol/server@2.0.0-alpha.2" → "modelcontextprotocol-server-2.0.0-alpha.2"  (npm-scoped)
     //   "@continuedev/config-yaml@1.42.0"            → "continuedev-config-yaml-1.42.0"
     //   "v1.3.38-vscode"                             → "1.3.38-vscode"                              (Continue platform suffix)
@@ -566,9 +573,9 @@ function filenameFor(target: FetchTarget, tag: string): string {
       .replace(/\//g, '-')          // / → -
       .replace(/@/g, '-')           // @ between name and version → -
       .replace(/-v(\d)/g, '-$1')   // strip v before any version digit
-      .replace(/^v/, '');           // also strip leading v if present
+      .replace(/^v(?=\d)/, '');    // strip leading v only before a version digit
   }
-  return tag.replace(/^v/, '');
+  return tag.replace(/^v(?=\d)/, '');
 }
 
 /**
@@ -586,7 +593,7 @@ function yamlQuote(s: string | null | undefined): string {
 }
 
 export function renderGhRelease(product: string, r: GhRelease): string {
-  const version = (r.tag_name ?? '').replace(/^v/, '');
+  const version = (r.tag_name ?? '').replace(/^v(?=\d)/, '');
   const bodyText = r.body != null ? redactVendorPii(r.body).text : '(no body)';
   return [
     '---',

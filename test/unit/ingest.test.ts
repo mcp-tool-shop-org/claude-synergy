@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -411,5 +411,439 @@ describe('ingest — vendor text screening and rescreenChanges', () => {
       .prepare(`SELECT flags FROM changes WHERE id = ?`)
       .get(Number(rowWithPii.lastInsertRowid)) as { flags: string };
     expect(JSON.parse(preserved.flags)).toEqual(['pii_email']);
+  });
+});
+
+describe('ingest — multi-package separation and collision preservation', () => {
+  it('stores colliding version numbers under distinct (product, package, version) keys and assigns unmatched stems to empty package', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'multipkg-ingest-'));
+    try {
+      const yamlPath = join(dir, 'products.yaml');
+      writeFileSync(
+        yamlPath,
+        `products:
+  - name: test-ts-sdk
+    display_name: Test TS SDK
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@scope/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@scope/aws-sdk"
+        release_prefix: "aws-sdk-"
+      - ecosystem: npm
+        name: "@scope/foundry-sdk"
+        release_prefix: "foundry-sdk-"
+`,
+        'utf-8'
+      );
+
+      const relDir = join(dir, 'test-ts-sdk', 'releases');
+      mkdirSync(relDir, { recursive: true });
+      const writeMd = (file: string, ver: string, bullet: string) =>
+        writeFileSync(
+          join(relDir, file),
+          `---\nproduct: test-ts-sdk\nversion: "${ver}"\nreleased_at: "2026-04-01"\n---\n\n- ${bullet}\n`,
+          'utf-8'
+        );
+
+      writeMd('sdk-0.3.0.md', 'sdk-0.3.0', 'Core SDK 0.3.0 change');
+      writeMd('aws-sdk-0.3.0.md', 'aws-sdk-v0.3.0', 'AWS SDK 0.3.0 change');
+      writeMd('foundry-sdk-0.3.0.md', 'foundry-sdk-v0.3.0', 'Foundry SDK 0.3.0 change');
+      writeMd('rogue-tag-1.0.0.md', 'rogue-tag-1.0.0', 'Unmatched stem change');
+
+      const first = ingestAll(temp.db, dir, { yamlPath });
+      expect(first.releasesAdded).toBe(4);
+      expect(first.changesAdded).toBe(4);
+
+      const rows = temp.db
+        .prepare(`SELECT package, version, notes_path FROM releases WHERE product = 'test-ts-sdk' ORDER BY package, version`)
+        .all() as Array<{ package: string; version: string; notes_path: string }>;
+      expect(rows).toEqual([
+        { package: '', version: 'rogue-tag-1.0.0', notes_path: 'test-ts-sdk/releases/rogue-tag-1.0.0.md' },
+        { package: '@scope/aws-sdk', version: '0.3.0', notes_path: 'test-ts-sdk/releases/aws-sdk-0.3.0.md' },
+        { package: '@scope/foundry-sdk', version: '0.3.0', notes_path: 'test-ts-sdk/releases/foundry-sdk-0.3.0.md' },
+        { package: '@scope/sdk', version: '0.3.0', notes_path: 'test-ts-sdk/releases/sdk-0.3.0.md' },
+      ]);
+
+      const changes = temp.db
+        .prepare(`SELECT package, version, text FROM changes WHERE product = 'test-ts-sdk' ORDER BY package, version`)
+        .all() as Array<{ package: string; version: string; text: string }>;
+      expect(changes).toHaveLength(4);
+      expect(changes.find((c) => c.package === '@scope/aws-sdk')?.text).toBe('AWS SDK 0.3.0 change');
+      expect(changes.find((c) => c.package === '@scope/foundry-sdk')?.text).toBe('Foundry SDK 0.3.0 change');
+
+      // Re-running ingestAll is idempotent when content hashes match
+      const second = ingestAll(temp.db, dir, { yamlPath });
+      expect(second.skipped).toBe(4);
+      expect(second.releasesAdded).toBe(0);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('evicts stale (product, notes_path) release and child rows when products.yaml adds a package prefix (google-cloud-sdk-)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'multipkg-remap-'));
+    try {
+      const yamlWithoutGcp = join(dir, 'products-v1.yaml');
+      writeFileSync(
+        yamlWithoutGcp,
+        `products:
+  - name: anthropic-sdk-typescript
+    display_name: Anthropic SDK (TypeScript)
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@anthropic-ai/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/aws-sdk"
+        release_prefix: "aws-sdk-"
+`,
+        'utf-8',
+      );
+      const yamlWithGcp = join(dir, 'products-v2.yaml');
+      writeFileSync(
+        yamlWithGcp,
+        `products:
+  - name: anthropic-sdk-typescript
+    display_name: Anthropic SDK (TypeScript)
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@anthropic-ai/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/aws-sdk"
+        release_prefix: "aws-sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/google-cloud-sdk"
+        release_prefix: "google-cloud-sdk-"
+`,
+        'utf-8',
+      );
+
+      const relDir = join(dir, 'anthropic-sdk-typescript', 'releases');
+      mkdirSync(relDir, { recursive: true });
+      const writeMd = (file: string, ver: string, bullet: string) =>
+        writeFileSync(
+          join(relDir, file),
+          `---\nproduct: anthropic-sdk-typescript\nversion: "${ver}"\nreleased_at: "2026-04-01"\n---\n\n- Added \`CLAUDE_GCP_TEST\` for ${bullet}\n`,
+          'utf-8',
+        );
+
+      writeMd('sdk-0.98.0.md', 'sdk-0.98.0', 'Core SDK 0.98.0');
+      writeMd('google-cloud-sdk-0.1.0.md', 'google-cloud-sdk-0.1.0', 'GCP SDK 0.1.0');
+      writeMd('google-cloud-sdk-0.2.0.md', 'google-cloud-sdk-v0.2.0', 'GCP SDK 0.2.0');
+
+      const first = ingestAll(temp.db, dir, { yamlPath: yamlWithoutGcp });
+      expect(first.releasesAdded).toBe(3);
+
+      // Attach child rows (chunks + chunks_vec + chunks_fts + relevance + synergy_change_refs) to unassigned GCP rows
+      initVecSchema(temp.db);
+      temp.db
+        .prepare(
+          `INSERT INTO synergies (id, name, title, trigger, status, last_validated, notes_path)
+           VALUES (1, 'gcp-syn', 'GCP Synergy', 'when gcp', 'confirmed', '2026-04-01', 'synergies/01.md')`,
+        )
+        .run();
+      const gcpChangeRows = temp.db
+        .prepare(`SELECT id, version FROM changes WHERE product = 'anthropic-sdk-typescript' AND package = '' ORDER BY version`)
+        .all() as Array<{ id: number; version: string }>;
+      expect(gcpChangeRows).toHaveLength(2);
+      const vec768 = new Float32Array(768).fill(0.1);
+      for (const ch of gcpChangeRows) {
+        temp.db
+          .prepare(`INSERT INTO relevance (change_id, tag, note, added_at) VALUES (?, 'urgent', 'tag', '2026-04-02')`)
+          .run(ch.id);
+        temp.db.prepare(`INSERT INTO synergy_change_refs (synergy_id, change_id) VALUES (1, ?)`).run(ch.id);
+        const cIns = temp.db
+          .prepare(
+            `INSERT INTO chunks (change_id, product, package, release_version, released_at, context_prefix, original_text, contextualized, context_provider, embedding_model, embedded_at)
+             VALUES (?, 'anthropic-sdk-typescript', '', ?, '2026-04-01', 'ctx', 'text', 'ctx text', 'none', 'test', '2026-04-02')`,
+          )
+          .run(ch.id, ch.version);
+        temp.db
+          .prepare(`INSERT INTO chunks_vec (rowid, embedding) VALUES (?, ?)`)
+          .run(BigInt(Number(cIns.lastInsertRowid)), vec768);
+      }
+
+      // Re-ingest unchanged files on disk using updated products.yaml -> must evict '' rows without duplicating releases
+      const second = ingestAll(temp.db, dir, { yamlPath: yamlWithGcp });
+      expect(second.releasesAdded).toBe(2);
+      expect(second.skipped).toBe(1);
+
+      const finalRows = temp.db
+        .prepare(`SELECT package, version, notes_path FROM releases WHERE product = 'anthropic-sdk-typescript' ORDER BY package, version`)
+        .all();
+      expect(finalRows).toEqual([
+        { package: '@anthropic-ai/google-cloud-sdk', version: '0.1.0', notes_path: 'anthropic-sdk-typescript/releases/google-cloud-sdk-0.1.0.md' },
+        { package: '@anthropic-ai/google-cloud-sdk', version: '0.2.0', notes_path: 'anthropic-sdk-typescript/releases/google-cloud-sdk-0.2.0.md' },
+        { package: '@anthropic-ai/sdk', version: '0.98.0', notes_path: 'anthropic-sdk-typescript/releases/sdk-0.98.0.md' },
+      ]);
+      expect(
+        (temp.db.prepare(`SELECT COUNT(*) AS c FROM releases WHERE product = 'anthropic-sdk-typescript' AND package = ''`).get() as { c: number }).c,
+      ).toBe(0);
+
+      // Verify zero orphaned children remain across every child table + chunks_vec + FTS
+      expect(
+        (temp.db.prepare(`SELECT COUNT(*) AS c FROM chunks WHERE change_id NOT IN (SELECT id FROM changes)`).get() as { c: number }).c,
+      ).toBe(0);
+      expect((temp.db.prepare(`SELECT COUNT(*) AS c FROM chunks_vec`).get() as { c: number }).c).toBe(0);
+      expect((temp.db.prepare(`SELECT COUNT(*) AS c FROM relevance`).get() as { c: number }).c).toBe(0);
+      expect((temp.db.prepare(`SELECT COUNT(*) AS c FROM synergy_change_refs`).get() as { c: number }).c).toBe(0);
+      expect(
+        (temp.db.prepare(`SELECT COUNT(*) AS c FROM entities WHERE change_id NOT IN (SELECT id FROM changes)`).get() as { c: number }).c,
+      ).toBe(0);
+      expect(temp.db.pragma('foreign_key_check')).toEqual([]);
+
+      // Editing an already-ingested release under the same key also cleans chunks + chunks_vec cleanly
+      const sdkCh = temp.db
+        .prepare(`SELECT id FROM changes WHERE product = 'anthropic-sdk-typescript' AND package = '@anthropic-ai/sdk' AND version = '0.98.0'`)
+        .get() as { id: number };
+      const sdkChunkIns = temp.db
+        .prepare(
+          `INSERT INTO chunks (change_id, product, package, release_version, released_at, context_prefix, original_text, contextualized, context_provider, embedding_model, embedded_at)
+           VALUES (?, 'anthropic-sdk-typescript', '@anthropic-ai/sdk', '0.98.0', '2026-04-01', 'ctx', 'text', 'ctx text', 'none', 'test', '2026-04-02')`,
+        )
+        .run(sdkCh.id);
+      temp.db
+        .prepare(`INSERT INTO chunks_vec (rowid, embedding) VALUES (?, ?)`)
+        .run(BigInt(Number(sdkChunkIns.lastInsertRowid)), vec768);
+      writeMd('sdk-0.98.0.md', 'sdk-0.98.0', 'Core SDK 0.98.0 updated');
+      const third = ingestAll(temp.db, dir, { yamlPath: yamlWithGcp });
+      expect(third.releasesAdded).toBe(1);
+      expect((temp.db.prepare(`SELECT COUNT(*) AS c FROM chunks`).get() as { c: number }).c).toBe(0);
+      expect((temp.db.prepare(`SELECT COUNT(*) AS c FROM chunks_vec`).get() as { c: number }).c).toBe(0);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('maps 2.1.0 ertex-sdk-*.md files with vertex-sdk-v source_url tag to @anthropic-ai/vertex-sdk without duplicating prior unassigned rows', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'multipkg-ertex-'));
+    try {
+      const yamlPath = join(dir, 'products.yaml');
+      writeFileSync(
+        yamlPath,
+        `products:
+  - name: anthropic-sdk-typescript
+    display_name: Anthropic SDK (TypeScript)
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@anthropic-ai/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/vertex-sdk"
+        release_prefix: "vertex-sdk-"
+`,
+        'utf-8',
+      );
+      const relDir = join(dir, 'anthropic-sdk-typescript', 'releases');
+      mkdirSync(relDir, { recursive: true });
+      writeFileSync(
+        join(relDir, 'ertex-sdk-0.17.0.md'),
+        `---\nproduct: anthropic-sdk-typescript\nversion: "ertex-sdk-v0.17.0"\nreleased_at: "2026-04-01"\nsource_url: "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.17.0"\n---\n\n- Vertex SDK 0.17.0\n`,
+        'utf-8',
+      );
+      writeFileSync(
+        join(relDir, 'ertex-sdk-9.9.9.md'),
+        `---\nproduct: anthropic-sdk-typescript\nversion: "ertex-sdk-9.9.9"\nreleased_at: "2026-04-02"\nsource_url: "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/other-tag-9.9.9"\n---\n\n- Other untyped release\n`,
+        'utf-8',
+      );
+
+      // Seed prior unassigned row for ertex-sdk-0.17.0.md to simulate upgrading a 2.1.0 store
+      temp.db
+        .prepare(`INSERT INTO products VALUES ('anthropic-sdk-typescript', 'Anthropic SDK (TypeScript)', 1, '', 'gh-releases', NULL)`)
+        .run();
+      temp.db
+        .prepare(
+          `INSERT INTO releases (product, package, version, released_at, notes_path, fetched_at, source_url, notes_hash)
+           VALUES ('anthropic-sdk-typescript', '', 'ertex-sdk-v0.17.0', '2026-04-01', 'anthropic-sdk-typescript/releases/ertex-sdk-0.17.0.md', '2026-04-01', 'https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.17.0', 'old-hash')`,
+        )
+        .run();
+
+      const res = ingestAll(temp.db, dir, { yamlPath });
+      expect(res.releasesAdded).toBe(2);
+
+      const rows = temp.db
+        .prepare(`SELECT package, version, notes_path FROM releases WHERE product = 'anthropic-sdk-typescript' ORDER BY package, version`)
+        .all();
+      expect(rows).toEqual([
+        { package: '', version: 'ertex-sdk-9.9.9', notes_path: 'anthropic-sdk-typescript/releases/ertex-sdk-9.9.9.md' },
+        { package: '@anthropic-ai/vertex-sdk', version: '0.17.0', notes_path: 'anthropic-sdk-typescript/releases/ertex-sdk-0.17.0.md' },
+      ]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('keeps canonical vertex-sdk-V.md over legacy ertex-sdk-V.md (and newer fetched_at on non-ertex collisions) across 3 ingests without swapping, losing relevance, or re-embedding', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'multipkg-both-ertex-vertex-'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const yamlPath = join(dir, 'products.yaml');
+      writeFileSync(
+        yamlPath,
+        `products:
+  - name: anthropic-sdk-typescript
+    display_name: Anthropic SDK (TypeScript)
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@anthropic-ai/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@anthropic-ai/vertex-sdk"
+        release_prefix: "vertex-sdk-"
+  - name: solo-prod
+    display_name: Solo Product
+    tier: 1
+    source_url: https://example.invalid/solo
+    fetch_strategy: gh-releases
+`,
+        'utf-8',
+      );
+
+      const tsDir = join(dir, 'anthropic-sdk-typescript', 'releases');
+      mkdirSync(tsDir, { recursive: true });
+      // Legacy ertex file has newer fetched_at -> canonical vertex-sdk-0.17.0.md must still win
+      writeFileSync(
+        join(tsDir, 'ertex-sdk-0.17.0.md'),
+        `---\nproduct: anthropic-sdk-typescript\nversion: "ertex-sdk-v0.17.0"\nreleased_at: "2026-04-20"\nfetched_at: "2026-04-25"\nsource_url: "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.17.0"\n---\n\n- Support Vertex AI streaming\n`,
+        'utf-8',
+      );
+      writeFileSync(
+        join(tsDir, 'vertex-sdk-0.17.0.md'),
+        `---\nproduct: anthropic-sdk-typescript\nversion: "vertex-sdk-v0.17.0"\nreleased_at: "2026-04-20"\nfetched_at: "2026-04-20"\nsource_url: "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.17.0"\n---\n\n- Support Vertex AI streaming\n`,
+        'utf-8',
+      );
+
+      // Non-ertex duplicate key on single-package product:
+      //   1) newer fetched_at beats older regardless of alphabetical order (z-newer beats a-older AND b-keep beats y-drop)
+      //   2) equal fetched_at breaks tie deterministically by hash
+      const soloDir = join(dir, 'solo-prod', 'releases');
+      mkdirSync(soloDir, { recursive: true });
+      writeFileSync(
+        join(soloDir, 'a-older.md'),
+        `---\nproduct: solo-prod\nversion: "1.0.0"\nreleased_at: "2026-04-10"\nfetched_at: "2026-04-10"\n---\n\n- Older duplicate file\n`,
+        'utf-8',
+      );
+      writeFileSync(
+        join(soloDir, 'z-newer.md'),
+        `---\nproduct: solo-prod\nversion: "1.0.0"\nreleased_at: "2026-04-10"\nfetched_at: "2026-04-15"\n---\n\n- Newer fetched duplicate file\n`,
+        'utf-8',
+      );
+      writeFileSync(
+        join(soloDir, 'b-keep.md'),
+        `---\nproduct: solo-prod\nversion: "2.0.0"\nreleased_at: "2026-04-12"\nfetched_at: "2026-04-15"\n---\n\n- Equal fetched_at A\n`,
+        'utf-8',
+      );
+      writeFileSync(
+        join(soloDir, 'y-drop.md'),
+        `---\nproduct: solo-prod\nversion: "2.0.0"\nreleased_at: "2026-04-12"\nfetched_at: "2026-04-15"\n---\n\n- Equal fetched_at B\n`,
+        'utf-8',
+      );
+      writeFileSync(
+        join(soloDir, 'c-win-first.md'),
+        `---\nproduct: solo-prod\nversion: "3.0.0"\nreleased_at: "2026-04-13"\nfetched_at: "2026-04-20"\n---\n\n- First wins\n`,
+        'utf-8',
+      );
+      writeFileSync(
+        join(soloDir, 'z-lose-second.md'),
+        `---\nproduct: solo-prod\nversion: "3.0.0"\nreleased_at: "2026-04-13"\nfetched_at: "2026-04-10"\n---\n\n- Second loses\n`,
+        'utf-8',
+      );
+
+      const r1 = ingestAll(temp.db, dir, { yamlPath });
+      expect(r1.releasesAdded).toBe(4);
+      expect(r1.skipped).toBe(4);
+      expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('ertex-sdk-0.17.0.md'));
+      expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('a-older.md'));
+      expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('z-lose-second.md'));
+
+      const relRows = temp.db
+        .prepare(`SELECT product, package, version, notes_path FROM releases WHERE version IN ('0.17.0', '1.0.0') ORDER BY product`)
+        .all();
+      expect(relRows).toEqual([
+        {
+          product: 'anthropic-sdk-typescript',
+          package: '@anthropic-ai/vertex-sdk',
+          version: '0.17.0',
+          notes_path: 'anthropic-sdk-typescript/releases/vertex-sdk-0.17.0.md',
+        },
+        {
+          product: 'solo-prod',
+          package: '',
+          version: '1.0.0',
+          notes_path: 'solo-prod/releases/z-newer.md',
+        },
+      ]);
+
+      // Seed relevance & embedding chunk/vector on surviving vertex change
+      initVecSchema(temp.db);
+      const vCh = temp.db
+        .prepare(`SELECT id FROM changes WHERE product = 'anthropic-sdk-typescript'`)
+        .get() as { id: number };
+      temp.db
+        .prepare(`INSERT INTO relevance (change_id, tag, note, added_at) VALUES (?, 'urgent', 'keep me', '2026-04-21')`)
+        .run(vCh.id);
+      const chunkIns = temp.db
+        .prepare(
+          `INSERT INTO chunks (change_id, product, package, release_version, released_at, context_prefix, original_text, contextualized, context_provider, embedding_model, embedded_at)
+           VALUES (?, 'anthropic-sdk-typescript', '@anthropic-ai/vertex-sdk', '0.17.0', '2026-04-20', 'ctx', 'Support Vertex AI streaming', 'ctx Support Vertex AI streaming', 'none', 'test', '2026-04-21T00:00:00Z')`,
+        )
+        .run(vCh.id);
+      const chunkId = Number(chunkIns.lastInsertRowid);
+      temp.db
+        .prepare(`INSERT INTO chunks_vec (rowid, embedding) VALUES (?, ?)`)
+        .run(BigInt(chunkId), new Float32Array(768).fill(0.2));
+
+      // Subsequent ingests with both files still on disk must skip everything cleanly and preserve relevance + chunks
+      const r2 = ingestAll(temp.db, dir, { yamlPath });
+      expect(r2.releasesAdded).toBe(0);
+      expect(r2.skipped).toBe(8);
+
+      const r3 = ingestAll(temp.db, dir, { yamlPath });
+      expect(r3.releasesAdded).toBe(0);
+      expect(r3.skipped).toBe(8);
+
+      expect((temp.db.prepare(`SELECT COUNT(*) AS c FROM relevance`).get() as { c: number }).c).toBe(1);
+      const survivingChunk = temp.db
+        .prepare(`SELECT id, embedded_at FROM chunks WHERE change_id = ?`)
+        .get(vCh.id) as { id: number; embedded_at: string } | undefined;
+      expect(survivingChunk).toEqual({ id: chunkId, embedded_at: '2026-04-21T00:00:00Z' });
+      expect(
+        (temp.db.prepare(`SELECT COUNT(*) AS c FROM changes c LEFT JOIN chunks ch ON ch.change_id = c.id WHERE c.product = 'anthropic-sdk-typescript' AND ch.id IS NULL`).get() as { c: number }).c,
+      ).toBe(0);
+
+      // Same content hash moved from ertex-sdk-0.18.0.md -> vertex-sdk-0.18.0.md updates notes_path in place without re-ingesting
+      const ertex18 = `---\nproduct: anthropic-sdk-typescript\nversion: "vertex-sdk-v0.18.0"\nreleased_at: "2026-04-22"\nfetched_at: "2026-04-22"\nsource_url: "https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.18.0"\n---\n\n- Vertex 0.18.0\n`;
+      writeFileSync(join(tsDir, 'ertex-sdk-0.18.0.md'), ertex18, 'utf-8');
+      const r3a = ingestAll(temp.db, dir, { yamlPath });
+      expect(r3a.releasesAdded).toBe(1);
+      writeFileSync(join(tsDir, 'vertex-sdk-0.18.0.md'), ertex18, 'utf-8');
+      const r4 = ingestAll(temp.db, dir, { yamlPath });
+      expect(r4.releasesAdded).toBe(0);
+      const moved18 = temp.db
+        .prepare(`SELECT notes_path FROM releases WHERE product = 'anthropic-sdk-typescript' AND version = '0.18.0'`)
+        .get() as { notes_path: string };
+      expect(moved18.notes_path).toBe('anthropic-sdk-typescript/releases/vertex-sdk-0.18.0.md');
+    } finally {
+      errSpy.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

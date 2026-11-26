@@ -61,6 +61,7 @@ Full-text search across all change bullets.
 |-----------|------|----------|-------------|
 | `query` | string | yes | FTS5 search query |
 | `product` | string | no | Limit to one product |
+| `package` | string | no | Filter to one package within a multi-package product (grouped per package when omitted) |
 | `since` | string | no | YYYY-MM-DD lower bound |
 | `until` | string | no | YYYY-MM-DD upper bound — **new in v1.1** |
 | `kind` | string | no | added, fixed, breaking, etc. |
@@ -77,21 +78,23 @@ Find when a specific entity (env var, slash command, model ID, CVE) was introduc
 
 ### `latest_releases`
 
-Recent releases across all or one product.
+Recent releases across all or one product. When `product` has multiple packages and `package` is omitted, releases are grouped into per-package sections rather than mixed across packages.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `product` | string | no | Limit to one product |
+| `package` | string | no | Filter to one package within a multi-package product (e.g. `@anthropic-ai/sdk`, `composer`, `unassigned`) |
 | `since` | string | no | YYYY-MM-DD lower bound — **new in v1.1** |
 | `limit` | number | no | Max results (default: 20) |
 
 ### `get_release`
 
-Get the full content of a specific release.
+Get the full content of a specific release. For multi-package products, `package` is required (returns `PACKAGE_REQUIRED` listing available packages if omitted).
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `product` | string | yes | Product name |
+| `package` | string | multi-pkg | Package name within a multi-package product |
 | `version` | string | yes | Release version |
 
 ### `list_products`
@@ -125,13 +128,14 @@ Read a specific synergy document by slug.
 
 ### `get_changes_since` (new in v1.1)
 
-Changes in a time window, grouped by product+version. Backs the `hk diff` CLI command.
+Changes in a time window, grouped by product+version (and grouped per package on multi-package products when `package` is omitted). Backs the `hk diff` CLI command.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `since` | string | yes | ISO date (`YYYY-MM-DD`), full ISO 8601, or relative (`7d`/`2w`/`3m`/`1y`) |
 | `until` | string | no | Upper bound — same formats |
 | `product` | string | no | Limit to one product |
+| `package` | string | no | Filter to one package within a multi-package product |
 | `kind` | string | no | Filter: added, fixed, breaking, deprecated, etc. |
 | `limit` | number | no | Max total change rows (default: 200) |
 
@@ -150,11 +154,12 @@ Returns a `ChangesSinceResult[]` — same JSON shape `hk diff --json` emits: gro
 
 ### `search_breaking_changes` (new in v1.1)
 
-Flat list of breaking changes — no search term required. Backs the `hk breaking` CLI command.
+Browse breaking changes without a search term — grouped per package on multi-package products when `package` is omitted. Backs the `hk breaking` CLI command.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `product` | string | no | Limit to one product |
+| `package` | string | no | Filter to one package within a multi-package product |
 | `since` | string | no | YYYY-MM-DD lower bound |
 | `until` | string | no | YYYY-MM-DD upper bound |
 | `limit` | number | no | Max results (default: 50) |
@@ -170,11 +175,12 @@ Flat list of breaking changes — no search term required. Backs the `hk breakin
 
 ### `compare_versions` (new in v1.1)
 
-All changes between two versions of one product. Useful for migration planning when you know the exact versions you're upgrading between. The interval is **exclusive at `from_version`, inclusive at `to_version`** — i.e. it returns everything that changed *after* you were on `from_version`, up to and including `to_version`.
+All changes between two versions of one package or single-package product. Useful for migration planning when you know the exact versions you're upgrading between. The interval is **exclusive at `from_version`, inclusive at `to_version`** — i.e. it returns everything that changed *after* you were on `from_version`, up to and including `to_version`. For multi-package products, `package` is required.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `product` | string | yes | Product slug |
+| `package` | string | multi-pkg | Package name within a multi-package product |
 | `from_version` | string | yes | Start version (**exclusive** — not included in results) |
 | `to_version` | string | yes | End version (**inclusive** — included in results) |
 
@@ -185,6 +191,7 @@ All changes between two versions of one product. Useful for migration planning w
   "name": "compare_versions",
   "arguments": {
     "product": "anthropic-sdk-typescript",
+    "package": "@anthropic-ai/sdk",
     "from_version": "0.94.0",
     "to_version": "0.95.1"
   }
@@ -275,6 +282,6 @@ The agent calls `search_breaking_changes({ since: "<7 days ago>" })` and gets a 
 
 ### Pin-to-pin upgrade brief
 
-> "We're upgrading anthropic-sdk-typescript from 0.94.0 to 0.95.1. Give me the change brief."
+> "We're upgrading @anthropic-ai/sdk in anthropic-sdk-typescript from 0.94.0 to 0.95.1. Give me the change brief."
 
-The agent calls `compare_versions({ product: "anthropic-sdk-typescript", from_version: "0.94.0", to_version: "0.95.1" })` and summarizes the response into a migration checklist.
+The agent calls `compare_versions({ product: "anthropic-sdk-typescript", package: "@anthropic-ai/sdk", from_version: "0.94.0", to_version: "0.95.1" })` and summarizes the response into a migration checklist.

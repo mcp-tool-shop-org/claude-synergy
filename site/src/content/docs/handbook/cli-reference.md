@@ -53,6 +53,7 @@ hk query --kind breaking --limit 50 "deprecated"
 | Flag | Description |
 |------|-------------|
 | `-p, --product <name>` | Limit to one product |
+| `--package <name>` | Limit to one package within a multi-package product (grouped per package when omitted on a multi-package product) |
 | `-s, --since <date>` | YYYY-MM-DD lower bound (or relative: `7d`, `2w`, `3m`) |
 | `-u, --until <date>` | YYYY-MM-DD upper bound (or relative) — **new in v1.1** |
 | `-k, --kind <kind>` | Filter: added, fixed, breaking, deprecated, etc. |
@@ -106,6 +107,8 @@ hk hybrid --until 2026-04-01 "deprecated"
 
 | Flag | Description |
 |------|-------------|
+| `-p, --product <name>` | Limit to one product |
+| `--package <name>` | Limit to one package within a multi-package product |
 | `-e, --embed <provider>` | Embedding provider: `ollama` (default), `voyage`, `openai` |
 | `-r, --rerank <provider>` | Rerank: `none` (default), `ollama-judge`, `voyage`, `cohere` |
 | `-u, --until <date>` | YYYY-MM-DD upper bound (or relative) — **new in v1.1** |
@@ -132,6 +135,7 @@ hk diff --json --since 7d | jq '.[].changes[] | select(.kind == "added")'
 | Flag | Description |
 |------|-------------|
 | Positional `product` | Optional product slug (e.g. `claude-code`) |
+| `--package <name>` | Limit to one package within a multi-package product |
 | `-s, --since <date>` | YYYY-MM-DD or relative (default: `7d`) |
 | `-u, --until <date>` | YYYY-MM-DD or relative upper bound |
 | `-k, --kind <kind>` | Filter by kind: added, fixed, breaking, deprecated, etc. |
@@ -153,6 +157,7 @@ hk breaking --json --limit 50 | jq '.[]'
 | Flag | Description |
 |------|-------------|
 | `-p, --product <name>` | Limit to one product |
+| `--package <name>` | Limit to one package within a multi-package product |
 | `-s, --since <date>` | YYYY-MM-DD or relative lower bound |
 | `-u, --until <date>` | YYYY-MM-DD or relative upper bound |
 | `-l, --limit <n>` | Max results (default: 50) |
@@ -247,11 +252,12 @@ hk ingest --rescreen    # apply the current screening rules to stored rows
 
 ### `hk latest`
 
-Recent releases across all products.
+Recent releases across all products, or grouped per package when filtering a multi-package product without `--package`.
 
 ```bash
 hk latest
 hk latest --product anthropic-sdk-typescript --limit 5
+hk latest --product anthropic-sdk-typescript --package @anthropic-ai/sdk --limit 5
 hk latest --since 2026-05-01     # only releases on or after 2026-05-01
 hk latest --since 7d --limit 100 # last week, broad
 ```
@@ -259,6 +265,7 @@ hk latest --since 7d --limit 100 # last week, broad
 | Flag | Description |
 |------|-------------|
 | `-p, --product <name>` | Limit to one product |
+| `--package <name>` | Limit to one package within a multi-package product (grouped per package when omitted on a multi-package product) |
 | `-s, --since <date>` | YYYY-MM-DD or relative lower bound — **new in v1.1** |
 | `-l, --limit <n>` | Max results (default: 20) |
 

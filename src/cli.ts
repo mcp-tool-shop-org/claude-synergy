@@ -14,17 +14,25 @@ import {
 } from './ingest.js';
 import {
   searchChanges,
+  searchChangesByPackage,
   lookupEntity,
   recentReleases,
+  recentReleasesByPackage,
   listProducts,
   entityFrequency,
   browseChanges,
+  browseChangesByPackage,
   getChangesSince,
+  getChangesSinceByPackage,
+  listProductPackageOrder,
   getCorpusFreshness,
   formatFreshnessStamp,
   formatFlagMarker,
+  formatPackageName,
+  formatReleaseLabel,
   type ChangesSinceResult,
 } from './query.js';
+import { isMultiPackageProduct, loadProductsConfig } from './products-config.js';
 import { embedAll } from './embed.js';
 import { hybridSearch } from './hybrid.js';
 import { fetchAll, seedMarkersFromDb } from './fetch.js';
@@ -522,11 +530,12 @@ program
   .description('Full-text search across all change bullets (FTS5). Quote multi-word: hk query "managed agents"')
   .option('-d, --db <path>', 'database path')
   .option('-p, --product <name>', 'limit to one product')
+  .option('--package <name>', 'limit to one package within a multi-package product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .option('-l, --limit <n>', 'max results', '20')
-  .action(async (text: string, opts: { db?: string; product?: string; since?: string; until?: string; kind?: string; limit: string; stamp?: boolean }) => {
+  .action(async (text: string, opts: { db?: string; product?: string; package?: string; since?: string; until?: string; kind?: string; limit: string; stamp?: boolean }) => {
     logDebug(`text=${JSON.stringify(text)} opts=${JSON.stringify(opts)}`);
     const session = await openQueryDbOrFirstUse(opts, opts.product);
     if (session.emptyOptOut || !session.db) {
@@ -534,20 +543,47 @@ program
       return;
     }
     const db = session.db;
+    const cfg = loadProductsConfig();
     const q = text;
     const since = resolveDateOrExit('since', opts.since);
     const until = resolveDateOrExit('until', opts.until);
-    let results;
+    const limit = intOpt('limit', opts.limit, 20);
+    const serializeQueryRow = (r: { released_at: string | null; product: string; package?: string; version: string; kind: string; text: string; snippet: string; flags: string[] }) => ({
+      released_at: r.released_at,
+      product: r.product,
+      ...(r.package !== undefined ? { package: r.package } : {}),
+      version: r.version,
+      kind: r.kind,
+      text: r.text,
+      snippet: r.snippet,
+      flags: r.flags,
+    });
+    const isGrouped = Boolean(opts.product && !opts.package && isMultiPackageProduct(cfg?.productMeta[opts.product]));
+    let results: ReturnType<typeof searchChanges> = [];
+    let groups: ReturnType<typeof searchChangesByPackage> = [];
     try {
-      results = searchChanges(db, q, {
-        product: opts.product,
-        since,
-        until,
-        kind: opts.kind,
-        limit: intOpt('limit', opts.limit, 20),
-      });
+      if (isGrouped && opts.product) {
+        groups = searchChangesByPackage(db, q, {
+          product: opts.product,
+          productsConfig: cfg,
+          since,
+          until,
+          kind: opts.kind,
+          limit,
+        });
+      } else {
+        results = searchChanges(db, q, {
+          product: opts.product,
+          package: opts.package,
+          productsConfig: cfg,
+          since,
+          until,
+          kind: opts.kind,
+          limit,
+        });
+      }
     } catch (e: any) {
-      const appErr = new AppError({
+      const appErr = e instanceof AppError ? e : new AppError({
         code: 'QUERY_FAILED',
         message: `query failed: ${e.message}`,
         hint: `FTS5 syntax — use double quotes for phrase: hk query '"AskUserQuestion"' or use plain words: hk query AskUserQuestion`,
@@ -563,22 +599,43 @@ program
       process.exit(1);
     }
     if (program.opts().json) {
-      emitArrayJson(
-        results.map((r) => ({
-          released_at: r.released_at, product: r.product, version: r.version,
-          kind: r.kind, text: r.text, snippet: r.snippet, flags: r.flags,
-        })),
-        db,
-        opts.product
-      );
+      if (isGrouped) {
+        emitArrayJson(
+          groups.map((g) => ({ package: g.package, results: g.results.map(serializeQueryRow) })),
+          db,
+          opts.product
+        );
+      } else {
+        emitArrayJson(results.map(serializeQueryRow), db, opts.product);
+      }
     } else {
-      if (results.length === 0) {
+      if (isGrouped) {
+        if (groups.length === 0) {
+          console.log('(no results)');
+        } else {
+          let total = 0;
+          for (const g of groups) {
+            console.log(`## ${g.package}`);
+            for (const r of g.results) {
+              const flagMarker = formatFlagMarker(r.flags);
+              const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+              const label = formatReleaseLabel(r.product, r.package, r.version, cfg);
+              console.log(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}`);
+              console.log(`  ${r.snippet}`);
+              total++;
+            }
+            console.log('');
+          }
+          console.log(`${total} result${total === 1 ? '' : 's'}`);
+        }
+      } else if (results.length === 0) {
         console.log('(no results)');
       } else {
         for (const r of results) {
           const flagMarker = formatFlagMarker(r.flags);
           const flagInfo = flagMarker ? ` ${flagMarker}` : '';
-          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
+          const label = formatReleaseLabel(r.product, r.package, r.version, cfg);
+          console.log(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}`);
           console.log(`  ${r.snippet}`);
         }
         console.log(`\n${results.length} result${results.length === 1 ? '' : 's'}`);
@@ -605,8 +662,13 @@ async function runEntityCommand(
   if (program.opts().json) {
     emitArrayJson(
       results.map((r) => ({
-        released_at: r.released_at, product: r.product, version: r.version,
-        kind: r.kind, text: r.text, flags: r.flags,
+        released_at: r.released_at,
+        product: r.product,
+        ...(r.package !== undefined ? { package: r.package } : {}),
+        version: r.version,
+        kind: r.kind,
+        text: r.text,
+        flags: r.flags,
       })),
       db
     );
@@ -928,6 +990,7 @@ program
   .description('Hybrid FTS5 + sqlite-vec search via RRF, optional rerank (requires `hk embed` first)')
   .option('-d, --db <path>', 'database path')
   .option('-p, --product <name>', 'limit to one product')
+  .option('--package <name>', 'limit to one package within a multi-package product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
@@ -950,6 +1013,7 @@ program
       opts: {
         db?: string;
         product?: string;
+        package?: string;
         since?: string;
         until?: string;
         kind?: string;
@@ -967,12 +1031,15 @@ program
       return;
     }
     const db = session.db;
+    const cfg = loadProductsConfig();
     const since = resolveDateOrExit('since', opts.since);
     const until = resolveDateOrExit('until', opts.until);
     try {
       const t0 = Date.now();
       const results = await hybridSearch(db, text, {
         product: opts.product,
+        package: opts.package,
+        productsConfig: cfg,
         since,
         until,
         kind: opts.kind,
@@ -983,19 +1050,53 @@ program
         rerankCandidates: intOpt('rerank-candidates', opts.rerankCandidates, 20),
       });
       const ms = Date.now() - t0;
+      const isGrouped = Boolean(opts.product && !opts.package && isMultiPackageProduct(cfg?.productMeta[opts.product]));
+      const serializeHybrid = (r: (typeof results)[number]) => ({
+        released_at: r.released_at,
+        product: r.product,
+        ...(isMultiPackageProduct(cfg?.productMeta[r.product]) ? { package: formatPackageName(r.package) } : {}),
+        version: r.version,
+        kind: r.kind,
+        text: r.text,
+        flags: r.flags,
+        rrf_score: r.rrf_score,
+        rerank_score: r.rerank_score,
+      });
       if (program.opts().json) {
-        emitArrayJson(
-          results.map((r) => ({
-            released_at: r.released_at, product: r.product, version: r.version,
-            kind: r.kind, text: r.text, flags: r.flags, rrf_score: r.rrf_score,
-            rerank_score: r.rerank_score,
-          })),
-          db,
-          opts.product
-        );
+        if (isGrouped && opts.product) {
+          const pkgOrder = listProductPackageOrder(db, opts.product, cfg);
+          const groups = pkgOrder
+            .map((rawPkg) => ({
+              package: formatPackageName(rawPkg),
+              results: results.filter((r) => r.package === rawPkg).map(serializeHybrid),
+            }))
+            .filter((g) => g.results.length > 0);
+          emitArrayJson(groups, db, opts.product);
+        } else {
+          emitArrayJson(results.map(serializeHybrid), db, opts.product);
+        }
       } else {
         if (results.length === 0) {
           console.log('(no results)');
+        } else if (isGrouped && opts.product) {
+          const pkgOrder = listProductPackageOrder(db, opts.product, cfg);
+          for (const rawPkg of pkgOrder) {
+            const sub = results.filter((r) => r.package === rawPkg);
+            if (sub.length === 0) continue;
+            console.log(`## ${formatPackageName(rawPkg)}`);
+            for (const r of sub) {
+              const bm = r.bm25_rank ? `bm25#${r.bm25_rank}` : '       ';
+              const vec = r.vec_rank ? `vec#${r.vec_rank}` : '      ';
+              const rerank = r.rerank_score !== null ? ` rerank=${r.rerank_score.toFixed(2)}` : '';
+              const flagMarker = formatFlagMarker(r.flags);
+              const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+              const label = formatReleaseLabel(r.product, formatPackageName(r.package), r.version, cfg);
+              console.log(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}  ${bm} ${vec} rrf=${r.rrf_score.toFixed(4)}${rerank}`);
+              console.log(`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '…' : ''}`);
+            }
+            console.log('');
+          }
+          console.log(`${results.length} result${results.length === 1 ? '' : 's'} in ${ms}ms (rerank: ${opts.rerank})`);
         } else {
           for (const r of results) {
             const bm = r.bm25_rank ? `bm25#${r.bm25_rank}` : '       ';
@@ -1003,7 +1104,9 @@ program
             const rerank = r.rerank_score !== null ? ` rerank=${r.rerank_score.toFixed(2)}` : '';
             const flagMarker = formatFlagMarker(r.flags);
             const flagInfo = flagMarker ? ` ${flagMarker}` : '';
-            console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}  ${bm} ${vec} rrf=${r.rrf_score.toFixed(4)}${rerank}`);
+            const pkgForLabel = isMultiPackageProduct(cfg?.productMeta[r.product]) ? formatPackageName(r.package) : undefined;
+            const label = formatReleaseLabel(r.product, pkgForLabel, r.version, cfg);
+            console.log(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}  ${bm} ${vec} rrf=${r.rrf_score.toFixed(4)}${rerank}`);
             console.log(`  ${r.text.slice(0, 200)}${r.text.length > 200 ? '…' : ''}`);
           }
           console.log(`\n${results.length} result${results.length === 1 ? '' : 's'} in ${ms}ms (rerank: ${opts.rerank})`);
@@ -1014,7 +1117,7 @@ program
       const hint = (e.message.includes('Ollama') || e.message.includes('11434'))
         ? 'start Ollama and pull the embedding model (and rerank model if using ollama-judge)'
         : 'Check provider connectivity. Re-run with --verbose for details.';
-      const appErr = new AppError({
+      const appErr = e instanceof AppError ? e : new AppError({
         code: 'HYBRID_QUERY_FAILED',
         message: `hybrid query failed: ${e.message}`,
         hint,
@@ -1026,7 +1129,7 @@ program
       } else {
         console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
       }
-      process.exit(2);
+      process.exit(e instanceof AppError ? 1 : 2);
     } finally {
       db.close();
       activeDb = null;
@@ -1038,28 +1141,72 @@ program
   .description('Recent releases across all products (or one)')
   .option('-d, --db <path>', 'database path')
   .option('-p, --product <name>', 'limit to one product')
+  .option('--package <name>', 'limit to one package within a multi-package product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-l, --limit <n>', 'max results', '20')
-  .action(async (opts: { db?: string; product?: string; since?: string; limit: string; stamp?: boolean }) => {
+  .action(async (opts: { db?: string; product?: string; package?: string; since?: string; limit: string; stamp?: boolean }) => {
     const session = await openQueryDbOrFirstUse(opts, opts.product);
     if (session.emptyOptOut || !session.db) {
       emitEmptyQueryOutput(session, opts.product, opts);
       return;
     }
     const db = session.db;
+    const cfg = loadProductsConfig();
     const since = resolveDateOrExit('since', opts.since);
-    const releases = recentReleases(db, opts.product, intOpt('limit', opts.limit, 20), since);
-    if (program.opts().json) {
-      emitArrayJson(releases, db, opts.product);
-    } else {
-      if (releases.length === 0) {
-        console.log('(no releases)');
+    const limit = intOpt('limit', opts.limit, 20);
+    const isGrouped = Boolean(opts.product && !opts.package && isMultiPackageProduct(cfg?.productMeta[opts.product]));
+    try {
+      if (isGrouped && opts.product) {
+        const groups = recentReleasesByPackage(db, opts.product, limit, since, cfg);
+        if (program.opts().json) {
+          emitArrayJson(groups, db, opts.product);
+        } else {
+          if (groups.length === 0) {
+            console.log('(no releases)');
+          } else {
+            for (let i = 0; i < groups.length; i++) {
+              const g = groups[i];
+              if (i > 0) console.log('');
+              console.log(`### ${g.package}`);
+              for (const r of g.releases) {
+                const label = formatReleaseLabel(r.product, r.package, r.version, cfg);
+                console.log(`${r.released_at}  ${label}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
+              }
+            }
+          }
+          emitTextStamp(db, opts.product, session.partialNote, opts);
+        }
       } else {
-        for (const r of releases) {
-          console.log(`${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
+        const releases = recentReleases(db, opts.product, limit, since, opts.package, cfg);
+        if (program.opts().json) {
+          emitArrayJson(releases, db, opts.product);
+        } else {
+          if (releases.length === 0) {
+            console.log('(no releases)');
+          } else {
+            for (const r of releases) {
+              const label = formatReleaseLabel(r.product, r.package, r.version, cfg);
+              console.log(`${r.released_at}  ${label}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
+            }
+          }
+          emitTextStamp(db, opts.product, session.partialNote, opts);
         }
       }
-      emitTextStamp(db, opts.product, session.partialNote, opts);
+    } catch (e: any) {
+      const appErr = e instanceof AppError ? e : new AppError({
+        code: 'LATEST_FAILED',
+        message: `latest failed: ${e.message}`,
+        hint: 'Verify filters and ensure the DB is initialized.',
+        cause: e.message,
+      });
+      if (program.opts().json) {
+        console.log(JSON.stringify({ ...appErr.toJSON(), data_as_of: getCorpusFreshness(db, { product: opts.product }) }));
+      } else {
+        console.error(formatError(appErr, LOG_LEVELS[logLevel] >= LOG_LEVELS.verbose));
+      }
+      db.close();
+      activeDb = null;
+      process.exit(1);
     }
     db.close();
     activeDb = null;
@@ -1104,17 +1251,19 @@ program
   .command('diff [product]')
   .description('Show changes in a date window, grouped by release. Default: last 7 days across all products.')
   .option('-d, --db <path>', 'database path')
+  .option('--package <name>', 'limit to one package within a multi-package product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)', '7d')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative); default: now')
   .option('-k, --kind <kind>', 'added|fixed|breaking|deprecated|renamed|removed|improved|changed')
   .option('-l, --limit <n>', 'max change rows', '200')
-  .action(async (product: string | undefined, opts: { db?: string; since: string; until?: string; kind?: string; limit: string; stamp?: boolean }) => {
+  .action(async (product: string | undefined, opts: { db?: string; package?: string; since: string; until?: string; kind?: string; limit: string; stamp?: boolean }) => {
     const session = await openQueryDbOrFirstUse(opts, product);
     if (session.emptyOptOut || !session.db) {
       emitEmptyQueryOutput(session, product, opts);
       return;
     }
     const db = session.db;
+    const cfg = loadProductsConfig();
     const since = resolveDateOrExit('since', opts.since);
     const until = resolveDateOrExit('until', opts.until);
     if (!since) {
@@ -1125,17 +1274,33 @@ program
       process.exit(1);
       return;
     }
-    let results: ChangesSinceResult[];
+    const limit = intOpt('limit', opts.limit, 200, 1, 10_000);
+    const isGrouped = Boolean(product && !opts.package && isMultiPackageProduct(cfg?.productMeta[product]));
+    let results: ChangesSinceResult[] = [];
+    let groups: Array<{ package: string; releases: ChangesSinceResult[] }> = [];
     try {
-      results = getChangesSince(db, {
-        since,
-        until,
-        product,
-        kind: opts.kind,
-        limit: intOpt('limit', opts.limit, 200, 1, 10_000),
-      });
+      if (isGrouped && product) {
+        groups = getChangesSinceByPackage(db, {
+          since,
+          until,
+          product,
+          productsConfig: cfg,
+          kind: opts.kind,
+          limit,
+        });
+      } else {
+        results = getChangesSince(db, {
+          since,
+          until,
+          product,
+          package: opts.package,
+          productsConfig: cfg,
+          kind: opts.kind,
+          limit,
+        });
+      }
     } catch (e: any) {
-      const appErr = new AppError({
+      const appErr = e instanceof AppError ? e : new AppError({
         code: 'DIFF_FAILED',
         message: `diff failed: ${e.message}`,
         hint: 'Verify --since / --until parse correctly and the DB is initialized.',
@@ -1152,26 +1317,48 @@ program
       return;
     }
     if (program.opts().json) {
-      emitArrayJson(results, db, product);
+      emitArrayJson(isGrouped ? groups : results, db, product);
     } else {
-      if (results.length === 0) {
-        const scope = product ? ` for product "${product}"` : '';
-        console.log(`(no changes in window since ${since}${until ? ` until ${until}` : ''}${scope})`);
-        console.log('Try widening the date window: hk diff --since 30d, or remove --kind / --product filters.');
-      } else {
-        let totalChanges = 0;
-        for (const rel of results) {
+      const sinceLbl = opts.since;
+      const untilLbl = opts.until ? ` until ${opts.until}` : '';
+      const printReleaseGroup = (list: ChangesSinceResult[]) => {
+        let count = 0;
+        for (const rel of list) {
           const date = rel.released_at ?? '????-??-??';
-          console.log(`\n${date}  ${rel.product}@${rel.version}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
+          const label = formatReleaseLabel(rel.product, rel.package, rel.version, cfg);
+          console.log(`\n${date}  ${label}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
           for (const c of rel.changes) {
             const flagMarker = formatFlagMarker(c.flags);
             const flagInfo = flagMarker ? ` ${flagMarker}` : '';
             console.log(`  - [${c.kind}]${flagInfo} ${c.text}`);
           }
-          totalChanges += rel.changes.length;
+          count += rel.changes.length;
         }
-        const sinceLbl = opts.since;
-        const untilLbl = opts.until ? ` until ${opts.until}` : '';
+        return count;
+      };
+      if (isGrouped) {
+        if (groups.length === 0) {
+          const scope = product ? ` for product "${product}"` : '';
+          console.log(`(no changes in window since ${since}${until ? ` until ${until}` : ''}${scope})`);
+          console.log('Try widening the date window: hk diff --since 30d, or remove --kind / --product filters.');
+        } else {
+          let totalChanges = 0;
+          let totalReleases = 0;
+          for (let i = 0; i < groups.length; i++) {
+            const g = groups[i];
+            if (i > 0) console.log('');
+            console.log(`## ${g.package}`);
+            totalChanges += printReleaseGroup(g.releases);
+            totalReleases += g.releases.length;
+          }
+          console.log(`\n${totalChanges} change${totalChanges === 1 ? '' : 's'} across ${totalReleases} release${totalReleases === 1 ? '' : 's'} since ${sinceLbl}${untilLbl}`);
+        }
+      } else if (results.length === 0) {
+        const scope = product ? ` for product "${product}"` : '';
+        console.log(`(no changes in window since ${since}${until ? ` until ${until}` : ''}${scope})`);
+        console.log('Try widening the date window: hk diff --since 30d, or remove --kind / --product filters.');
+      } else {
+        const totalChanges = printReleaseGroup(results);
         console.log(`\n${totalChanges} change${totalChanges === 1 ? '' : 's'} across ${results.length} release${results.length === 1 ? '' : 's'} since ${sinceLbl}${untilLbl}`);
       }
       emitTextStamp(db, product, session.partialNote, opts);
@@ -1187,29 +1374,56 @@ program
   .description('List breaking changes, most recent first. Filter by product / date window.')
   .option('-d, --db <path>', 'database path')
   .option('-p, --product <name>', 'limit to one product')
+  .option('--package <name>', 'limit to one package within a multi-package product')
   .option('-s, --since <date>', 'lower bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-u, --until <date>', 'upper bound (YYYY-MM-DD or relative like 7d, 2w, 1m)')
   .option('-l, --limit <n>', 'max results', '50')
-  .action(async (opts: { db?: string; product?: string; since?: string; until?: string; limit: string; stamp?: boolean }) => {
+  .action(async (opts: { db?: string; product?: string; package?: string; since?: string; until?: string; limit: string; stamp?: boolean }) => {
     const session = await openQueryDbOrFirstUse(opts, opts.product);
     if (session.emptyOptOut || !session.db) {
       emitEmptyQueryOutput(session, opts.product, opts);
       return;
     }
     const db = session.db;
+    const cfg = loadProductsConfig();
     const since = resolveDateOrExit('since', opts.since);
     const until = resolveDateOrExit('until', opts.until);
-    let results;
+    const limit = intOpt('limit', opts.limit, 50, 1, 10_000);
+    const serializeBreakingRow = (r: { released_at: string | null; product: string; package?: string; version: string; kind: string; text: string; flags: string[] }) => ({
+      released_at: r.released_at,
+      product: r.product,
+      ...(r.package !== undefined ? { package: r.package } : {}),
+      version: r.version,
+      kind: r.kind,
+      text: r.text,
+      flags: r.flags,
+    });
+    const isGrouped = Boolean(opts.product && !opts.package && isMultiPackageProduct(cfg?.productMeta[opts.product]));
+    let results: ReturnType<typeof browseChanges> = [];
+    let groups: ReturnType<typeof browseChangesByPackage> = [];
     try {
-      results = browseChanges(db, {
-        product: opts.product,
-        since,
-        until,
-        kind: 'breaking',
-        limit: intOpt('limit', opts.limit, 50, 1, 10_000),
-      });
+      if (isGrouped && opts.product) {
+        groups = browseChangesByPackage(db, {
+          product: opts.product,
+          productsConfig: cfg,
+          since,
+          until,
+          kind: 'breaking',
+          limit,
+        });
+      } else {
+        results = browseChanges(db, {
+          product: opts.product,
+          package: opts.package,
+          productsConfig: cfg,
+          since,
+          until,
+          kind: 'breaking',
+          limit,
+        });
+      }
     } catch (e: any) {
-      const appErr = new AppError({
+      const appErr = e instanceof AppError ? e : new AppError({
         code: 'BREAKING_FAILED',
         message: `breaking query failed: ${e.message}`,
         hint: 'Verify --since / --until parse correctly and the DB is initialized.',
@@ -1226,23 +1440,45 @@ program
       return;
     }
     if (program.opts().json) {
-      emitArrayJson(
-        results.map((r) => ({
-          released_at: r.released_at, product: r.product, version: r.version,
-          kind: r.kind, text: r.text, flags: r.flags,
-        })),
-        db,
-        opts.product
-      );
+      if (isGrouped) {
+        emitArrayJson(
+          groups.map((g) => ({ package: g.package, results: g.results.map(serializeBreakingRow) })),
+          db,
+          opts.product
+        );
+      } else {
+        emitArrayJson(results.map(serializeBreakingRow), db, opts.product);
+      }
     } else {
-      if (results.length === 0) {
+      if (isGrouped) {
+        if (groups.length === 0) {
+          console.log('(no breaking changes)');
+          console.log('Note: ingest may not have classified any changes as breaking yet — try `hk query "" --kind breaking` patterns, or widen --since.');
+        } else {
+          let total = 0;
+          for (const g of groups) {
+            console.log(`## ${g.package}`);
+            for (const r of g.results) {
+              const flagMarker = formatFlagMarker(r.flags);
+              const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+              const label = formatReleaseLabel(r.product, r.package, r.version, cfg);
+              console.log(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}`);
+              console.log(`  ${r.text}`);
+              total++;
+            }
+            console.log('');
+          }
+          console.log(`${total} breaking change${total === 1 ? '' : 's'}`);
+        }
+      } else if (results.length === 0) {
         console.log('(no breaking changes)');
         console.log('Note: ingest may not have classified any changes as breaking yet — try `hk query "" --kind breaking` patterns, or widen --since.');
       } else {
         for (const r of results) {
           const flagMarker = formatFlagMarker(r.flags);
           const flagInfo = flagMarker ? ` ${flagMarker}` : '';
-          console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
+          const label = formatReleaseLabel(r.product, r.package, r.version, cfg);
+          console.log(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}`);
           console.log(`  ${r.text}`);
         }
         console.log(`\n${results.length} breaking change${results.length === 1 ? '' : 's'}`);
@@ -1343,7 +1579,8 @@ function printEntityResults(name: string, label: string, results: ReturnType<typ
   for (const r of results) {
     const flagMarker = formatFlagMarker(r.flags);
     const flagInfo = flagMarker ? ` ${flagMarker}` : '';
-    console.log(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
+    const label = formatReleaseLabel(r.product, r.package, r.version);
+    console.log(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}`);
     console.log(`  ${r.text}`);
   }
 }

@@ -1,7 +1,20 @@
 import type Database from 'better-sqlite3';
 import { AppError } from './errors.js';
-import { SCHEMA_VERSION, getSchemaVersion, hasChangesFlagsColumn } from './db.js';
-import { loadProductsConfig } from './products-config.js';
+import {
+  SCHEMA_VERSION,
+  getSchemaVersion,
+  hasChangesFlagsColumn,
+  hasReleasesPackageColumn,
+} from './db.js';
+import {
+  UNASSIGNED_PACKAGE,
+  UNASSIGNED_PACKAGE_LABEL,
+  deriveReleaseIdentity,
+  getCanonicalPackages,
+  isMultiPackageProduct,
+  loadProductsConfig,
+  type ProductsConfig,
+} from './products-config.js';
 import {
   VENDOR_TEXT_FRAME,
   formatFlagMarker,
@@ -386,6 +399,165 @@ export function formatManualFeedWarning(
   return `MANUAL FEED (${product}): last updated ${dateStr}, ${ageStr} days old, not refreshed by sync`;
 }
 
+/** Format display package name (mapping empty unassigned package to `'unassigned'`). */
+export function formatPackageName(pkg: string | null | undefined): string {
+  return pkg && pkg.length > 0 ? pkg : UNASSIGNED_PACKAGE_LABEL;
+}
+
+/**
+ * Format `product@version` for single-package products (byte-for-byte legacy shape),
+ * or `product (package)@version` for multi-package products.
+ */
+export function formatReleaseLabel(
+  product: string,
+  pkg: string | null | undefined,
+  version: string,
+  config: ProductsConfig | null = loadProductsConfig(),
+): string {
+  if (!isMultiPackageProduct(config?.productMeta[product])) {
+    return `${product}@${version}`;
+  }
+  return `${product} (${formatPackageName(pkg)})@${version}`;
+}
+
+/**
+ * Resolve a caller-supplied `package` filter against `products.yaml`.
+ * Maps `'unassigned'` / `''` to `UNASSIGNED_PACKAGE`, collapses Go `/v2` aliases
+ * to the canonical package name, and throws `UNKNOWN_PACKAGE` when `product`
+ * has declared packages and `requestedPackage` is not one of them.
+ */
+export function resolvePackageFilter(
+  product: string | undefined,
+  requestedPackage: string,
+  config: ProductsConfig | null = loadProductsConfig(),
+): string {
+  const trimmed = requestedPackage.trim();
+  if (trimmed === '' || trimmed.toLowerCase() === UNASSIGNED_PACKAGE_LABEL) {
+    return UNASSIGNED_PACKAGE;
+  }
+  if (product) {
+    const meta = config?.productMeta[product];
+    const canonical = getCanonicalPackages(meta);
+    if (canonical.length > 0) {
+      const exact = canonical.find(
+        (c) => c.name === trimmed || c.aliases.includes(trimmed),
+      );
+      if (exact) return exact.name;
+      const ci = canonical.find(
+        (c) =>
+          c.name.toLowerCase() === trimmed.toLowerCase() ||
+          c.aliases.some((a) => a.toLowerCase() === trimmed.toLowerCase()),
+      );
+      if (ci) return ci.name;
+      const valid = [...canonical.map((c) => c.name), UNASSIGNED_PACKAGE_LABEL].join(', ');
+      throw new AppError({
+        code: 'UNKNOWN_PACKAGE',
+        message: `unknown package ${JSON.stringify(requestedPackage)} for product ${product}`,
+        hint: `Available packages for ${product}: ${valid}`,
+      });
+    }
+    return trimmed;
+  }
+  if (config) {
+    for (const meta of Object.values(config.productMeta)) {
+      const canonical = getCanonicalPackages(meta);
+      const exact = canonical.find(
+        (c) => c.name === trimmed || c.aliases.includes(trimmed),
+      );
+      if (exact) return exact.name;
+    }
+  }
+  return trimmed;
+}
+
+/**
+ * List canonical package names present for `product` in `products.yaml` declaration
+ * order, appending any extra/unassigned packages present in the DB (unassigned last).
+ */
+export function listProductPackageOrder(
+  db: Database.Database,
+  product: string,
+  config: ProductsConfig | null = loadProductsConfig(),
+): string[] {
+  const meta = config?.productMeta[product];
+  const declared = getCanonicalPackages(meta).map((c) => c.name);
+  const seenInDb = new Set<string>();
+  const hasPkgCol = hasReleasesPackageColumn(db);
+  if (hasPkgCol) {
+    const rows = db
+      .prepare(`SELECT DISTINCT package FROM releases WHERE product = ?`)
+      .all(product) as Array<{ package: string }>;
+    for (const r of rows) seenInDb.add(r.package);
+  } else {
+    const rows = db
+      .prepare(`SELECT version, notes_path FROM releases WHERE product = ?`)
+      .all(product) as Array<{ version: string; notes_path: string }>;
+    for (const r of rows) {
+      seenInDb.add(deriveReleaseIdentity(product, r.version, r.notes_path, config).pkg);
+    }
+  }
+
+  const out: string[] = [];
+  for (const name of declared) {
+    if (seenInDb.has(name)) {
+      out.push(name);
+      seenInDb.delete(name);
+    }
+  }
+  const hasUnassigned = seenInDb.delete(UNASSIGNED_PACKAGE);
+  for (const extra of [...seenInDb].sort()) {
+    out.push(extra);
+  }
+  if (hasUnassigned) {
+    out.push(UNASSIGNED_PACKAGE);
+  }
+  return out;
+}
+
+/**
+ * Require `package` when `product` declares multiple packages in `products.yaml`.
+ * Returns the resolved package name (or `undefined` for single-package products).
+ */
+export function requirePackageIfMultiPackage(
+  db: Database.Database,
+  product: string,
+  requestedPackage: string | undefined,
+  config: ProductsConfig | null = loadProductsConfig(),
+): string | undefined {
+  if (requestedPackage !== undefined) {
+    return resolvePackageFilter(product, requestedPackage, config);
+  }
+  const meta = config?.productMeta[product];
+  if (!isMultiPackageProduct(meta)) {
+    return undefined;
+  }
+  const packages = listProductPackageOrder(db, product, config);
+  const displayList =
+    packages.length > 0
+      ? packages.map((p) => formatPackageName(p))
+      : getCanonicalPackages(meta).map((c) => c.name);
+  throw new AppError({
+    code: 'PACKAGE_REQUIRED',
+    message: `product "${product}" has multiple packages; specify package (${displayList.join(', ')})`,
+    hint: `Pass package as one of: ${displayList.join(', ')}`,
+  });
+}
+
+function resolveCfg(config?: ProductsConfig | null): ProductsConfig | null {
+  return config !== undefined ? config : loadProductsConfig();
+}
+
+function attachMultiPackageField<T extends { product: string }>(
+  row: T,
+  pkg: string,
+  config: ProductsConfig | null,
+): T & { package?: string } {
+  if (!isMultiPackageProduct(config?.productMeta[row.product])) {
+    return row;
+  }
+  return { ...row, package: formatPackageName(pkg) };
+}
+
 // ─── CLI / MCP formatting helpers ─────────────────────────────────────────
 
 /**
@@ -407,12 +579,21 @@ export function truncate(text: string | undefined | null, maxLen = 200): string 
  * so columns stay aligned across rows with varying product name lengths.
  */
 export function formatResultLine(
-  row: { released_at: string | null; product: string; version: string; kind: string; flags?: readonly string[] },
+  row: {
+    released_at: string | null;
+    product: string;
+    package?: string;
+    version: string;
+    kind: string;
+    flags?: readonly string[];
+  },
   bodyText: string,
-  opts: { maxTextLen?: number; productColWidth?: number } = {}
+  opts: { maxTextLen?: number; productColWidth?: number; productsConfig?: ProductsConfig | null } = {}
 ): string {
   const date = row.released_at ?? '????-??-??';
-  const pv = `${row.product}@${row.version}`;
+  const pv = row.package
+    ? `${row.product} (${row.package})@${row.version}`
+    : `${row.product}@${row.version}`;
   const padWidth = opts.productColWidth ?? 40;
   const flagMarker = formatFlagMarker(row.flags);
   const flagSuffix = flagMarker ? ` ${flagMarker}` : '';
@@ -426,11 +607,12 @@ export function formatResultLine(
  * (max observed length + 2 padding chars).
  */
 export function productColWidth(
-  rows: Array<{ product: string; version: string }>
+  rows: Array<{ product: string; package?: string; version: string }>
 ): number {
   if (rows.length === 0) return 30;
   const maxLen = rows.reduce(
-    (mx, r) => Math.max(mx, `${r.product}@${r.version}`.length),
+    (mx, r) =>
+      Math.max(mx, (r.package ? `${r.product} (${r.package})@${r.version}` : `${r.product}@${r.version}`).length),
     0
   );
   return maxLen + 2;
@@ -438,6 +620,7 @@ export function productColWidth(
 
 export interface QueryResult {
   product: string;
+  package?: string;
   version: string;
   released_at: string | null;
   ordinal: number;
@@ -449,6 +632,8 @@ export interface QueryResult {
 
 export interface QueryOptions {
   product?: string;
+  package?: string;
+  productsConfig?: ProductsConfig | null;
   since?: string;
   /** Inclusive date upper bound (YYYY-MM-DD). Pairs with `since` for windowed search. */
   until?: string;
@@ -461,6 +646,10 @@ export function searchChanges(
   query: string,
   opts: QueryOptions = {}
 ): QueryResult[] {
+  const cfg = resolveCfg(opts.productsConfig);
+  const hasPkgCol = hasReleasesPackageColumn(db);
+  const resolvedPkg =
+    opts.package !== undefined ? resolvePackageFilter(opts.product, opts.package, cfg) : undefined;
   const limit = opts.limit ?? 20;
   const filters: string[] = [];
   const params: Record<string, any> = { query, limit };
@@ -468,6 +657,10 @@ export function searchChanges(
   if (opts.product) {
     filters.push('c.product = @product');
     params.product = opts.product;
+  }
+  if (resolvedPkg !== undefined && hasPkgCol) {
+    filters.push('c.package = @package');
+    params.package = resolvedPkg;
   }
   if (opts.since) {
     filters.push('r.released_at >= @since');
@@ -485,84 +678,368 @@ export function searchChanges(
   const where = filters.length > 0 ? `AND ${filters.join(' AND ')}` : '';
   const hasFlagsCol = hasChangesFlagsColumn(db);
   const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
+  const pkgSelect = hasPkgCol ? 'c.package AS pkg, r.notes_path AS notes_path' : `'' AS pkg, r.notes_path AS notes_path`;
+  const joinCond = hasPkgCol
+    ? 'c.product = r.product AND c.package = r.package AND c.version = r.version'
+    : 'c.product = r.product AND c.version = r.version';
+  const limitSql = !hasPkgCol && resolvedPkg !== undefined ? '' : 'LIMIT @limit';
 
   const sql = `
-    SELECT c.product, c.version, r.released_at,
+    SELECT c.product, ${pkgSelect}, c.version, r.released_at,
            c.ordinal, c.kind, c.text AS body, ${flagsExpr} AS flags_json,
            snippet(changes_fts, 0, '[[', ']]', '…', 16) AS snippet
     FROM changes_fts
     JOIN changes c ON changes_fts.rowid = c.id
-    JOIN releases r ON c.product = r.product AND c.version = r.version
+    JOIN releases r ON ${joinCond}
     WHERE changes_fts MATCH @query
       ${where}
     ORDER BY r.released_at DESC, c.ordinal ASC
-    LIMIT @limit
+    ${limitSql}
   `;
 
-  const rows = db.prepare(sql).all(params) as Array<
-    Omit<QueryResult, 'text' | 'flags'> & { body: string; flags_json?: string | null }
-  >;
-  return rows.map((r) => {
-    const { body, flags_json, snippet, ...rest } = r;
-    const screened = resolveRowScreening(body, flags_json, hasFlagsCol);
-    const cleanSnippet = hasFlagsCol ? snippet : screenVendorText(snippet).text;
-    return { ...rest, snippet: cleanSnippet, text: screened.text, flags: screened.flags };
-  });
+  const rows = db.prepare(sql).all(params) as Array<{
+    product: string;
+    pkg: string;
+    notes_path: string;
+    version: string;
+    released_at: string | null;
+    ordinal: number;
+    kind: string;
+    body: string;
+    flags_json?: string | null;
+    snippet: string;
+  }>;
+
+  const out: QueryResult[] = [];
+  for (const r of rows) {
+    const derived = hasPkgCol
+      ? { pkg: r.pkg, version: r.version }
+      : deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg);
+    if (resolvedPkg !== undefined && derived.pkg !== resolvedPkg) continue;
+    const screened = resolveRowScreening(r.body, r.flags_json, hasFlagsCol);
+    const cleanSnippet = hasFlagsCol ? r.snippet : screenVendorText(r.snippet).text;
+    out.push(
+      attachMultiPackageField(
+        {
+          product: r.product,
+          version: derived.version,
+          released_at: r.released_at,
+          ordinal: r.ordinal,
+          kind: r.kind,
+          text: screened.text,
+          snippet: cleanSnippet,
+          flags: screened.flags,
+        },
+        derived.pkg,
+        cfg,
+      ),
+    );
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+export function searchChangesByPackage(
+  db: Database.Database,
+  query: string,
+  opts: QueryOptions & { product: string },
+): Array<{ package: string; results: QueryResult[] }> {
+  const cfg = resolveCfg(opts.productsConfig);
+  const pkgOrder = listProductPackageOrder(db, opts.product, cfg);
+  const groups: Array<{ package: string; results: QueryResult[] }> = [];
+  for (const pkg of pkgOrder) {
+    const results = searchChanges(db, query, {
+      ...opts,
+      package: formatPackageName(pkg),
+      productsConfig: cfg,
+    });
+    if (results.length > 0) {
+      groups.push({ package: formatPackageName(pkg), results });
+    }
+  }
+  return groups;
 }
 
 export function lookupEntity(
   db: Database.Database,
   type: string,
-  value: string
+  value: string,
+  opts: { productsConfig?: ProductsConfig | null } = {},
 ): QueryResult[] {
+  const cfg = resolveCfg(opts.productsConfig);
   const hasFlagsCol = hasChangesFlagsColumn(db);
+  const hasPkgCol = hasReleasesPackageColumn(db);
   const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
+  const pkgSelect = hasPkgCol ? 'c.package AS pkg, r.notes_path AS notes_path' : `'' AS pkg, r.notes_path AS notes_path`;
+  const joinCond = hasPkgCol
+    ? 'c.product = r.product AND c.package = r.package AND c.version = r.version'
+    : 'c.product = r.product AND c.version = r.version';
   const sql = `
-    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text,
+    SELECT c.product, ${pkgSelect}, c.version, r.released_at, c.ordinal, c.kind, c.text,
            ${flagsExpr} AS flags_json, '' AS snippet
     FROM entities e
     JOIN changes c ON e.change_id = c.id
-    JOIN releases r ON c.product = r.product AND c.version = r.version
+    JOIN releases r ON ${joinCond}
     WHERE e.entity_type = ? AND e.entity_value = ?
     ORDER BY r.released_at ASC, c.product
   `;
-  const rows = db.prepare(sql).all(type, value) as Array<
-    Omit<QueryResult, 'flags'> & { flags_json?: string | null }
-  >;
+  const rows = db.prepare(sql).all(type, value) as Array<{
+    product: string;
+    pkg: string;
+    notes_path: string;
+    version: string;
+    released_at: string | null;
+    ordinal: number;
+    kind: string;
+    text: string;
+    flags_json?: string | null;
+    snippet: string;
+  }>;
   return rows.map((r) => {
-    const { flags_json, text, ...rest } = r;
-    const screened = resolveRowScreening(text, flags_json, hasFlagsCol);
-    return { ...rest, text: screened.text, flags: screened.flags };
+    const derived = hasPkgCol
+      ? { pkg: r.pkg, version: r.version }
+      : deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg);
+    const screened = resolveRowScreening(r.text, r.flags_json, hasFlagsCol);
+    return attachMultiPackageField(
+      {
+        product: r.product,
+        version: derived.version,
+        released_at: r.released_at,
+        ordinal: r.ordinal,
+        kind: r.kind,
+        text: screened.text,
+        snippet: r.snippet,
+        flags: screened.flags,
+      },
+      derived.pkg,
+      cfg,
+    );
   });
+}
+
+export interface RecentReleaseRow {
+  product: string;
+  package?: string;
+  version: string;
+  released_at: string;
+  change_count: number;
 }
 
 export function recentReleases(
   db: Database.Database,
   product?: string,
   limit = 20,
-  since?: string
-): Array<{ product: string; version: string; released_at: string; change_count: number }> {
+  since?: string,
+  pkg?: string,
+  productsConfig?: ProductsConfig | null,
+): RecentReleaseRow[] {
+  const cfg = resolveCfg(productsConfig);
+  const hasPkgCol = hasReleasesPackageColumn(db);
+  const resolvedPkg =
+    pkg !== undefined ? resolvePackageFilter(product, pkg, cfg) : undefined;
   const filters: string[] = [];
   const params: Record<string, any> = { limit };
   if (product) {
     filters.push('r.product = @product');
     params.product = product;
   }
+  if (resolvedPkg !== undefined && hasPkgCol) {
+    filters.push('r.package = @package');
+    params.package = resolvedPkg;
+  }
   if (since) {
     filters.push('r.released_at >= @since');
     params.since = since;
   }
   const where = filters.length > 0 ? `WHERE ${filters.join(' AND ')}` : '';
+  const pkgSelect = hasPkgCol ? 'r.package AS pkg, r.notes_path AS notes_path' : `'' AS pkg, r.notes_path AS notes_path`;
+  const joinCond = hasPkgCol
+    ? 'c.product = r.product AND c.package = r.package AND c.version = r.version'
+    : 'c.product = r.product AND c.version = r.version';
+  const groupBy = hasPkgCol ? 'r.product, r.package, r.version' : 'r.product, r.version';
+  const limitSql = !hasPkgCol && resolvedPkg !== undefined ? '' : 'LIMIT @limit';
   const sql = `
-    SELECT r.product, r.version, r.released_at, COUNT(c.id) AS change_count
+    SELECT r.product, ${pkgSelect}, r.version, r.released_at, COUNT(c.id) AS change_count
     FROM releases r
-    LEFT JOIN changes c ON c.product = r.product AND c.version = r.version
+    LEFT JOIN changes c ON ${joinCond}
     ${where}
-    GROUP BY r.product, r.version
+    GROUP BY ${groupBy}
     ORDER BY r.released_at DESC
-    LIMIT @limit
+    ${limitSql}
   `;
-  return db.prepare(sql).all(params) as any;
+  const rows = db.prepare(sql).all(params) as Array<{
+    product: string;
+    pkg: string;
+    notes_path: string;
+    version: string;
+    released_at: string;
+    change_count: number;
+  }>;
+  const out: RecentReleaseRow[] = [];
+  for (const r of rows) {
+    const derived = hasPkgCol
+      ? { pkg: r.pkg, version: r.version }
+      : deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg);
+    if (resolvedPkg !== undefined && derived.pkg !== resolvedPkg) continue;
+    out.push(
+      attachMultiPackageField(
+        {
+          product: r.product,
+          version: derived.version,
+          released_at: r.released_at,
+          change_count: r.change_count,
+        },
+        derived.pkg,
+        cfg,
+      ),
+    );
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+export function recentReleasesByPackage(
+  db: Database.Database,
+  product: string,
+  limit = 20,
+  since?: string,
+  productsConfig?: ProductsConfig | null,
+): Array<{ package: string; releases: RecentReleaseRow[] }> {
+  const cfg = resolveCfg(productsConfig);
+  const pkgOrder = listProductPackageOrder(db, product, cfg);
+  const groups: Array<{ package: string; releases: RecentReleaseRow[] }> = [];
+  for (const pkg of pkgOrder) {
+    const releases = recentReleases(db, product, limit, since, formatPackageName(pkg), cfg);
+    if (releases.length > 0) {
+      groups.push({ package: formatPackageName(pkg), releases });
+    }
+  }
+  return groups;
+}
+
+export interface ReleaseDetails {
+  product: string;
+  package?: string;
+  version: string;
+  released_at: string | null;
+  source_url: string;
+  notes_path: string;
+  changes: Array<{ ordinal: number; kind: string; text: string; flags: string[] }>;
+}
+
+export function getRelease(
+  db: Database.Database,
+  opts: { product: string; package?: string; version: string; productsConfig?: ProductsConfig | null },
+): ReleaseDetails | null {
+  const cfg = resolveCfg(opts.productsConfig);
+  const resolvedPkg = requirePackageIfMultiPackage(db, opts.product, opts.package, cfg);
+  const hasPkgCol = hasReleasesPackageColumn(db);
+  const hasFlagsCol = hasChangesFlagsColumn(db);
+  const bareVersion = opts.version.replace(/^v(?=\d)/i, '');
+
+  let release:
+    | {
+        product: string;
+        pkg: string;
+        version: string;
+        dbVersion: string;
+        released_at: string | null;
+        source_url: string;
+        notes_path: string;
+      }
+    | undefined;
+
+  if (hasPkgCol) {
+    const pkgFilter = resolvedPkg !== undefined ? 'AND package = ?' : '';
+    const selectStmt = db.prepare(
+      `SELECT product, package AS pkg, version, version AS dbVersion, released_at, source_url, notes_path
+       FROM releases
+       WHERE product = ? AND version = ? ${pkgFilter}`,
+    );
+    const args = resolvedPkg !== undefined ? [opts.product, opts.version, resolvedPkg] : [opts.product, opts.version];
+    release = selectStmt.get(...args) as typeof release;
+    if (!release && bareVersion !== opts.version) {
+      const bareArgs =
+        resolvedPkg !== undefined ? [opts.product, bareVersion, resolvedPkg] : [opts.product, bareVersion];
+      release = selectStmt.get(...bareArgs) as typeof release;
+    } else if (!release && `v${bareVersion}` !== opts.version) {
+      const vVersion = `v${bareVersion}`;
+      const vArgs = resolvedPkg !== undefined ? [opts.product, vVersion, resolvedPkg] : [opts.product, vVersion];
+      release = selectStmt.get(...vArgs) as typeof release;
+    }
+  } else {
+    const candidates = db
+      .prepare(
+        `SELECT product, version, released_at, source_url, notes_path
+         FROM releases
+         WHERE product = ?`,
+      )
+      .all(opts.product) as Array<{
+      product: string;
+      version: string;
+      released_at: string | null;
+      source_url: string;
+      notes_path: string;
+    }>;
+    for (const c of candidates) {
+      const derived = deriveReleaseIdentity(c.product, c.version, c.notes_path, cfg);
+      if (resolvedPkg !== undefined && derived.pkg !== resolvedPkg) continue;
+      if (
+        derived.version === opts.version ||
+        c.version === opts.version ||
+        derived.version === bareVersion
+      ) {
+        release = {
+          product: c.product,
+          pkg: derived.pkg,
+          version: derived.version,
+          dbVersion: c.version,
+          released_at: c.released_at,
+          source_url: c.source_url,
+          notes_path: c.notes_path,
+        };
+        break;
+      }
+    }
+  }
+
+  if (!release) return null;
+
+  const changeRows = (
+    hasPkgCol
+      ? db
+          .prepare(
+            `SELECT ordinal, kind, text, ${hasFlagsCol ? 'flags' : 'NULL AS flags'}
+             FROM changes
+             WHERE product = ? AND package = ? AND version = ?
+             ORDER BY ordinal`,
+          )
+          .all(release.product, release.pkg, release.dbVersion)
+      : db
+          .prepare(
+            `SELECT ordinal, kind, text, ${hasFlagsCol ? 'flags' : 'NULL AS flags'}
+             FROM changes
+             WHERE product = ? AND version = ?
+             ORDER BY ordinal`,
+          )
+          .all(release.product, release.dbVersion)
+  ) as Array<{ ordinal: number; kind: string; text: string; flags?: string | null }>;
+
+  return attachMultiPackageField(
+    {
+      product: release.product,
+      version: release.version,
+      released_at: release.released_at,
+      source_url: release.source_url,
+      notes_path: release.notes_path,
+      changes: changeRows.map((c) => {
+        const screened = resolveRowScreening(c.text, c.flags, hasFlagsCol);
+        return { ordinal: c.ordinal, kind: c.kind, text: screened.text, flags: screened.flags };
+      }),
+    },
+    release.pkg,
+    cfg,
+  );
 }
 
 export function listProducts(
@@ -570,7 +1047,7 @@ export function listProducts(
 ): Array<{ name: string; display_name: string; release_count: number; latest_version: string | null; latest_date: string | null }> {
   const sql = `
     SELECT p.name, p.display_name,
-           COUNT(DISTINCT r.version) AS release_count,
+           COUNT(r.version) AS release_count,
            (SELECT version FROM releases r2 WHERE r2.product = p.name ORDER BY r2.released_at DESC LIMIT 1) AS latest_version,
            (SELECT released_at FROM releases r2 WHERE r2.product = p.name ORDER BY r2.released_at DESC LIMIT 1) AS latest_date
     FROM products p
@@ -618,7 +1095,7 @@ export function getSyncStatus(
            CASE WHEN m.updated_at IS NULL THEN NULL
                 ELSE ROUND((julianday('now') - julianday(m.updated_at)) * 24.0, 1)
            END                          AS hours_since_fetch,
-           (SELECT COUNT(DISTINCT r.version)
+           (SELECT COUNT(*)
             FROM releases r
             WHERE r.product = p.name)   AS releases_ingested
     FROM products p
@@ -650,13 +1127,16 @@ export function entityFrequency(
   type: string,
   limit = 30
 ): Array<{ value: string; count: number; first_seen: string | null }> {
+  const joinCond = hasReleasesPackageColumn(db)
+    ? 'c.product = r.product AND c.package = r.package AND c.version = r.version'
+    : 'c.product = r.product AND c.version = r.version';
   const sql = `
     SELECT e.entity_value AS value,
            COUNT(*) AS count,
            MIN(r.released_at) AS first_seen
     FROM entities e
     JOIN changes c ON e.change_id = c.id
-    JOIN releases r ON c.product = r.product AND c.version = r.version
+    JOIN releases r ON ${joinCond}
     WHERE e.entity_type = ?
     GROUP BY e.entity_value
     ORDER BY count DESC, first_seen ASC
@@ -669,6 +1149,8 @@ export function entityFrequency(
 
 export interface BrowseOptions {
   product?: string;
+  package?: string;
+  productsConfig?: ProductsConfig | null;
   since?: string;
   until?: string;
   kind?: string;
@@ -687,6 +1169,10 @@ export function browseChanges(
   db: Database.Database,
   opts: BrowseOptions = {}
 ): QueryResult[] {
+  const cfg = resolveCfg(opts.productsConfig);
+  const hasPkgCol = hasReleasesPackageColumn(db);
+  const resolvedPkg =
+    opts.package !== undefined ? resolvePackageFilter(opts.product, opts.package, cfg) : undefined;
   const limit = opts.limit ?? 20;
   const filters: string[] = [];
   const params: Record<string, any> = { limit };
@@ -694,6 +1180,10 @@ export function browseChanges(
   if (opts.product) {
     filters.push('c.product = @product');
     params.product = opts.product;
+  }
+  if (resolvedPkg !== undefined && hasPkgCol) {
+    filters.push('c.package = @package');
+    params.package = resolvedPkg;
   }
   if (opts.since) {
     filters.push('r.released_at >= @since');
@@ -711,32 +1201,89 @@ export function browseChanges(
   const where = filters.length > 0 ? `WHERE ${filters.join(' AND ')}` : '';
   const hasFlagsCol = hasChangesFlagsColumn(db);
   const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
+  const pkgSelect = hasPkgCol ? 'c.package AS pkg, r.notes_path AS notes_path' : `'' AS pkg, r.notes_path AS notes_path`;
+  const joinCond = hasPkgCol
+    ? 'c.product = r.product AND c.package = r.package AND c.version = r.version'
+    : 'c.product = r.product AND c.version = r.version';
+  const limitSql = !hasPkgCol && resolvedPkg !== undefined ? '' : 'LIMIT @limit';
 
   const sql = `
-    SELECT c.product, c.version, r.released_at,
+    SELECT c.product, ${pkgSelect}, c.version, r.released_at,
            c.ordinal, c.kind, c.text AS body, ${flagsExpr} AS flags_json,
            '' AS snippet
     FROM changes c
-    JOIN releases r ON c.product = r.product AND c.version = r.version
+    JOIN releases r ON ${joinCond}
     ${where}
     ORDER BY r.released_at DESC, c.product, c.ordinal ASC
-    LIMIT @limit
+    ${limitSql}
   `;
 
-  const rows = db.prepare(sql).all(params) as Array<
-    Omit<QueryResult, 'text' | 'flags'> & { body: string; flags_json?: string | null }
-  >;
-  return rows.map((r) => {
-    const { body, flags_json, ...rest } = r;
-    const screened = resolveRowScreening(body, flags_json, hasFlagsCol);
-    return { ...rest, text: screened.text, flags: screened.flags };
-  });
+  const rows = db.prepare(sql).all(params) as Array<{
+    product: string;
+    pkg: string;
+    notes_path: string;
+    version: string;
+    released_at: string | null;
+    ordinal: number;
+    kind: string;
+    body: string;
+    flags_json?: string | null;
+    snippet: string;
+  }>;
+  const out: QueryResult[] = [];
+  for (const r of rows) {
+    const derived = hasPkgCol
+      ? { pkg: r.pkg, version: r.version }
+      : deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg);
+    if (resolvedPkg !== undefined && derived.pkg !== resolvedPkg) continue;
+    const screened = resolveRowScreening(r.body, r.flags_json, hasFlagsCol);
+    out.push(
+      attachMultiPackageField(
+        {
+          product: r.product,
+          version: derived.version,
+          released_at: r.released_at,
+          ordinal: r.ordinal,
+          kind: r.kind,
+          text: screened.text,
+          snippet: r.snippet,
+          flags: screened.flags,
+        },
+        derived.pkg,
+        cfg,
+      ),
+    );
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+export function browseChangesByPackage(
+  db: Database.Database,
+  opts: BrowseOptions & { product: string },
+): Array<{ package: string; results: QueryResult[] }> {
+  const cfg = resolveCfg(opts.productsConfig);
+  const pkgOrder = listProductPackageOrder(db, opts.product, cfg);
+  const groups: Array<{ package: string; results: QueryResult[] }> = [];
+  for (const pkg of pkgOrder) {
+    const results = browseChanges(db, {
+      ...opts,
+      package: formatPackageName(pkg),
+      productsConfig: cfg,
+    });
+    if (results.length > 0) {
+      groups.push({ package: formatPackageName(pkg), results });
+    }
+  }
+  return groups;
 }
 
 export interface ChangesSinceOptions {
   since: string;
   until?: string;
   product?: string;
+  package?: string;
+  productsConfig?: ProductsConfig | null;
   kind?: string;
   /** Total changes cap. Default 200. */
   limit?: number;
@@ -744,13 +1291,14 @@ export interface ChangesSinceOptions {
 
 export interface ChangesSinceResult {
   product: string;
+  package?: string;
   version: string;
   released_at: string;
   changes: Array<{ ordinal: number; kind: string; text: string; flags: string[] }>;
 }
 
 /**
- * Return changes within a date window grouped by product+release.
+ * Return changes within a date window grouped by product+package+release.
  *
  * Output is sorted release-newest-first, with each release's changes
  * inlined in ordinal order. `since` is required (the function's reason
@@ -773,6 +1321,10 @@ export function getChangesSince(
       hint: 'pass since as YYYY-MM-DD (e.g. "2026-01-01")',
     });
   }
+  const cfg = resolveCfg(opts.productsConfig);
+  const hasPkgCol = hasReleasesPackageColumn(db);
+  const resolvedPkg =
+    opts.package !== undefined ? resolvePackageFilter(opts.product, opts.package, cfg) : undefined;
   const limit = opts.limit ?? 200;
   const filters: string[] = ['r.released_at >= @since'];
   const params: Record<string, any> = { since: opts.since };
@@ -784,6 +1336,10 @@ export function getChangesSince(
     filters.push('c.product = @product');
     params.product = opts.product;
   }
+  if (resolvedPkg !== undefined && hasPkgCol) {
+    filters.push('c.package = @package');
+    params.package = resolvedPkg;
+  }
   if (opts.kind) {
     filters.push('c.kind = @kind');
     params.kind = opts.kind;
@@ -791,17 +1347,26 @@ export function getChangesSince(
   const where = `WHERE ${filters.join(' AND ')}`;
   const hasFlagsCol = hasChangesFlagsColumn(db);
   const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
+  const pkgSelect = hasPkgCol ? 'c.package AS pkg, r.notes_path AS notes_path' : `'' AS pkg, r.notes_path AS notes_path`;
+  const joinCond = hasPkgCol
+    ? 'c.product = r.product AND c.package = r.package AND c.version = r.version'
+    : 'c.product = r.product AND c.version = r.version';
+  const orderBy = hasPkgCol
+    ? 'ORDER BY r.released_at DESC, c.product, c.package, c.version, c.ordinal ASC'
+    : 'ORDER BY r.released_at DESC, c.product, c.version, c.ordinal ASC';
 
   // Pull rows; group in JS so we can honor the change-count cap across releases.
   const sql = `
-    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text, ${flagsExpr} AS flags_json
+    SELECT c.product, ${pkgSelect}, c.version, r.released_at, c.ordinal, c.kind, c.text, ${flagsExpr} AS flags_json
     FROM changes c
-    JOIN releases r ON c.product = r.product AND c.version = r.version
+    JOIN releases r ON ${joinCond}
     ${where}
-    ORDER BY r.released_at DESC, c.product, c.version, c.ordinal ASC
+    ${orderBy}
   `;
   const rows = db.prepare(sql).all(params) as Array<{
     product: string;
+    pkg: string;
+    notes_path: string;
     version: string;
     released_at: string;
     ordinal: number;
@@ -814,15 +1379,23 @@ export function getChangesSince(
   let total = 0;
   for (const r of rows) {
     if (total >= limit) break;
-    const key = `${r.product}@${r.version}`;
+    const derived = hasPkgCol
+      ? { pkg: r.pkg, version: r.version }
+      : deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg);
+    if (resolvedPkg !== undefined && derived.pkg !== resolvedPkg) continue;
+    const key = `${r.product}\0${derived.pkg}\0${derived.version}`;
     let bucket = grouped.get(key);
     if (!bucket) {
-      bucket = {
-        product: r.product,
-        version: r.version,
-        released_at: r.released_at,
-        changes: [],
-      };
+      bucket = attachMultiPackageField(
+        {
+          product: r.product,
+          version: derived.version,
+          released_at: r.released_at,
+          changes: [],
+        },
+        derived.pkg,
+        cfg,
+      );
       grouped.set(key, bucket);
     }
     const screened = resolveRowScreening(r.text, r.flags_json, hasFlagsCol);
@@ -838,8 +1411,30 @@ export function getChangesSince(
   return Array.from(grouped.values());
 }
 
+export function getChangesSinceByPackage(
+  db: Database.Database,
+  opts: ChangesSinceOptions & { product: string },
+): Array<{ package: string; releases: ChangesSinceResult[] }> {
+  const cfg = resolveCfg(opts.productsConfig);
+  const pkgOrder = listProductPackageOrder(db, opts.product, cfg);
+  const groups: Array<{ package: string; releases: ChangesSinceResult[] }> = [];
+  for (const pkg of pkgOrder) {
+    const releases = getChangesSince(db, {
+      ...opts,
+      package: formatPackageName(pkg),
+      productsConfig: cfg,
+    });
+    if (releases.length > 0) {
+      groups.push({ package: formatPackageName(pkg), releases });
+    }
+  }
+  return groups;
+}
+
 export interface CompareVersionsOptions {
   product: string;
+  package?: string;
+  productsConfig?: ProductsConfig | null;
   /** Exclusive lower bound — changes in this version are NOT included. */
   fromVersion: string;
   /** Inclusive upper bound — changes in this version ARE included. */
@@ -847,14 +1442,9 @@ export interface CompareVersionsOptions {
 }
 
 /**
- * Compare two versions of the same product: return every change in
- * releases strictly after `fromVersion` (by released_at) up to and
- * including `toVersion`. The output reuses ChangesSinceResult so the
- * formatter and caller code paths stay identical.
- *
- * Both versions must exist; if either is missing the function throws an
- * AppError so callers can surface a clear "unknown version" message
- * rather than silently returning empty.
+ * Compare two versions of the same product (and package for multi-package products):
+ * return every change in releases strictly after `fromVersion` (by released_at)
+ * up to and including `toVersion`.
  */
 export function compareVersions(
   db: Database.Database,
@@ -868,25 +1458,129 @@ export function compareVersions(
     });
   }
 
-  // Resolve released_at for both endpoints so we can compare on date
-  // (versions are strings; SQLite would lexicographically compare them, which
-  // is wrong for "2.1.10" vs "2.1.9").
-  const endpoint = db.prepare(`
-    SELECT version, released_at FROM releases
-    WHERE product = ? AND version = ?
-  `);
-  const fromRow = endpoint.get(opts.product, opts.fromVersion) as
-    | { version: string; released_at: string | null }
-    | undefined;
-  const toRow = endpoint.get(opts.product, opts.toVersion) as
-    | { version: string; released_at: string | null }
-    | undefined;
-  if (!fromRow || !toRow) {
-    // Unknown product or version → return empty rather than throw. Callers
-    // (CLI / MCP) decide whether to surface an empty result or error; this
-    // mirrors how searchChanges and browseChanges behave on no-match inputs.
-    return [];
+  const cfg = resolveCfg(opts.productsConfig);
+  const resolvedPkg = requirePackageIfMultiPackage(db, opts.product, opts.package, cfg);
+  const hasPkgCol = hasReleasesPackageColumn(db);
+  const hasFlagsCol = hasChangesFlagsColumn(db);
+  const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
+
+  if (hasPkgCol) {
+    const pkgFilter = resolvedPkg !== undefined ? 'AND package = ?' : '';
+    const endpoint = db.prepare(`
+      SELECT package, version, released_at FROM releases
+      WHERE product = ? AND version = ? ${pkgFilter}
+    `);
+    const findEndpoint = (v: string) => {
+      const exact = (
+        resolvedPkg !== undefined
+          ? endpoint.get(opts.product, v, resolvedPkg)
+          : endpoint.get(opts.product, v)
+      ) as { package: string; version: string; released_at: string | null } | undefined;
+      if (exact) return exact;
+      const bare = v.replace(/^v(?=\d)/i, '');
+      if (bare !== v) {
+        const bareRow = (
+          resolvedPkg !== undefined
+            ? endpoint.get(opts.product, bare, resolvedPkg)
+            : endpoint.get(opts.product, bare)
+        ) as { package: string; version: string; released_at: string | null } | undefined;
+        if (bareRow) return bareRow;
+      } else {
+        const vPrefixed = `v${bare}`;
+        return (
+          resolvedPkg !== undefined
+            ? endpoint.get(opts.product, vPrefixed, resolvedPkg)
+            : endpoint.get(opts.product, vPrefixed)
+        ) as { package: string; version: string; released_at: string | null } | undefined;
+      }
+      return undefined;
+    };
+
+    const fromRow = findEndpoint(opts.fromVersion);
+    const toRow = findEndpoint(opts.toVersion);
+    if (!fromRow || !toRow) {
+      return [];
+    }
+    if (!fromRow.released_at || !toRow.released_at) {
+      throw new AppError({
+        code: 'QUERY_VERSION_NO_DATE',
+        message: `cannot compare versions without released_at on both endpoints (${opts.product}@${opts.fromVersion} or ${opts.toVersion} is missing a date)`,
+        hint: 're-ingest the affected product so released_at is populated',
+      });
+    }
+
+    const effectivePkg = resolvedPkg !== undefined ? resolvedPkg : fromRow.package;
+    const pkgClause = resolvedPkg !== undefined || effectivePkg === toRow.package ? 'AND c.package = @package' : '';
+    const sql = `
+      SELECT c.product, c.package AS pkg, c.version, r.released_at, c.ordinal, c.kind, c.text, ${flagsExpr} AS flags_json
+      FROM changes c
+      JOIN releases r ON c.product = r.product AND c.package = r.package AND c.version = r.version
+      WHERE c.product = @product
+        ${pkgClause}
+        AND r.released_at > @fromDate
+        AND r.released_at <= @toDate
+      ORDER BY r.released_at DESC, c.version, c.ordinal ASC
+    `;
+    const rows = db.prepare(sql).all({
+      product: opts.product,
+      ...(pkgClause ? { package: effectivePkg } : {}),
+      fromDate: fromRow.released_at,
+      toDate: toRow.released_at,
+    }) as Array<{
+      product: string;
+      pkg: string;
+      version: string;
+      released_at: string;
+      ordinal: number;
+      kind: string;
+      text: string;
+      flags_json?: string | null;
+    }>;
+
+    const grouped = new Map<string, ChangesSinceResult>();
+    for (const r of rows) {
+      const key = `${r.product}\0${r.pkg}\0${r.version}`;
+      let bucket = grouped.get(key);
+      if (!bucket) {
+        bucket = attachMultiPackageField(
+          {
+            product: r.product,
+            version: r.version,
+            released_at: r.released_at,
+            changes: [],
+          },
+          r.pkg,
+          cfg,
+        );
+        grouped.set(key, bucket);
+      }
+      const screened = resolveRowScreening(r.text, r.flags_json, hasFlagsCol);
+      bucket.changes.push({
+        ordinal: r.ordinal,
+        kind: r.kind,
+        text: screened.text,
+        flags: screened.flags,
+      });
+    }
+    return Array.from(grouped.values());
   }
+
+  // Unmigrated pre-v5 read-only fallback: derive package + normalized version from notes_path
+  const allReleases = db
+    .prepare(`SELECT version, released_at, notes_path FROM releases WHERE product = ?`)
+    .all(opts.product) as Array<{ version: string; released_at: string | null; notes_path: string }>;
+  const scoped = allReleases.map((r) => {
+    const derived = deriveReleaseIdentity(opts.product, r.version, r.notes_path, cfg);
+    return { dbVersion: r.version, pkg: derived.pkg, version: derived.version, released_at: r.released_at };
+  });
+  const candidates = resolvedPkg !== undefined ? scoped.filter((r) => r.pkg === resolvedPkg) : scoped;
+  const matchEndpoint = (v: string) => {
+    const bare = v.replace(/^v(?=\d)/i, '');
+    return candidates.find((r) => r.version === v || r.dbVersion === v || r.version === bare);
+  };
+  const fromRow = matchEndpoint(opts.fromVersion);
+  const toRow = matchEndpoint(opts.toVersion);
+  if (!fromRow || !toRow) return [];
   if (!fromRow.released_at || !toRow.released_at) {
     throw new AppError({
       code: 'QUERY_VERSION_NO_DATE',
@@ -894,26 +1588,34 @@ export function compareVersions(
       hint: 're-ingest the affected product so released_at is populated',
     });
   }
-
-  const hasFlagsCol = hasChangesFlagsColumn(db);
-  const flagsExpr = hasFlagsCol ? 'c.flags' : 'NULL';
-  const sql = `
-    SELECT c.product, c.version, r.released_at, c.ordinal, c.kind, c.text, ${flagsExpr} AS flags_json
-    FROM changes c
-    JOIN releases r ON c.product = r.product AND c.version = r.version
-    WHERE c.product = @product
-      AND r.released_at > @fromDate
-      AND r.released_at <= @toDate
-    ORDER BY r.released_at DESC, c.version, c.ordinal ASC
-  `;
-  const rows = db.prepare(sql).all({
-    product: opts.product,
-    fromDate: fromRow.released_at,
-    toDate: toRow.released_at,
-  }) as Array<{
+  const effectivePkg = resolvedPkg !== undefined ? resolvedPkg : fromRow.pkg;
+  const inRangeDbVersions = new Set(
+    candidates
+      .filter(
+        (r) =>
+          (resolvedPkg !== undefined || r.pkg === effectivePkg) &&
+          r.released_at !== null &&
+          r.released_at > fromRow.released_at! &&
+          r.released_at <= toRow.released_at!,
+      )
+      .map((r) => r.dbVersion),
+  );
+  if (inRangeDbVersions.size === 0) return [];
+  const rows = db
+    .prepare(
+      `SELECT c.product, c.version, r.released_at, r.notes_path, c.ordinal, c.kind, c.text, ${flagsExpr} AS flags_json
+       FROM changes c
+       JOIN releases r ON c.product = r.product AND c.version = r.version
+       WHERE c.product = ?
+         AND r.released_at > ?
+         AND r.released_at <= ?
+       ORDER BY r.released_at DESC, c.version, c.ordinal ASC`,
+    )
+    .all(opts.product, fromRow.released_at, toRow.released_at) as Array<{
     product: string;
     version: string;
     released_at: string;
+    notes_path: string;
     ordinal: number;
     kind: string;
     text: string;
@@ -922,15 +1624,21 @@ export function compareVersions(
 
   const grouped = new Map<string, ChangesSinceResult>();
   for (const r of rows) {
-    const key = `${r.product}@${r.version}`;
+    if (!inRangeDbVersions.has(r.version)) continue;
+    const derived = deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg);
+    const key = `${r.product}\0${derived.pkg}\0${derived.version}`;
     let bucket = grouped.get(key);
     if (!bucket) {
-      bucket = {
-        product: r.product,
-        version: r.version,
-        released_at: r.released_at,
-        changes: [],
-      };
+      bucket = attachMultiPackageField(
+        {
+          product: r.product,
+          version: derived.version,
+          released_at: r.released_at,
+          changes: [],
+        },
+        derived.pkg,
+        cfg,
+      );
       grouped.set(key, bucket);
     }
     const screened = resolveRowScreening(r.text, r.flags_json, hasFlagsCol);

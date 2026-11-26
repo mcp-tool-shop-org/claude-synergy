@@ -28,29 +28,37 @@ import { join, dirname, basename, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import matter from 'gray-matter';
-import { openDb, initSchema, isReadonlyDbError, hasChangesFlagsColumn } from './db.js';
+import { openDb, initSchema, isReadonlyDbError } from './db.js';
 import { AppError, formatError } from './errors.js';
+import { isMultiPackageProduct, loadProductsConfig } from './products-config.js';
 import { isUncOrDevicePath, readWorkspace, type WorkspaceScanResult } from './workspace.js';
 import { evaluateWorkspaceRelevance, formatRelevanceReport } from './relevance.js';
 import {
   searchChanges,
+  searchChangesByPackage,
   lookupEntity,
   recentReleases,
+  recentReleasesByPackage,
+  getRelease,
   listProducts,
   entityFrequency,
   getChangesSince,
+  getChangesSinceByPackage,
   browseChanges,
+  browseChangesByPackage,
   compareVersions,
+  listProductPackageOrder,
   listSynergies,
   getSynergy,
   getSyncStatus,
   getCorpusFreshness,
   formatFreshnessStamp,
   formatManualFeedWarning,
+  formatPackageName,
+  formatReleaseLabel,
   VENDOR_TEXT_FRAME,
   formatFlagMarker,
   frameVendorText,
-  resolveRowScreening,
   type ChangesSinceResult,
   type QueryResult,
   type SyncStatusRow,
@@ -178,6 +186,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           query: { type: 'string', description: 'Search query. Natural language works for hybrid; FTS5 syntax for fts mode.' },
           mode: { type: 'string', enum: ['hybrid', 'fts'], description: 'hybrid = FTS5+vec via RRF (best for concepts); fts = BM25 only (best for exact terms)', default: 'hybrid' },
           product: { type: 'string', description: 'Limit to one product (e.g. claude-code, claude-agent-sdk-python, anthropic-cli)' },
+          package: { type: 'string', description: 'Optional package filter within a multi-package product (e.g. @anthropic-ai/aws-sdk, composer, unassigned). When omitted on a multi-package product, results are grouped per package.' },
           since: { type: 'string', description: 'YYYY-MM-DD lower bound on release date' },
           until: { type: 'string', description: 'YYYY-MM-DD upper bound on release date' },
           kind: { type: 'string', description: 'Filter by change kind: added | fixed | breaking | deprecated | renamed | removed | improved | changed' },
@@ -206,11 +215,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'latest_releases',
-      description: 'Get recent releases across all products (or one). Use this to orient on what shipped recently before recommending features.',
+      description: 'Get recent releases across all products (or one). For multi-package products, pass package or omit package for per-package grouped output. Use this to orient on what shipped recently before recommending features.',
       inputSchema: {
         type: 'object',
         properties: {
           product: { type: 'string', description: 'Limit to one product' },
+          package: { type: 'string', description: 'Optional package filter within a multi-package product (when omitted on a multi-package product, results are grouped per package)' },
           since: { type: 'string', description: 'YYYY-MM-DD lower bound on release date' },
           limit: { type: 'number', description: 'Max releases', default: 20 },
         },
@@ -218,11 +228,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'get_release',
-      description: 'Full content of one specific release (all change bullets + metadata).',
+      description: 'Full content of one specific release (all change bullets + metadata). For multi-package products, package is required.',
       inputSchema: {
         type: 'object',
         properties: {
           product: { type: 'string' },
+          package: { type: 'string', description: 'Package name within a multi-package product (required for multi-package products)' },
           version: { type: 'string' },
         },
         required: ['product', 'version'],
@@ -277,6 +288,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           since: { type: 'string', description: 'Lower bound — YYYY-MM-DD, full ISO, or relative (e.g. 7d, 2w, 1m, 1y)' },
           until: { type: 'string', description: 'Upper bound — YYYY-MM-DD, full ISO, or relative; defaults to now' },
           product: { type: 'string', description: 'Limit to one product' },
+          package: { type: 'string', description: 'Optional package filter within a multi-package product' },
           kind: { type: 'string', description: 'Filter by change kind: added | fixed | breaking | deprecated | renamed | removed | improved | changed' },
           limit: { type: 'number', description: 'Max change rows returned (default 200)', default: 200 },
         },
@@ -291,6 +303,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         type: 'object',
         properties: {
           product: { type: 'string', description: 'Limit to one product' },
+          package: { type: 'string', description: 'Optional package filter within a multi-package product' },
           since: { type: 'string', description: 'Lower bound — YYYY-MM-DD, full ISO, or relative (e.g. 7d)' },
           until: { type: 'string', description: 'Upper bound — YYYY-MM-DD, full ISO, or relative; defaults to now' },
           limit: { type: 'number', description: 'Max results (default 50)', default: 50 },
@@ -300,11 +313,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'compare_versions',
       description:
-        'Cumulative diff between two versions of a product, grouped by intermediate release. Use for upgrade planning ("I am on python 0.88.0, what changed through 0.94.0?"). Single call replaces N+1 get_release lookups.',
+        'Cumulative diff between two versions of a product, grouped by intermediate release. Use for upgrade planning ("I am on python 0.88.0, what changed through 0.94.0?"). For multi-package products, package is required.',
       inputSchema: {
         type: 'object',
         properties: {
           product: { type: 'string', description: 'Product slug (e.g. anthropic-sdk-python)' },
+          package: { type: 'string', description: 'Package name within a multi-package product (required for multi-package products)' },
           from_version: { type: 'string', description: 'Starting version, exclusive (you are already on this)' },
           to_version: { type: 'string', description: 'Target version, inclusive' },
         },
@@ -539,6 +553,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           query: requireString(r, 'query', 'search'),
           mode: optEnum<'hybrid' | 'fts'>(r, 'mode', SEARCH_MODES, 'search'),
           product: optString(r, 'product', 'search'),
+          package: optString(r, 'package', 'search'),
           since: optString(r, 'since', 'search'),
           until: optString(r, 'until', 'search'),
           kind: optString(r, 'kind', 'search'),
@@ -570,6 +585,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const r = asRecord(args ?? {}, 'latest_releases');
         const params = {
           product: optString(r, 'product', 'latest_releases'),
+          package: optString(r, 'package', 'latest_releases'),
           since: optString(r, 'since', 'latest_releases'),
           limit: optInt(r, 'limit', 'latest_releases'),
         };
@@ -580,6 +596,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const r = asRecord(args, 'get_release');
         const params = {
           product: requireString(r, 'product', 'get_release'),
+          package: optString(r, 'package', 'get_release'),
           version: requireString(r, 'version', 'get_release'),
         };
         parsedCall = async () => ({ text: handleGetRelease(params) });
@@ -625,6 +642,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           since: requireString(r, 'since', 'get_changes_since'),
           until: optString(r, 'until', 'get_changes_since'),
           product: optString(r, 'product', 'get_changes_since'),
+          package: optString(r, 'package', 'get_changes_since'),
           kind: optString(r, 'kind', 'get_changes_since'),
           limit: optInt(r, 'limit', 'get_changes_since'),
         };
@@ -635,6 +653,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const r = asRecord(args ?? {}, 'search_breaking_changes');
         const params = {
           product: optString(r, 'product', 'search_breaking_changes'),
+          package: optString(r, 'package', 'search_breaking_changes'),
           since: optString(r, 'since', 'search_breaking_changes'),
           until: optString(r, 'until', 'search_breaking_changes'),
           limit: optInt(r, 'limit', 'search_breaking_changes'),
@@ -646,6 +665,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const r = asRecord(args, 'compare_versions');
         const params = {
           product: requireString(r, 'product', 'compare_versions'),
+          package: optString(r, 'package', 'compare_versions'),
           from_version: requireString(r, 'from_version', 'compare_versions'),
           to_version: requireString(r, 'to_version', 'compare_versions'),
         };
@@ -723,14 +743,42 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; product?: string; since?: string; until?: string; kind?: string; rerank?: 'none' | 'ollama-judge'; limit?: number }): Promise<{ text: string; isError?: boolean }> {
+async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; product?: string; package?: string; since?: string; until?: string; kind?: string; rerank?: 'none' | 'ollama-judge'; limit?: number }): Promise<{ text: string; isError?: boolean }> {
   const activeDb = getDbOrThrow();
+  const cfg = loadProductsConfig();
   const mode = args.mode ?? 'hybrid';
   const limit = args.limit ?? 10;
 
   if (mode === 'fts') {
+    if (args.product && !args.package && isMultiPackageProduct(cfg?.productMeta[args.product])) {
+      const groups = searchChangesByPackage(activeDb, args.query, {
+        product: args.product,
+        productsConfig: cfg,
+        since: args.since,
+        until: args.until,
+        kind: args.kind,
+        limit,
+      });
+      if (groups.length === 0) return { text: frameVendorText('(no results)') };
+      const sections: string[] = [];
+      for (const g of groups) {
+        sections.push(`## ${g.package}\n\n${formatSearchResults(g.results.map((r) => ({
+          product: r.product,
+          package: r.package,
+          version: r.version,
+          released_at: r.released_at,
+          kind: r.kind,
+          text: r.text,
+          flags: r.flags,
+          mode: 'fts',
+        })))}`);
+      }
+      return { text: frameVendorText(sections.join('\n\n')) };
+    }
     const results = searchChanges(activeDb, args.query, {
       product: args.product,
+      package: args.package,
+      productsConfig: cfg,
       since: args.since,
       until: args.until,
       kind: args.kind,
@@ -739,6 +787,7 @@ async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; prod
     return {
       text: frameVendorText(formatSearchResults(results.map((r) => ({
         product: r.product,
+        package: r.package,
         version: r.version,
         released_at: r.released_at,
         kind: r.kind,
@@ -760,24 +809,41 @@ async function handleSearch(args: { query: string; mode?: 'hybrid' | 'fts'; prod
 
   const results = await hybridSearch(activeDb, args.query, {
     product: args.product,
+    package: args.package,
+    productsConfig: cfg,
     since: args.since,
     until: args.until,
     kind: args.kind,
     rerankProviderName: args.rerank ?? 'none',
     limit,
   });
+  const formattedRows = results.map((r) => ({
+    product: r.product,
+    ...(isMultiPackageProduct(cfg?.productMeta[r.product]) ? { package: formatPackageName(r.package) } : {}),
+    rawPackage: r.package,
+    version: r.version,
+    released_at: r.released_at,
+    kind: r.kind,
+    text: r.text,
+    flags: r.flags,
+    mode: 'hybrid',
+    rrf_score: r.rrf_score,
+    rerank_score: r.rerank_score,
+  }));
+  if (args.product && !args.package && isMultiPackageProduct(cfg?.productMeta[args.product])) {
+    if (formattedRows.length === 0) return { text: frameVendorText('(no results)') };
+    const pkgOrder = listProductPackageOrder(activeDb, args.product, cfg);
+    const sections: string[] = [];
+    for (const rawPkg of pkgOrder) {
+      const sub = formattedRows.filter((r) => r.rawPackage === rawPkg);
+      if (sub.length > 0) {
+        sections.push(`## ${formatPackageName(rawPkg)}\n\n${formatSearchResults(sub)}`);
+      }
+    }
+    return { text: frameVendorText(sections.join('\n\n')) };
+  }
   return {
-    text: frameVendorText(formatSearchResults(results.map((r) => ({
-      product: r.product,
-      version: r.version,
-      released_at: r.released_at,
-      kind: r.kind,
-      text: r.text,
-      flags: r.flags,
-      mode: 'hybrid',
-      rrf_score: r.rrf_score,
-      rerank_score: r.rerank_score,
-    })))),
+    text: frameVendorText(formatSearchResults(formattedRows)),
   };
 }
 
@@ -788,7 +854,8 @@ function formatSearchResults(results: any[]): string {
     const flagMarker = formatFlagMarker(r.flags);
     const flagInfo = flagMarker ? ` ${flagMarker}` : '';
     const scoreInfo = r.rerank_score != null ? ` rerank=${r.rerank_score.toFixed(2)}` : r.rrf_score != null ? ` rrf=${r.rrf_score.toFixed(4)}` : '';
-    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}${scoreInfo}`);
+    const label = formatReleaseLabel(r.product, r.package, r.version);
+    lines.push(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}${scoreInfo}`);
     lines.push(`  ${r.text}`);
     lines.push('');
   }
@@ -803,48 +870,70 @@ function handleLookupEntity(args: { type: string; value: string }): string {
   for (const r of results) {
     const flagMarker = formatFlagMarker(r.flags);
     const flagInfo = flagMarker ? ` ${flagMarker}` : '';
-    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
+    const label = formatReleaseLabel(r.product, r.package, r.version);
+    lines.push(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}`);
     lines.push(`  ${r.text}`);
     lines.push('');
   }
   return frameVendorText(lines.join('\n'));
 }
 
-function handleLatestReleases(args: { product?: string; since?: string; limit?: number }): string {
+function handleLatestReleases(args: { product?: string; package?: string; since?: string; limit?: number }): string {
+  const activeDb = getDbOrThrow();
+  const cfg = loadProductsConfig();
   const limit = args.limit ?? 20;
-  const releases = recentReleases(getDbOrThrow(), args.product, limit, args.since);
+  if (args.product && !args.package && isMultiPackageProduct(cfg?.productMeta[args.product])) {
+    const groups = recentReleasesByPackage(activeDb, args.product, limit, args.since, cfg);
+    if (groups.length === 0) return '(no releases)';
+    const sections: string[] = [];
+    for (const g of groups) {
+      const lines = [`### ${g.package}`];
+      for (const r of g.releases) {
+        const label = formatReleaseLabel(r.product, r.package, r.version, cfg);
+        lines.push(`${r.released_at}  ${label}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`);
+      }
+      sections.push(lines.join('\n'));
+    }
+    return sections.join('\n\n');
+  }
+  const releases = recentReleases(activeDb, args.product, limit, args.since, args.package, cfg);
   if (releases.length === 0) return '(no releases)';
   return releases
-    .map((r) => `${r.released_at}  ${r.product}@${r.version}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`)
+    .map((r) => {
+      const label = formatReleaseLabel(r.product, r.package, r.version, cfg);
+      return `${r.released_at}  ${label}  (${r.change_count} change${r.change_count === 1 ? '' : 's'})`;
+    })
     .join('\n');
 }
 
-function handleGetRelease(args: { product: string; version: string }): string {
-  const activeDb = getDbOrThrow();
-  const release = activeDb
-    .prepare(`SELECT product, version, released_at, source_url, notes_path FROM releases WHERE product = ? AND version = ?`)
-    .get(args.product, args.version) as any;
-  if (!release) return frameVendorText(`(no such release: ${args.product}@${args.version})`);
-  const hasFlagsCol = hasChangesFlagsColumn(activeDb);
-  const changes = activeDb
-    .prepare(
-      `SELECT ordinal, kind, text, ${hasFlagsCol ? 'flags' : 'NULL AS flags'} FROM changes WHERE product = ? AND version = ? ORDER BY ordinal`
-    )
-    .all(args.product, args.version) as Array<{ ordinal: number; kind: string; text: string; flags?: string | null }>;
+function handleGetRelease(args: { product: string; package?: string; version: string }): string {
+  const cfg = loadProductsConfig();
+  const release = getRelease(getDbOrThrow(), {
+    product: args.product,
+    package: args.package,
+    version: args.version,
+    productsConfig: cfg,
+  });
+  if (!release) {
+    const target = formatReleaseLabel(args.product, args.package, args.version, cfg);
+    return frameVendorText(`(no such release: ${target})`);
+  }
+  const header = release.package
+    ? `# ${release.product} (${release.package}) ${release.version}`
+    : `# ${release.product} ${release.version}`;
   const lines = [
-    `# ${release.product} ${release.version}`,
+    header,
     `Released: ${release.released_at}`,
     `Source: ${release.source_url}`,
     `Notes file: ${release.notes_path}`,
     ``,
-    `## Changes (${changes.length})`,
+    `## Changes (${release.changes.length})`,
     ``,
   ];
-  for (const c of changes) {
-    const screened = resolveRowScreening(c.text, c.flags, hasFlagsCol);
-    const flagMarker = formatFlagMarker(screened.flags);
+  for (const c of release.changes) {
+    const flagMarker = formatFlagMarker(c.flags);
     const flagInfo = flagMarker ? ` ${flagMarker}` : '';
-    lines.push(`- [${c.kind}]${flagInfo} ${screened.text}`);
+    lines.push(`- [${c.kind}]${flagInfo} ${c.text}`);
   }
   return frameVendorText(lines.join('\n'));
 }
@@ -995,7 +1084,8 @@ function formatChangesSinceResults(results: ChangesSinceResult[]): string {
   let total = 0;
   for (const rel of results) {
     const date = rel.released_at ?? '????-??-??';
-    lines.push(`${date}  ${rel.product}@${rel.version}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
+    const label = formatReleaseLabel(rel.product, rel.package, rel.version);
+    lines.push(`${date}  ${label}  (${rel.changes.length} change${rel.changes.length === 1 ? '' : 's'})`);
     for (const c of rel.changes) {
       const flagMarker = formatFlagMarker(c.flags);
       const flagInfo = flagMarker ? ` ${flagMarker}` : '';
@@ -1008,48 +1098,105 @@ function formatChangesSinceResults(results: ChangesSinceResult[]): string {
   return lines.join('\n');
 }
 
-function handleGetChangesSince(args: { since: string; until?: string; product?: string; kind?: string; limit?: number }): string {
+function handleGetChangesSince(args: { since: string; until?: string; product?: string; package?: string; kind?: string; limit?: number }): string {
+  const activeDb = getDbOrThrow();
+  const cfg = loadProductsConfig();
+  if (args.product && !args.package && isMultiPackageProduct(cfg?.productMeta[args.product])) {
+    let groups: Array<{ package: string; releases: ChangesSinceResult[] }>;
+    try {
+      groups = getChangesSinceByPackage(activeDb, {
+        since: args.since,
+        until: args.until,
+        product: args.product,
+        productsConfig: cfg,
+        kind: args.kind,
+        limit: args.limit ?? 200,
+      });
+    } catch (e: any) {
+      if (e instanceof AppError && e.code === 'UNKNOWN_PACKAGE') throw e;
+      throw new McpError(ErrorCode.InvalidParams, `get_changes_since: ${e.message}`);
+    }
+    if (groups.length === 0) {
+      return frameVendorText('(no changes in window — try widening --since)');
+    }
+    const sections = groups.map((g) => `## ${g.package}\n\n${formatChangesSinceResults(g.releases)}`);
+    return frameVendorText(sections.join('\n\n'));
+  }
   let results: ChangesSinceResult[];
   try {
-    results = getChangesSince(getDbOrThrow(), {
+    results = getChangesSince(activeDb, {
       since: args.since,
       until: args.until,
       product: args.product,
+      package: args.package,
+      productsConfig: cfg,
       kind: args.kind,
       limit: args.limit ?? 200,
     });
   } catch (e: any) {
+    if (e instanceof AppError && e.code === 'UNKNOWN_PACKAGE') throw e;
     throw new McpError(ErrorCode.InvalidParams, `get_changes_since: ${e.message}`);
   }
   return frameVendorText(formatChangesSinceResults(results));
 }
 
-function handleSearchBreakingChanges(args: { product?: string; since?: string; until?: string; limit?: number }): string {
+function formatBreakingResults(results: QueryResult[]): string {
+  const lines: string[] = [];
+  for (const r of results) {
+    const flagMarker = formatFlagMarker(r.flags);
+    const flagInfo = flagMarker ? ` ${flagMarker}` : '';
+    const label = formatReleaseLabel(r.product, r.package, r.version);
+    lines.push(`${r.released_at ?? '????-??-??'}  ${label}  [${r.kind}]${flagInfo}`);
+    lines.push(`  ${r.text}`);
+    lines.push('');
+  }
+  lines.push(`${results.length} breaking change${results.length === 1 ? '' : 's'}`);
+  return lines.join('\n');
+}
+
+function handleSearchBreakingChanges(args: { product?: string; package?: string; since?: string; until?: string; limit?: number }): string {
+  const activeDb = getDbOrThrow();
+  const cfg = loadProductsConfig();
+  if (args.product && !args.package && isMultiPackageProduct(cfg?.productMeta[args.product])) {
+    let groups: Array<{ package: string; results: QueryResult[] }>;
+    try {
+      groups = browseChangesByPackage(activeDb, {
+        product: args.product,
+        productsConfig: cfg,
+        since: args.since,
+        until: args.until,
+        kind: 'breaking',
+        limit: args.limit ?? 50,
+      });
+    } catch (e: any) {
+      if (e instanceof AppError && e.code === 'UNKNOWN_PACKAGE') throw e;
+      throw new McpError(ErrorCode.InvalidParams, `search_breaking_changes: ${e.message}`);
+    }
+    if (groups.length === 0) {
+      return frameVendorText('(no breaking changes — note: ingest may not have classified any changes as breaking yet)');
+    }
+    const sections = groups.map((g) => `## ${g.package}\n\n${formatBreakingResults(g.results)}`);
+    return frameVendorText(sections.join('\n\n'));
+  }
   let results: QueryResult[];
   try {
-    results = browseChanges(getDbOrThrow(), {
+    results = browseChanges(activeDb, {
       product: args.product,
+      package: args.package,
+      productsConfig: cfg,
       since: args.since,
       until: args.until,
       kind: 'breaking',
       limit: args.limit ?? 50,
     });
   } catch (e: any) {
+    if (e instanceof AppError && e.code === 'UNKNOWN_PACKAGE') throw e;
     throw new McpError(ErrorCode.InvalidParams, `search_breaking_changes: ${e.message}`);
   }
   if (results.length === 0) {
     return frameVendorText('(no breaking changes — note: ingest may not have classified any changes as breaking yet)');
   }
-  const lines: string[] = [];
-  for (const r of results) {
-    const flagMarker = formatFlagMarker(r.flags);
-    const flagInfo = flagMarker ? ` ${flagMarker}` : '';
-    lines.push(`${r.released_at ?? '????-??-??'}  ${r.product}@${r.version}  [${r.kind}]${flagInfo}`);
-    lines.push(`  ${r.text}`);
-    lines.push('');
-  }
-  lines.push(`${results.length} breaking change${results.length === 1 ? '' : 's'}`);
-  return frameVendorText(lines.join('\n'));
+  return frameVendorText(formatBreakingResults(results));
 }
 
 // ── Sync handlers ──────────────────────────────────────────────────────────
@@ -1242,19 +1389,25 @@ async function handleSyncNow(args: SyncNowArgs): Promise<string> {
   }, () => db);
 }
 
-function handleCompareVersions(args: { product: string; from_version: string; to_version: string }): string {
+function handleCompareVersions(args: { product: string; package?: string; from_version: string; to_version: string }): string {
+  const cfg = loadProductsConfig();
   let results: ChangesSinceResult[];
   try {
     results = compareVersions(getDbOrThrow(), {
       product: args.product,
+      package: args.package,
+      productsConfig: cfg,
       fromVersion: args.from_version,
       toVersion: args.to_version,
     });
   } catch (e: any) {
+    if (e instanceof AppError) throw e;
     throw new McpError(ErrorCode.InvalidParams, `compare_versions: ${e.message}`);
   }
   if (results.length === 0) {
-    return frameVendorText(`(no intermediate releases between ${args.product}@${args.from_version} and ${args.product}@${args.to_version})`);
+    const fromLbl = formatReleaseLabel(args.product, args.package, args.from_version, cfg);
+    const toLbl = formatReleaseLabel(args.product, args.package, args.to_version, cfg);
+    return frameVendorText(`(no intermediate releases between ${fromLbl} and ${toLbl})`);
   }
   return frameVendorText(formatChangesSinceResults(results));
 }

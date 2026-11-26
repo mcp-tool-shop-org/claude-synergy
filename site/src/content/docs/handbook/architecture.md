@@ -52,30 +52,30 @@ Fetch markers track the last-seen release date per product. Each subsequent `hk 
 
 | Table | Purpose |
 |-------|---------|
-| `releases` | One row per product release (product, version, date, body) |
-| `changes` | One row per change bullet (release_id, kind, text) |
+| `releases` | One row per product+package release (`PRIMARY KEY (product, package, version)`) |
+| `changes` | One row per change bullet (product, package, version, ordinal, kind, text, flags) |
 | `changes_fts` | FTS5 virtual table for full-text search on change text |
 | `entities` | Extracted entities (env_var, slash_command, model_id, etc.) |
 | `fetch_markers` | Per-product watermark for incremental fetch |
-| `schema_meta` | Schema version + active embedding dimension (`embedding_dim`) |
+| `schema_meta` | Schema version (`5`) + active embedding dimension (`embedding_dim`) |
 | `synergies` / `synergy_products` / `synergy_steps` / `synergy_evidence` / `synergy_change_refs` | Cache of `synergies/*.md` populated on `hk ingest` (v1.1+). Powers `list_synergies` / `read_synergy` MCP tools off the DB rather than the filesystem. |
 
 ### Vector tables (optional)
 
 | Table | Purpose |
 |-------|---------|
-| `chunks` | Contextual chunks with metadata (change_id, context text, content hash) |
+| `chunks` | Contextual chunks with metadata (`change_id`, `product`, `package`, `release_version`, context text, content hash) |
 | `vec_chunks` | sqlite-vec virtual table storing float32 embeddings at the dimension stamped in `schema_meta.embedding_dim` (768 / 1024 / 1536 for Ollama / Voyage / OpenAI respectively) |
 
 ### Schema versioning
 
-The database carries a `schema_meta` table with a version stamp. On `hk init`:
+The database carries a `schema_meta` table with a version stamp (currently **v5**). On `hk init` (and automatically on read-write open):
 
-- If the DB version matches the code version, no action is taken
-- If the DB version is older, migrations run automatically (v2 → v3 stamps `embedding_dim = 768` to preserve existing Ollama DBs)
+- If the DB version matches the code version (`5`), no action is taken
+- If the DB version is older, migrations run automatically under an `IMMEDIATE` lock (`v2 → v3` stamps `embedding_dim = 768`; `v3 → v4` adds `changes.flags`; `v4 → v5` adds `package` to `releases`, `changes`, and `chunks`, re-derives `(package, version)` from `products.yaml` `packages[].release_prefix`, and upgrades keys to `(product, package, version)`). Unwritable pre-v5 DBs remain queryable read-only with query-time package derivation and stamp `old schema (vN < v5, read-only)`.
 - If the DB version is newer than the code, the CLI throws with upgrade instructions
 
-Migration is one-way: a v3 DB cannot be opened by a pre-v1.1 tool version. The `embedding_dim` column is the negotiation point for the configurable-dim feature — `setEmbeddingDim()` refuses to change dim while chunks exist, raising `EMBEDDING_DIM_MISMATCH` with a hint to wipe the DB.
+Migration is one-way: a v5 DB cannot be opened by an older tool version. The `embedding_dim` column is the negotiation point for the configurable-dim feature — `setEmbeddingDim()` refuses to change dim while chunks exist, raising `EMBEDDING_DIM_MISMATCH` with a hint to wipe the DB.
 
 ## Search pipeline
 

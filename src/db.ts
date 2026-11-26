@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import * as sqliteVec from 'sqlite-vec';
 import { AppError } from './errors.js';
-import { rescreenChanges } from './ingest.js';
+import { deleteChangeChildren, rescreenChanges } from './ingest.js';
+import { deriveReleaseIdentity, loadProductsConfig } from './products-config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -18,8 +19,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
  *       Defaults to 768 for backward compat with v2 DBs.
  *   4 — Added changes.flags JSON array column, changes_fts_update trigger, and
  *       one-time deterministic vendor text screening of stored changes.
+ *   5 — Added package column to releases, changes, and chunks with
+ *       PRIMARY KEY (product, package, version), re-deriving package and
+ *       prefix-stripped versions from products.yaml.
  */
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 /** Default embedding dimension when none is recorded (matches v2 behavior). */
 export const DEFAULT_EMBEDDING_DIM = 768;
@@ -97,21 +101,40 @@ function isUnwritableExistingOpenError(e: unknown, absPath: string): boolean {
   return (code === 'SQLITE_CANTOPEN' || code.startsWith('SQLITE_CANTOPEN_')) && existsSync(absPath);
 }
 
-/** Cacheable check for whether `changes.flags` exists (false on unmigrated v3 read-only DBs). */
-export function hasChangesFlagsColumn(db: Database.Database): boolean {
-  const tagged = db as Database.Database & { __synergyHasChangesFlags?: boolean };
-  if (tagged.__synergyHasChangesFlags === true) return true;
-  if (tagged.__synergyHasChangesFlags === false && db.readonly) return false;
+function hasTableColumn(
+  db: Database.Database,
+  tableName: 'changes' | 'releases' | 'chunks',
+  columnName: string,
+  cacheKey: '__synergyHasChangesFlags' | '__synergyHasReleasesPackage' | '__synergyHasChunksPackage',
+): boolean {
+  const tagged = db as Database.Database & Partial<Record<typeof cacheKey, boolean>>;
+  if (tagged[cacheKey] === true) return true;
+  if (tagged[cacheKey] === false && db.readonly) return false;
   try {
-    const cols = db.pragma('table_info(changes)') as Array<{ name: string }>;
-    const has = cols.some((c) => c.name === 'flags');
+    const cols = db.pragma(`table_info(${tableName})`) as Array<{ name: string }>;
+    const has = cols.some((c) => c.name === columnName);
     if (has || db.readonly) {
-      tagged.__synergyHasChangesFlags = has;
+      tagged[cacheKey] = has;
     }
     return has;
   } catch {
     return false;
   }
+}
+
+/** Cacheable check for whether `changes.flags` exists (false on unmigrated v3 read-only DBs). */
+export function hasChangesFlagsColumn(db: Database.Database): boolean {
+  return hasTableColumn(db, 'changes', 'flags', '__synergyHasChangesFlags');
+}
+
+/** Cacheable check for whether `releases.package` exists (false on unmigrated pre-v5 read-only DBs). */
+export function hasReleasesPackageColumn(db: Database.Database): boolean {
+  return hasTableColumn(db, 'releases', 'package', '__synergyHasReleasesPackage');
+}
+
+/** Cacheable check for whether `chunks.package` exists (false on unmigrated pre-v5 read-only DBs). */
+export function hasChunksPackageColumn(db: Database.Database): boolean {
+  return hasTableColumn(db, 'chunks', 'package', '__synergyHasChunksPackage');
 }
 
 export function openDb(
@@ -229,36 +252,53 @@ function ensureSchemaVersion(
 
   onBeforeMigrationLock?.();
 
-  const runMigration = db.transaction(() => {
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS schema_meta (
-        key   TEXT PRIMARY KEY,
-        value TEXT NOT NULL
-      )
-    `);
+  // Disable foreign_keys outside the IMMEDIATE transaction when rebuilding
+  // `releases` / `changes`, because child tables (`entities`, `chunks`) hold
+  // FKs to `changes(id)` and SQLite ignores `PRAGMA foreign_keys` mid-tx.
+  const fkWasOn = !db.readonly && db.pragma('foreign_keys', { simple: true }) === 1;
+  if (fkWasOn) {
+    db.pragma('foreign_keys = OFF');
+  }
+  try {
+    const runMigration = db.transaction(() => {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS schema_meta (
+          key   TEXT PRIMARY KEY,
+          value TEXT NOT NULL
+        )
+      `);
 
-    const row = db
-      .prepare(`SELECT value FROM schema_meta WHERE key = 'schema_version'`)
-      .get() as { value: string } | undefined;
+      const row = db
+        .prepare(`SELECT value FROM schema_meta WHERE key = 'schema_version'`)
+        .get() as { value: string } | undefined;
 
-    const currentVersion = row ? parseInt(row.value, 10) : 0;
+      const currentVersion = row ? parseInt(row.value, 10) : 0;
 
-    if (currentVersion > SCHEMA_VERSION) {
-      throw new Error(
-        `Database schema version ${currentVersion} is newer than this tool supports (version ${SCHEMA_VERSION}). ` +
-          `Please upgrade claude-synergy: npm update -g @mcptoolshop/claude-synergy`,
-      );
+      if (currentVersion > SCHEMA_VERSION) {
+        throw new Error(
+          `Database schema version ${currentVersion} is newer than this tool supports (version ${SCHEMA_VERSION}). ` +
+            `Please upgrade claude-synergy: npm update -g @mcptoolshop/claude-synergy`,
+        );
+      }
+
+      if (currentVersion < SCHEMA_VERSION) {
+        migrateSchema(db, currentVersion, SCHEMA_VERSION);
+
+        db.prepare(`
+          INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_version', @version)
+        `).run({ version: String(SCHEMA_VERSION) });
+      }
+    });
+    runMigration.immediate();
+  } finally {
+    if (fkWasOn) {
+      try {
+        db.pragma('foreign_keys = ON');
+      } catch {
+        /* ignore if db was closed on error */
+      }
     }
-
-    if (currentVersion < SCHEMA_VERSION) {
-      migrateSchema(db, currentVersion, SCHEMA_VERSION);
-
-      db.prepare(`
-        INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_version', @version)
-      `).run({ version: String(SCHEMA_VERSION) });
-    }
-  });
-  runMigration.immediate();
+  }
 }
 
 /**
@@ -307,7 +347,280 @@ function migrateSchema(db: Database.Database, fromVersion: number, toVersion: nu
       rescreenChanges(db);
     }
   }
+  // Migration 4 → 5: add `package` to releases, changes, and chunks with
+  // PRIMARY KEY (product, package, version), re-deriving package and
+  // normalized version from products.yaml for every existing row.
+  if (fromVersion < 5 && toVersion >= 5) {
+    migrateToV5PackageSchema(db);
+  }
   void toVersion;
+}
+
+function migrateToV5PackageSchema(db: Database.Database): void {
+  const hasReleases = db
+    .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='releases'`)
+    .get();
+  if (!hasReleases) return;
+
+  const relCols = db.pragma('table_info(releases)') as Array<{ name: string }>;
+  const releasesNeedsRebuild = !relCols.some((c) => c.name === 'package');
+
+  if (releasesNeedsRebuild) {
+    const cfg = loadProductsConfig();
+    type OldReleaseRow = {
+      rowid: number;
+      product: string;
+      version: string;
+      released_at: string | null;
+      notes_path: string;
+      fetched_at: string;
+      source_url: string;
+      bundle_size_kb: number | null;
+      notes_hash: string | null;
+    };
+    const oldReleases = db
+      .prepare(
+        `SELECT rowid, product, version, released_at, notes_path, fetched_at, source_url, bundle_size_kb, notes_hash
+         FROM releases
+         ORDER BY rowid ASC`,
+      )
+      .all() as OldReleaseRow[];
+
+    const isNewerRelease = (candidate: OldReleaseRow, incumbent: OldReleaseRow): boolean => {
+      const cFetched = candidate.fetched_at ?? '';
+      const iFetched = incumbent.fetched_at ?? '';
+      if (cFetched !== iFetched) return cFetched > iFetched;
+      const cHash = candidate.notes_hash ?? '';
+      const iHash = incumbent.notes_hash ?? '';
+      if (cHash !== iHash) return cHash > iHash;
+      return candidate.rowid > incumbent.rowid;
+    };
+
+    // Derive target (package, version) per legacy row, picking a deterministic
+    // collision winner by newer fetched_at, then notes_hash, then rowid.
+    const identityByLegacyKey = new Map<string, { pkg: string; version: string }>();
+    const winnerRowByTarget = new Map<string, { legacyKey: string; row: OldReleaseRow }>();
+    for (const r of oldReleases) {
+      const legacyKey = `${r.product}\0${r.version}`;
+      const derived = deriveReleaseIdentity(r.product, r.version, r.notes_path, cfg, r.source_url);
+      identityByLegacyKey.set(legacyKey, derived);
+      const targetKey = `${r.product}\0${derived.pkg}\0${derived.version}`;
+      const incumbent = winnerRowByTarget.get(targetKey);
+      if (!incumbent || isNewerRelease(r, incumbent.row)) {
+        winnerRowByTarget.set(targetKey, { legacyKey, row: r });
+      }
+    }
+    const winningLegacyKeyByTarget = new Map<string, string>();
+    for (const [targetKey, entry] of winnerRowByTarget) {
+      winningLegacyKeyByTarget.set(targetKey, entry.legacyKey);
+    }
+
+    const hasChanges = db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='changes'`)
+      .get();
+    const hasChangesFts = db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='changes_fts'`)
+      .get();
+    let droppedChangeCount = 0;
+
+    db.pragma('legacy_alter_table = ON');
+    try {
+      db.exec(`
+        DROP TRIGGER IF EXISTS changes_fts_insert;
+        DROP TRIGGER IF EXISTS changes_fts_delete;
+        DROP TRIGGER IF EXISTS changes_fts_update;
+        CREATE TABLE releases_v5 (
+          product          TEXT NOT NULL REFERENCES products(name) ON DELETE CASCADE,
+          package          TEXT NOT NULL DEFAULT '',
+          version          TEXT NOT NULL,
+          released_at      DATE,
+          notes_path       TEXT NOT NULL,
+          fetched_at       DATETIME NOT NULL,
+          source_url       TEXT NOT NULL,
+          bundle_size_kb   REAL,
+          notes_hash       TEXT,
+          PRIMARY KEY (product, package, version)
+        );
+      `);
+
+      const insertRelV5 = db.prepare(`
+        INSERT INTO releases_v5 (product, package, version, released_at, notes_path, fetched_at, source_url, bundle_size_kb, notes_hash)
+        VALUES (@product, @package, @version, @released_at, @notes_path, @fetched_at, @source_url, @bundle_size_kb, @notes_hash)
+      `);
+      for (const r of oldReleases) {
+        const legacyKey = `${r.product}\0${r.version}`;
+        const derived = identityByLegacyKey.get(legacyKey)!;
+        const targetKey = `${r.product}\0${derived.pkg}\0${derived.version}`;
+        if (winningLegacyKeyByTarget.get(targetKey) !== legacyKey) continue;
+        insertRelV5.run({
+          product: r.product,
+          package: derived.pkg,
+          version: derived.version,
+          released_at: r.released_at,
+          notes_path: r.notes_path,
+          fetched_at: r.fetched_at,
+          source_url: r.source_url,
+          bundle_size_kb: r.bundle_size_kb,
+          notes_hash: r.notes_hash,
+        });
+      }
+
+      if (hasChanges) {
+        const chCols = db.pragma('table_info(changes)') as Array<{ name: string }>;
+        const hasFlags = chCols.some((c) => c.name === 'flags');
+        const oldChanges = db
+          .prepare(
+            `SELECT id, product, version, ordinal, kind, text, ${hasFlags ? 'flags' : "'[]' AS flags"}
+             FROM changes
+             ORDER BY id ASC`,
+          )
+          .all() as Array<{
+          id: number;
+          product: string;
+          version: string;
+          ordinal: number;
+          kind: string;
+          text: string;
+          flags: string;
+        }>;
+
+        db.exec(`
+          CREATE TABLE changes_v5 (
+            id               INTEGER PRIMARY KEY,
+            product          TEXT NOT NULL,
+            package          TEXT NOT NULL DEFAULT '',
+            version          TEXT NOT NULL,
+            ordinal          INTEGER NOT NULL,
+            kind             TEXT NOT NULL,
+            text             TEXT NOT NULL,
+            flags            TEXT NOT NULL DEFAULT '[]',
+            FOREIGN KEY (product, package, version) REFERENCES releases(product, package, version) ON DELETE CASCADE,
+            UNIQUE (product, package, version, ordinal)
+          );
+        `);
+
+        const insertChV5 = db.prepare(`
+          INSERT INTO changes_v5 (id, product, package, version, ordinal, kind, text, flags)
+          VALUES (@id, @product, @package, @version, @ordinal, @kind, @text, @flags)
+        `);
+        const winningChangeIdByTargetKindText = new Map<string, number>();
+        const losingChanges: Array<{ id: number; targetKindTextKey: string | null }> = [];
+        for (const ch of oldChanges) {
+          const legacyKey = `${ch.product}\0${ch.version}`;
+          const derived = identityByLegacyKey.get(legacyKey);
+          if (!derived) {
+            losingChanges.push({ id: ch.id, targetKindTextKey: null });
+            continue;
+          }
+          const targetKey = `${ch.product}\0${derived.pkg}\0${derived.version}`;
+          const matchKey = `${targetKey}\0${ch.kind}\0${ch.text}`;
+          if (winningLegacyKeyByTarget.get(targetKey) !== legacyKey) {
+            losingChanges.push({ id: ch.id, targetKindTextKey: matchKey });
+            continue;
+          }
+          if (!winningChangeIdByTargetKindText.has(matchKey)) {
+            winningChangeIdByTargetKindText.set(matchKey, ch.id);
+          }
+          insertChV5.run({
+            id: ch.id,
+            product: ch.product,
+            package: derived.pkg,
+            version: derived.version,
+            ordinal: ch.ordinal,
+            kind: ch.kind,
+            text: ch.text,
+            flags: ch.flags ?? '[]',
+          });
+        }
+
+        if (losingChanges.length > 0) {
+          droppedChangeCount = losingChanges.length;
+          const rePointByChangeId = new Map<number, number>();
+          const losingIds: number[] = [];
+          for (const lc of losingChanges) {
+            losingIds.push(lc.id);
+            if (lc.targetKindTextKey) {
+              const winId = winningChangeIdByTargetKindText.get(lc.targetKindTextKey);
+              if (winId !== undefined) {
+                rePointByChangeId.set(lc.id, winId);
+              }
+            }
+          }
+          deleteChangeChildren(db, losingIds, rePointByChangeId);
+        }
+
+        db.exec(`DROP TABLE changes;`);
+      }
+
+      db.exec(`DROP TABLE releases;`);
+      db.exec(`ALTER TABLE releases_v5 RENAME TO releases;`);
+      db.exec(`
+        CREATE INDEX idx_releases_date ON releases(released_at);
+        CREATE INDEX idx_releases_prod_pkg_date ON releases(product, package, released_at);
+        CREATE INDEX idx_releases_prod_path ON releases(product, notes_path);
+      `);
+
+      if (hasChanges) {
+        db.exec(`ALTER TABLE changes_v5 RENAME TO changes;`);
+        db.exec(`
+          CREATE INDEX idx_changes_pv ON changes(product, package, version);
+          CREATE INDEX idx_changes_kind ON changes(kind);
+        `);
+        if (hasChangesFts) {
+          db.exec(`
+            CREATE TRIGGER changes_fts_insert AFTER INSERT ON changes BEGIN
+              INSERT INTO changes_fts(rowid, text) VALUES (new.id, new.text);
+            END;
+            CREATE TRIGGER changes_fts_delete AFTER DELETE ON changes BEGIN
+              INSERT INTO changes_fts(changes_fts, rowid, text) VALUES('delete', old.id, old.text);
+            END;
+            CREATE TRIGGER changes_fts_update AFTER UPDATE OF text ON changes BEGIN
+              INSERT INTO changes_fts(changes_fts, rowid, text) VALUES('delete', old.id, old.text);
+              INSERT INTO changes_fts(rowid, text) VALUES (new.id, new.text);
+            END;
+          `);
+          if (droppedChangeCount > 0) {
+            db.exec(`INSERT INTO changes_fts(changes_fts) VALUES('rebuild');`);
+          }
+        }
+      }
+    } finally {
+      db.pragma('legacy_alter_table = OFF');
+    }
+  }
+
+  const hasChunks = db
+    .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='chunks'`)
+    .get();
+  if (hasChunks) {
+    const chunkCols = db.pragma('table_info(chunks)') as Array<{ name: string }>;
+    if (!chunkCols.some((c) => c.name === 'package')) {
+      db.exec(`ALTER TABLE chunks ADD COLUMN package TEXT NOT NULL DEFAULT ''`);
+      db.exec(`CREATE INDEX IF NOT EXISTS idx_chunks_prod_pkg ON chunks(product, package, released_at)`);
+      db.exec(`
+        UPDATE chunks
+        SET package = COALESCE((SELECT c.package FROM changes c WHERE c.id = chunks.change_id), ''),
+            release_version = COALESCE((SELECT c.version FROM changes c WHERE c.id = chunks.change_id), release_version)
+      `);
+    }
+  }
+
+  const fkErrors = db.pragma('foreign_key_check') as unknown[];
+  if (fkErrors.length > 0) {
+    throw new AppError({
+      code: 'SCHEMA_MIGRATION_FK_ERROR',
+      message: `Database migration to schema v${SCHEMA_VERSION} failed foreign key integrity check.`,
+      hint: 'Delete the local database file (e.g. ~/.claude-synergy/data/claude-synergy.db or CLAUDE_SYNERGY_DB) and run `hk sync` to rebuild the store from release notes (note: deleting the database also deletes your relevance tags and synergy references).',
+      cause: JSON.stringify(fkErrors[0]),
+    });
+  }
+
+  const tagged = db as Database.Database & {
+    __synergyHasReleasesPackage?: boolean;
+    __synergyHasChunksPackage?: boolean;
+  };
+  delete tagged.__synergyHasReleasesPackage;
+  delete tagged.__synergyHasChunksPackage;
 }
 
 /**

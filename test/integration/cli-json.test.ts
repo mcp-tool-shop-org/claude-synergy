@@ -27,12 +27,12 @@ afterEach(() => {
   temp.cleanup();
 });
 
-function runCli(args: string[]) {
+function runCli(args: string[], extraEnv: Record<string, string> = {}) {
   const result = spawnSync('npx', ['tsx', CLI, ...args], {
     encoding: 'utf-8',
     timeout: 25_000,
     shell: process.platform === 'win32',
-    env: { ...process.env, HK_DEBUG: '', NO_COLOR: '1' },
+    env: { ...process.env, HK_DEBUG: '', NO_COLOR: '1', ...extraEnv },
   });
   return {
     code: result.status,
@@ -250,7 +250,7 @@ describe('CLI --json output mode', () => {
         const roOut = runCli(['query', 'CliRoCheck', '--db', roPath]);
         expect(roOut.code).toBe(0);
         expect(roOut.stdout).toContain('[[CliRoCheck]] feature');
-        expect(roOut.stdout).toContain('old schema (v3 < v4, read-only)');
+        expect(roOut.stdout).toContain('old schema (v3 < v5, read-only)');
       } finally {
         chmodSync(roPath, 0o666);
       }
@@ -370,6 +370,101 @@ describe('CLI --json output mode', () => {
           expect(out.stderr).not.toContain(tok);
         }
       }
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }, 60_000);
+
+  it('groups multi-package CLI results per package, filters with --package, and keeps single-package output byte-identical', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'cli-multipkg-'));
+    try {
+      const yamlPath = join(dir, 'products.yaml');
+      writeFileSync(
+        yamlPath,
+        `products:
+  - name: ts-multi
+    display_name: TS Multi
+    tier: 1
+    source_url: https://example.invalid/ts
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@scope/sdk"
+        release_prefix: "sdk-"
+      - ecosystem: npm
+        name: "@scope/aws-sdk"
+        release_prefix: "aws-sdk-"
+  - name: test-cli
+    display_name: Test CLI
+    tier: 1
+    source_url: https://example.invalid/test-cli
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@test/cli"
+        release_prefix: ""
+`,
+        'utf-8'
+      );
+      const prodDir = join(dir, 'products');
+      const relDir = join(prodDir, 'ts-multi', 'releases');
+      mkdirSync(relDir, { recursive: true });
+      writeFileSync(
+        join(relDir, 'sdk-0.98.0.md'),
+        `---\nproduct: ts-multi\nversion: "sdk-0.98.0"\nreleased_at: "2026-04-10"\n---\n\n- Added Core feature MULTIPKG_CLI\n- Breaking change: Core breaking change\n`,
+        'utf-8'
+      );
+      writeFileSync(
+        join(relDir, 'aws-sdk-0.3.0.md'),
+        `---\nproduct: ts-multi\nversion: "aws-sdk-v0.3.0"\nreleased_at: "2026-04-08"\n---\n\n- Breaking change: AWS break MULTIPKG_CLI\n`,
+        'utf-8'
+      );
+
+      const db = openDb(temp.path, { loadVec: false });
+      ingestAll(db, prodDir, { yamlPath });
+      db.close();
+
+      const env = { CLAUDE_SYNERGY_PRODUCTS_YAML: yamlPath };
+
+      const latestGroupedJson = parseJson(
+        runCli(['--json', 'latest', '--db', temp.path, '--product', 'ts-multi'], env).stdout
+      ) as Array<{ package: string; releases: Array<{ version: string }> }>;
+      expect(latestGroupedJson.map((g) => g.package)).toEqual(['@scope/sdk', '@scope/aws-sdk']);
+
+      const latestGroupedText = runCli(['latest', '--db', temp.path, '--product', 'ts-multi'], env).stdout;
+      expect(latestGroupedText).toContain('### @scope/sdk');
+      expect(latestGroupedText).toContain('ts-multi (@scope/aws-sdk)@0.3.0');
+
+      const latestFilteredJson = parseJson(
+        runCli(['--json', 'latest', '--db', temp.path, '--product', 'ts-multi', '--package', '@scope/aws-sdk'], env).stdout
+      ) as Array<{ package: string; version: string }>;
+      expect(latestFilteredJson.map((r) => `${r.package}:${r.version}`)).toEqual(['@scope/aws-sdk:0.3.0']);
+
+      const diffGroupedText = runCli(['diff', 'ts-multi', '--db', temp.path, '--since', '2026-04-01'], env).stdout;
+      expect(diffGroupedText).toContain('## @scope/sdk');
+      expect(diffGroupedText).toContain('## @scope/aws-sdk');
+
+      const breakingFilteredJson = parseJson(
+        runCli(['--json', 'breaking', '--db', temp.path, '--product', 'ts-multi', '--package', '@scope/aws-sdk'], env).stdout
+      ) as Array<{ package: string; version: string }>;
+      expect(breakingFilteredJson.map((r) => `${r.package}:${r.version}`)).toEqual(['@scope/aws-sdk:0.3.0']);
+
+      const queryGroupedJson = parseJson(
+        runCli(['--json', 'query', 'MULTIPKG_CLI', '--db', temp.path, '--product', 'ts-multi'], env).stdout
+      ) as Array<{ package: string }>;
+      expect(queryGroupedJson.map((g) => g.package)).toEqual(['@scope/sdk', '@scope/aws-sdk']);
+
+      const badPkg = runCli(['--json', 'latest', '--db', temp.path, '--product', 'ts-multi', '--package', 'nope'], env);
+      expect(badPkg.code).toBe(1);
+      expect((parseJson(badPkg.stdout) as { code: string }).code).toBe('UNKNOWN_PACKAGE');
+
+      const singleLatestJson = parseJson(
+        runCli(['--json', 'latest', '--db', temp.path, '--product', 'test-cli'], env).stdout
+      ) as Array<Record<string, unknown>>;
+      expect(singleLatestJson.every((r) => !Object.hasOwn(r, 'package'))).toBe(true);
+      const singleLatestText = runCli(['latest', '--db', temp.path, '--product', 'test-cli'], env).stdout;
+      expect(singleLatestText).toContain('test-cli@1.1.0');
+      expect(singleLatestText).not.toContain('(@test/cli)');
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

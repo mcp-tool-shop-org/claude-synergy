@@ -143,12 +143,12 @@ hk sync                              # combined fetch → ingest → embed (cron
 hk seed-markers                      # one-time setup after initial corpus
 
 # Search
-hk query "managed agents"            # FTS5 keyword search (+ --until <date>)
-hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --rerank, --until)
+hk query "managed agents"            # FTS5 keyword search (+ --package, --until)
+hk hybrid "credential exfiltration"  # FTS5 + vec hybrid via RRF (+ --package, --rerank, --until)
 
 # Windowed change browsing
-hk diff [product] --since 7d         # what changed in a window, grouped by product+version
-hk breaking --since 30d              # filter-browse of breaking changes (no search term)
+hk diff [product] --since 7d         # what changed in a window (+ --package; grouped per package on multi-package products)
+hk breaking --since 30d              # filter-browse of breaking changes (+ --package; grouped per package when omitted)
 
 # Entity lookups
 hk env-var CLAUDE_CODE_WORKFLOWS     # when introduced + history
@@ -157,7 +157,7 @@ hk model claude-opus-4-7             # model launch + mentions across products
 hk cve CVE-2025-66414                # CVE references in corpus
 
 # Browsing
-hk latest [--product X] [--limit N]  # recent releases (+ --since <date>)
+hk latest [--product X] [--limit N]  # recent releases (+ --package, --since; grouped per package when --package omitted)
 hk products                          # list all 44 with counts
 hk top env_var                       # most-mentioned by entity type
                                      # (env_var, slash_command, cli_option,
@@ -258,17 +258,17 @@ Tools exposed:
 
 | Tool | Purpose |
 |---|---|
-| `search` | Hybrid FTS5 + vec; optional rerank. Default mode for natural-language queries. (+ `until` date upper bound) |
+| `search` | Hybrid FTS5 + vec; optional rerank. Accepts `package?` (groups per package on multi-package products when omitted) and labels multi-package results with `product (package)@version`. |
 | `lookup_entity` | Exact entity history: env vars, slash commands, model IDs, CVEs, etc. |
-| `latest_releases` | Recent releases across products (or one). (+ `since` date lower bound) |
-| `get_release` | Full content of one release |
+| `latest_releases` | Recent releases across products (or one). Accepts `package?` and `since?`; groups per package when `package` is omitted on multi-package products. |
+| `get_release` | Full content of one release (`package` required on multi-package products). |
 | `list_products` | Enumeration with counts + latest version |
 | `top_entities` | Most-mentioned entities by type |
 | `list_synergies` | Curated cross-product workflows. (+ optional `product` filter) |
 | `read_synergy` | Full text of one synergy file |
-| `get_changes_since` | **New.** Changes in a time window, grouped by product+version. Inputs: `since` (required), `until?`, `product?`, `kind?`, `limit?`. |
-| `search_breaking_changes` | **New.** Flat list of breaking changes — no search term needed. Inputs: `product?`, `since?`, `until?`, `limit?`. |
-| `compare_versions` | **v1.1.** All changes between two versions of one product. Inputs: `product`, `from_version`, `to_version`. |
+| `get_changes_since` | Changes in a time window, grouped by release (and per package on multi-package products). Inputs: `since` (required), `until?`, `product?`, `package?`, `kind?`, `limit?`. |
+| `search_breaking_changes` | Breaking changes without a search term. Inputs: `product?`, `package?`, `since?`, `until?`, `limit?` (grouped per package on multi-package products when `package` is omitted). |
+| `compare_versions` | All changes between two versions of one package/product. Inputs: `product`, `package?` (required on multi-package products), `from_version`, `to_version`. |
 | `sync_status` | **v1.2.** Per-product sync freshness — last fetch timestamp, hours since fetch, ingested release count. Inputs: `product?`, `stale_only?`, `stale_hours?`. Use BEFORE trusting `latest_releases` to know if the corpus is stale. |
 | `sync_now` | **v1.2.** On-demand refresh (mirrors `hk sync`). Inputs: `product?`, `dry_run?`, `include_ingest?`, `include_embed?`, `timeout_ms?`. Rejects with `InvalidParams` if another `sync_now` is already in flight. Does NOT commit to git. |
 | `workspace_relevance` | Match a workspace directory's top-level lockfiles against mirrored releases. Inputs: `workspace_path` (required, absolute directory path), `include_all?` (boolean, list unused product names). Read-only; leads with products needing action and lists breaking changes first. |

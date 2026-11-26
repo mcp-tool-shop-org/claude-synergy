@@ -149,14 +149,14 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
   const limitClause = opts.limit ? 'LIMIT @limit' : '';
 
   const pendingSql = `
-    SELECT c.id AS change_id, c.product, c.version, r.released_at, c.kind, c.text, c.ordinal
+    SELECT c.id AS change_id, c.product, c.package, c.version, r.released_at, c.kind, c.text, c.ordinal
     FROM changes c
-    JOIN releases r ON c.product = r.product AND c.version = r.version
+    JOIN releases r ON c.product = r.product AND c.package = r.package AND c.version = r.version
     LEFT JOIN chunks ch ON ch.change_id = c.id
     WHERE 1=1
       ${productFilter}
       ${forceFilter}
-    ORDER BY c.product, c.version, c.ordinal
+    ORDER BY c.product, c.package, c.version, c.ordinal
     ${limitClause}
   `;
   const params: Record<string, any> = {};
@@ -166,6 +166,7 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
   const pending = db.prepare(pendingSql).all(params) as Array<{
     change_id: number;
     product: string;
+    package: string;
     version: string;
     released_at: string | null;
     kind: string;
@@ -186,13 +187,14 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
   }
 
   // Group by release for sibling context
-  const byRelease = new Map<string, ChangeChunk[]>();
+  const byRelease = new Map<string, Array<ChangeChunk & { packageName: string }>>();
   for (const row of pending) {
-    const key = `${row.product}@${row.version}`;
+    const key = `${row.product}\0${row.package}\0${row.version}`;
     if (!byRelease.has(key)) byRelease.set(key, []);
     byRelease.get(key)!.push({
       changeId: row.change_id,
       product: row.product,
+      packageName: row.package,
       releaseVersion: row.version,
       releasedAt: row.released_at,
       kind: row.kind,
@@ -212,10 +214,11 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
   let embedMs = 0;
 
   const contextsByChange = new Map<number, string>();
-  const allChunks: ChangeChunk[] = [];
+  const allChunks: Array<ChangeChunk & { packageName: string }> = [];
   for (const [, siblings] of byRelease) {
+    const pkgLabel = siblings[0].packageName ? `${siblings[0].product} (${siblings[0].packageName})` : siblings[0].product;
     const release: ReleaseContext = {
-      product: siblings[0].product,
+      product: pkgLabel,
       version: siblings[0].releaseVersion,
       releasedAt: siblings[0].releasedAt,
       siblings,
@@ -236,9 +239,9 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
   const batchSize = opts.batchSize ?? 64;
   const insertChunk = db.prepare(`
     INSERT OR REPLACE INTO chunks
-      (change_id, product, release_version, released_at, context_prefix, original_text, contextualized, context_provider, embedding_model, embedded_at)
+      (change_id, product, package, release_version, released_at, context_prefix, original_text, contextualized, context_provider, embedding_model, embedded_at)
     VALUES
-      (@change_id, @product, @release_version, @released_at, @context_prefix, @original_text, @contextualized, @context_provider, @embedding_model, @embedded_at)
+      (@change_id, @product, @package, @release_version, @released_at, @context_prefix, @original_text, @contextualized, @context_provider, @embedding_model, @embedded_at)
   `);
 
   const deleteVec = db.prepare(`DELETE FROM chunks_vec WHERE rowid = ?`);
@@ -301,6 +304,7 @@ export async function embedAll(db: Database.Database, opts: EmbedOptions): Promi
         const result = insertChunk.run({
           change_id: c.changeId,
           product: c.product,
+          package: c.packageName,
           release_version: c.releaseVersion,
           released_at: c.releasedAt,
           context_prefix: prefix,

@@ -4,8 +4,16 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   PRODUCTS_PACKAGES_CONFIG_ERROR,
+  UNASSIGNED_PACKAGE,
+  UNASSIGNED_PACKAGE_LABEL,
+  deriveReleaseIdentity,
+  extractVersionFromNotesPath,
+  getCanonicalPackages,
+  isMultiPackageProduct,
   loadProductsConfig,
   resetWarnedFlag,
+  resolveCanonicalPackageName,
+  resolveReleasePackage,
 } from '../../src/products-config.js';
 import {
   validProductsYaml,
@@ -240,7 +248,7 @@ describe('loadProductsConfig — packages identity validation', () => {
         release_prefix: "sdk-"
       - ecosystem: pypi
         name: some-py-pkg
-        release_prefix: ""
+        release_prefix: "py-"
       - ecosystem: crates
         name: some-crate
         release_prefix: "rmcp-v"
@@ -256,7 +264,7 @@ describe('loadProductsConfig — packages identity validation', () => {
     const cfg = loadProductsConfig(writeYaml(yaml))!;
     expect(cfg.productMeta['mapped-prod'].packages).toEqual([
       { ecosystem: 'npm', name: '@scope/pkg', release_prefix: 'sdk-' },
-      { ecosystem: 'pypi', name: 'some-py-pkg', release_prefix: '' },
+      { ecosystem: 'pypi', name: 'some-py-pkg', release_prefix: 'py-' },
       { ecosystem: 'crates', name: 'some-crate', release_prefix: 'rmcp-v' },
       { ecosystem: 'go', name: 'example.invalid/mod', release_prefix: '' },
     ]);
@@ -306,12 +314,168 @@ describe('loadProductsConfig — repo products.yaml', () => {
     ]);
     expect(cfg!.productMeta['mcp-rust-sdk'].packages).toEqual([
       { ecosystem: 'crates', name: 'rmcp', release_prefix: 'rmcp-v' },
+      { ecosystem: 'crates', name: 'rmcp-macros', release_prefix: 'rmcp-macros-v' },
     ]);
     expect(cfg!.productMeta['anthropic-sdk-typescript'].packages).toEqual([
       { ecosystem: 'npm', name: '@anthropic-ai/sdk', release_prefix: 'sdk-' },
+      { ecosystem: 'npm', name: '@anthropic-ai/bedrock-sdk', release_prefix: 'bedrock-sdk-' },
+      { ecosystem: 'npm', name: '@anthropic-ai/vertex-sdk', release_prefix: 'vertex-sdk-' },
+      { ecosystem: 'npm', name: '@anthropic-ai/aws-sdk', release_prefix: 'aws-sdk-' },
+      { ecosystem: 'npm', name: '@anthropic-ai/foundry-sdk', release_prefix: 'foundry-sdk-' },
+      { ecosystem: 'npm', name: '@anthropic-ai/google-cloud-sdk', release_prefix: 'google-cloud-sdk-' },
     ]);
-    expect(cfg!.productMeta['mcp-typescript-sdk'].packages).toEqual([
-      { ecosystem: 'npm', name: '@modelcontextprotocol/sdk', release_prefix: '' },
+    expect(cfg!.productMeta['mcp-typescript-sdk'].packages?.length).toBe(10);
+    expect(cfg!.productMeta['anthropic-sdk-csharp'].packages?.map((p) => [p.ecosystem, p.name, p.release_prefix])).toEqual([
+      ['nuget', 'Anthropic', 'Anthropic-'],
+      ['nuget', 'Anthropic.Bedrock', 'Bedrock-'],
+      ['nuget', 'Anthropic.Vertex', 'Vertex-'],
+      ['nuget', 'Anthropic.Foundry', 'Foundry-'],
+      ['nuget', 'Anthropic.Aws', 'Aws-'],
+      ['nuget', 'Anthropic.GoogleCloud', 'GoogleCloud-'],
     ]);
+    expect(cfg!.productMeta['anthropic-cli'].packages?.map((p) => p.release_prefix)).toEqual(['', '', 'sandboxes-v']);
+    expect(cfg!.productMeta['continue-dev'].packages?.length).toBe(7);
+    expect(cfg!.productMeta['cursor'].packages).toEqual([
+      { name: 'cursor', release_prefix: '' },
+      { name: 'composer', release_prefix: 'composer-' },
+    ]);
+    expect(isMultiPackageProduct(cfg!.productMeta['anthropic-sdk-go'])).toBe(false);
+    expect(isMultiPackageProduct(cfg!.productMeta['anthropic-cli'])).toBe(true);
+    expect(isMultiPackageProduct(cfg!.productMeta['anthropic-sdk-typescript'])).toBe(true);
+    expect(isMultiPackageProduct(cfg!.productMeta['cursor'])).toBe(true);
+  });
+
+  it('supports nuget, optional ecosystem, Go /v2 alias deduping, and rejects duplicate non-Go prefixes', () => {
+    const goAndNuget = `products:
+  - name: nuget-and-go
+    display_name: Test
+    tier: 1
+    source_url: https://example.invalid
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: go
+        name: example.invalid/mod
+        release_prefix: ""
+      - ecosystem: go
+        name: example.invalid/mod/v2
+        release_prefix: ""
+      - ecosystem: nuget
+        name: Example.Pkg
+        release_prefix: "Example-"
+      - name: logical-only
+        release_prefix: "logical-"
+`;
+    const cfg = loadProductsConfig(writeYaml(goAndNuget))!;
+    const meta = cfg.productMeta['nuget-and-go'];
+    expect(meta.packages).toHaveLength(4);
+    expect(getCanonicalPackages(meta)).toEqual([
+      { name: 'example.invalid/mod', ecosystems: ['go'], aliases: ['example.invalid/mod', 'example.invalid/mod/v2'], release_prefix: '' },
+      { name: 'Example.Pkg', ecosystems: ['nuget'], aliases: ['Example.Pkg'], release_prefix: 'Example-' },
+      { name: 'logical-only', ecosystems: [], aliases: ['logical-only'], release_prefix: 'logical-' },
+    ]);
+    expect(resolveCanonicalPackageName(meta, { name: 'example.invalid/mod/v2', release_prefix: '' })).toBe('example.invalid/mod');
+
+    const dupPrefix = `products:
+  - name: dup
+    display_name: Dup
+    tier: 1
+    source_url: https://example.invalid
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: npm
+        name: "@scope/a"
+        release_prefix: "a-"
+      - ecosystem: npm
+        name: "@scope/b"
+        release_prefix: "a-"
+`;
+    expect(() => loadProductsConfig(writeYaml(dupPrefix))).toThrow(/duplicate release_prefix/i);
+  });
+
+  it('derives package and normalized version solely from declared release_prefix rules', () => {
+    const cfg = loadProductsConfig()!;
+    expect(deriveReleaseIdentity('anthropic-sdk-typescript', 'aws-sdk-v0.3.0', 'anthropic-sdk-typescript/releases/aws-sdk-0.3.0.md', cfg)).toEqual({
+      pkg: '@anthropic-ai/aws-sdk',
+      version: '0.3.0',
+    });
+    expect(deriveReleaseIdentity('anthropic-sdk-typescript', 'sdk-0.98.0', 'anthropic-sdk-typescript/releases/sdk-0.98.0.md', cfg)).toEqual({
+      pkg: '@anthropic-ai/sdk',
+      version: '0.98.0',
+    });
+    // Unknown stem on multi-package product is unassigned (never falls back to sdk or empty)
+    expect(deriveReleaseIdentity('anthropic-sdk-typescript', 'ertex-sdk-0.17.0', 'anthropic-sdk-typescript/releases/ertex-sdk-0.17.0.md', cfg)).toEqual({
+      pkg: UNASSIGNED_PACKAGE,
+      version: 'ertex-sdk-0.17.0',
+    });
+    // Suffix-tagged continue-dev release has no prefix match -> unassigned
+    expect(deriveReleaseIdentity('continue-dev', '1.5.20-vscode', 'continue-dev/releases/v1.5.20-vscode.md', cfg)).toEqual({
+      pkg: UNASSIGNED_PACKAGE,
+      version: '1.5.20-vscode',
+    });
+    // Prefix-tagged continue-dev release matches its declared package
+    expect(deriveReleaseIdentity('continue-dev', 'continuedev-config-yaml-1.42.0', 'continue-dev/releases/continuedev-config-yaml-1.42.0.md', cfg)).toEqual({
+      pkg: '@continuedev/config-yaml',
+      version: '1.42.0',
+    });
+    // Bare vscode-suffixed / v-prefixed continue-dev filenames are unassigned
+    expect(deriveReleaseIdentity('continue-dev', '1.2.23-vscode', 'continue-dev/releases/1.2.23-vscode.md', cfg)).toEqual({
+      pkg: UNASSIGNED_PACKAGE,
+      version: '1.2.23-vscode',
+    });
+    // Cursor feature slug without composer- or numeric start -> unassigned
+    expect(deriveReleaseIdentity('cursor', 'cli-jan-08-2026', 'cursor/releases/cli-jan-08-2026.md', cfg)).toEqual({
+      pkg: UNASSIGNED_PACKAGE,
+      version: 'cli-jan-08-2026',
+    });
+    expect(deriveReleaseIdentity('cursor', 'composer-1.5', 'cursor/releases/composer-1.5.md', cfg)).toEqual({
+      pkg: 'composer',
+      version: '1.5',
+    });
+    // Longest prefix wins for rmcp-macros-v vs rmcp-v
+    expect(deriveReleaseIdentity('mcp-rust-sdk', 'rmcp-macros-v0.16.0', 'mcp-rust-sdk/releases/rmcp-macros-v0.16.0.md', cfg)).toEqual({
+      pkg: 'rmcp-macros',
+      version: '0.16.0',
+    });
+    // Single-package Go module merges v2 under canonical package
+    expect(deriveReleaseIdentity('anthropic-sdk-go', 'v2.1.0', 'anthropic-sdk-go/releases/2.1.0.md', cfg)).toEqual({
+      pkg: 'github.com/anthropics/anthropic-sdk-go',
+      version: 'v2.1.0',
+    });
+    // Single-package prefixed product keeps rawVersion unchanged for byte-identity
+    const soloPrefixedCfg = loadProductsConfig(
+      writeYaml(`products:
+  - name: solo-prefixed
+    display_name: Solo Prefixed
+    tier: 1
+    source_url: https://example.invalid/solo
+    fetch_strategy: gh-releases
+    packages:
+      - ecosystem: crates
+        name: solo-crate
+        release_prefix: "solo-v"
+`),
+    )!;
+    expect(deriveReleaseIdentity('solo-prefixed', 'solo-v1.2.0', 'solo-prefixed/releases/solo-v1.2.0.md', soloPrefixedCfg)).toEqual({
+      pkg: 'solo-crate',
+      version: 'solo-v1.2.0',
+    });
+    // 2.1.0 ertex-sdk-<V>.md maps to @anthropic-ai/vertex-sdk only when source_url tag starts with vertex-sdk-v
+    expect(
+      deriveReleaseIdentity(
+        'anthropic-sdk-typescript',
+        'ertex-sdk-v0.17.0',
+        'anthropic-sdk-typescript/releases/ertex-sdk-0.17.0.md',
+        cfg,
+        'https://github.com/anthropics/anthropic-sdk-typescript/releases/tag/vertex-sdk-v0.17.0',
+      ),
+    ).toEqual({
+      pkg: '@anthropic-ai/vertex-sdk',
+      version: '0.17.0',
+    });
+    expect(resolveReleasePackage('anthropic-cli/releases/sandboxes-v0.1.0.md', cfg.productMeta['anthropic-cli']).pkg).toBe(
+      'github.com/anthropics/anthropic-cli/sandboxes'
+    );
+    expect(extractVersionFromNotesPath('mcp-rust-sdk/releases/rmcp-macros-0.16.0.md', 'rmcp-macros-v')).toBeNull();
+    expect(UNASSIGNED_PACKAGE_LABEL).toBe('unassigned');
   });
 });
