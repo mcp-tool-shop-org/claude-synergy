@@ -329,6 +329,93 @@ require (
       },
     ]);
   });
+
+  it('reads older pnpm-lock.yaml (v6-8) without importers using top-level dependencies', () => {
+    const dir = makeTempDir();
+    writeFileSync(
+      join(dir, 'pnpm-lock.yaml'),
+      `lockfileVersion: '6.0'
+dependencies:
+  '@anthropic-ai/sdk':
+    specifier: ^0.97.0
+    version: 0.97.0
+devDependencies:
+  '@modelcontextprotocol/sdk':
+    specifier: ^1.29.0
+    version: 1.29.0(zod@3.24.0)
+`,
+      'utf-8'
+    );
+
+    const res = readWorkspace(dir);
+    expect(res.files_skipped).toEqual([]);
+    expect(res.files_read).toEqual([{ file: 'pnpm-lock.yaml', ecosystem: 'npm', entries_count: 2 }]);
+    expect(res.entries).toEqual([
+      {
+        ecosystem: 'npm',
+        name: '@anthropic-ai/sdk',
+        version: '0.97.0',
+        source_file: 'pnpm-lock.yaml',
+      },
+      {
+        ecosystem: 'npm',
+        name: '@modelcontextprotocol/sdk',
+        version: '1.29.0',
+        source_file: 'pnpm-lock.yaml',
+      },
+    ]);
+  });
+
+  it('accepts ignore directives and skips replace-targeted modules in go.mod', () => {
+    const dir = makeTempDir();
+    writeFileSync(
+      join(dir, 'go.mod'),
+      `module example.invalid/demo
+
+go 1.25
+
+ignore ./testdata
+
+ignore (
+	./tmp
+	./fixtures
+)
+
+require (
+	github.com/anthropics/anthropic-sdk-go/v2 v2.14.0
+	github.com/modelcontextprotocol/go-sdk v1.7.0
+	github.com/anthropics/anthropic-cli v1.9.0
+)
+
+replace github.com/modelcontextprotocol/go-sdk => ../local-go-sdk
+
+replace (
+	github.com/anthropics/anthropic-cli v1.9.0 => example.invalid/fork v1.9.1
+)
+`,
+      'utf-8'
+    );
+
+    const res = readWorkspace(dir);
+    expect(res.files_skipped).toEqual([]);
+    expect(res.files_read).toEqual([
+      {
+        file: 'go.mod',
+        ecosystem: 'go',
+        entries_count: 1,
+        skipped_lines: 2,
+        skipped_reason: 'targeted by replace directive',
+      },
+    ]);
+    expect(res.entries).toEqual([
+      {
+        ecosystem: 'go',
+        name: 'github.com/anthropics/anthropic-sdk-go/v2',
+        version: '2.14.0',
+        source_file: 'go.mod',
+      },
+    ]);
+  });
 });
 
 describe('readWorkspace — refusals, warnings, and non-recursion', () => {
@@ -567,6 +654,57 @@ meta = { k = "v", }
     const tomlOk = readWorkspace(dToml);
     expect(tomlOk.files_skipped).toEqual([]);
     expect(tomlOk.entries[0]?.version).toBe('1.2.3');
+  });
+
+  it('refuses UNC and device paths before any filesystem call (spy)', () => {
+    const uncForms = [
+      '\\\\host\\share',
+      '//host/share',
+      '\\\\?\\UNC\\host\\share',
+      '//?/UNC/host/share',
+      '\\\\.\\pipe\\test',
+      '//./pipe/test',
+    ];
+    for (const form of uncForms) {
+      const statSpy = vi.fn(() => {
+        throw new Error('statSync must not be called for UNC/device path');
+      });
+      const lstatSpy = vi.fn(() => {
+        throw new Error('lstatSync must not be called for UNC/device path');
+      });
+      const readSpy = vi.fn(() => {
+        throw new Error('readFileSync must not be called for UNC/device path');
+      });
+      const spyFs: WorkspaceFs = {
+        statSync: statSpy as unknown as WorkspaceFs['statSync'],
+        lstatSync: lstatSpy as unknown as WorkspaceFs['lstatSync'],
+        readFileSync: readSpy as unknown as WorkspaceFs['readFileSync'],
+      };
+      let caught: any;
+      try {
+        readWorkspace(form, { fs: spyFs });
+      } catch (e) {
+        caught = e;
+      }
+      expect(caught).toBeInstanceOf(AppError);
+      expect(caught.code).toBe(WORKSPACE_INVALID_DIR);
+      expect(statSpy).not.toHaveBeenCalled();
+      expect(lstatSpy).not.toHaveBeenCalled();
+      expect(readSpy).not.toHaveBeenCalled();
+    }
+  });
+
+  it('skips malformed pnpm-lock.yaml without dependencies and malformed go.mod replace', () => {
+    const cases: Array<[string, string]> = [
+      ['pnpm-lock.yaml', 'other: true\n'],
+      ['go.mod', 'module x\nreplace example.invalid/a ../local\n'],
+    ];
+    for (const [fname, content] of cases) {
+      const d = makeTempDir();
+      writeFileSync(join(d, fname), content, 'utf-8');
+      const r = readWorkspace(d);
+      expect(r.files_skipped[0]?.code).toBe('LOCKFILE_MALFORMED');
+    }
   });
 
   it('does not recurse into subdirectories (spies on lstatSync and readFileSync)', () => {

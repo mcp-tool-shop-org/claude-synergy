@@ -158,4 +158,13 @@ describe('hk relevance CLI integration', () => {
     const parsed = JSON.parse(out.stdout);
     expect(parsed.code).toBe('WORKSPACE_INVALID_DIR');
   }, 30_000);
+
+  it('exits 1 with WORKSPACE_INVALID_DIR on UNC and device paths', () => {
+    for (const unc of ['\\\\192.0.2.1\\share', '//192.0.2.1/share', '\\\\?\\UNC\\192.0.2.1\\share', '\\\\.\\device']) {
+      const out = runCli(['relevance', unc, '--json', '--db', temp.path]);
+      expect(out.code).toBe(1);
+      const parsed = JSON.parse(out.stdout);
+      expect(parsed.code).toBe('WORKSPACE_INVALID_DIR');
+    }
+  }, 30_000);
 });

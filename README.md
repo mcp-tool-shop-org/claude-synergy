@@ -73,7 +73,7 @@ claude-synergy/
 └── URGENT_FINDINGS.md       # 23 actionable items surfaced from the corpus
 ```
 
-**Live numbers (as of v1.2.1):** 44 products / 1,171 release files / 6,573 changes / 1,260 entities / 12 synergies / 519 tests / 14 MCP tools / 18 CLI commands. (Corpus refreshed via `sync_now` on 2026-05-24.)
+**Live numbers:** 44 products / 1,171 release files / 6,573 changes / 1,260 entities / 12 synergies / 519 tests / 14 MCP tools / 18 CLI commands. (Corpus refreshed via `sync_now` on 2026-05-24.)
 
 ---
 
@@ -100,7 +100,7 @@ Roadmap beyond v1.3: tracked in [URGENT_FINDINGS.md](URGENT_FINDINGS.md) and iss
 
 ## Security & data model
 
-This tool runs locally. **Data touched:** a derived SQLite database and markdown release files — all re-creatable. **Network:** outbound HTTPS when you run `hk fetch`/`hk sync`, when an agent calls the MCP `sync_now` tool, and on first use: a query command or MCP tool run against an empty store syncs on its own (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off). Destinations are the GitHub API, RSS feeds, changelog pages and MCP registries, plus a remote AI provider only when you choose one: `hk embed` (Voyage embeddings, Anthropic for context generation), or `hk hybrid -e voyage` / `-r voyage|cohere`. Otherwise hybrid search, including the MCP `search` tool's default mode, calls a local Ollama on localhost to embed the query. **Secrets:** reads `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` from env vars — never logged, never stored to disk. **No telemetry.** See [SECURITY.md](SECURITY.md) for reporting policy.
+This tool runs locally. **Data touched:** a derived SQLite database and markdown release files — all re-creatable. Workspace relevance reads up to seven named lockfiles at the top of a directory the caller names. **Network:** outbound HTTPS when you run `hk fetch`/`hk sync`, when an agent calls the MCP `sync_now` tool, and on first use: a query command or MCP tool run against an empty store syncs on its own (`CLAUDE_SYNERGY_NO_AUTO_SYNC=1` turns that off). Destinations are the GitHub API, RSS feeds, changelog pages and MCP registries, plus a remote AI provider only when you choose one: `hk embed` (Voyage embeddings, Anthropic for context generation), or `hk hybrid -e voyage` / `-r voyage|cohere`. Otherwise hybrid search, including the MCP `search` tool's default mode, calls a local Ollama on localhost to embed the query. **Secrets:** reads `GITHUB_TOKEN`, `VOYAGE_API_KEY`, `COHERE_API_KEY`, `ANTHROPIC_API_KEY` from env vars — never logged, never stored to disk. **No telemetry.** See [SECURITY.md](SECURITY.md) for reporting policy.
 
 **Vendor text:** Third-party release notes and catalog entries are treated strictly as quoted data, never standing instructions. Release text is deterministically screened at ingest (stripping hidden Unicode controls, neutralising image/unsafe links, redacting emails and home paths, and flagging instruction-shaped patterns), wrapped in a fixed data frame by the seven MCP tools that return release text, with inline `[flagged: …]` markers, and never written into instruction files.
 

@@ -1177,6 +1177,11 @@ describe('MCP server integration', () => {
             await expect(
               client.callTool('workspace_relevance', { workspace_path: 'relative/path' })
             ).rejects.toThrow(/must be an absolute path/i);
+            for (const unc of ['\\\\192.0.2.1\\share', '//192.0.2.1/share', '\\\\?\\UNC\\192.0.2.1\\share', '\\\\.\\device']) {
+              await expect(
+                client.callTool('workspace_relevance', { workspace_path: unc })
+              ).rejects.toThrow(/must be an absolute path/i);
+            }
             await expect(
               client.callTool('workspace_relevance', { workspace_path: join(tmpDir, 'missing') })
             ).rejects.toThrow(/not found or unreadable/i);

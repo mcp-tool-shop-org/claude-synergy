@@ -30,7 +30,7 @@ import { createRequire } from 'node:module';
 import matter from 'gray-matter';
 import { openDb, initSchema, isReadonlyDbError, hasChangesFlagsColumn } from './db.js';
 import { AppError, formatError } from './errors.js';
-import { readWorkspace, type WorkspaceScanResult } from './workspace.js';
+import { isUncOrDevicePath, readWorkspace, type WorkspaceScanResult } from './workspace.js';
 import { evaluateWorkspaceRelevance, formatRelevanceReport } from './relevance.js';
 import {
   searchChanges,
@@ -655,7 +655,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'workspace_relevance': {
         const r = asRecord(args, 'workspace_relevance');
         const workspacePath = requireString(r, 'workspace_path', 'workspace_relevance');
-        if (!isAbsolute(workspacePath) || workspacePath.includes('\0')) {
+        if (!isAbsolute(workspacePath) || workspacePath.includes('\0') || isUncOrDevicePath(workspacePath)) {
           throw new McpError(
             ErrorCode.InvalidParams,
             'workspace_relevance: workspace_path must be an absolute path to a directory'

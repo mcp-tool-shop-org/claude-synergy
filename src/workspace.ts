@@ -39,6 +39,7 @@ export interface WorkspaceFileRead {
   ecosystem: PackageEcosystem;
   entries_count: number;
   skipped_lines?: number;
+  skipped_reason?: string;
 }
 
 export interface WorkspaceFileSkipped {
@@ -68,7 +69,11 @@ export interface ReadWorkspaceOptions {
 interface LockfileSpec {
   file: KnownLockfileName;
   ecosystem: PackageEcosystem;
-  parse: (raw: string) => { entries: Array<{ name: string; version: string }>; skippedLines?: number };
+  parse: (raw: string) => {
+    entries: Array<{ name: string; version: string }>;
+    skippedLines?: number;
+    skippedReason?: string;
+  };
 }
 
 const DEFAULT_FS: WorkspaceFs = {
@@ -84,7 +89,7 @@ const KNOWN_LOCKFILES: readonly LockfileSpec[] = [
   { file: 'poetry.lock', ecosystem: 'pypi', parse: (raw) => ({ entries: parseTomlLock(raw, 'poetry') }) },
   { file: 'requirements.txt', ecosystem: 'pypi', parse: parseRequirementsTxt },
   { file: 'Cargo.lock', ecosystem: 'crates', parse: (raw) => ({ entries: parseTomlLock(raw, 'crates') }) },
-  { file: 'go.mod', ecosystem: 'go', parse: (raw) => ({ entries: parseGoMod(raw) }) },
+  { file: 'go.mod', ecosystem: 'go', parse: parseGoMod },
 ];
 
 /**
@@ -109,6 +114,16 @@ function isPlainObject(val: unknown): val is Record<string, unknown> {
 }
 
 /**
+ * Reject Windows UNC share and device namespace prefixes (`\\host\share`,
+ * `//host/share`, `\\?\UNC\...`, `\\.\...`) before any path resolution or stat
+ * call can trigger SMB/network I/O.
+ */
+export function isUncOrDevicePath(rawPath: string): boolean {
+  const trimmed = rawPath.trimStart();
+  return /^(?:\\\\|\/\/|\\\/|\/\\)/.test(rawPath) || /^(?:\\\\|\/\/|\\\/|\/\\)/.test(trimmed);
+}
+
+/**
  * Read all supported top-level lockfiles in `dir` without recursing, globbing,
  * or executing any external tools. Missing lockfiles are ignored; symlinked,
  * oversized (>20 MB), non-regular, or malformed lockfiles are skipped with a
@@ -120,6 +135,13 @@ export function readWorkspace(dir: string, opts: ReadWorkspaceOptions = {}): Wor
       code: WORKSPACE_INVALID_DIR,
       message: 'workspace path must be a non-empty directory path',
       hint: 'Pass the path to a directory containing lockfiles (e.g. ".").',
+    });
+  }
+  if (isUncOrDevicePath(dir)) {
+    throw new AppError({
+      code: WORKSPACE_INVALID_DIR,
+      message: 'workspace path must not be a UNC or device path',
+      hint: 'Pass a local directory path containing lockfiles (e.g. ".").',
     });
   }
 
@@ -232,6 +254,7 @@ export function readWorkspace(dir: string, opts: ReadWorkspaceOptions = {}): Wor
         ecosystem: spec.ecosystem,
         entries_count: parsed.entries.length,
         ...(parsed.skippedLines !== undefined ? { skipped_lines: parsed.skippedLines } : {}),
+        ...(parsed.skippedReason !== undefined ? { skipped_reason: parsed.skippedReason } : {}),
       });
     } catch (e: any) {
       files_skipped.push({
@@ -330,22 +353,38 @@ function parsePnpmLock(raw: string): Array<{ name: string; version: string }> {
     throw new Error(`invalid YAML: ${e?.message ?? String(e)}`);
   }
 
-  if (!isPlainObject(doc) || !isPlainObject(doc.importers)) {
-    throw new Error('pnpm-lock.yaml missing "importers" object');
+  if (!isPlainObject(doc)) {
+    throw new Error('pnpm-lock.yaml must be a YAML mapping');
   }
-  const rootImporter = doc.importers['.'];
-  if (!isPlainObject(rootImporter)) {
-    throw new Error('pnpm-lock.yaml missing importers["."] object');
+
+  let depHolder: Record<string, unknown>;
+  if (doc.importers !== undefined) {
+    if (!isPlainObject(doc.importers)) {
+      throw new Error('pnpm-lock.yaml "importers" must be an object');
+    }
+    const rootImporter = doc.importers['.'];
+    if (!isPlainObject(rootImporter)) {
+      throw new Error('pnpm-lock.yaml missing importers["."] object');
+    }
+    depHolder = rootImporter;
+  } else {
+    const hasLockfileVersion =
+      typeof doc.lockfileVersion === 'string' || typeof doc.lockfileVersion === 'number';
+    if (!hasLockfileVersion && doc.dependencies === undefined && doc.devDependencies === undefined) {
+      throw new Error('pnpm-lock.yaml missing "importers" or top-level dependencies');
+    }
+    depHolder = doc;
   }
 
   const out: Array<{ name: string; version: string }> = [];
   const seen = new Set<string>();
 
   for (const sectionName of ['dependencies', 'devDependencies'] as const) {
-    const section = rootImporter[sectionName];
+    const section = depHolder[sectionName];
     if (section === undefined) continue;
     if (!isPlainObject(section)) {
-      throw new Error(`pnpm-lock.yaml importers["."].${sectionName} must be an object`);
+      const scope = doc.importers !== undefined ? `importers["."].${sectionName}` : sectionName;
+      throw new Error(`pnpm-lock.yaml ${scope} must be an object`);
     }
     for (const [depKey, rawVal] of Object.entries(section)) {
       let rawSpec: string | null = null;
@@ -770,6 +809,7 @@ const VALID_GOMOD_DIRECTIVES = new Set([
   'retract',
   'tool',
   'godebug',
+  'ignore',
 ]);
 
 function stripGoComment(line: string): string {
@@ -791,9 +831,34 @@ function normalizeGoVersion(rawVer: string): string {
   return rawVer.replace(/^v/, '').replace(/\+incompatible$/, '');
 }
 
-function parseGoMod(raw: string): Array<{ name: string; version: string }> {
-  const out: Array<{ name: string; version: string }> = [];
+function parseGoReplaceSpec(
+  tokens: string[],
+  replacedAll: Set<string>,
+  replacedVersions: Set<string>,
+  fullLine: string
+): void {
+  const arrowIdx = tokens.indexOf('=>');
+  if ((arrowIdx !== 1 && arrowIdx !== 2) || tokens.length <= arrowIdx + 1) {
+    throw new Error(`malformed go.mod replace directive: "${fullLine}"`);
+  }
+  const mod = normalizePackageName('go', unquoteGoToken(tokens[0]));
+  if (arrowIdx === 1) {
+    replacedAll.add(mod);
+  } else {
+    const ver = normalizeGoVersion(tokens[1]);
+    replacedVersions.add(`${mod}@${ver}`);
+  }
+}
+
+function parseGoMod(raw: string): {
+  entries: Array<{ name: string; version: string }>;
+  skippedLines?: number;
+  skippedReason?: string;
+} {
+  const rawRequires: Array<{ name: string; version: string }> = [];
   const seen = new Set<string>();
+  const replacedAll = new Set<string>();
+  const replacedVersions = new Set<string>();
   let inBlock: string | null = null;
 
   for (const rawLine of raw.split(/\r?\n/)) {
@@ -815,8 +880,10 @@ function parseGoMod(raw: string): Array<{ name: string; version: string }> {
         const key = `${mod}@${ver}`;
         if (!seen.has(key)) {
           seen.add(key);
-          out.push({ name: mod, version: ver });
+          rawRequires.push({ name: mod, version: ver });
         }
+      } else if (inBlock === 'replace') {
+        parseGoReplaceSpec(line.split(/\s+/), replacedAll, replacedVersions, line);
       }
       continue;
     }
@@ -825,15 +892,20 @@ function parseGoMod(raw: string): Array<{ name: string; version: string }> {
       throw new Error('unexpected ")" outside block in go.mod');
     }
 
+    const blockStart = /^([A-Za-z]+)\s*\($/.exec(line);
+    if (blockStart) {
+      const directive = blockStart[1];
+      if (!VALID_GOMOD_DIRECTIVES.has(directive)) {
+        throw new Error(`unknown go.mod directive "${directive}"`);
+      }
+      inBlock = directive;
+      continue;
+    }
+
     const tokens = line.split(/\s+/);
     const directive = tokens[0];
     if (!VALID_GOMOD_DIRECTIVES.has(directive)) {
       throw new Error(`unknown go.mod directive "${directive}"`);
-    }
-
-    if (tokens.length === 2 && tokens[1] === '(') {
-      inBlock = directive;
-      continue;
     }
 
     if (directive === 'require') {
@@ -845,8 +917,10 @@ function parseGoMod(raw: string): Array<{ name: string; version: string }> {
       const key = `${mod}@${ver}`;
       if (!seen.has(key)) {
         seen.add(key);
-        out.push({ name: mod, version: ver });
+        rawRequires.push({ name: mod, version: ver });
       }
+    } else if (directive === 'replace') {
+      parseGoReplaceSpec(tokens.slice(1), replacedAll, replacedVersions, line);
     }
   }
 
@@ -854,5 +928,22 @@ function parseGoMod(raw: string): Array<{ name: string; version: string }> {
     throw new Error(`unclosed ${inBlock} (...) block in go.mod`);
   }
 
-  return out;
+  const entries: Array<{ name: string; version: string }> = [];
+  let skippedCount = 0;
+  for (const req of rawRequires) {
+    if (replacedAll.has(req.name) || replacedVersions.has(`${req.name}@${req.version}`)) {
+      skippedCount++;
+    } else {
+      entries.push(req);
+    }
+  }
+
+  if (skippedCount > 0) {
+    return {
+      entries,
+      skippedLines: skippedCount,
+      skippedReason: 'targeted by replace directive',
+    };
+  }
+  return { entries };
 }
