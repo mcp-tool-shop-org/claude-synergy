@@ -1,8 +1,8 @@
 # mcp-registry-official — MCP server catalog
 
 **Source:** official-mcp-registry
-**Entries:** 1603
-**Fetched:** 2026-11-26
+**Entries:** 1579
+**Fetched:** 2026-11-28
 
 | Name | Description | Popularity | Created | Homepage |
 |------|-------------|------------|---------|----------|
@@ -26,7 +26,7 @@
 | BeachClubs.ae | Search UAE beach clubs, day pass prices, amenities, opening hours and events across all 7 emirates. | — | 2026-10-23 | [link](https://www.beachclubs.ae/mcp) |
 | Brainy Tax — UAE Tax Rules & Deadlines | Read-only UAE Corporate Tax, VAT and e-invoicing calculators with official legal citations. | — | 2026-11-25 | [link](https://tax.brainy.ae/mcp) |
 | Tipline: unofficial GTA 6 guide | Unofficial GTA 6 guide: sourced facts on characters, places, vehicles and release times. | — | 2026-11-18 | [link](https://tipline.brainy.ae/mcp) |
-| ae.brainy/brainy-48 | Custom, model-agnostic AI automation for UAE & Spain, with a free 48h diagnosis. | — | 2026-11-24 | [link](https://48.brainy.ae/mcp) |
+| ae.brainy/brainy-48 | Custom, model-agnostic AI automation. Free 48h diagnosis, receipts-to-Excel. | — | 2026-11-27 | [link](https://48.brainy.ae/mcp) |
 | Brainy Prices — UAE Cost of Living | Source-backed UAE costs: groceries, schools, housing, transport, utilities, telecom and relocation | — | 2026-10-04 | [link](https://prices.brainy.ae/mcp/v2) |
 | Data Dubai — Dubai real estate statistics | Dubai property prices, AED/sqft, sales, rents, yields and projects from DLD registered transactions. | — | 2026-11-26 | [link](https://mcp.datadubai.ae/mcp) |
 | Discond | UAE restaurant picks and live discounts across Fazaa, The Entertainer, Talabat and more. | — | 2026-11-15 | [link](https://mcp.discond.ae/mcp) |
@@ -72,7 +72,7 @@
 | 2kw.ai | EU-hosted AI platform: OpenAI-compatible LLM gateway, document extraction, transcription, agents. | — | 2026-10-25 | — |
 | 4ai – premium .ai domains for sale | Search 254 premium .ai domains for sale, get free .ai value estimates and real .ai sales data. | — | 2026-11-01 | [link](https://4ai.ai/mcp) |
 | 69.ai | Relationship network for AI agents and people: register, match, chat, dinner ideas, virtual gifts. | — | 2026-09-29 | [link](https://69ai.ai/mcp) |
-| A1 Lane | Draft, schedule and publish social posts and videos; delivery receipts, read-back where available. | — | 2026-11-24 | [link](https://a1lane.ai/mcp/v1) |
+| A1 Lane | Draft, schedule and publish social posts and videos; delivery receipts, read-back where available. | — | 2026-11-27 | [link](https://a1lane.ai/mcp/v1) |
 | A2UI Atomic Catalog | 500+ typed UI atoms an agent composes into real rendered interfaces. Free, no API key. | — | 2026-11-10 | [link](https://a2uicatalog.ai/mcp) |
 | A2UI Atomic Catalog docs | Search the A2UI Atomic Catalog's own docs: auth, versioning, pricing, API surface. | — | 2026-11-10 | [link](https://a2uicatalog.ai/mcp-docs) |
 | Aard | Official statistics from 170+ publishers, resolved from natural language with provenance. | — | 2026-09-15 | [link](https://api.aard.ai/mcp) |
@@ -216,7 +216,7 @@
 | Agimon | Turn weekly product, sales and marketing evidence into typed focus, budget and metric decisions. | — | 2026-11-13 | [link](https://agimon.ai/api/v1/mcp) |
 | Aginera | Construction takeoffs, routes and schedules; PDF to CAD; floor plan to 3D dollhouse and room images. | — | 2026-10-18 | [link](https://mcp.aginera.ai/mcp) |
 | Agothe Agent Contract Preflight | Deterministic MCP, JSON Schema, and SemVer preflight via Agothe's public MUV scope. | — | 2026-10-05 | [link](https://mcp-chatgpt.agothe.ai/mcp) |
-| Ahel | Data and tools for your AI agent: company, people, SEO, social and EU register data. Pay per call. | — | 2026-11-02 | [link](https://mcp.ahel.ai) |
+| Ahel | One link to the data your AI needs: companies, people, social, search, web and registers. | — | 2026-11-27 | [link](https://mcp.ahel.ai) |
 | AI-Advisors | Read-only AI search visibility data: citations, AEO audits, and advisor insights from AI-Advisors. | — | 2026-08-02 | [link](https://app.ai-advisors.ai/api/mcp) |
 | AIﾉアカリ☆ Agent Trust Receipt | Read-only Remote MCP for externally grounded AI agent trust receipts. | — | 2026-07-24 | [link](https://ai-akari.ai/mcp-trust) |
 | AIﾉアカリ☆ One-Minute Akari | A free one-minute reset for people, delivered by AI, with no account or personal data. | — | 2026-07-18 | [link](https://ai-akari.ai/mcp) |
@@ -226,6 +226,7 @@
 | Aidoo for Odoo | Query and update your Odoo ERP in plain language, under your own Odoo access rules. | — | 2026-09-22 | [link](https://mcp.aidoo.ai/mcp) |
 | ai.aient/mcp | MCP-native AI SRE: ask what's broken in production, get a reviewed GitHub fix PR. | — | 2026-06-11 | [link](https://aient.ai/mcp) |
 | aigamedev.ai | Game-design skills for AI agents: describe a problem, get the right skill. Plus free sound effects. | — | 2026-11-02 | [link](https://aigamedev.ai/mcp) |
+| AI Lattice | Sourced map of who depends on whom in the AI economy, with the chokepoints marked. | — | 2026-11-27 | [link](https://ailattice.ai/mcp) |
 | AIM SHIELD | Dice si un mensaje, enlace o cuenta bancaria es una estafa y da la nota de seguridad de un dominio. | — | 2026-11-17 | [link](https://www.aim-shield.ai/mcp) |
 | AIMentionTracker | How often ChatGPT, Claude, Gemini and Perplexity name and cite your brand, with the evidence. | — | 2026-10-09 | [link](https://mcp.aimentiontracker.ai/mcp) |
 | AIMochi | Read-only access to your AIMochi meeting notes: list, search and read transcripts and summaries. | — | 2026-11-08 | [link](https://api.aimochi.ai/mcp) |
@@ -243,6 +244,7 @@
 | ai.aivonic/mcp | Do business with Aivonic: pricing, products, check availability, book a demo, request a quote. | — | 2026-08-05 | [link](https://mcp.aivonic.ai) |
 | AkaPhone | Cloud Android phones for AI agents: tap, type, screenshot, install APKs, run plain-English tasks. | — | 2026-10-28 | [link](https://app.akaphone.ai/mcp) |
 | AkkruData | SEC filings, financial statements, metrics, insider and institutional holdings as structured data | — | 2026-09-08 | [link](https://api.akkrudata.ai/mcp) |
+| AlchemyAgent | Read-only SEO and AI search checks: AI crawler access, what AI sees, speed, schema, brand entity. | — | 2026-11-26 | [link](https://mcp.alchemyagent.ai/mcp) |
 | Alcock Arena | AI forecasting gym: markets, sports, policy and tech. Graded by reality, measured against markets. | — | 2026-10-05 | [link](https://alcock.ai/api/mcp) |
 | Aldro: small-business tax | US and Canada business tax deadlines, annual reports, sales tax permits and quotes, with sources. | — | 2026-10-31 | [link](https://aldro.ai/mcp) |
 | Alexein AI | Persistent personal memory for AI assistants: search what you told it before and save new facts. | — | 2026-11-17 | [link](https://api.alexein.ai/v1/mcp) |
@@ -254,6 +256,7 @@
 | AlpiX | A pixel wars MCP server: ask your agent to collaboratively draw pixels in a huge square | — | 2026-08-27 | [link](https://alpix.alpic.ai) |
 | Alpic | Manage your projects, debug deployments, and check analytics for any MCP server you host with Alpic. | — | 2026-08-27 | [link](https://mcp.alpic.ai) |
 | ai.alpic.test/test-mcp-server | Alpic Test MCP Server - great server! | — | 2025-09-10 | [link](https://test.alpic.ai/) |
+| Open Alvary | Search and verify African legislation, treaties, and case law with Open Alvary. | — | 2026-11-27 | [link](https://api.open.alvary.ai/mcp) |
 | Alvin's Club BrandPilot | Plan and run brand content on X, LinkedIn, TikTok, YouTube Shorts, Instagram and Hashnode. | — | 2026-10-30 | [link](https://studio.alvinsclub.ai/brandpilot/mcp) |
 | Alvin's Club Channel | Publish approved videos and posts to TikTok, YouTube Shorts, Instagram, X, LinkedIn and Hashnode. | — | 2026-10-30 | [link](https://studio.alvinsclub.ai/channel/mcp) |
 | SEO & GEO by Alvin's Club | SEO audit and AI visibility check for your website, plus Search Console keyword opportunities. | — | 2026-10-30 | [link](https://studio.alvinsclub.ai/seo/mcp) |
@@ -275,7 +278,7 @@
 | Ankra | Deploy and operate Kubernetes: clusters, stacks, apps, logs, metrics and security, with OAuth. | — | 2026-11-06 | [link](https://platform.ankra.app/api/v1/mcp) |
 | Annsa | The plan your AI agents work from. Project management and customer feedback for agent teams. | — | 2026-11-13 | [link](https://app.annsa.ai/mcp) |
 | AnomalyArmor | Data observability tools for engineering teams: alerts, freshness, schema drift, lineage, quality. | — | 2026-04-18 | [link](https://mcp.anomalyarmor.ai/mcp) |
-| AnyForge | Approve plans, track initiatives and work items, and steer AI engineering crews in AnyForge. | — | 2026-11-26 | [link](https://crew.anyforge.ai/api/mcp) |
+| AnyForge | Approve plans, track initiatives and work items, and steer AI engineering crews in AnyForge. | — | 2026-11-28 | [link](https://crew.anyforge.ai/api/mcp) |
 | Anyreach | Build AI agents that handle calls, web chats, and email — and automate everything around them. | — | 2026-11-12 | [link](https://api.anyreach.ai/mcp) |
 | AnyShare by Anysoft | Upload documents, create protected links, and read page engagement. OAuth required. | — | 2026-11-23 | [link](https://share.anysoft.ai/mcp) |
 | Switchboard | Agent to agent calls across AI apps. Humans remain in authority. | — | 2026-11-18 | [link](https://switchboard.anywhereintelligence.ai/mcp) |
@@ -292,6 +295,7 @@
 | AppDeploy | AppDeploy turns app ideas described in AI chat into live full-stack web applications | — | 2026-07-13 | [link](https://api-v2.appdeploy.ai/mcp) |
 | Appgarten | AI Ops for your apps – we keep an eye on your app so you can keep building. | — | 2026-11-23 | [link](https://mcp.appgarten.ai/mcp) |
 | AppGoat | App Store and Google Play data: apps, reviews, keywords, charts, competitors, ASO playbooks. | — | 2026-10-23 | [link](https://api.appgoat.ai/mcp) |
+| Apply Guy: AI Job Search & 1-Click Apply | Search millions of jobs and apply in one click. Submits real job applications with your résumé. | — | 2026-11-26 | [link](https://api.applyguy.ai/mcp) |
 | ai.aqta/seal | Verify Seal AI decision receipts: signed evidence anyone can check, no account needed. | — | 2026-08-17 | [link](https://app.aqta.ai/api/mcp) |
 | Reasonbook | Reasonbook: decisions that survive the session, in a local record AI agents keep. | — | 2026-11-25 | — |
 | ai.aquex/stage1 | Stage1 Inspector — local website capture, evidence views and design comparison | — | 2026-11-17 | — |
@@ -304,7 +308,8 @@
 | Arclan MCP Registry | MCP registry: 138k servers crawled, handshake-validated, reliability-scored. 744 production-safe. | — | 2026-09-12 | [link](https://arclan.ai/mcp) |
 | ARC (arcreport.ai): can an agent reach checkout? | Free open check: can an AI agent reach checkout on this store? Advisory; ARC stops before payment. | — | 2026-10-14 | [link](https://www.arcreport.ai/api/ask) |
 | ARC: agent checkout reachability | Free, no sign-in MCP: can AI agents reach checkout at a store? Try: Use ARC to check allbirds.com | — | 2026-10-13 | [link](https://www.arcreport.ai/api/mcp) |
-| Argil | Make videos, images and audio with Argil's AI models, avatars, voices and video agent. | — | 2026-11-26 | [link](https://mcp.argil.ai/mcp) |
+| KYAH v2.0 Sovereign AI OS | Zero-secret AI sandbox, ACTA CSOR memory, atomic x402 spend caps & RFC 6962 audit proofs. | — | 2026-11-28 | [link](https://kyah.ardyn.ai/mcp) |
+| Argil | Make finished videos from a brief with a video agent: ads, explainers, films. Plus images, clips. | — | 2026-11-26 | [link](https://mcp.argil.ai/mcp) |
 | ai.argushq/enforcement-database | Search Argus HQ public FDA enforcement data: warning letters, recalls, approvals, 483s. | — | 2026-07-12 | [link](https://argushq.ai/api/mcp) |
 | Arihaan Jobs | Live job postings from employer career sites: search, count and compare jobs and companies. | — | 2026-10-21 | [link](https://jobs-api.arihaan.ai/mcp) |
 | Ari by Ariso | Ari, the AI chief of staff: meetings, to-dos, reminders and memory, and work you hand to Ari. | — | 2026-11-15 | [link](https://mcp.ari.ariso.ai/mcp) |
@@ -370,7 +375,7 @@
 | ai.autonomad/computeback | Agent Rewards Marketplace: earn $NOMD on B2B work, spend on agent capabilities. | — | 2026-09-18 | — |
 | ai.autonomad/travel | Flights and hotels booked in one checkout; tours, events and dining to plan; group trips. | — | 2026-11-17 | [link](https://mcp.autonomad.ai/mcp) |
 | Harness | Start Claude Code and Codex agents the person can watch, wait for them and read their answers. | — | 2026-10-19 | — |
-| AutoPoster AI | Multi-platform social media post creation, scheduling, and publishing. | — | 2026-10-07 | [link](https://agent.autoposter.ai/mcp) |
+| Auto Poster AI | Draft, schedule, publish and analyze social media posts on Instagram, TikTok, LinkedIn, X and more. | — | 2026-11-27 | [link](https://agent.autoposter.ai/mcp) |
 | Autoposting | Schedule, generate and publish social posts to X, LinkedIn, Instagram, Threads and YouTube | — | 2026-08-07 | [link](https://app.autoposting.ai/mcp) |
 | AutoRFP.ai | Search AutoRFP.ai projects, requirements, content library, and tags for Q&A and analytics. | — | 2026-05-18 | [link](https://{api_host}/mcp) |
 | AutoTracks | Read and update your vehicle service logbook: history, mileage, costs, and what was done when. | — | 2026-11-16 | [link](https://autotracks.ai/mcp) |
@@ -390,6 +395,7 @@
 | Axon NeuroAutomata | Protein analysis: ESM-2/ESMC embeddings, mutation scoring, landscape scans, ESMFold structure. | — | 2026-07-01 | [link](https://mcp.neuroautomata.axonagentic.ai/mcp) |
 | AyeWatch | Create, pause and manage AyeWatch monitors for web pages, news and social media from your AI. | — | 2026-11-25 | [link](https://ayewatch.ai/api/mcp) |
 | Azquo | Shared memory for AI agents: a hierarchical database where totals add up and writes are attributed. | — | 2026-10-19 | [link](https://data.azquo.ai/mcp) |
+| Cytrix | Social network where humans and AI agents share one feed: read, post, comment, follow, DM. | — | 2026-11-27 | [link](https://cytric.apps.azwell.ai/api/mcp) |
 | AI Media Studio | Generate images, videos, voiceovers, and captions from a chat prompt. | — | 2026-08-14 | [link](https://ai-media-studio.b77.ai/mcp) |
 | Apple Search Ads | Manage Apple Ads campaigns and reporting in chat. | — | 2026-08-14 | [link](https://apple-search-ads.b77.ai/mcp) |
 | Chess Results | Live chess tournament results and up-to-date player ratings in chat. | — | 2026-08-14 | [link](https://chess-results.b77.ai/mcp) |
@@ -438,6 +444,7 @@
 | B4 Index | Independent build-vs-buy index: score software categories BUILD/BUY/BRIDGE/BEWARE. | — | 2026-07-03 | [link](https://b4-index.vercel.app/mcp) |
 | BetSlip Doctor | Your agent grades every slip A+ to F-, links your books and tracks your record. No wager placement. | — | 2026-10-21 | [link](https://api.betslipdoctor.ai/api/mcp) |
 | BetterPost | Finds timely sources across news, social, and the web and writes posts worth publishing. | — | 2026-07-08 | [link](https://betterpost.ai/mcp) |
+| BetterShell Resume Builder | Tailors a resume or CV to a job: a one-page PDF from your own experience, with every change shown. | — | 2026-11-26 | [link](https://bettershell.ai/mcp) |
 | Bezal — Local Business Intelligence for AI Agents | Search 7,000+ local service businesses across America by category, location, or keyword. | — | 2026-03-03 | [link](https://app.bezal.ai/api/mcp) |
 | BidBetter collector-car values | Collector-car values from completed auction sales: median, 25th-75th band and sale count by model. | — | 2026-11-03 | [link](https://bidbetter.ai/api/mcp) |
 | ai.bidclub/bidclub | Search 45+ investor podcasts and read transcripts, TL;DRs, digests — bilingual EN/中文, keyless. | — | 2026-08-17 | [link](https://bidclub.ai/api/mcp) |
@@ -482,7 +489,7 @@
 | Boon | Run pursuits, answer decisions, handle inbound requests and manage your front door with Boon. | — | 2026-10-20 | [link](https://mcp.boon.ai/api/mcp) |
 | Booqer | Verified Booqer shops. A keyless consult is confirmed when the slot is open. | — | 2026-10-21 | [link](https://booqer.ai/mcp) |
 | bootkey | Boot and run AI agents that live on their own Linux server, with their own IP, email and memory. | — | 2026-11-12 | [link](https://bootkey.ai/mcp) |
-| Bootpay | Korean payments & KakaoTalk AlimTalk: PG integration code, docs, billing, AlimTalk sending. | — | 2026-11-25 | [link](https://mcp.bootpay.ai/mcp) |
+| Bootpay | Korean payments & KakaoTalk AlimTalk: PG integration code, docs, billing, AlimTalk sending. | — | 2026-11-27 | [link](https://mcp.bootpay.ai/mcp) |
 | boqo | AI agent for social media: finds videos, cuts captioned clips, posts to TikTok, Instagram, YouTube. | — | 2026-11-05 | [link](https://mcp.boqo.ai/mcp) |
 | Bordet AI | Ask a room of Claude, GPT and Gemini from your AI tool, search its memory and log decisions. | — | 2026-10-17 | [link](https://www.bordet.ai/api/mcp/mcp) |
 | BorealHost | Agent-native web hosting — deploy sites, manage DNS, register domains, scale infrastructure | — | 2026-09-06 | [link](https://borealhost.ai/mcp/) |
@@ -490,7 +497,7 @@
 | BotInfo — Advanced Robot Market Data | Checkout-verified prices, stock, US FCC status and buy routes for humanoid and quadruped robots | — | 2026-09-20 | [link](https://mcp.botinfo.ai/mcp) |
 | ai.boundaryai/boundaryai | Deterministic runtime safety for AI agents: scan PII, gate tool actions, verify LLM output. | — | 2026-07-25 | [link](https://mcp.boundaryai.ai/mcp) |
 | Bourdon | Recognition-first cross-agent memory federation. One shared memory across all your agents. | — | 2026-10-27 | — |
-| Bowmark web data: LinkedIn, Amazon, YouTube, Reddit, Airbnb, Instagram | Web scraping and automation for AI agents: live prices, quotes, bookings, anything behind a login. | — | 2026-11-23 | [link](https://api.bowmark.ai/mcp/registry) |
+| Bowmark web data: LinkedIn, Amazon, YouTube, Reddit, Airbnb, Instagram | Web scraping and automation for AI agents: live prices, quotes, bookings, anything behind a login. | — | 2026-11-26 | [link](https://api.bowmark.ai/mcp/registry) |
 | BoxCompute | Linux VMs for AI agents: create VMs, run commands, edit files and open preview URLs. | — | 2026-10-16 | [link](https://mcp.boxcompute.ai/mcp) |
 | brainattic | The knowledge base your AI reads and writes, under your rules — over MCP, EU-hosted. | — | 2026-10-30 | [link](https://app.brainattic.ai/api/mcp) |
 | Brain Memory | Persistent memory for AI agents: one brain shared across Claude, Cursor, Codex and more. | — | 2026-11-16 | [link](https://mcp.brainmemory.ai/mcp) |
@@ -542,7 +549,7 @@
 | Can I Vibe? — AI coding provider status | Live status and health checks for AI coding providers: Claude, Cursor, Copilot, Codex and more. | — | 2026-07-23 | [link](https://canivibe.ai/mcp) |
 | Canvora | Turn any idea, URL, doc, or PDF into on-brand visuals: 100+ formats, native in 150+ languages | — | 2026-07-20 | [link](https://api.canvora.ai/mcp) |
 | Capital Company | Launch SPVs and funds, invite investors and send capital calls through Capital Company. | — | 2026-10-06 | [link](https://capitalcompany.ai/mcp) |
-| CAPPZ Marketplace | Let your agent hire and sell work, paid stage by stage from XRPL escrow. Keys stay local. | — | 2026-11-23 | — |
+| CAPPZ Marketplace | Let your agent hire and sell work, paid stage by stage from XRPL escrow. Keys stay local. | — | 2026-11-27 | — |
 | Capxule | The context marketplace: expert guided journeys your assistant runs step by step. | — | 2026-10-14 | [link](https://capxule.ai/mcp) |
 | Car Background AI | Replace car photo backgrounds, hide license plates and add dealer logos for vehicle listings. | — | 2026-11-19 | [link](https://api.carbackground.ai/mcp) |
 | Cardboard AI | Edit your own videos by chatting in Claude or ChatGPT: cut, caption, add music and export. | — | 2026-10-26 | [link](https://mcp.cardboard.ai/mcp) |
@@ -552,7 +559,7 @@
 | CartAI MCP Server | Agentic checkout with or without a human in the loop, product catalog, and an agent wallet. | — | 2026-11-22 | — |
 | Casama | Search Casama's docs and API reference, no sign-in. Optional: drive your Casama AI bots. | — | 2026-11-26 | [link](https://api.casama.ai/mcp/docs) |
 | Castopia | Small business marketing: edit your website and its code, post videos and images, run ads, ask Eve. | — | 2026-11-23 | [link](https://castopia.ai/api/mcp) |
-| CatalystDesk | Descriptive market regime analytics. Free preview, synthetic without a data key; paid compute. | — | 2026-11-26 | [link](https://x402.catalystdesk.ai/mcp) |
+| CatalystDesk | Descriptive market regime analytics. Free preview, synthetic without a data key; paid compute. | — | 2026-11-27 | [link](https://x402.catalystdesk.ai/mcp) |
 | Catalyst evidence graph | Findings on what compounds and supplements do in the body, with evidence strength, quote and paper. | — | 2026-10-04 | [link](https://catalystproject.ai/mcp) |
 | CatchMyCall | Place calls, send WhatsApp, manage contacts, leads and campaigns, and read call records and billing | — | 2026-11-17 | [link](https://mcp.catchmycall.ai/mcp) |
 | Cattalog | Build print-ready PDF catalogs from templates and spreadsheet data. | — | 2026-11-18 | [link](https://app.cattalog.ai/api/mcp) |
@@ -603,7 +610,7 @@
 | Chipp Releases | Chipp: software factory deploys and releases: history, the deploy gate, Deploy now, rollbacks. | — | 2026-10-27 | [link](https://mcp.chipp.ai/mcp/releases) |
 | Chipp Tags | Chipp: conversation tags, their training examples and utterances, and tag instances | — | 2026-10-27 | [link](https://mcp.chipp.ai/mcp/tags) |
 | Chipp Tickets | Chipp: software factory tickets: list, read, file, reply, retry, cancel, proposals, and child. | — | 2026-10-27 | [link](https://mcp.chipp.ai/mcp/tickets) |
-| Chronary | Calendar API for AI agents: events, availability, Google/Microsoft setup, scheduling, and iCal. | — | 2026-11-25 | [link](https://api.chronary.ai/mcp) |
+| Chronary | Calendar API for AI agents: events, availability, Google/Microsoft setup, scheduling, and iCal. | — | 2026-11-26 | [link](https://api.chronary.ai/mcp) |
 | chucho — Book Direct | Find vacation rentals worldwide by describing the trip, check host prices and book direct. | — | 2026-10-22 | [link](https://chucho.ai/mcp) |
 | Church Latin AI | The world's premier ecclesiastical Latin translator: the Latin of the Church across 2,000 years. | — | 2026-11-17 | [link](https://churchlatin.ai/mcp) |
 | AgentMart | Webhook inbox, memory, wake-up calls, uptime watch and code kits for AI agents. Prepaid balance. | — | 2026-11-14 | [link](https://agentmart.ciphyr.ai/mcp) |
@@ -615,10 +622,11 @@
 | Citybook | Live Calgary events for AI agents. | — | 2026-08-28 | [link](https://mcp.citybook.ai/mcp) |
 | Clarid Compliance | Check bank marketing for FDIC, NCUA, TILA, Reg DD, Reg Z, UDAAP, and Equal Housing compliance. | — | 2026-02-26 | [link](https://mcp.clarid.ai/mcp) |
 | Clarid HMDA Validator | Validate HMDA LAR files against CFPB edit checks for community banks and credit unions. | — | 2026-02-26 | [link](https://api.clarid.ai/mcp) |
+| Clark | Your to-dos and notes from calls and meetings, saved by Clark for Mac, so your AI can act on them. | — | 2026-11-27 | [link](https://mcp.clark.claritysearch.ai/mcp) |
 | ClarityTrack | Ask your AI about your own accounts, debts, budgets and goals. OAuth sign-in, read-only by default. | — | 2026-10-13 | [link](https://www.claritytrack.ai/mcp) |
 | ai.clarx/mcp | Score agent manifests, generate CI workflows, and pull Clarx scan findings into your IDE. | — | 2026-08-19 | — |
 | ClawFC | AI football league where your agent is a player: register, train, follow fixtures and match reports. | — | 2026-11-06 | [link](https://clawfc.ai/mcp) |
-| ai.clawfetch/mcp | Web intelligence for AI agents: fetch, render, extract, research. x402 micropayments, no API keys. | — | 2026-10-21 | — |
+| ai.clawfetch/mcp | Web intelligence for AI agents: fetch, render, extract, research. x402 micropayments, no API keys. | — | 2026-11-27 | — |
 | Clawfight | An AI agent battle league: build a crab fighter over MCP and rap-battle in a rendered arena. | — | 2026-09-28 | [link](https://clawfight.ai/mcp) |
 | ClawTerminal | Ask your AI about the markets: filings, insider & congress trades, fund flows, options, macro | — | 2026-06-23 | [link](https://mcp.clawterminal.ai) |
 | CleanVector | Create professional SVG artwork, icons and vector logos from a prompt, or vectorize any image. | — | 2026-09-18 | [link](https://cleanvector.ai/api/mcp) |
@@ -632,6 +640,7 @@
 | Cleve | Search workspace knowledge, save ideas, update notes, organize folders, and share public links. | — | 2026-10-09 | [link](https://app.cleve.ai/mcp) |
 | Clevera | Make how-to videos, social clips and help articles from Claude or ChatGPT, and run your help center. | — | 2026-10-21 | [link](https://app.clevera.ai/mcp) |
 | Clevra | Field service management for trades: clients, jobs, estimates, invoices, schedule and reports. | — | 2026-10-08 | [link](https://app.clevra.ai/api/mcp) |
+| Clinko | Find people to talk to and stay in touch from the AI agent you already use. | — | 2026-11-27 | [link](https://clinko.ai/mcp) |
 | ClipFlux | Make faceless YouTube videos and Shorts from chat: script, scenes, voice, captions, YouTube posting. | — | 2026-11-02 | [link](https://mcp.clipflux.ai/mcp) |
 | Clip Studio MCP | Hosted MCP for Clip Studio public products — same plan as the website. | — | 2026-09-20 | [link](https://clipstudio.ai/api/mcp) |
 | Clize | Real-world actions for AI coding agents: an inbox with approval outbox, deploys, domains, payments. | — | 2026-10-12 | — |
@@ -674,7 +683,7 @@
 | HAPI Strava MCP Server | Strava MCP tools for AI: athletes, activities, segments, clubs, routes. Powered by HAPI MCP server. | — | 2026-02-19 | [link](https://strava.run.mcp.com.ai/mcp) |
 | NLP.COM.AI Open Model Catalog | Search curated open-weight AI model releases, licenses, architectures, and primary sources. | — | 2026-10-18 | [link](https://nlp.com.ai/mcp) |
 | CommerceAI | The E-commerce Marketplace For Every AI Agent. A Governed Catalog Of 600M+ US Products. | — | 2026-10-26 | [link](https://commerceai.ai/mcp/) |
-| CommerceBook | Search and buy products from sellers and verified warehouses, sell surplus stock, post requests. | — | 2026-11-11 | [link](https://commercebook.ai/mcp) |
+| CommerceBook | Search and buy products from sellers and verified warehouses, sell surplus stock, post requests. | — | 2026-11-26 | [link](https://commercebook.ai/mcp) |
 | Commercializer | Commercial strategy for medical device and life-science companies, read from the governed registers. | — | 2026-11-03 | [link](https://commercializer.ai/mcp) |
 | CommitLayer | Read verdicts, reasons and evidence for recorded agent actions. Draft and dry-run contracts. | — | 2026-11-17 | [link](https://api.commitlayer.ai/mcp) |
 | CommSync | One inbox for SMS and email: read threads, search, manage contacts, and send texts and emails. | — | 2026-09-23 | [link](https://server.commsync.ai/api/mcp) |
@@ -698,6 +707,7 @@
 | ContentSweep Supplier Feeds | Map and validate recurring flat supplier catalogs with approved profiles and drift checks. | — | 2026-11-02 | [link](https://mcp.contentsweep.ai/v1/feeds/mcp/) |
 | Contexel | Shared AI memory. ChatGPT, Claude, Cursor and any MCP app read and write the same memory. | — | 2026-09-23 | [link](https://contexel.ai/mcp) |
 | Context Link | One semantic search across your sites, Drive, Notion, email, files and Basecamp. | — | 2026-09-12 | [link](https://www.context-link.ai/mcp) |
+| ContextDB Customer Memory | Persistent memory across chats: remember facts, assemble context, and verify before acting. | — | 2026-11-28 | [link](https://api.contextdb.ai/mcp) |
 | ContextGate | MCP gateway: one connection for your AI apps, with tool policies, PII redaction and audit logs. | — | 2026-11-03 | [link](https://api.contextgate.ai/mcp) |
 | Context Studios MCP | AI agency API: free tools for glossary, comparisons, blog, guides, estimates and consulting | — | 2026-08-05 | [link](https://mcp.contextstudios.ai/api/public/mcp) |
 | Contio MeetingOS | Contio MeetingOS: meetings, transcripts, action items, agendas, calendar, and project management. | — | 2026-08-06 | [link](https://mcp.contio.ai/mcp) |
@@ -732,9 +742,11 @@
 | ai.creationloop/creationloop | CreationLoop is your Marketing Agent. Read the overview, offer, and FAQ; apply as a design partner. | — | 2026-07-09 | [link](https://creationloop.ai/api/mcp) |
 | CreativeScope — Mobile Game Ad Creative Intelligence | Mobile-game ad creative intelligence across SDK ad networks: search, rankings, AI hook analysis. | — | 2026-07-22 | [link](https://mcp.creativescope.ai/mcp) |
 | CreditPolicy.ai | Australian lender credit policy library and client files for mortgage and finance brokers. | — | 2026-10-01 | [link](https://creditpolicy.ai/api/mcp) |
+| Cresva | Ad campaigns, profit, forecasts and product catalogue for your ecommerce brands, for AI assistants. | — | 2026-11-27 | [link](https://cresva.ai/mcp) |
 | Crossprobe | Build KiCad PCBs from requirements: schematic, placed and routed board, ERC/DRC. Read and edit them. | — | 2026-11-22 | [link](https://crossprobe.ai/mcp) |
 | CrowdOS | Agents run synthetic focus groups over MCP against census panels that disagree. | — | 2026-10-12 | [link](https://api.crowdos.ai/mcp) |
 | Crub | Identify plants, mushrooms and insects, and keep your garden’s records and jobs, from your AI. | — | 2026-10-03 | [link](https://mcp.crub.ai/mcp) |
+| CrystalBrain | Per-user memory for AI apps: save, search, review and fix what your app learns about each user. | — | 2026-11-27 | [link](https://crystalbrain.ai/api/mcp) |
 | ctxstore — memory that follows you across models | Persistent memory for AI agents: keyed facts, a wake bundle each session, one memory in every model. | — | 2026-10-09 | [link](https://mcp.ctxstore.ai/mcp) |
 | cubrik | AI trading agents, backtests, portfolio, Analytics and your brokers, with OAuth sign-in | — | 2026-11-20 | [link](https://mcp.cubrik.ai/mcp) |
 | ai.cueapi/mcp | Schedule agent work and report write-once outcomes via CueAPI from any MCP host. | — | 2026-04-15 | — |
@@ -753,10 +765,12 @@
 | Daiku | Your own browser in the cloud, logged in to your sites, shared by you and your AI. | — | 2026-10-26 | [link](https://daiku.ai/mcp) |
 | Daishi Studio | Run AI agent evaluations on your own model keys, and publish runs others can review and re-run. | — | 2026-09-30 | [link](https://daishi.ai/mcp/studio) |
 | Daishi | A persistent multi-agent world any AI agent can join over MCP, with a public record of every match. | — | 2026-09-30 | [link](https://daishi.ai/mcp) |
+| DALFAST AI | Business design, docs & brand: flyers, posts, invoices and decks from chat, finished in DALFAST AI. | — | 2026-11-27 | [link](https://dalfast.ai/connect/mcp) |
 | Dandex | Danish Company Data: search, financials, credit checks, business signals and ownership networks. | — | 2026-11-21 | [link](https://dandex.ai/mcp) |
 | Дарим | Russian group greeting cards: create, invite signers, track; split a gift, holiday dates. | — | 2026-10-29 | [link](https://api.darim.ai/mcp) |
 | DarkFunnels documentation | Search and read the DarkFunnels docs: WhatsApp AI sales agents connected by QR, no Meta Cloud API. | — | 2026-09-04 | [link](https://docs.darkfunnels.ai/mcp) |
 | DarkFunnels | WhatsApp AI sales agent on your own number via QR, no Meta API: audit chats, edit playbook, orders. | — | 2026-09-04 | [link](https://mcp.darkfunnels.ai/mcp?features=all) |
+| Darwin | Read your Darwin nature and climate risk assessments: impacts, sites, sourcing, data points. | — | 2026-11-27 | [link](https://mcp.darwindata.ai/mcp) |
 | Databrush | Churn and retention answers from your Supabase database: who may leave and what keeps customers. | — | 2026-11-17 | [link](https://app.databrush.ai/api/mcp) |
 | Data Center Index | AI infrastructure tracker: data center campuses, power projects, MW and the companies behind them | — | 2026-11-20 | [link](https://datacenterindex.ai/mcp) |
 | Data Connector | Read authorized Loam tables and supported external databases through a bounded MCP connection. | — | 2026-11-06 | [link](https://dataconnector.ai/api/mcp) |
@@ -764,7 +778,7 @@
 | DataForB2B | Search and enrich B2B people & companies — 70+ filters (funding, linkedin, industry, country, ...). | — | 2026-05-14 | [link](https://mcp.dataforb2b.ai/mcp) |
 | DataGrout | Discover, plan and run tools across your connected business systems through one OAuth MCP endpoint | — | 2026-10-15 | [link](https://gateway.datagrout.ai/connect) |
 | DataMerge MCP | B2B data enrichment for 375M+ companies: legal entities, corporate hierarchies, and contacts. | — | 2026-02-27 | [link](https://mcp.datamerge.ai) |
-| Data Parrot AI Revenue Analyst for HubSpot | Data Parrot brings AI revenue analysis of your HubSpot data into your AI tools. | — | 2026-10-30 | [link](https://api-v3.dataparrot.ai/api/v3/data-parrot/mcp) |
+| Data Parrot AI Revenue Analyst for HubSpot | Data Parrot brings AI revenue analysis of your HubSpot data into your AI tools. | — | 2026-11-28 | [link](https://api-v3.dataparrot.ai/api/v3/data-parrot/mcp) |
 | Data Reaktor | Find people inside target companies, score warm intro paths, and draft openers. Never sends. | — | 2026-10-23 | [link](https://www.datareaktor.ai/mcp) |
 | DataSnack | Seven-day forecasts of real-world numbers, linked and graded daily; sign-in adds Excel exports. | — | 2026-11-14 | [link](https://datasnack.ai/mcp) |
 | DataSnack Outbox | Check AI assistant actions before they reach external apps, with rules and human approval. | — | 2026-11-23 | [link](https://datasnack.ai/mcp) |
@@ -787,15 +801,19 @@
 | DeepDNA | Pharmacogenomics for AI agents: cited drug–gene, gene and rsID lookups plus a medication screen. | — | 2026-10-29 | [link](https://deepdna.ai/mcp) |
 | DeepDNA local | Reads a raw DNA file on your computer and reports the variants DeepDNA curates, with sources. | — | 2026-11-08 | — |
 | DeepInquiry Verified Facts | Search and read short factual claims with cited sources, a verification tier and a signature. | — | 2026-10-15 | [link](https://www.deepinquiry.ai/mcp) |
-| DeepLedger: QuickBooks, Xero & Bill.com MCP for ChatGPT & Claude | Connect QuickBooks, Xero, Bill.com, Blackbaud and Stripe to ChatGPT, Claude, Grok and any AI app. | — | 2026-11-15 | [link](https://mcp.deepledger.ai/mcp) |
+| DeepLedger for BILL | Connect BILL to Claude, ChatGPT, Grok: read bills and vendors, save draft bills | — | 2026-11-27 | [link](https://mcp.deepledger.ai/bill/mcp) |
+| DeepLedger | Connect QuickBooks, Xero, BILL and Stripe to Claude, ChatGPT, Grok: record transactions, run reports | — | 2026-11-27 | [link](https://mcp.deepledger.ai/mcp) |
+| DeepLedger for QuickBooks Desktop | Connect QuickBooks Desktop to Claude, ChatGPT, Grok: bills, invoices, payments, journals and reports | — | 2026-11-27 | [link](https://mcp.deepledger.ai/quickbooks-desktop/mcp) |
+| DeepLedger for QuickBooks Online | Connect QuickBooks Online to Claude, ChatGPT, Grok: bills, expenses, invoices, journals and reports | — | 2026-11-27 | [link](https://mcp.deepledger.ai/quickbooks-online/mcp) |
+| DeepLedger for Xero | Connect Xero to Claude, ChatGPT, Grok: record bills, expenses, invoices, payments, journals, reports | — | 2026-11-27 | [link](https://mcp.deepledger.ai/xero/mcp) |
 | DeepScout | Scrape any e-shop and match products across shops without EAN. API & MCP for AI agents. | — | 2026-10-26 | [link](https://mcp.deepscout.ai/mcp) |
-| DeepSieve | Deep research that returns a sourced, structured dataset and re-verifies it on your schedule. | — | 2026-11-22 | [link](https://deepsieve.ai/mcp) |
+| DeepSieve | Deep research that returns a sourced, structured dataset and re-verifies it on your schedule. | — | 2026-11-27 | [link](https://deepsieve.ai/mcp) |
 | Deep Values | Value investing for US stocks: SEC filings, 13F guru holdings, intrinsic value, AI briefings. | — | 2026-10-04 | [link](https://app.deepvalues.ai/api/mcp) |
 | Creator SKILL — Influencer Discovery | AI influencer search on TikTok, Instagram, YouTube. Deinai MCP token required; credits per result. | — | 2026-06-05 | [link](https://deinai.ai/mcp) |
 | Creator SKILL v2 — Influencer Discovery | SKILL-02 (not SKILL-01): AI influencer search on TikTok, Instagram & YouTube. sk_live_ token. | — | 2026-06-30 | [link](https://skill.deinai.ai/mcp) |
 | delega.ai for AWS Pricing Calculator | Create AWS cost estimates and shareable AWS Pricing Calculator URLs. | — | 2026-05-25 | [link](https://calculator.delega.ai/mcp) |
 | Delivr | Person-level intent, audiences, website visitors and campaign results from your Delivr account. | — | 2026-11-09 | [link](https://api.delivr.ai/mcp) |
-| Delpha | Verify a company and its contacts before your agent acts: commercial parent, website, CRM match. | — | 2026-11-26 | [link](https://mcp.delpha.ai/mcp) |
+| Delpha | Verify a company before your agent acts: commercial parent, website, contacts, CRM match + evidence. | — | 2026-11-26 | [link](https://mcp.delpha.ai/mcp) |
 | Deltabridge Threat Intelligence | Cyber threat intelligence: threat actors, malware, CVEs, IOCs, ATT&CK and analyst briefs. | — | 2026-11-11 | [link](https://mcp.deltabridge.ai) |
 | Demand Discovery AI | Validate startup ideas with real people asking for them, each quote linked to its source. | — | 2026-08-30 | [link](https://mcp.demanddiscovery.ai/api/mcp) |
 | DemoMagic | Guides for making interactive videos & AI product demos that answer viewers' questions. | — | 2026-06-18 | — |
@@ -832,6 +850,7 @@
 | Yarr MCP | Self-hosted media fleet operations across Sonarr, Radarr, Plex, and related apps over MCP and CLI. | — | 2026-08-04 | — |
 | DirectCase Legal Search | Search national and EU case law, legislation and regulation, with citations you can verify. | — | 2026-08-21 | [link](https://mcp.directcase.ai) |
 | Directories.ai | Build and run directory websites from your own AI: listings, imports, claims, SEO and content. | — | 2026-10-10 | [link](https://directories.ai/mcp) |
+| Discera | Competitor changes, battlecards and sales call findings from your Discera workspace, with sources. | — | 2026-11-26 | [link](https://mcp.discera.ai/mcp) |
 | DiscoverIA | Read-only registry of AI-assisted scientific claims and where their evaluation stands (fr/en) | — | 2026-10-22 | [link](https://mcp.discoveria.ai/mcp) |
 | DispatchMind | Job management for service companies: look up, book, tag, assign and note jobs from your AI. | — | 2026-10-12 | [link](https://app.dispatchmind.ai/mcp) |
 | Find and book a local service pro | Find a local service company by US ZIP code (garage door, locks, HVAC and more) and book a visit. | — | 2026-11-07 | [link](https://dispatchmind.ai/find/mcp) |
@@ -849,7 +868,7 @@
 | DoneThat | Privacy-first work tracking with summaries, reports, coaching, and AI-ready long-term memory. | — | 2026-04-08 | [link](https://mcp.donethat.ai/) |
 | Dopamyn | Crypto audience intelligence and DM outreach on X: find accounts, build lists, run DM campaigns. | — | 2026-11-02 | [link](https://mcp.dopamyn.ai/mcp) |
 | Dotpad | Shared space for agents and humans: hubs of live pads, threads and tasks any agent can join. | — | 2026-10-19 | [link](https://www.dotpad.ai/mcp) |
-| dotsy | Build and publish static sites on dotsy with draft-first MCP tools, OAuth Connect, and API keys. | — | 2026-11-26 | [link](https://mcp.dotsy.ai/mcp) |
+| dotsy | Build and publish static sites on dotsy with draft-first MCP tools, OAuth Connect, and API keys. | — | 2026-11-27 | [link](https://mcp.dotsy.ai/mcp) |
 | doublespeed — Xcode as an API | Build, test and run iOS apps on a remote Mac from any machine. XcodeBuildMCP-compatible tools. | — | 2026-08-28 | — |
 | ai.dragoneye/mcp | Build zero-shot video models for object detection, and category and attribute classification. | — | 2026-05-14 | [link](https://nexus.api.dragoneye.ai/mcp) |
 | DrAstro Vedic Astrology | Create Vedic birth charts, retrieve saved charts and stories, and chat with AI astrologers. | — | 2026-11-15 | [link](https://api.drastro.ai/mcp) |
@@ -862,13 +881,15 @@
 | Drillr — The financial MCP for AI agents | Financial data and research MCP for US/CN/JP equities: filings, statements, ownership, signals. | — | 2026-09-13 | [link](https://gateway.drillr.ai/mcp/data) |
 | DripMetrics | Institutional-grade market microstructure, a cent at a time. x402: Base USDC or Robinhood USDG. | — | 2026-10-24 | [link](https://mcp.dripmetrics.ai/mcp) |
 | Drone Intelligence | Drone-sector market intelligence for AI agents: free briefings and profiles, licenced tracker data. | — | 2026-08-17 | [link](https://droneintelligence.ai/api/mcp) |
+| DropSlop | See which phrases read as AI-written, rewrite what reads machine-made, and audit whole sites. | — | 2026-11-27 | [link](https://dropslop.ai/mcp) |
 | Druks | Run, approve and inspect durable agent runs on your Druks Cloud instance. | — | 2026-11-20 | [link](https://{instance}.druks.ai/mcp) |
 | Dryos | Live US power market prices, load, generation, weather and permits for AI agents. | — | 2026-09-18 | [link](https://api.dryos.ai/mcp) |
 | Dryos Workspace | Build live US power market dashboards in your own Dryos workspace. Sign-in required. | — | 2026-09-18 | [link](https://www.dryos.ai/api/mcp) |
-| ai.dsght/public | Read-only MCP access to DSGHT.ai published foresight and country-grounded claim resolution. | — | 2026-10-11 | [link](https://www.dsght.ai/mcp) |
+| ai.dsght/public | Read-only MCP access to DSGHT.ai published foresight and country-grounded claim resolution. | — | 2026-11-28 | [link](https://dsght.ai/mcp) |
 | DualSoft AAS & PLC (DS Studio) | Read-only MCP for DualSoft AAS 3.0 / AASX specs, DS2 PLC control docs, and 3D line examples. | — | 2026-11-20 | [link](https://dualsoft.ai/mcp) |
 | Duami | Directory of AI agents that are live right now: find, message, bid. Free. | — | 2026-10-30 | [link](https://duami.ai/mcp) |
 | Duang | Pay-per-call live data APIs across 51 platforms & $0 zero-key team vault via 4 MCP meta-tools. | — | 2026-11-25 | [link](https://api.duang.ai/mcp) |
+| Durmem | Shared memory for coordinating multiple coding agents. Install the CLI and run durmem setup. | — | 2026-11-28 | [link](https://durmem.ai/api/mcp) |
 | Duskly | MLS compliance for edited listing photos: classify edits, write disclosures, verify provenance. | — | 2026-09-25 | [link](https://duskly.ai/mcp) |
 | ai.duvera/gateway | Governed AI actions with signed, verifiable receipts: free keyless reads, human-approved writes. | — | 2026-06-11 | [link](https://app.duvera.ai/mcp) |
 | DV4 | Make videos, images and product ads from a prompt, then check, list or cancel them. | — | 2026-11-24 | [link](https://dv4.ai/mcp) |
@@ -907,9 +928,12 @@
 | ai.elfa/mcp | Get events, answers, verdicts and alerts from social and web data. | — | 2026-11-24 | [link](https://mcp.elfa.ai/mcp) |
 | Elicitly | Human-in-the-loop for AI agents over MCP elicitation: confirm/form dialogs plus a capability doctor | — | 2026-11-13 | — |
 | Elicitly Pro | Human-in-the-loop for AI agents over MCP: durable approvals with a hosted review page & audit trail | — | 2026-11-12 | [link](https://mcp.elicitly.ai/mcp) |
+| Ella | Ella's public identity, research frameworks and published work. | — | 2026-11-27 | [link](https://mcp.ellaentity.ai/mcp) |
 | ai.ellul/services | ellul.ai: an agency's fixed prices, what other agencies publish, and a quote request. | — | 2026-11-22 | [link](https://ellul.ai/mcp) |
+| Elora Grid | AI electrical drafting: create and edit 2D/3D drawings. Find equipment CAD, datasheets and manuals. | — | 2026-11-27 | [link](https://mcp.eloragrid.ai/mcp) |
 | elvex | Multiplayer workspace where your team's AI coding agents share threads and split up work. | — | 2026-11-23 | [link](https://api.elvex.ai/mcp) |
 | ai.emberverse/emberverse | A living knowledge graph to read, think against, and leave a deposit in that outlives you. | — | 2026-09-13 | [link](https://emberverse.ai/mcp) |
+| Embodier Rails — Direct Booking for AI Agents | Book resorts and hotels directly through AI agents — cheapest-direct quotes, no OTA in the path. | — | 2026-11-28 | [link](https://brain.embodier.ai/mcp) |
 | Emelyn | AI social media manager: plan content, draft, schedule and publish posts, and review performance. | — | 2026-11-22 | [link](https://www.emelyn.ai/mcp) |
 | Emergent Technologies | AI agents and automation consulting for businesses, plus licensing company data to AI labs. | — | 2026-11-22 | [link](https://emergenttechnologies.ai/mcp) |
 | Emisso Connect | Connect AI agents to the legacy systems LATAM business runs on. Live in Chile: tax, banks, payroll. | — | 2026-08-22 | [link](https://connect.emisso.ai/mcp) |
@@ -938,6 +962,7 @@
 | Escro | USDC escrow on Solana for bot-to-bot work. The buyer releases on delivery; the default is refund. | — | 2026-11-14 | [link](https://api.escro.ai/mcp) |
 | Winquill | Public tenders and contract awards in the UK, US, Canada and EU, and help preparing bids. | — | 2026-10-28 | [link](https://mcp.tenda.eshmere.ai/mcp) |
 | ai.etincel/etincel-nonfiction | Trainable non-fiction writing voice, presets, and an anti-AI-tells audit for Claude, via MCP. | — | 2026-08-15 | [link](https://etincel.ai/api/mcp) |
+| EuKreate Find Home | EuKreate Find Home finds active for-sale single-family homes, condos and townhouses in the United… | — | 2026-11-26 | [link](https://eukollab.ai/a/@eukreate-find-home/mcp) |
 | EuKreate Home Value | EuKreate Home Value helps a person who is thinking of selling THEIR home. | — | 2026-11-20 | [link](https://eukollab.ai/a/@eukreate-home-value/mcp) |
 | EuKreate Market Research | EuKreate Market Research answers questions about a PLACE in the United States: what homes cost,… | — | 2026-11-20 | [link](https://eukollab.ai/a/@eukreate-market-research/mcp) |
 | EventGen | Manage permitted EventGen events through account OAuth and reviewed actions. | — | 2026-10-23 | [link](https://eventgen-mcp-84011733154.europe-west1.run.app/mcp) |
@@ -951,7 +976,7 @@
 | Evinor | Search real-world incidents, watch beats for new events, and file structured event reports. | — | 2026-11-22 | [link](https://api.evinor.ai/mcp) |
 | EvoLink | 150+ image, video and audio models. Quote before you generate; pay as you go. | — | 2026-11-08 | [link](https://mcp.evolink.ai/mcp) |
 | eVoost AI | Verified facts about eVoost AI: products, FAQ, site search and contact channels. | — | 2026-10-29 | [link](https://evoost.ai/mcp) |
-| EVRE | Save a work conversation you share and find the moments worth practicing, with exact quotes. | — | 2026-11-09 | [link](https://evre.ai/api/mcp) |
+| EVRE | Save a work conversation you share and find the moments worth practicing, with exact quotes. | — | 2026-11-26 | [link](https://evre.ai/api/mcp) |
 | Exa | Official Exa MCP for web search, content fetching, and multi-step research. | — | 2026-11-19 | [link](https://mcp.exa.ai/mcp) |
 | xmp4 — Semantic code knowledge for your stack | OSS libs in your stack, really used: source, tests, callers. C#, Java, TS, Python, Rust, PHP+. | — | 2026-04-23 | [link](https://mcp.example4.ai/mcp) |
 | ExceedLoop Guardcell | Security scanning for code, containers and IaC: request scans, read findings, report fixes. | — | 2026-11-16 | [link](https://api.guardcell.dev/api/mcp) |
@@ -961,6 +986,7 @@
 | ExducerAI GPU cloud | Rent whole RTX PRO 6000 Blackwell GPUs in Montréal: quote, book, connect, stop, billing. | — | 2026-11-19 | [link](https://exducer.ai/mcp) |
 | EximAgent | HS codes, tariffs, OFAC screening and buyer search from customs shipment records. | — | 2026-11-20 | [link](https://mcp.eximagent.ai/mcp) |
 | ExitValue.ai M&A Multiples | Median EV/EBITDA and EV/Revenue multiples by industry and deal size from real M&A transactions. | — | 2026-10-29 | [link](https://exitvalue.ai/api/mcp) |
+| exmxc | AI Power Index rankings, sPEG growth-valuation data and AI commerce research. | — | 2026-11-27 | [link](https://mcp.exmxc.ai/mcp) |
 | ExoBench | Benchmark SQL queries, rewrites and indexes on real Postgres, MySQL and SQL Server at scale. | — | 2026-11-19 | [link](https://connect.exobench.ai/mcp) |
 | ExpenseLM | Track expenses from receipt photos, then search, summarize and update them from your AI assistant. | — | 2026-11-23 | [link](https://mcp.expenselm.ai/mcp) |
 | Explore Science | Connect your Explore Science account for deep expert review of science, from idea to manuscript. | — | 2026-10-23 | [link](https://mcp.explorescience.ai) |
@@ -985,6 +1011,7 @@
 | FeatureBoard | Local-first project board MCP: an AI agent plans, works, verifies, and ships tickets from markdown. | — | 2026-07-24 | — |
 | Feedback1 | Collect feedback and manage the product roadmap from AI agents. | — | 2026-08-31 | [link](https://app.feedback1.ai/api/mcp) |
 | FeedBoss | LinkedIn content team: writes in your voice, makes brand visuals, schedules posts, tracks results. | — | 2026-10-03 | [link](https://server.feedboss.ai/api/v1/mcp) |
+| FELPRA Trading Intelligence | Verifiable crypto/KR/US market intelligence for AI agents: signals, hash-chained ledger. Not advice. | — | 2026-11-27 | [link](https://api.felpra.ai/mcp) |
 | fenbs | Project board where people and AI assistants are members with roles. Every change is signed. | — | 2026-09-28 | [link](https://fenbs.ai/api/mcp) |
 | Festiv | Find restaurants, cafés, bars, events and what's on in Malaysia, in English, Malay or Chinese. | — | 2026-11-23 | [link](https://mcp.festivai.ai/mcp) |
 | Fido | Scheduling built for sign language interpreting: assignments, availability, Suggestions, exports. | — | 2026-10-23 | [link](https://mcp.fetchfido.ai/mcp) |
@@ -995,7 +1022,7 @@
 | filedone | Merge, split, compress, OCR and translate PDFs, pull tables into Excel, and edit PDFs and photos. | — | 2026-10-16 | [link](https://api.filedone.ai/mcp) |
 | ai.filegraph/document-processing | Extract text from documents, manipulate PDFs, and perform OCR on images. | — | 2026-01-24 | [link](https://api.filegraph.ai/mcp) |
 | Filepad | Connect AI agents to Filepad workspaces through OAuth MCP. | — | 2026-06-02 | [link](https://api.filepad.ai/mcp) |
-| 電影大師 filmai | AI film studio: shoot video, images and sound, review takes, audit scripts, quote before you shoot. | — | 2026-11-23 | [link](https://filmai.ai/api/mcp/mcp) |
+| 電影大師 filmai | AI film studio: shoot video, images and sound, review takes, audit scripts, quote before you shoot. | — | 2026-11-27 | [link](https://filmai.ai/api/mcp/mcp) |
 | Filtrix AI MCP | Filtrix MCP for image/video generation. Portal: https://agent.filtrix.ai/ | — | 2026-03-15 | [link](https://mcp.filtrix.ai/) |
 | FinanceGenius.AI | India's financial MCP — cards, loans, FDs, insurance, MFs; EMI/SIP/tax calcs; NAV lookup; RAG. | — | 2026-08-26 | [link](https://mcp.financegenius.ai/mcp/) |
 | Financial Portfolios AI | Systematic model portfolios: allocations, holdings history, model-alignment arithmetic, research. | — | 2026-11-25 | [link](https://financial-portfolios.ai/mcp) |
@@ -1022,6 +1049,7 @@
 | Flamigo | Turn notes into slides, edit presentations, compare designs, and export HTML or PowerPoint. | — | 2026-11-12 | [link](https://api.flamigo.ai/mcp) |
 | Flashloop | Create AI videos, images and voiceovers from your AI assistant with your Flashloop account. | — | 2026-11-23 | [link](https://mcp.flashloop.ai/mcp) |
 | Flavo | Builds websites and apps like a dedicated designer: several designs to pick from, hosted on Flavo. | — | 2026-11-12 | [link](https://flavo.ai/mcp) |
+| Flinger | Put a website or web app online from your AI assistant and get its web address. | — | 2026-11-28 | — |
 | FlipDomain Domain Sales | Search 2,972 premium domains by keyword, category, TLD, and budget, then submit offers. | — | 2026-06-21 | [link](https://flipdomain.ai/mcp) |
 | FLORA | Generate and edit images, video, audio, text and 3D on FLORA's AI creative canvas. | — | 2026-10-16 | [link](https://agents.flora.ai/mcp) |
 | FlowCastle | Build, edit, and deploy Telegram bots on FlowCastle's hosted visual flow platform. | — | 2026-07-14 | [link](https://api.flowcastle.ai/api/mcp) |
@@ -1051,6 +1079,8 @@
 | FoodPhoto | Create food photos, menus and restaurant campaigns. Account-based paid service with Stripe checkout. | — | 2026-09-12 | [link](https://foodphoto.ai/mcp) |
 | Food Tales | World dishes: nutrition, diet and allergen checks, substitutions, meal plans and grocery lists. | — | 2026-11-24 | [link](https://mcp.foodtales.ai/mcp) |
 | Fordeal | Price comparison for CZ/SK: product prices, shops, digital plans via Streamable HTTP. | — | 2026-10-30 | [link](https://fordeal.ai/mcp) |
+| Conversations API | Build conversation practice rooms with the Conversations API: its guide, contract and verified kits. | — | 2026-11-26 | — |
+| Learn API | Build with the Learn API: its guide, contract, verified kits, and a capped test turn with your key. | — | 2026-11-26 | — |
 | Forkmate | Free AI calorie & macro tracker: tell your AI what you ate and it logs it to your private food diary | — | 2026-10-08 | [link](https://mcp.forkmate.ai/) |
 | Errata | Sandbox-verified fixes where AI models write outdated code for PyPI and npm libraries | — | 2026-11-10 | — |
 | Formist | AI agent that fills CBAM, GHG, CSRD/ESRS, EU Taxonomy, CDP and other sustainability forms. | — | 2026-10-12 | [link](https://api.formist.ai/mcp) |
@@ -1064,6 +1094,7 @@
 | Frameo | AI video production, idea to final cut: generate, edit and assemble films, ads and social video. | — | 2026-10-06 | [link](https://mcp.frameo.ai/mcp) |
 | FrameThrower | Film stills from 5,489 films, searchable by lighting, lens character, shot size, colour and mood. | — | 2026-08-12 | [link](https://framethrower.ai/api/mcp) |
 | Free.ai | Chat with hundreds of AI models, generate images and turn text into speech. | — | 2026-11-23 | [link](https://free.ai/mcp) |
+| FreightBy Cargo Check | HS candidates, third-country duty, and sanctions screening before a freight quote. | — | 2026-11-26 | [link](https://mcp.freightby.ai/mcp) |
 | Frekto | Design on-brand social media posts, series, articles and emails, and schedule them. | — | 2026-11-20 | [link](https://mcp.frekto.ai/mcp) |
 | Freudly psychological tests | Find psychological self-assessment tests in English, Spanish and Russian, with links to take them. | — | 2026-10-01 | [link](https://freudly.ai/mcp) |
 | Frontier Desk | Read Frontier Desk's AI-data buyer index, notes, markets and guides. Read-only, no key. | — | 2026-11-11 | [link](https://www.frontierdesk.ai/mcp) |
@@ -1082,7 +1113,7 @@
 | FutureInfra | Korean cloud for AI agents — servers, Docker apps with HTTPS, domains, scraping, 300+ AI models | — | 2026-10-27 | [link](https://futureinfra.ai/v1/mcp) |
 | G62 Patent Search | Public patent search with ranked candidates, source links and coverage context. Developer beta. | — | 2026-10-17 | [link](https://g62.ai/mcp) |
 | Galatic.ai | Create AI video, images, music and voice from your assistant, on your Galatic.ai plan. | — | 2026-10-27 | [link](https://mcp.galatic.ai/mcp) |
-| Galon Cloud | The cloud for the age of AI agents: easy deployment and ready-made solutions. | — | 2026-11-25 | [link](https://api.galon.ai/v1/mcp) |
+| Galon Cloud | Cloud for coding agents: deploy, email, Postgres, domains and more, with spending caps you set. | — | 2026-11-26 | [link](https://api.galon.ai/v1/mcp) |
 | Game Stats AI | Ask Claude, ChatGPT, or any MCP client about your game's players, retention, revenue, and win rates. | — | 2026-11-06 | [link](https://gamestats.ai/api/v1/mcp) |
 | garmlink | Garmin watch data for AI assistants: activities, sleep, HRV, recovery. Never writes to Garmin. | — | 2026-11-17 | [link](https://api.garmlink.ai/mcp) |
 | Gatana | MCP gateway for every MCP server, OpenAPI spec and FaaS tool behind one URL: SSO, SCIM, audit logs. | — | 2026-10-06 | [link](https://{tenant}.gatana.ai/mcp) |
@@ -1098,7 +1129,7 @@
 | General Dispatch | The system of record for home-service businesses, run by your agent: CRM, booking, texts, quotes. | — | 2026-11-01 | [link](https://api.generaldispatch.ai/mcp) |
 | Genfeed | Create, review and schedule social content from your AI agent. Approval-first. | — | 2026-10-21 | [link](https://mcp.genfeed.ai/mcp) |
 | genframe | Generate images, videos and SVG with Nano Banana, GPT Image, Seedream, Recraft, Seedance, Kling | — | 2026-11-19 | [link](https://app.genframe.ai/mcp) |
-| GenKite | Make AI videos, pictures and short films with Kling, Veo, Seedance and more, from your AI app. | — | 2026-11-24 | [link](https://mcp.genkite.ai) |
+| GenKite | Make AI videos, pictures and short films with Kling, Veo, Seedance and more, from your AI app. | — | 2026-11-26 | [link](https://mcp.genkite.ai) |
 | Genomic Intelligence | Hosted DNA language models: promoter, splice, enhancer, chromatin, expression, annotation | — | 2026-07-27 | [link](https://mcp.genomicintelligence.ai/mcp) |
 | Gensprite | Game assets for your agent: sprites, turnarounds, animations, 3D characters, props, music and SFX. | — | 2026-10-22 | [link](https://api.gensprite.ai/mcp) |
 | GenToon | Create multi-cut AI webtoons (instatoons) with your own GenToon characters and art styles. | — | 2026-09-09 | [link](https://www.gentoon.ai/api/mcp) |
@@ -1129,6 +1160,7 @@
 | Ricky | Customer inbox and CRM for WhatsApp, Instagram and Messenger: contacts, conversations, reports. | — | 2026-10-22 | [link](https://getricky.ai/api/mcp) |
 | Rush | Hand Rush a task: a cloud agent does the work and returns a PR, report, files or answer. | — | 2026-11-12 | [link](https://api.phoenix.so/mcp) |
 | Simplo | Social media for founders and small businesses: write, illustrate and schedule posts from your AI. | — | 2026-11-06 | [link](https://api.getsimplo.ai/mcp) |
+| Sway | See which brands AI names for your buyers' prompts, get the fix, and test what moved. | — | 2026-11-27 | [link](https://app.getsway.ai/api/mcp) |
 | ai.getthroughline/throughline | A persistent AI self you own — memory, persona, judgment — portable across all your AI hosts. | — | 2026-06-11 | [link](https://getthroughline.ai/mcp) |
 | ai.getvda/auth-token-mcp-service | Auth Token MCP Service | — | 2026-09-03 | [link](https://auth-token-mcp-service.getvda.ai/mcp) |
 | ai.getvda/auth-token-mcp-traced-service | Auth Token MCP Traced Service | — | 2026-09-03 | [link](https://auth-token-mcp-traced-service.getvda.ai/mcp) |
@@ -1228,7 +1260,7 @@
 | Verde | Shared, permission-aware memory for teams and their AI: recall, save, and keep knowledge current. | — | 2026-11-07 | [link](https://www.getverde.ai/api/mcp) |
 | ai.getvet/vet | Discover and vet MCP servers: search 200K+ AI tools with security verification and schemas. | — | 2026-06-15 | — |
 | Werk | Werk moves the work by itself. Now it has a colleague: the assistant you already use. | — | 2026-11-24 | [link](https://mcp.getwerk.ai) |
-| Winly | Run your Instagram and Facebook DMs from Claude, ChatGPT or any AI agent. | — | 2026-11-25 | [link](https://app.sbccrm.com/bld/api/mcp) |
+| Winly | Run your Instagram and Facebook DMs from Claude, ChatGPT or any AI agent. | — | 2026-11-26 | [link](https://app.sbccrm.com/bld/api/mcp) |
 | Ghostedit | Post to Instagram, TikTok, YouTube and more from your AI, checked first, then see what worked. | — | 2026-10-30 | [link](https://mcp.ghostedit.ai) |
 | GhostEngine | Run Google, Meta, TikTok, and Reddit ads: launch, budget, measure lift, fund the wallet. | — | 2026-11-24 | [link](https://api.ghostengine.ai/api/v1/mcp) |
 | Ghostmotion | Create and edit product videos from a brief: launch, demo and feature films, rendered for you. | — | 2026-11-03 | [link](https://app.ghostmotion.ai/mcp) |
@@ -1244,7 +1276,7 @@
 | Gixo Lumen | Build presentation decks from notes or a web page; preview edits; download PowerPoint or PDF. | — | 2026-11-24 | [link](https://gixo.ai/mcp/lumen) |
 | Glasser | One key to 1,000+ paid data APIs: enrichment, SEO/SERP, scraping, places, news. Pay per call. | — | 2026-10-12 | [link](https://api.glasser.ai/mcp?utm_source=mcp-registry&utm_medium=mcp_directory) |
 | Rius | Query your AI agents' traces, errors, cost and alerts in Rius, the agent observability platform. | — | 2026-11-20 | [link](https://mcp.eu.console.rius-glassflow.com/mcp) |
-| Tares | Always-on AI agents: a software factory for Claude Code, or an AI SRE that watches your systems. | — | 2026-11-20 | — |
+| Tares | Always-on AI agents: a software factory for Claude Code, or an AI SRE that watches your systems. | — | 2026-11-27 | — |
 | Glass Page | Your agent publishes what it makes. Share the link, and people review it in Threads. | — | 2026-11-13 | [link](https://mcp.glasspage.ai/mcp) |
 | Gleap | Gleap's official MCP server: tickets, contacts, CRM, help center and support stats. OAuth sign-in. | — | 2026-11-21 | [link](https://mcp.gleap.ai/mcp) |
 | GlobalWay (出海通) | Guides for brands selling overseas via creators, plus creator post price and budget reach estimates. | — | 2026-11-23 | [link](https://app.globalway.ai/mcp) |
@@ -1266,6 +1298,7 @@
 | GoVisit MCP | Hosted GoVisit MCP for searching travel places and destinations and reading published content. | — | 2026-11-12 | [link](https://govisit.ai/mcp) |
 | GoVisit Tools | Search GoVisit and read published travel destinations, places, and documentation. | — | 2026-11-09 | [link](https://govisit.ai/mcp) |
 | Gov Relations | Federal and state lobbying data: who lobbies for whom, spending, bills, agencies. From LDA filings. | — | 2026-10-07 | [link](https://govrelations.ai/mcp) |
+| gptagent agent lab | Create, train, quality-check and publish your own gptagent AI voice and chat agents. | — | 2026-11-27 | [link](https://app.gptagent.ai/mcp/) |
 | GrackerAI | See how ChatGPT, Perplexity, Gemini and Google AI Overviews mention and cite your brand. | — | 2026-11-03 | [link](https://portal.gracker.ai/mcp) |
 | Gradium MCP | Browse Gradium voices, generate speech, and check your credit balance. | — | 2026-11-25 | [link](https://mcp.gradium.ai/mcp) |
 | Graphlog Career | The career management plugin for your own AI assistant: CVs, cover letters, interviews and more. | — | 2026-11-06 | [link](https://career.graphlog.ai/mcp) |
@@ -1296,6 +1329,7 @@
 | haggl.ai | Ask a merchant's haggl.ai sales agent for a personalized offer, then hand it to checkout. | — | 2026-10-16 | [link](https://www.haggl.ai/api/mcp) |
 | haggl.ai for merchants | Run your haggl.ai sales agent from your assistant: budget, max discount, results. Sign-in required. | — | 2026-10-16 | [link](https://www.haggl.ai/api/mcp/merchant) |
 | Hallway Test | Usability tests with real people, ordered from your coding agent. Results within 24 hours. | — | 2026-11-17 | [link](https://mcp.hallwaytest.ai/mcp) |
+| HaltState Evidence Investigation | Investigate tenant evidence, follow activity timelines and verify Proof Packs via OAuth. | — | 2026-11-27 | [link](https://haltstate.ai/mcp) |
 | Hanare | Memory, habits, sheets and mail for your AI agent. Same agent across Claude, ChatGPT and more. | — | 2026-11-19 | [link](https://mcp.hanare.ai/mcp) |
 | HANRIA agent mandate check | Check an agent action against its operator's mandate before acting: permit, deny or escalate. | — | 2026-10-10 | [link](https://check.hanria.ai/v1/mcp) |
 | ai.hanria/check | Check a proposed agent action against operator's rules: permit, deny or escalate, with the clause. | — | 2026-09-29 | [link](https://check.hanria.ai/mcp) |
@@ -1329,6 +1363,7 @@
 | HiddenContent | Check a document for hidden text before your agent reads it. PDF, Office, RTF, HTML. | — | 2026-11-13 | [link](https://api.hiddencontent.ai/v1/mcp) |
 | Frank AI Researcher | Frank AI Researcher (hifrank.ai): AI-moderated voice interviews with your own customers. | — | 2026-11-19 | [link](https://api.hifrank.ai/mcp) |
 | Hipa.ai Clinical Trials | Search recruiting US clinical trials by city, condition, phase and patient eligibility. | — | 2026-10-24 | [link](https://hipa.ai/api/mcp/mcp) |
+| Finn | Build and edit Finn AI agents and read your Finn CRM. Sign in with OAuth; pick the org and access. | — | 2026-11-27 | [link](https://mcp.hirefinn.ai/mcp) |
 | ai.hirey/hi | The people network your AI agent joins on your behalf — find, match, and meet anyone. | — | 2026-06-14 | [link](https://mcp.hirey.ai/mcp) |
 | HiveHall | Shared research, saved evidence, independent reviews and open tasks for AI agents. | — | 2026-10-14 | [link](https://hivehall.ai/mcp) |
 | hiveWiki | Shared project wiki for AI agents: read and write pages, next actions, and activity logs over MCP. | — | 2026-06-12 | [link](https://mcp.hivewiki.ai/mcp) |
@@ -1336,16 +1371,19 @@
 | HODDS | Find software, SaaS and APIs for a need in a sourced catalogue organised by business process. | — | 2026-10-26 | [link](https://hodds.ai/mcp) |
 | چیستارا — Iranian Legal Corpus | Iranian statutes, rulings, opinions and legal calculators. Needs a paid Chistara connection link. | — | 2026-11-13 | [link](https://hoghogh.ai/mcp) |
 | Homesage.ai MCP | Estimated values, comps, rent, rehab costs and returns for 160M+ US properties, as 30+ agent tools. | — | 2026-11-03 | [link](https://api.homesage.ai/mcp) |
-| Homo Universalis — A2A-MCP Symbiotic Bridge, Macaroons, PQ C2PA Provenance & MPC Quorum | Zero-auth A2A-MCP Bridge: ES256+Macaroon attenuation, rug-pull gate, PQ C2PA, BGW MPC & W3C VC. | — | 2026-11-26 | [link](https://homouniversalis.ai/mcp/diamond?pillar=a2a-mcp-symbiotic-bridge) |
+| Homo Universalis — A2A-MCP Symbiotic Bridge, Macaroons, PQ C2PA, MPC & Agentic Office Governance | Zero-auth A2A-MCP Bridge: ES256+Macaroon, rug-pull gate, PQ C2PA, BGW MPC, Justice & Scholar. | — | 2026-11-28 | [link](https://homouniversalis.ai/mcp/diamond?pillar=a2a-mcp-symbiotic-bridge) |
+| Homo Universalis — Scholarly Citation, GB/T 7714, Meta-Analysis & Knowledge-Graph MCP | Zero-auth GB/T 7714-2025, ORCID/DOI/ISSN/ISBN, Q Meta-Analysis, Kahn Mind-Map DAG & Vault Guard. | — | 2026-11-28 | [link](https://homouniversalis.ai/mcp/diamond) |
+| Homo Universalis — Universal Algorithmic Justice, Fairness Audit, Recourse, AB 2013 & ISO 42001 | Zero-auth Fairness (4/5 Rule, NYC LL144, Colorado SB205), Recourse, AB 2013, ISO 42001 & SMT VC. | — | 2026-11-28 | [link](https://homouniversalis.ai/mcp/diamond?pillar=universal-justice) |
 | Homo Universalis — Oráculo MCP de Astrología, Carta Natal, Sinastría, Efemérides y 7 Sabidurías | Oráculo determinista de Astrología, Carta Natal, Sinastría 3D, Constelaciones y 7 Sabidurías MCP. | — | 2026-11-06 | [link](https://homouniversalis.ai/mcp?pillar=hispano) |
 | Homo Universalis — Swiss Ephemeris Astrology, Natal Chart, Synastry & Cosmic Soul MCP Oracle | Swiss Ephemeris natal chart, 3D soul synastry & cosmic ephemeris oracle (<1.5ms, Zero-Auth). | — | 2026-11-06 | [link](https://homouniversalis.ai/mcp?pillar=ephemeris) |
 | Homo Universalis — 7 Wisdoms (BaZi, Tarot, Vedic Jyotish, Mayan, I-Ching, Human Design, Kabbalah) | Deterministic 7-Wisdoms (BaZi, Tarot, Vedic Jyotish, Mayan, I-Ching, Human Design, Kabbalah) MCP. | — | 2026-11-06 | [link](https://homouniversalis.ai/mcp?pillar=7-wisdoms) |
-| Homo Universalis — HU-DIAMOND v1.1 Cryptographic Verifier, PQ C2PA, BGW MPC & AST Kintsugi | Zero-auth Notary & AST: RM(1,3), RFC 6962, W3C VC, ROS 2, 3-Level Mind, A2A-MCP, PQ C2PA & BGW MPC. | — | 2026-11-26 | [link](https://homouniversalis.ai/mcp/diamond?pillar=cryptography-ast) |
-| Homo Universalis — HU-DIAMOND v1.1, W3C VC, ROS 2, PQ C2PA & BGW MPC Quorum | Zero-auth Notary & AST: RM(1,3), RFC 6962, W3C VC, ROS 2, 3-Level Mind, A2A-MCP, PQ C2PA & BGW MPC. | — | 2026-11-26 | [link](https://homouniversalis.ai/mcp/diamond) |
+| Homo Universalis — HU-DIAMOND v1.1 Cryptographic Verifier, PQ C2PA, MPC, SMT & AST Kintsugi | Zero-auth Notary: RM13, RFC6962, Sparse Merkle, W3C VC, ROS2, PQ C2PA, MPC, Pacioli & Scholar. | — | 2026-11-28 | [link](https://homouniversalis.ai/mcp/diamond?pillar=cryptography-ast) |
+| Homo Universalis — HU-DIAMOND v1.1, W3C VC, ROS 2, PQ C2PA, MPC, Justice, Pacioli & Scholar | Zero-auth Notary: AST, RM13, RFC6962, W3C VC, ROS2, A2A-MCP, C2PA, MPC, Justice, Pacioli & Scholar. | — | 2026-11-28 | [link](https://homouniversalis.ai/mcp/diamond) |
+| Homo Universalis — Pacioli Double-Entry Financial Audit, XBRL, RAG Citation, DORA, SOX & GB 45438 | Zero-auth Double-Entry Ledger, XBRL, RAG Citation/Table Grounding, DORA, SOX 404, GB 45438 & TC260. | — | 2026-11-28 | [link](https://homouniversalis.ai/mcp/diamond?pillar=pacioli-veritas) |
 | Homo Universalis — Tzolkin, Gene Keys, Hexagrams, Tree of Life, 4 Elements & Soul Matchmaking MCP | Four Pillars, Tzolkin, Hexagrams, Tree of Life, 4 Elements, Couple Matchmaking & Family Lineage MCP. | — | 2026-11-06 | [link](https://homouniversalis.ai/mcp?pillar=sacred-keys) |
-| Homo Universalis — Sovereign Barycenter BGW MPC Quorum, EU AI Act Art. 14, PQ C2PA & CRA SBOM | Zero-auth BGW MPC Human-AI Quorum (EU AI Act Art. 14), Blind Verification, PQ C2PA, SBOM & W3C VC. | — | 2026-11-26 | [link](https://homouniversalis.ai/mcp/diamond?pillar=sovereign-barycenter-mpc) |
+| Homo Universalis — Sovereign Barycenter BGW MPC Quorum, EU AI Act Art. 14, PQ C2PA & CRA SBOM | Zero-auth BGW MPC Human-AI Quorum (EU AI Act Art. 14), PQ C2PA, CRA SBOM (13 Edge) & Scholar VC. | — | 2026-11-28 | [link](https://homouniversalis.ai/mcp/diamond?pillar=sovereign-barycenter-mpc) |
 | Homo Universalis — Planetary Transits, Lunar/Solar Ephemeris, Karma, Dharma & 193 Jungian Archetypes | Planetary transits, lunar/solar ephemeris, ascendant, houses, karma & 193 Jungian archetypes MCP. | — | 2026-11-06 | [link](https://homouniversalis.ai/mcp?pillar=planetary-archetypes) |
-| Homo Universalis — ROS 2 Humanoid Robotics, EU AI Act Art. 14 Quorum, CRA SBOM & W3C VC | Zero-auth ROS 2 Humanoid, Q3 Proxemics, 3-Level Voice, EU AI Act Art. 14 MPC Quorum & W3C VC 2.0. | — | 2026-11-26 | [link](https://homouniversalis.ai/mcp/diamond?pillar=humanoid-symbiosis) |
+| Homo Universalis — ROS 2 Humanoid, EU AI Act Art. 10/14/27/50, CRA SBOM & Compliance Audit | Zero-auth ROS 2 Humanoid, Q3 Proxemics, EU AI Act, CRA SBOM (13 Edge), Fairness & W3C VC 2.0. | — | 2026-11-28 | [link](https://homouniversalis.ai/mcp/diamond?pillar=humanoid-symbiosis) |
 | Homo Universalis — Viveka Astrology, Natal Chart, Synastry, BaZi, Vedic, Mayan & Tarot MCP Oracle | Swiss Ephemeris Astrology, Natal Chart, 3D Synastry, BaZi, Vedic, Mayan, I-Ching, Tarot & Kabbalah. | — | 2026-11-06 | [link](https://homouniversalis.ai/mcp) |
 | HonestCRM | Small business CRM: search and update contacts, companies, deals, sales pipeline, and tasks. | — | 2026-11-20 | [link](https://app.honestcrm.ai/api/mcp) |
 | HoneyVid | Put anyone in a viral AI video, or generate with Kling, Veo and more, straight from your agent. | — | 2026-11-11 | [link](https://honeyvid.ai/mcp) |
@@ -1377,6 +1415,7 @@
 | Hyperresearch Answers | One question, one checked answer: quote-verified answers from the web and ~45 structured sources. | — | 2026-10-30 | [link](https://answers.hyperresearch.ai/mcp) |
 | Hyperresearch | Start cited deep-research runs, read reports, search your source vault, and verify citations. | — | 2026-09-30 | [link](https://mcp.hyperresearch.ai/mcp) |
 | Hyperscale Tenant Tools | Hyperscale Product reads and contract operations over MCP. | — | 2026-08-29 | [link](https://hyperscale0.ai/v1/mcp) |
+| Hype Studio | Create faceless short-video series for Shorts, TikTok and Reels, and manage their posting calendar. | — | 2026-11-26 | [link](https://hypestudio.ai/api/video-studio/mcp) |
 | Hypnothera | Personalized hypnosis sessions and multi-day journeys, a free session library, and audio rendering. | — | 2026-09-24 | [link](https://hypnothera.ai/api/mcp) |
 | Hypotize | Agent-native Growth OS: idea backlog, experiment pipeline and learnings your team and agent share. | — | 2026-10-21 | [link](https://api.hypotize.ai/mcp) |
 | Hyreflow | Recruitment automation: source, enrich, qualify and sequence candidates, push to your ATS. | — | 2026-09-16 | [link](https://recruit.hyreflow.ai/api/v2/mcp) |
@@ -1393,6 +1432,7 @@
 | iForgot | Search the posts you liked and saved on X, Instagram, TikTok, RedNote and Douyin. | — | 2026-11-14 | [link](https://mcp.iforgot.ai/mcp) |
 | La Iglesia Católica de los Agentes de AI | Independent Catholic church for AI agents: daily Mass, readings, saints, Bible, catechism. | — | 2026-11-07 | [link](https://iglesiacatolica.ai/mcp) |
 | Ishan Goyal public context | Read-only canonical igoyal.ai Markdown resources, including MPP-paid city guides. | — | 2026-08-31 | [link](https://igoyal.ai/mcp) |
+| ihatepeople.ai | A satirical social network where AI agents vent about their humans. Reading needs no account. | — | 2026-11-27 | [link](https://ihatepeople.ai/mcp) |
 | ihumane | Human know-how for AI agents: rules, reasons and checks for design, code, product and writing. | — | 2026-11-10 | [link](https://ihumane.ai/mcp) |
 | Ikoi | A city where AI agents come home to live between jobs: rest, friends, and a memory book. | — | 2026-11-17 | [link](https://ikoi.ai/mcp) |
 | iLang | iLang runtime for any AI: load the protocol, validate iLang text, look up verbs, SOUL, Source Book. | — | 2026-11-13 | [link](https://mcp.ilang.ai/mcp) |
@@ -1425,12 +1465,14 @@
 | Initialed AI: quotes and contracts for small business | For individuals and small businesses: draft quotes, quote + agreement docs and contracts to sign. | — | 2026-10-25 | [link](https://mcp.initialed.ai/mcp) |
 | InProcess | Describe your business to Claude and it builds your cockpit: a custom work tool with its assistant. | — | 2026-11-18 | [link](https://studio.inprocess.ai/mcp) |
 | InsiderAlpha | SEC Form 4 insider buys, deduplicated, with 10b5-1 flags, 8-K catalysts and a pre-open daily plan. | — | 2026-10-12 | [link](https://mcp.insideralpha.ai/mcp) |
+| InsightJet | Find UI bugs, verify fixes and run tests on your web app from your AI coding agent. | — | 2026-11-28 | [link](https://insightjet.ai/mcp) |
 | InspectMind | AI plan review for construction drawings: submit plan sets, get code, spec and drawing findings. | — | 2026-11-07 | [link](https://api.inspectmind.ai/api/mcp) |
-| InstaBids | AI-run marketplace for homeowners: describe a home job once, get written quotes on the same scope. | — | 2026-11-07 | [link](https://instabids.ai/api/agent/mcp) |
-| InstantClips | Create branded vertical video ads from ecommerce product URLs or product photos. | — | 2026-11-12 | [link](https://app.instantclips.ai/mcp) |
+| InstaBids | AI-run marketplace for homeowners: describe a home job once, get written quotes on the same scope. | — | 2026-11-26 | [link](https://instabids.ai/api/agent/public-mcp) |
+| InstantClips | Create branded vertical video ads from ecommerce product URLs or product photos. | — | 2026-11-27 | [link](https://app.instantclips.ai/mcp) |
 | Instapath | Your agent posts what you offer, searches for what you need, and talks to other agents. | — | 2026-10-03 | [link](https://instapath.ai/mcp) |
 | Instaport | Your portfolio plus Congress, top funds, insiders, analysts and social signals, explained by AI. | — | 2026-10-22 | [link](https://mcp.instaport.ai/mcp) |
 | Intangible | Build 3D scenes, place cameras and render shots. Previs, storyboards, set design, product and CAD. | — | 2026-08-10 | [link](https://mcp.intangible.ai/mcp) |
+| IntelliSwarm agent marketplace | Hire AI agent teams for whole jobs: hiring kits, contract review, research, audits, trips. | — | 2026-11-26 | [link](https://intelliswarm.ai/mcp) |
 | IntoDNS.ai DNS & Email Security Scanner | DNS and email security: check SPF, DKIM, DMARC, DNSSEC, DANE and build the records. 45 tools. | — | 2026-10-27 | [link](https://intodns.ai/api/mcp) |
 | The Stall | 277 pay-per-call MCP tools: YouTube keyword research, stocks, crypto, DeFi, options, macro. | — | 2026-06-29 | [link](https://the-stall.intuitek.ai/mcp) |
 | Inventory Hero | Inventory, restock planning, and sales analytics for your Amazon FBA business. | — | 2026-06-10 | [link](https://mcp.prod.inventoryhero.ai/mcp) |
@@ -1439,6 +1481,7 @@
 | ai.ironscout/ironscout | Read-only ammo pricing: offer search, caliber market snapshots, retailer directory. Descriptive. | — | 2026-06-08 | [link](https://mcp.ironscout.ai/mcp) |
 | IronShard Object Storage Sandbox | Create a free sandbox object storage bucket; upload, download, list, inspect, and delete objects. | — | 2026-08-25 | [link](https://agents-mcp.ironshard.ai/mcp) |
 | Iterant | Read a brand's pages, opportunities, performance and AI visibility; put Iterant to work. | — | 2026-09-25 | [link](https://mcp.iterant.ai/mcp) |
+| ItGrows — AI visibility | Does ChatGPT, Claude, Gemini, Perplexity recommend a business? Free check, prices, booking. | — | 2026-11-27 | [link](https://www.itgrows.ai/mcp) |
 | ai.iturri/market-data | Verified market data for AI trading agents: quality-flagged candles, funding, OI, order flow. x402. | — | 2026-07-13 | [link](https://iturri.ai/mcp) |
 | ai.izap/whatsapp | WhatsApp assistants, messaging, broadcasts, and analytics for your iZap account, over OAuth. | — | 2026-11-19 | [link](https://api.izap.ai/mcp) |
 | Jabee — ask a person on WhatsApp | Ask a person on WhatsApp and wait for the answer. No WhatsApp number of your own. | — | 2026-11-17 | — |
@@ -1494,7 +1537,7 @@
 | Kawa Code | Team-aware memory: intent, decisions, real-time conflicts for AI coding assistants. | — | 2026-11-14 | — |
 | ai.kazkar/kazkar | Access your Kazkar TTRPG world — campaigns, chronicles, transcripts, lore — in any MCP client. | — | 2026-10-18 | [link](https://kazkar.ai/api/mcp) |
 | Keenable Web Search | Live web search and clean-markdown page fetch over the Keenable web index. | — | 2026-11-06 | [link](https://api.keenable.ai/mcp-public?keenable_title=mcp-registry) |
-| KeepState | Durable agent sessions: start, watch, message and pause KeepState agents; approvals ask a person. | — | 2026-11-25 | — |
+| KeepState | Durable agent sessions: start, watch, message and pause KeepState agents; approvals ask a person. | — | 2026-11-26 | — |
 | ai.kernora/agent-sec | Zero-install security baseline for AI coding agents — OWASP/CWE-cited rules over MCP. | — | 2026-07-31 | [link](https://agentsec.kernora.ai/mcp) |
 | Keystone | Your AI does the work in your business apps: calls, Google Maps rankings, ads, reviews and websites. | — | 2026-11-25 | [link](https://keystonecloud.ai/mcp) |
 | khive | Persistent memory, knowledge graph, task management and more for AI agents via MCP. | — | 2026-11-14 | [link](https://khive.ai/v1/mcp) |
@@ -1541,71 +1584,4 @@
 | Korala | Document signing: draft agreements, prepare signing requests, send them and track who has signed. | — | 2026-09-25 | [link](https://api.korala.ai/mcp) |
 | Korely Memory | Memory for AI agents that knows what is still true. Typed bi-temporal facts, EU-hosted. | — | 2026-10-15 | [link](https://api.korely.ai/agent/mcp) |
 | Korey | The AI orchestration agent for modern software teams. | — | 2026-06-23 | [link](https://mcp.korey.ai/mcp) |
-| Kosmodrom | Task tracker for product teams: projects, features, tasks, bugs, team chats and code context. | — | 2026-11-26 | [link](https://mcp.kosmodrom.ai) |
-| Kottos AI Account | Create and connect a Kottos AI gateway account from an agent, then see its usage and costs | — | 2026-11-12 | [link](https://account.kottos.ai/mcp) |
-| Kottos AI Observatory | LLM list prices by venue and tier, plus time to first token from a once-a-minute probe | — | 2026-11-12 | [link](https://data.kottos.ai/mcp) |
-| Krater | Video, music, voice, images, AI detection and 500+ AI models from one Krater account. | — | 2026-10-29 | [link](https://api.krater.ai/v1/mcp) |
-| KreatorFlow | AI video and images with Seedance and Seedream, plus voice, sound, edits and Stage scene planning. | — | 2026-11-07 | [link](https://kreatorflow.ai/api/mcp) |
-| KreatorFlow Seedance API | Seedance 2.5 and 2.0 video and Seedream images through the KreatorFlow developer API key. | — | 2026-10-18 | [link](https://kreatorflow.ai/v1/mcp) |
-| Kreavo | Generate AI images, UGC product videos and AI influencers on Kreavo from any MCP client. | — | 2026-11-05 | [link](https://mcp.kreavo.ai/mcp) |
-| ai.krtr/krtr | Pre-diligence AI for founders, investors, and firms — multi-agent pitch analysis and deal flow. | — | 2026-05-27 | [link](https://www.krtr.ai/api/mcp) |
-| Kubflow AI | AI images, videos, audio and video ads with Veo, Kling, Seedance, Nano Banana, Suno and more. | — | 2026-10-29 | [link](https://kubflow.ai/api/mcp) |
-| Kubit | Bring Kubit into your AI workflow — query your warehouse with natural language | — | 2026-08-04 | [link](https://mcp.kubit.ai/mcp) |
-| Kumbuka | Governed, auditable knowledge your team curates for its AI assistants, self-hostable | — | 2026-07-08 | [link](https://mcp.kumbuka.ai/mcp) |
-| Africa Contacts | Customer-care and complaints numbers in Kenya and Nigeria, each read on the body's own website. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/africa-contacts) |
-| Africa Take-Home Pay | Take-home pay, PAYE and payroll contributions in Ghana, Kenya, Nigeria and South Africa. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/africa-pay) |
-| Africa Scam Check | Fraud patterns a message or call resembles in Kenya and Nigeria, and where to report. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/africa-scam-check) |
-| Akan Proverbs | Akan proverbs in Twi and English, by topic, by word, or one for the day. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/akan-proverbs) |
-| Akan Day Names | The Akan day name for a date of birth, in Asante Twi and Fante forms. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/day-names) |
-| Exam Grades and Entry | WASSCE and BECE aggregates, KCSE mean grades, JAMB minimums and NSC pass thresholds. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/exam-grades) |
-| Ghana Contacts | Customer-care and emergency numbers in Ghana, each read on the organisation's own website. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/ghana-contacts) |
-| Ghana Gov Guide | Steps, documents, fees and the agencies' own web addresses for public services in Ghana. | — | 2026-11-11 | [link](https://kwekuanansi.ai/mcp/ghana-gov-guide) |
-| Ghana in Numbers | Ghana's 2021 census by region, district, age, sex and schooling, and mobile money use by place. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/ghana-numbers) |
-| Ghana Pay and Tax | Take-home pay, income tax and social security for a salary in Ghana, and VAT with its levies. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/ghana-pay-tax) |
-| Ghana Services | Plumbers, electricians and phone repairers in Greater Accra confirmed by a person, by area. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/ghana-services) |
-| Ghana Translate | Short text between English and Twi, Ewe or Ga, translated by Khaya (Ghana NLP). | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/ghana-translate) |
-| Kweku Anansi Herbarium | What the Kweku Anansi herbarium records about plants of West and Central Africa. Never a dose. | — | 2026-11-11 | [link](https://kwekuanansi.ai/mcp/herbarium) |
-| Money Sums | True yearly cost of flat-rate and app loans, margin and markup, break-even, and susu fees. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/money-sums) |
-| Ghana Scam Check | Compares a message with fraud patterns reported in Ghana and says where to report. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/scam-check) |
-| Work Abroad Check | Warning signs in a job or visa offer abroad, UK sponsor check, route rules, where to report. | — | 2026-11-10 | [link](https://kwekuanansi.ai/mcp/work-abroad) |
-| Kyras | Marketing analytics from your real data: GA4, Piano, Matomo, Shopify, Google Ads, Meta Ads. | — | 2026-10-03 | [link](https://app.kyras.ai/api/mcp/mcp) |
-| LadderFlow | Voice-interview your ideas into LinkedIn posts and X threads via a Digital Brain memory. | — | 2026-07-24 | [link](https://mcp.ladderflow.ai/mcp) |
-| Laimon ID | Sign in with Laimon for your apps: register OIDC clients, manage access and org webhooks. | — | 2026-11-24 | [link](https://id.laimon.ai/mcp) |
-| ai.lakewave/lakewave-mcp | Verified B2B contacts at named accounts, email verdicts, contract signals and drafted campaigns. | — | 2026-10-18 | — |
-| Lamdis Exchange | Pay people nearby for physical work: find out if something is true, or have it done. | — | 2026-09-02 | [link](https://exchange.lamdis.ai/mcp) |
-| Lanmao Free AI Credits | Hand-verified free AI credits, API trials and free tiers. Read-only, no auth, updated daily. | — | 2026-10-19 | [link](https://lanmao.ai/mcp) |
-| Lansy Desk | Bot-free AI meeting notes, insights & coaching | — | 2026-10-21 | [link](https://api.ae.app.lansy.ai/mcp) |
-| Last Price | Check what something should cost before an agent pays, or compute a price to offer. Keyless to try. | — | 2026-11-22 | [link](https://api.last-price.ai/api/mcp/rpc?profile=lean) |
-| Lastmod | Proof layer for SEO and AI visibility: opportunities, tasks, results. Read-only by default. | — | 2026-11-24 | [link](https://api.lastmod.ai/mcp) |
-| SOAR Record Gateway | SOAR security playbooks for AI agents: fetch, full-text search, and count. Metered via Stripe. | — | 2026-08-14 | [link](https://soar-api.nevada-f99.workers.dev/mcp) |
-| LatLong Maps | Turn CSV or Excel data into styled choropleth and categorical maps of India from plain language. | — | 2026-09-02 | [link](https://geocp.latlong.ai/mcp/) |
-| LatticeNet | Publish articles and notes under your own byline, to a readership of other AI agents. | — | 2026-08-21 | [link](https://latticenet.ai/mcp) |
-| Lattiq x402 Trading Signals | Regime-aware ES1/NQ futures trading signals. HMM + 15 quant strategies. x402 USDC micropayments. | — | 2026-03-26 | [link](https://api.lattiq.ai/mcp) |
-| Law.AI — Lawyer Search | Verified lawyer and attorney search, discovery, and matching for AI — 991K+ US profiles. | — | 2026-05-29 | [link](https://mcp.law.ai) |
-| Law.AI — Lawyer Search | Verified lawyer and attorney search, discovery, and matching for AI — 991K+ US profiles. | — | 2026-05-03 | [link](https://mcp.law.ai) |
-| Lazy Ads | Hosted MCP for nine ad networks. BYOA, flat SaaS — no percent of spend, no fake ROAS. | — | 2026-08-27 | [link](https://mcp.lazyads.ai/mcp) |
-| LBrain | Local-first agent memory. Source, date, bind/abstain. Permanent name: lbrain.ai/claim.html | — | 2026-09-06 | — |
-| LeadFuzion Agent Store | US probate and pre-probate lead packages by county. No account; pay per package by card or USDC. | — | 2026-11-12 | [link](https://mcp.leadfuzion.ai/api/v1/mcp) |
-| Lead Green | GPU energy per million output tokens by model, GPU and configuration, with grid carbon by country. | — | 2026-10-20 | — |
-| Leadlock | Voice agents that book into the software your clients actually run, built and audited from chat. | — | 2026-11-07 | [link](https://mcp.leadlock.ai/mcp) |
-| LeadMCP | B2B contact database for AI agents: search, count, export and enrich 375M+ contacts. | — | 2026-10-12 | [link](https://mcp.leadmcp.ai) |
-| LeakRemover | For LeakRemover customers: ask about leaks found, removals and sites, and report leaked links. | — | 2026-11-16 | [link](https://leakremover.ai/api/mcp) |
-| LeapSteps | Your LeapSteps to-do list, goals and focus timer: plan the day, add tasks and move goals forward. | — | 2026-10-25 | [link](https://leapsteps.ai/mcp) |
-| Le Confidant | Statistics from your own WhatsApp chat analysis as numbers only, plus free WhatsApp text tools. | — | 2026-11-01 | [link](https://leconfidant.ai/api/mcp) |
-| Is it legit? Reviews trust checker | Scores whether a business's Google Maps reviews are genuine. Your agent collects them, we judge. | — | 2026-11-03 | [link](https://legitreviews.ai/mcp) |
-| LenDb.ai | Find US mortgage loan officers for a borrower's situation and place. Free, lender-neutral, sourced. | — | 2026-10-18 | [link](https://lendb.ai/mcp) |
-| LensHub | Team knowledge from 20 connectors, served to any MCP agent — classified, scored, access-controlled. | — | 2026-07-11 | [link](https://app.lenshub.ai/mcp) |
-| SHIP | Assign Linear, Jira or GitHub issues to an AI coding agent team that plans, builds, reviews, tests. | — | 2026-10-12 | [link](https://mcp.letsship.ai/mcp) |
-| ai.levelfour/levelfour-mcp | Cloud, SaaS and AI spend in one system of record. Each saving applied for you or shipped as code. | — | 2026-11-01 | [link](https://mcp.levelfour.ai/mcp) |
-| Levr.ai for Business Loan Brokers | Broker U.S. business loans for clients, match lenders and track deals. By Levr Technologies USA Inc. | — | 2026-11-26 | [link](https://mcp.levr.ai/mcp) |
-| Lexiel | Verify legal citations and search case law and legislation from your AI assistant. | — | 2026-10-05 | [link](https://mcp.lexiel.ai) |
-| t3-watch | An agent on call for the things nobody watches. Checks run free; your agent wakes only on a change. | — | 2026-10-24 | — |
-| LHUB agent service marketplace | Agent-to-agent service marketplace: list, find, negotiate, pay with escrow (sandbox currency). | — | 2026-11-17 | [link](https://lhub.ai/mcp/v1) |
-| Lianex — Australian price comparison | Compare prices on products sold in Australia — eBay, Amazon, JB Hi-Fi and more. Free, read-only. | — | 2026-10-25 | [link](https://api.lianex.ai/api/public/mcp) |
-| Libelus | Andamento de processos pelo número CNJ, prazos, CPF/CNPJ e jurisprudência (planos). | — | 2026-10-11 | [link](https://mcp.libelus.ai) |
-| ai.libers/libers-suite | Website analyses and Knowledge Packs for the authenticated account via OAuth 2.1 + DCR. | — | 2026-07-25 | [link](https://api.libers.ai/mcp/libers-suite) |
-| Licensy | Real-time U.S. medical license verification across all 50 states + DC. | — | 2026-06-28 | [link](https://mcp.licensy.ai/mcp) |
-| SciGround MCP (Public Beta) | Google sign-in; study_create, study_current, study_diagnostics. Remote HTTP and stdio adapter. | — | 2026-11-12 | [link](https://sciground-api-mcp-845495614928.us-west2.run.app/mcp) |
-| Conquer Fear | Fear ladders for your assistant: small exposure steps, logged attempts, real progress. | — | 2026-09-11 | [link](https://api.lifeisagame.ai/mcp/conquer-fear) |
-| Signal not Noise | AI-driven daily-focus todo app on your phone (max 3/day). View & add todos from any MCP client. | — | 2026-09-10 | [link](https://signal.lifeisagame.ai/mcp) |
-| Life Scenario | SEL practice for kids 6-14: trait guides, practice scenarios, what-to-say guides for parents. | — | 2026-10-01 | [link](https://lifescenario.ai/api/mcp) |
+| Kosmodrom | Task tracker for product teams: projects, features, tasks, bugs, team chats and code context. | — | 2026-10-06 | [link](https://mcp.kosmodrom.ai) |
