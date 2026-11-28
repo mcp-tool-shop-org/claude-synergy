@@ -2,7 +2,7 @@
 
 **Source:** smithery
 **Entries:** 200
-**Fetched:** 2026-11-26
+**Fetched:** 2026-11-28
 
 | Name | Description | Popularity | Created | Homepage |
 |------|-------------|------------|---------|----------|
